@@ -12,3 +12,13 @@ services:
         sync: false
       - key: FIREBASE_DATABASE_URL
         sync: false
+      - key: EMAIL_USER
+        value: 123v213@gmail.com
+      - key: EMAIL_PASS
+        value: "@#asdA123"
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: REPO_OWNER
+        value: Sareef6235
+      - key: REPO_NAME
+        value: muhsinu2
