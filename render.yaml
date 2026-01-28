@@ -15,7 +15,7 @@ services:
       - key: EMAIL_USER
         value: 123v213@gmail.com
       - key: EMAIL_PASS
-        value: "@#saREE#MNB"
+        value: "xdug drha kgkn jlla"
       - key: GITHUB_TOKEN
         sync: false
       - key: REPO_OWNER
