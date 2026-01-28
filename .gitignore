@@ -1,13 +1,1 @@
-node_modules/
-.DS_Store
-Thumbs.db
-*.log
-.env
-dist/
-build/
-.vscode/
-.idea/
 
-# Firebase configuration
-hn/*.json
-my-pc-*.json
