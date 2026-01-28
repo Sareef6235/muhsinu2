@@ -56,7 +56,65 @@ if (renderUrl) {
 const app = express();
 app.use(bodyParser.json());
 
-// Handle Webhook POST requests
+// CORS Middleware
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
+// API: Handle Student Creations Submission
+app.post('/api/submit-creation', async (req, res) => {
+    const { name, className, type, title, content } = req.body;
+
+    // Basic Validation
+    if (!name || !title || !content) {
+        return res.status(400).json({ success: false, error: "Missing required fields" });
+    }
+
+    // Only handling Stories automatically for now
+    if (type !== 'Story' && type !== 'Poem') {
+        return res.status(400).json({ success: false, error: "Only Stories/Poems are supported for auto-upload currently." });
+    }
+
+    try {
+        const timestamp = Date.now();
+        const safeTitle = title.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_") || "Untitled";
+        const safeName = name.replace(/[^a-zA-Z0-9]/g, "") || "Student";
+        const filename = `${safeTitle}_by_${safeName}_${timestamp}.txt`;
+        const filePath = `assets/creations/stories/${filename}`;
+
+        // Create Content
+        const fileContent = `Title: ${title}\nStudent: ${name}\nClass: ${className}\nType: ${type}\nDate: ${new Date().toLocaleString()}\n\n---\n\n${content}`;
+        const base64Content = Buffer.from(fileContent).toString('base64');
+
+        // Upload to GitHub
+        await axios.put(
+            `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`,
+            {
+                message: `New submission: ${title} by ${name}`,
+                content: base64Content
+            },
+            {
+                headers: {
+                    Authorization: `token ${githubToken}`
+                }
+            }
+        );
+
+        console.log(`✅ New story uploaded: ${filename}`);
+        res.json({ success: true, message: "Your work has been submitted and is now live in the gallery!" });
+
+    } catch (error) {
+        console.error("❌ Submission upload failed:", error.response ? error.response.data : error.message);
+        res.status(500).json({ success: false, error: "Failed to upload submission. Please try again later." });
+    }
+});
+
+// Handle Webhook POST requests (Telegram)
 app.post(`/bot${botToken}`, (req, res) => {
     bot.processUpdate(req.body);
     res.sendStatus(200);

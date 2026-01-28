@@ -170,6 +170,8 @@
     <script>
         const REPO_OWNER = "Sareef6235";
         const REPO_NAME = "muhsinu2";
+        // REPLACE WITH YOUR ACTUAL RENDER APP URL
+        const API_URL = "https://muhsinu2.onrender.com";
 
         function syncDrawings() {
             const drawingList = document.getElementById('drawings-list');
@@ -211,10 +213,15 @@
                                 fetch(file.download_url)
                                     .then(r => r.text())
                                     .then(text => {
+                                        // Simple parsing of our custom format
+                                        const cleanText = text.replace(/Title:.*\n|Student:.*\n|Class:.*\n|Type:.*\n|Date:.*\n|---/g, '').trim();
+                                        const titleMatch = text.match(/Title: (.*)/);
+                                        const title = titleMatch ? titleMatch[1] : file.name.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
+
                                         const card = document.createElement('div');
                                         card.className = 'creation-card story animate-fade-up';
-                                        const title = file.name.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
-                                        const preview = text.substring(0, 100) + "...";
+                                        const preview = cleanText.substring(0, 100) + "...";
+
                                         card.innerHTML = `
                                             <div class="story-content">
                                                 <i class="ph ph-quotes" style="font-size: 2rem; color: var(--primary-color);"></i>
@@ -234,8 +241,13 @@
         }
 
         // Form Handling Logic
-        document.getElementById('creation-submission-form').addEventListener('submit', function (e) {
+        document.getElementById('creation-submission-form').addEventListener('submit', async function (e) {
             e.preventDefault();
+
+            const btn = this.querySelector('button[type="submit"]');
+            const originalBtnText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Processing...';
 
             const name = document.getElementById('student-name').value;
             const className = document.getElementById('student-class').value;
@@ -243,6 +255,36 @@
             const title = document.getElementById('work-title').value;
             const content = document.getElementById('work-content').value;
 
+            // Strategy: 
+            // 1. Stories/Poems -> Try API first, fallback to Email
+            // 2. Drawings/Other -> Email Only (requires attachment)
+
+            if (type === 'Story' || type === 'Poem') {
+                try {
+                    const response = await fetch(`${API_URL}/api/submit-creation`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, className, type, title, content })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(result.message);
+                        this.reset();
+                        btn.disabled = false;
+                        btn.innerHTML = originalBtnText;
+                        return; // Stop here if success
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (err) {
+                    console.log("API Upload failed, falling back to email:", err);
+                    // Fallthrough to email logic below
+                }
+            }
+
+            // Email Fallback / Default for Images
             const subject = encodeURIComponent(`New ${type} Submission: ${title}`);
             const body = encodeURIComponent(
                 `Submission Details:\n` +
@@ -256,6 +298,9 @@
             );
 
             window.location.href = `mailto:123v213@gmail.com?subject=${subject}&body=${body}`;
+
+            btn.disabled = false;
+            btn.innerHTML = originalBtnText;
         });
 
         document.addEventListener('DOMContentLoaded', () => {
