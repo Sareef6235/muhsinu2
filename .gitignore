@@ -1,14 +1,4 @@
-
-node_modules/
-.DS_Store
-Thumbs.db
-*.log
-.env
-
-build/
-.vscode/
-.idea/
-
-# Firebase configuration
-hn/*.json
-my-pc-*.json
+npm run build
+git add dist build
+git commit -m "add build files"
+git push
