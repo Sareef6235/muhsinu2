@@ -7,3 +7,7 @@ dist/
 build/
 .vscode/
 .idea/
+
+# Firebase configuration
+hn/*.json
+my-pc-*.json
