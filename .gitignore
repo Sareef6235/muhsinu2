@@ -3,11 +3,12 @@ node_modules/
 Thumbs.db
 *.log
 .env
-dist/
-build/
+# dist/
+# build/
 .vscode/
 .idea/
 
 # Firebase configuration
+# firebase.json (tracked for hosting config)
 hn/*.json
 my-pc-*.json
