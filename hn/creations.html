@@ -132,7 +132,7 @@
                         </div>
 
                         <div class="form-group" style="margin-bottom: 30px;">
-                            <label
+                            <label for="work-content"
                                 style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--primary-color);">Message
                                 or Content (For Stories)</label>
                             <textarea id="work-content"
@@ -140,11 +140,20 @@
                                 style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: #fff; outline: none; resize: vertical;"></textarea>
                         </div>
 
+                        <!-- File Upload (Hidden by default, shown for Drawings) -->
+                        <div class="form-group" id="file-upload-group" style="display: none; margin-bottom: 20px;">
+                            <label
+                                style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--primary-color);">Attach
+                                File (Image/Photo)</label>
+                            <input type="file" id="submission-file" accept="image/*"
+                                style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: #fff;">
+                        </div>
+
                         <div class="submission-footer"
                             style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
                             <button type="submit" class="btn btn-primary"
                                 style="width: 100%; padding: 15px; font-size: 1rem;">
-                                <i class="ph ph-paper-plane-tilt"></i> Submit via Email
+                                <i class="ph ph-paper-plane-tilt"></i> Submit Work
                             </button>
                             <span style="color: #666; font-size: 0.85rem;">or connect directly via</span>
                             <div style="display: flex; gap: 10px;">
@@ -158,8 +167,7 @@
 
                     <p
                         style="margin-top: 40px; color: #666; font-size: 0.9rem; border-top: 1px solid var(--glass-border); padding-top: 20px;">
-                        Note: For drawings, please attach the clear photo of your work in the email that will be
-                        generated.
+                        Note: For drawings, please attach the clear photo of your work.
                     </p>
                 </div>
             </div>
@@ -240,67 +248,66 @@
                 }).catch(err => console.log("Story sync error:", err));
         }
 
-        // Form Handling Logic
+        // Toggle File Input based on Work Type
+        document.getElementById('work-type').addEventListener('change', function () {
+            const type = this.value;
+            const fileGroup = document.getElementById('file-upload-group');
+            const contentLabel = document.querySelector('label[for="work-content"]');
+
+            if (type === 'Drawing' || type === 'Other') {
+                fileGroup.style.display = 'block';
+                contentLabel.textContent = "Description or Message";
+                document.getElementById('work-content').placeholder = "Tell us a bit about your artwork...";
+            } else {
+                fileGroup.style.display = 'none';
+                contentLabel.textContent = "Message or Content (For Stories)";
+                document.getElementById('work-content').placeholder = "Write your story here...";
+            }
+        });
+
+        // Form Handling Logic (API Submission)
         document.getElementById('creation-submission-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const btn = this.querySelector('button[type="submit"]');
             const originalBtnText = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Processing...';
+            btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Sending...';
 
-            const name = document.getElementById('student-name').value;
-            const className = document.getElementById('student-class').value;
-            const type = document.getElementById('work-type').value;
-            const title = document.getElementById('work-title').value;
-            const content = document.getElementById('work-content').value;
+            const formData = new FormData();
+            formData.append('name', document.getElementById('student-name').value);
+            formData.append('className', document.getElementById('student-class').value);
+            formData.append('type', document.getElementById('work-type').value);
+            formData.append('title', document.getElementById('work-title').value);
+            formData.append('content', document.getElementById('work-content').value);
 
-            // Strategy: 
-            // 1. Stories/Poems -> Try API first, fallback to Email
-            // 2. Drawings/Other -> Email Only (requires attachment)
-
-            if (type === 'Story' || type === 'Poem') {
-                try {
-                    const response = await fetch(`${API_URL}/api/submit-creation`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, className, type, title, content })
-                    });
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        alert(result.message);
-                        this.reset();
-                        btn.disabled = false;
-                        btn.innerHTML = originalBtnText;
-                        return; // Stop here if success
-                    } else {
-                        throw new Error(result.error);
-                    }
-                } catch (err) {
-                    console.log("API Upload failed, falling back to email:", err);
-                    // Fallthrough to email logic below
-                }
+            const fileInput = document.getElementById('submission-file');
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
             }
 
-            // Email Fallback / Default for Images
-            const subject = encodeURIComponent(`New ${type} Submission: ${title}`);
-            const body = encodeURIComponent(
-                `Submission Details:\n` +
-                `-------------------\n` +
-                `Student Name: ${name}\n` +
-                `Class: ${className}\n` +
-                `Work Type: ${type}\n` +
-                `Work Title: ${title}\n\n` +
-                `Content/Message:\n${content}\n\n` +
-                `(Note: If this is a drawing, please attach the image file to this email.)`
-            );
+            try {
+                const response = await fetch(`${API_URL}/api/submit-creation`, {
+                    method: 'POST',
+                    body: formData // Browser sets Content-Type: multipart/form-data
+                });
 
-            window.location.href = `mailto:123v213@gmail.com?subject=${subject}&body=${body}`;
+                const result = await response.json();
 
-            btn.disabled = false;
-            btn.innerHTML = originalBtnText;
+                if (result.success) {
+                    alert(result.message);
+                    this.reset();
+                    document.getElementById('file-upload-group').style.display = 'none';
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                console.error("Submission error:", err);
+                alert("Something went wrong. Please try again later.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnText;
+            }
         });
 
         document.addEventListener('DOMContentLoaded', () => {

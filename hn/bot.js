@@ -1,116 +1,81 @@
-import TelegramBot from "node-telegram-bot-api";
-import axios from "axios";
-import dotenv from "dotenv";
-import admin from "firebase-admin";
-import express from "express";
-import bodyParser from "body-parser";
-import fs from "fs";
+import nodemailer from "nodemailer";
+import multer from "multer";
 
 dotenv.config();
 
-// Config from .env
-const botToken = process.env.BOT_TOKEN;
-const adminId = process.env.ADMIN_CHAT_ID;
-const githubToken = process.env.GITHUB_TOKEN;
-const repoOwner = process.env.REPO_OWNER;
-const repoName = process.env.REPO_NAME;
-const uploadPath = process.env.UPLOAD_PATH;
-const databaseURL = process.env.FIREBASE_DATABASE_URL;
-const renderUrl = process.env.RENDER_EXTERNAL_URL;
-const port = process.env.PORT || 3000;
+// ... (keep existing imports and config)
 
-// Initialize Firebase Admin
-try {
-    let credential;
-    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-        credential = admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT));
-    } else {
-        // If local, try to read the file
-        const keyData = JSON.parse(fs.readFileSync('./my-pc-895cd-firebase-adminsdk-fbsvc-b34d8c77ec.json', 'utf8'));
-        credential = admin.credential.cert(keyData);
+// Multer Config (Memory Storage for direct email attachment)
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Nodemailer Transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
-
-    admin.initializeApp({
-        credential: credential,
-        databaseURL: databaseURL
-    });
-    console.log("✅ Firebase Admin initialized.");
-} catch (error) {
-    console.error("❌ Firebase initialization failed:", error.message);
-}
-
-const db = admin.database();
-
-// Initialize Bot
-const bot = new TelegramBot(botToken);
-
-// Set Webhook for Render
-if (renderUrl) {
-    bot.setWebHook(`${renderUrl}/bot${botToken}`);
-    console.log(`📡 Webhook set to: ${renderUrl}/bot${botToken}`);
-} else {
-    console.log("⚠️ RENDER_EXTERNAL_URL not found, using polling mode (not recommended for production).");
-    // bot = new TelegramBot(botToken, { polling: true }); // Need to redeclare if switching modes
-}
-
-const app = express();
-app.use(bodyParser.json());
-
-// CORS Middleware
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
-    next();
 });
 
-// API: Handle Student Creations Submission
-app.post('/api/submit-creation', async (req, res) => {
+// API: Handle Student Creations Submission (with File Support)
+app.post('/api/submit-creation', upload.single('file'), async (req, res) => {
     const { name, className, type, title, content } = req.body;
+    const file = req.file; // The uploaded file (if any)
 
     // Basic Validation
-    if (!name || !title || !content) {
-        return res.status(400).json({ success: false, error: "Missing required fields" });
-    }
-
-    // Only handling Stories automatically for now
-    if (type !== 'Story' && type !== 'Poem') {
-        return res.status(400).json({ success: false, error: "Only Stories/Poems are supported for auto-upload currently." });
+    if (!name || (!content && !file)) {
+        return res.status(400).json({ success: false, error: "Missing required fields (Name and either Content or File)" });
     }
 
     try {
-        const timestamp = Date.now();
-        const safeTitle = title.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_") || "Untitled";
-        const safeName = name.replace(/[^a-zA-Z0-9]/g, "") || "Student";
-        const filename = `${safeTitle}_by_${safeName}_${timestamp}.txt`;
-        const filePath = `assets/creations/stories/${filename}`;
+        // 1. Prepare Email Options
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: "123v213@gmail.com", // Target email address
+            subject: `New ${type} Submission: ${title || 'Untitled'}`,
+            text: `Submission Details:\n-------------------\nStudent Name: ${name}\nClass: ${className}\nWork Type: ${type}\nWork Title: ${title}\n\nContent/Message:\n${content || '(See attached file)'}`,
+            attachments: []
+        };
 
-        // Create Content
-        const fileContent = `Title: ${title}\nStudent: ${name}\nClass: ${className}\nType: ${type}\nDate: ${new Date().toLocaleString()}\n\n---\n\n${content}`;
-        const base64Content = Buffer.from(fileContent).toString('base64');
+        // 2. Attach File if exists
+        if (file) {
+            mailOptions.attachments.push({
+                filename: file.originalname,
+                content: file.buffer
+            });
+        }
 
-        // Upload to GitHub
-        await axios.put(
-            `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`,
-            {
-                message: `New submission: ${title} by ${name}`,
-                content: base64Content
-            },
-            {
-                headers: {
-                    Authorization: `token ${githubToken}`
-                }
-            }
-        );
+        // 3. Send Email via Nodemailer
+        await transporter.sendMail(mailOptions);
+        console.log(`📧 Email sent for: ${title}`);
 
-        console.log(`✅ New story uploaded: ${filename}`);
-        res.json({ success: true, message: "Your work has been submitted and is now live in the gallery!" });
+        // 4. GitHub Upload (Keep logic for Stories/Poems)
+        if (type === 'Story' || type === 'Poem') {
+            const timestamp = Date.now();
+            const safeTitle = (title || "Untitled").replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
+            const safeName = name.replace(/[^a-zA-Z0-9]/g, "") || "Student";
+            const filename = `${safeTitle}_by_${safeName}_${timestamp}.txt`;
+            const filePath = `assets/creations/stories/${filename}`;
+
+            const fileContent = `Title: ${title}\nStudent: ${name}\nClass: ${className}\nType: ${type}\nDate: ${new Date().toLocaleString()}\n\n---\n\n${content}`;
+            const base64Content = Buffer.from(fileContent).toString('base64');
+
+            await axios.put(
+                `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`,
+                {
+                    message: `New submission: ${title} by ${name}`,
+                    content: base64Content
+                },
+                { headers: { Authorization: `token ${githubToken}` } }
+            );
+            console.log(`✅ GitHub upload success: ${filename}`);
+        }
+
+        res.json({ success: true, message: "Submission received! Email sent and gallery updated (if applicable)." });
 
     } catch (error) {
-        console.error("❌ Submission upload failed:", error.response ? error.response.data : error.message);
-        res.status(500).json({ success: false, error: "Failed to upload submission. Please try again later." });
+        console.error("❌ Submission processing failed:", error.message);
+        res.status(500).json({ success: false, error: "Failed to process submission. Please try again." });
     }
 });
 
