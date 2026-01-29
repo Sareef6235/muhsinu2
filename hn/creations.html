@@ -307,6 +307,10 @@
                     alert(result.message || 'Submitted successfully!');
                     this.reset();
                     document.getElementById('file-upload-group').style.display = 'none';
+
+                    // Refresh galleries immediately
+                    syncDrawings();
+                    syncStories();
                 } else {
                     throw new Error(result.error || 'Submission failed');
                 }

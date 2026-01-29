@@ -47,10 +47,6 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Serve Static Files (Frontend)
-// Assuming bot.js is in 'hn/' and static files are in 'hn/' or parent
-app.use(express.static(__dirname));
-
 // Multer Config (Memory Storage for direct email attachment)
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -101,7 +97,7 @@ app.post('/api/submit-creation', upload.single('file'), async (req, res) => {
             const safeTitle = (title || "Untitled").replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
             const safeName = name.replace(/[^a-zA-Z0-9]/g, "") || "Student";
             const filename = `${safeTitle}_by_${safeName}_${timestamp}.txt`;
-            const filePath = `assets/creations/stories/${filename}`;
+            const filePath = `hn/assets/creations/stories/${filename}`;
 
             const fileContent = `Title: ${title}\nStudent: ${name}\nClass: ${className}\nType: ${type}\nDate: ${new Date().toLocaleString()}\n\n---\n\n${content}`;
             const base64Content = Buffer.from(fileContent).toString('base64');
@@ -132,6 +128,9 @@ app.post(`/bot${botToken}`, (req, res) => {
     }
     res.sendStatus(200);
 });
+
+// Serve Static Files (Frontend) after API routes
+app.use(express.static(__dirname));
 
 // Serve index.html as the root
 app.get('/', (req, res) => {
