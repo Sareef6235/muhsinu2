@@ -317,7 +317,7 @@
                 }
             } catch (err) {
                 console.error("Submission error:", err);
-                alert(`Error: ${err.message}.\n\nTested URL: ${API_URL}/api/submit-creation\n\nPlease ensure your Render service (telegram-firebase-bot) is active and running.`);
+                alert(`Error: ${err.message}.\\n\\nTested URL: ${API_URL}/api/submit-creation\\n\\nPlease ensure your Render service is active and running.`);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalBtnText;
