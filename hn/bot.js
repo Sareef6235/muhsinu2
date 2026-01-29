@@ -1,9 +1,50 @@
 import nodemailer from "nodemailer";
 import multer from "multer";
+import express from 'express'; // Ensure express is imported if used explicitly, though initialized below
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Fix for __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import TelegramBot from 'node-telegram-bot-api';
+import axios from 'axios';
+import admin from 'firebase-admin';
+import dotenv from 'dotenv';
+import bodyParser from 'body-parser';
+import cors from 'cors';
 
 dotenv.config();
 
-// ... (keep existing imports and config)
+// --- Configuration ---
+const botToken = process.env.BOT_TOKEN;
+const adminId = process.env.ADMIN_CHAT_ID;
+const githubToken = process.env.GITHUB_TOKEN;
+const repoOwner = process.env.REPO_OWNER;
+const repoName = process.env.REPO_NAME;
+const uploadPath = process.env.UPLOAD_PATH || "assets/gallery";
+const port = process.env.PORT || 3000;
+
+// Firebase Init
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)),
+        databaseURL: process.env.FIREBASE_DATABASE_URL
+    });
+}
+const db = admin.database();
+
+// Telegram Bot Init
+const bot = new TelegramBot(botToken);
+const app = express();
+
+app.use(cors());
+app.use(bodyParser.json());
+
+// Serve Static Files (Frontend)
+// Assuming bot.js is in 'hn/' and static files are in 'hn/' or parent
+app.use(express.static(__dirname));
 
 // Multer Config (Memory Storage for direct email attachment)
 const upload = multer({ storage: multer.memoryStorage() });
@@ -85,7 +126,10 @@ app.post(`/bot${botToken}`, (req, res) => {
     res.sendStatus(200);
 });
 
-app.get('/', (req, res) => res.send('🤖 Madrasa Admin Bot is running!'));
+// Serve index.html as the root
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 app.listen(port, () => {
     console.log(`📡 Server is listening on port ${port}`);
