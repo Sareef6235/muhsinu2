@@ -1884,3 +1884,126 @@ footer {
         font-size: 2.5rem;
     }
 }
+/* WhatsApp Floating Button - Elementor Style */
+.whatsapp-float-wrapper {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.whatsapp-btn {
+    width: 60px;
+    height: 60px;
+    background: #25d366;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+
+.whatsapp-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+    color: #fff;
+}
+
+.whatsapp-btn::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(37, 211, 102, 0.6);
+    border-radius: 50%;
+    z-index: -1;
+    animation: pulse-whatsapp 2s infinite;
+}
+
+@keyframes pulse-whatsapp {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .whatsapp-float-wrapper {
+        bottom: 80px; /* Sit above bottom nav */
+        right: 20px;
+    }
+    .whatsapp-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 28px;
+    }
+}
+
+/* Elementor-style e-con inner for Booking section */
+.e-con-inner {
+    background: rgba(15, 15, 15, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 243, 255, 0.05);
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.e-con-inner:hover {
+    border-color: rgba(0, 243, 255, 0.3);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 243, 255, 0.1);
+}
+
+.e-con-inner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 243, 255, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* Elementor structure support */
+.dialog-message {
+    padding: 20px;
+    position: relative;
+}
+
+.elementor-location-popup {
+    background: transparent;
+}
+
+.e-con.e-parent {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.elementor-widget-heading {
+    width: 100%;
+}
+
+/* Further refinement for e-con-inner inside the nested structure */
+.dialog-message .e-con-inner {
+    margin: 30px auto;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+}

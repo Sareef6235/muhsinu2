@@ -30,7 +30,8 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Result</a>
                     <ul class="dropdown-menu">
-                        <li><a href="exam.result.html">Exam Result</a></li>
+                        <li><a href="result.html">Exam Result (New)</a></li>
+                        <li><a href="exam_result.html">Exam Result (Old)</a></li>
                         <li><a href="meelad_result.html">Meelad Result</a></li>
                     </ul>
                 </li>
@@ -101,7 +102,7 @@
                         <div id="home-result-container"
                             style="display: none; background: rgba(0, 243, 255, 0.03); border: 1px solid rgba(0, 243, 255, 0.2); padding: 25px; border-radius: 15px; margin-top: 20px; animation: fadeIn 0.5s ease;">
                             <div id="home-result-area"></div>
-                            <a href="exam.result.html" class="btn-link"
+                            <a href="result.html" class="btn-link"
                                 style="display: inline-block; margin-top: 15px; color: var(--primary-color);">View Full
                                 Transcript →</a>
                         </div>
@@ -145,128 +146,144 @@
             </div>
         </section>
 
-        <section id="booking">
-            <div class="container">
-                <h2 class="section-title">Book a Tuition Session</h2>
-                <div class="booking-container">
-                    <form class="booking-form" id="tuition-form"
-                        action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfzhjNS8F_8_BvbwYFFZMxqfmdJqMTJx2rik6C29szqPPc9EA/formResponse"
-                        method="POST" target="hidden_iframe">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="fname">First Name</label>
-                                <input type="text" name="entry.819151435" id="fname" placeholder="First Name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="lname">Last Name</label>
-                                <input type="text" name="entry.1242527177" id="lname" placeholder="Last Name" required>
-                            </div>
+        <div class="dialog-message dialog-lightbox-message">
+            <div data-elementor-type="popup" data-elementor-id="748"
+                class="elementor elementor-748 elementor-location-popup"
+                data-elementor-settings='{"prevent_scroll":"yes","a11y_navigation":"yes","triggers":{"inactivity_time":5,"inactivity":"yes"},"timing":[]}'
+                data-elementor-post-type="elementor_library" style="display: block;">
+                <div class="elementor-element elementor-element-32902fd e-flex e-con-boxed e-con e-parent"
+                    data-id="32902fd" data-element_type="container">
+                    <div class="e-con-inner">
+                        <div class="elementor-element elementor-element-4379674 elementor-widget elementor-widget-heading"
+                            data-id="4379674" data-element_type="widget" data-widget_type="heading.default">
+                            <form class="booking-form" id="tuition-form"
+                                action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfzhjNS8F_8_BvbwYFFZMxqfmdJqMTJx2rik6C29szqPPc9EA/formResponse"
+                                method="POST" target="hidden_iframe">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="fname">First Name</label>
+                                        <input type="text" name="entry.819151435" id="fname" placeholder="First Name"
+                                            required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lname">Last Name</label>
+                                        <input type="text" name="entry.1242527177" id="lname" placeholder="Last Name"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" placeholder="Your Email" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Subject (Max 8)</label>
+                                    <!-- Hidden inputs for granular Google Form mapping -->
+                                    <input type="hidden" name="entry.63709490" id="booking-subjects-hidden">
+                                    <input type="hidden" name="entry.9885691" id="booking-class-hidden">
+                                    <input type="hidden" name="entry.116107118" id="booking-price-hidden">
+
+                                    <div class="checkbox-grid" id="subject-checkboxes">
+                                        <label><input type="checkbox" name="subject[]" value="Malayalam"
+                                                data-price="500">
+                                            Malayalam</label>
+                                        <label><input type="checkbox" name="subject[]" value="Arabic" data-price="600">
+                                            Arabic</label>
+                                        <label><input type="checkbox" name="subject[]" value="Maths" data-price="700">
+                                            Maths</label>
+                                        <label><input type="checkbox" name="subject[]" value="Social Science"
+                                                data-price="550">
+                                            Social Science</label>
+                                        <label><input type="checkbox" name="subject[]" value="English" data-price="500">
+                                            English</label>
+                                        <label><input type="checkbox" name="subject[]" value="Science" data-price="650">
+                                            Science</label>
+                                        <label><input type="checkbox" name="subject[]" value="Hindi" data-price="450">
+                                            Hindi</label>
+                                        <label><input type="checkbox" name="subject[]" value="Islamic Studies"
+                                                data-price="550">
+                                            Islamic Studies</label>
+                                        <label><input type="checkbox" name="subject[]" value="Computer"
+                                                data-price="750">
+                                            Computer</label>
+                                        <label><input type="checkbox" name="subject[]" value="General Knowledge"
+                                                data-price="400">
+                                            General Knowledge</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Class</label>
+                                    <div class="radio-group classes-grid" id="class-radios">
+                                        <label class="radio-label"><input type="radio" name="class" value="1" required
+                                                data-multiplier="1"> 1</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="2"
+                                                data-multiplier="1">
+                                            2</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="3"
+                                                data-multiplier="1">
+                                            3</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="4"
+                                                data-multiplier="1">
+                                            4</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="5"
+                                                data-multiplier="1.1">
+                                            5</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="6"
+                                                data-multiplier="1.2">
+                                            6</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="7"
+                                                data-multiplier="1.3">
+                                            7</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="8"
+                                                data-multiplier="1.4">
+                                            8</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="9"
+                                                data-multiplier="1.5">
+                                            9</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="10"
+                                                data-multiplier="1.6">
+                                            10</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="+1"
+                                                data-multiplier="1.8">
+                                            +1</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="+2"
+                                                data-multiplier="2.0">
+                                            +2</label>
+                                    </div>
+                                </div>
+
+                                <div class="price-box">
+                                    <h3>Total Price: <span id="total-price">₹0</span></h3>
+                                </div>
+
+                                <div class="payment-section">
+
+                                    <!-- QR Code -->
+                                    <div class="upi-qr">
+                                        <img src="upi-qr.jpeg" alt="UPI QR Code">
+                                        <p><strong>Scan & Pay (UPI)</strong></p>
+                                        <p>UPI ID: <b>mmuhsinu2-1@okaxis</b></p>
+                                        <p>Name: Mo Mhn</p>
+                                    </div>
+
+                                    <!-- Buttons -->
+                                    <div class="payment-buttons-dual">
+                                        <button type="submit" id="btn-submit-only" class="btn-choice btn-outline">
+                                            Register Only
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                            </form>
                         </div>
-
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" placeholder="Your Email" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Subject (Max 8)</label>
-                            <!-- Hidden inputs for granular Google Form mapping -->
-                            <input type="hidden" name="entry.63709490" id="booking-subjects-hidden">
-                            <input type="hidden" name="entry.9885691" id="booking-class-hidden">
-                            <input type="hidden" name="entry.116107118" id="booking-price-hidden">
-
-                            <div class="checkbox-grid" id="subject-checkboxes">
-                                <label><input type="checkbox" name="subject[]" value="Malayalam" data-price="500">
-                                    Malayalam</label>
-                                <label><input type="checkbox" name="subject[]" value="Arabic" data-price="600">
-                                    Arabic</label>
-                                <label><input type="checkbox" name="subject[]" value="Maths" data-price="700">
-                                    Maths</label>
-                                <label><input type="checkbox" name="subject[]" value="Social Science" data-price="550">
-                                    Social Science</label>
-                                <label><input type="checkbox" name="subject[]" value="English" data-price="500">
-                                    English</label>
-                                <label><input type="checkbox" name="subject[]" value="Science" data-price="650">
-                                    Science</label>
-                                <label><input type="checkbox" name="subject[]" value="Hindi" data-price="450">
-                                    Hindi</label>
-                                <label><input type="checkbox" name="subject[]" value="Islamic Studies" data-price="550">
-                                    Islamic Studies</label>
-                                <label><input type="checkbox" name="subject[]" value="Computer" data-price="750">
-                                    Computer</label>
-                                <label><input type="checkbox" name="subject[]" value="General Knowledge"
-                                        data-price="400">
-                                    General Knowledge</label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Class</label>
-                            <div class="radio-group classes-grid" id="class-radios">
-                                <label class="radio-label"><input type="radio" name="class" value="1" required
-                                        data-multiplier="1"> 1</label>
-                                <label class="radio-label"><input type="radio" name="class" value="2"
-                                        data-multiplier="1">
-                                    2</label>
-                                <label class="radio-label"><input type="radio" name="class" value="3"
-                                        data-multiplier="1">
-                                    3</label>
-                                <label class="radio-label"><input type="radio" name="class" value="4"
-                                        data-multiplier="1">
-                                    4</label>
-                                <label class="radio-label"><input type="radio" name="class" value="5"
-                                        data-multiplier="1.1">
-                                    5</label>
-                                <label class="radio-label"><input type="radio" name="class" value="6"
-                                        data-multiplier="1.2">
-                                    6</label>
-                                <label class="radio-label"><input type="radio" name="class" value="7"
-                                        data-multiplier="1.3">
-                                    7</label>
-                                <label class="radio-label"><input type="radio" name="class" value="8"
-                                        data-multiplier="1.4">
-                                    8</label>
-                                <label class="radio-label"><input type="radio" name="class" value="9"
-                                        data-multiplier="1.5">
-                                    9</label>
-                                <label class="radio-label"><input type="radio" name="class" value="10"
-                                        data-multiplier="1.6">
-                                    10</label>
-                                <label class="radio-label"><input type="radio" name="class" value="+1"
-                                        data-multiplier="1.8">
-                                    +1</label>
-                                <label class="radio-label"><input type="radio" name="class" value="+2"
-                                        data-multiplier="2.0">
-                                    +2</label>
-                            </div>
-                        </div>
-
-                        <div class="price-box">
-                            <h3>Total Price: <span id="total-price">₹0</span></h3>
-                        </div>
-
-                        <div class="payment-section">
-
-                            <!-- QR Code -->
-                            <div class="upi-qr">
-                                <img src="upi-qr.jpeg" alt="UPI QR Code">
-                                <p><strong>Scan & Pay (UPI)</strong></p>
-                                <p>UPI ID: <b>mmuhsinu2-1@okaxis</b></p>
-                                <p>Name: Mo Mhn</p>
-                            </div>
-
-                            <!-- Buttons -->
-                            <div class="payment-buttons-dual">
-                                <button type="submit" id="btn-submit-only" class="btn-choice btn-outline">
-                                    Register Only
-                                </button>
-                            </div>
-
-                        </div>
-
-                    </form>
+                    </div>
                 </div>
             </div>
+        </div>
+        </div>
         </section>
 
         <section id="latest-sessions">
@@ -499,7 +516,7 @@
                 <i class="ph ph-calendar-plus"></i>
                 Book Tuition
             </a>
-            <a href="exam.result.html" class="nav-item">
+            <a href="result.html" class="nav-item">
                 <i class="ph ph-exam"></i>
                 <span>Result</span>
             </a>
@@ -827,6 +844,12 @@
             </div>
         </div>
     </footer>
+    <!-- WhatsApp Floating Button -->
+    <div class="whatsapp-float-wrapper">
+        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp">
+            <i class="ph-fill ph-whatsapp-logo"></i>
+        </a>
+    </div>
 </body>
 
 </html>

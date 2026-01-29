@@ -114,7 +114,72 @@
                 display: none;
             }
         }
+
+        /* WhatsApp Floating Button - Elementor Style */
+        .whatsapp-float-wrapper {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .whatsapp-btn {
+            width: 60px;
+            height: 60px;
+            background: #25d366;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            text-decoration: none;
+        }
+
+        .whatsapp-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+            color: #fff;
+        }
+
+        .whatsapp-btn::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(37, 211, 102, 0.6);
+            border-radius: 50%;
+            z-index: -1;
+            animation: pulse-whatsapp 2s infinite;
+        }
+
+        @keyframes pulse-whatsapp {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .whatsapp-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 28px;
+            }
+        }
     </style>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -299,6 +364,12 @@
         }
     </script>
 
+    <!-- WhatsApp Floating Button -->
+    <div class="whatsapp-float-wrapper">
+        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp">
+            <i class="ph-fill ph-whatsapp-logo"></i>
+        </a>
+    </div>
 </body>
 
 </html>
