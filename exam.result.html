@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Result Portal</title>
+
+    <style>
+        :root {
+            --primary: #00e5ff;
+            --bg: #0d0d0d;
+            --card: #151515;
+            --border: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: #fff;
+            font-family: system-ui, sans-serif;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--primary);
+        }
+
+        .exam-type-box {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .exam-type-box label {
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            text-align: left;
+            color: #aaa;
+        }
+
+        .info-card {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .status-pass {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .status-fail {
+            color: #ff5252;
+            font-weight: bold;
+        }
+
+        @media print {
+
+            button,
+            .exam-type-box {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="card">
+            <h1>🏫 School Result Portal</h1>
+
+            <div class="exam-type-box">
+                <label><input type="radio" name="examType" value="100" checked> Total 100</label>
+                <label><input type="radio" name="examType" value="50"> Total 50</label>
+            </div>
+
+            <input type="text" id="regno" placeholder="Enter Register Number">
+            <button onclick="showResult()">View Result</button>
+        </div>
+
+        <div id="resultBox"></div>
+
+    </div>
+
+    <script>
+        const SHEET_ID = "1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU";
+        const SHEET_NAME = "class1";
+
+        // ---------------- LOGIC ----------------
+        function getSelectedMax() {
+            return parseInt(document.querySelector('input[name="examType"]:checked').value);
+        }
+
+        function getPassMark(max) {
+            return max === 50 ? 18 : 40;
+        }
+
+        function getGrade(mark, max) {
+            const p = (mark / max) * 100;
+            if (p >= 90) return "A+";
+            if (p >= 80) return "A";
+            if (p >= 70) return "B";
+            if (p >= 60) return "C";
+            return "D";
+        }
+
+        function isArabic(t) {
+            return /[\u0600-\u06FF]/.test(t);
+        }
+
+        // ---------------- MAIN ----------------
+        async function showResult() {
+            const reg = document.getElementById("regno").value.trim().toUpperCase();
+            const rb = document.getElementById("resultBox");
+
+            if (!reg) return;
+
+            rb.innerHTML = '<div class="card" style="margin-top:20px; text-align:center;">🔍 Searching database...</div>';
+
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const json = JSON.parse(text.substring(47).slice(0, -2));
+                const cols = json.table.cols;
+                const rows = json.table.rows;
+
+                const findIdx = (keywords) => cols.findIndex(c => keywords.some(k => (c.label || "").toLowerCase().includes(k)));
+                const idxMap = {
+                    id: findIdx(['id', 'reg']),
+                    name: findIdx(['name']),
+                    class: findIdx(['class'])
+                };
+
+                const getVal = (row, idx) => {
+                    if (!row || !row.c[idx]) return "";
+                    return row.c[idx].f || String(row.c[idx].v) || "";
+                };
+
+                const studentRow = rows.find(r => getVal(r, idxMap.id).trim().toUpperCase() === reg);
+
+                if (!studentRow) {
+                    alert("Student ID not found in " + SHEET_NAME);
+                    rb.innerHTML = "";
+                    return;
+                }
+
+                const max = getSelectedMax();
+                const pass = getPassMark(max);
+
+                // Identify subject columns
+                const subjectCols = [];
+                cols.forEach((col, idx) => {
+                    const label = (col.label || "").trim();
+                    if (idx > 2 && label && !label.toLowerCase().includes('column') && !label.includes('@')) {
+                        subjectCols.push({ idx, label });
+                    }
+                });
+
+                let total = 0, totalMax = 0, failed = false;
+                let gradeSummary = { "A+": 0, "A": 0, "B": 0, "C": 0, "D": 0 };
+                let rowsHtml = "";
+
+                subjectCols.forEach(sub => {
+                    const mVal = getVal(studentRow, sub.idx);
+                    const m = parseFloat(mVal) || 0;
+
+                    if (mVal !== "-" && mVal !== "") {
+                        if (m < pass) failed = true;
+                        total += m;
+                        totalMax += max;
+                        const g = getGrade(m, max);
+                        gradeSummary[g]++;
+                        rowsHtml += `
+          <tr>
+            <td>${sub.label}</td>
+            <td>${m}</td>
+            <td>${max}</td>
+            <td>${g}</td>
+          </tr>`;
+                    }
+                });
+
+                // Class topper logic
+                const studentClass = getVal(studentRow, idxMap.class);
+                const classmates = rows.filter(r => getVal(r, idxMap.class) === studentClass);
+
+                const topper = classmates
+                    .map(r => {
+                        let sTotal = 0;
+                        subjectCols.forEach(sub => {
+                            sTotal += parseFloat(getVal(r, sub.idx)) || 0;
+                        });
+                        return { name: getVal(r, idxMap.name), total: sTotal };
+                    })
+                    .sort((a, b) => b.total - a.total)[0];
+
+                const studentName = getVal(studentRow, idxMap.name);
+                const rtl = isArabic(studentName) ? "rtl" : "ltr";
+
+                rb.innerHTML = `
+    <div class="card" style="margin-top:20px">
+      <h2 style="direction:${rtl}; text-align:${rtl === "rtl" ? "right" : "left"}">
+        ${studentName}
+      </h2>
+      <p>Reg No: ${getVal(studentRow, idxMap.id)} | Class: ${studentClass}</p>
+
+      <table>
+        <tr>
+          <th>Subject</th><th>Marks</th><th>Max</th><th>Grade</th>
+        </tr>
+        ${rowsHtml || '<tr><td colspan="4" style="text-align:center">No marks available</td></tr>'}
+      </table>
+
+      <div class="info-card">
+        <p><b>Total:</b> ${total} / ${totalMax}</p>
+        <p><b>Percentage:</b> ${totalMax > 0 ? ((total / totalMax) * 100).toFixed(2) : 0}%</p>
+        <p class="${failed ? "status-fail" : "status-pass"}">
+          ${failed ? "FAILED" : "PASSED"}
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>🏆 Class Topper</h3>
+        <p>${topper ? topper.name + " — " + topper.total : "N/A"}</p>
+      </div>
+
+      <div class="info-card">
+        <h3>📊 Grade Summary</h3>
+        <p>A+ : ${gradeSummary["A+"]}</p>
+        <p>A  : ${gradeSummary["A"]}</p>
+        <p>B  : ${gradeSummary["B"]}</p>
+        <p>C  : ${gradeSummary["C"]}</p>
+        <p>D  : ${gradeSummary["D"]}</p>
+      </div>
+      
+      <button onclick="window.print()" style="margin-top:15px; background:#444;">Print Result</button>
+    </div>`;
+
+            } catch (error) {
+                console.error(error);
+                rb.innerHTML = '<div class="card" style="margin-top:20px; color:#ff5252;">⚠️ Error connecting to database.</div>';
+            }
+        }
+    </script>
+
+</body>
+
+</html>
