@@ -18,7 +18,7 @@ import cors from 'cors';
 dotenv.config();
 
 // --- Configuration ---
-const botToken = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN;
+const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_CHAT_ID;
 const githubToken = process.env.GITHUB_TOKEN;
 const repoOwner = process.env.REPO_OWNER;
