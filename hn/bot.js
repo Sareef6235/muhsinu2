@@ -59,6 +59,9 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Diagnostic: Check if API is alive
+app.get('/api/ping', (req, res) => res.json({ success: true, message: "API is online!" }));
+
 // API: Handle Student Creations Submission (with File Support)
 app.post('/api/submit-creation', upload.single('file'), async (req, res) => {
     const { name, className, type, title, content } = req.body;
