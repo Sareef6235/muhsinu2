@@ -195,12 +195,17 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Gallery</a>
                     <ul class="dropdown-menu">
-                        <li><a href="index.html#gallerySection">Photo Gallery</a></li>
+                        <li><a href="photos.html">Photo Gallery</a></li>
                         <li><a href="gallery.html">Video Gallery</a></li>
                     </ul>
                 </li>
-                <li><a href="creations.html">Creations</a></li>
-                <li><a href="creative.html">Creative Corner</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Creative Corner</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="creative.html">Creative Corner</a></li>
+                        <li><a href="creations.html">Creations</a></li>
+                    </ul>
+                </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Result</a>
                     <ul class="dropdown-menu">
@@ -400,7 +405,59 @@
         }
     </script>
 
-    <!-- Bottom Navigation -->
+    <footer
+        style="background: #0a0a0a; border-top: 1px solid var(--glass-border); padding: 60px 0 30px; margin-top: 80px;">
+        <div class="container">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <div>
+                    <h3 style="color: var(--primary-color); margin-bottom: 20px; font-size: 1.3rem;">MIFTHAHUL HUDA
+                        MADRASA</h3>
+                    <p style="color: #888; line-height: 1.8;">Empowering students through quality education and Islamic
+                        values at Vengara S S Road.</p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Quick Links</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 12px;"><a href="index.html#about"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">About Us</a></li>
+                        <li style="margin-bottom: 12px;"><a href="index.html#booking"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Book Tuition</a></li>
+                        <li style="margin-bottom: 12px;"><a href="exam_result.html"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Exam Results</a></li>
+                        <li style="margin-bottom: 12px;"><a href="index.html#gallery"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Gallery</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Contact</h4>
+                    <p style="color: #888; margin-bottom: 10px;">📍 Vengara S S Road</p>
+                    <p style="color: #888; margin-bottom: 10px;">📞 <a href="https://wa.me/916235989198"
+                            style="color: #888; text-decoration: none;">+91 6235989198</a></p>
+                    <p style="color: #888;">✉️ Contact via WhatsApp</p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Enroll Now</h4>
+                    <p style="color: #888; margin-bottom: 20px; line-height: 1.6;">Start your learning journey with us
+                        today!</p>
+                    <a href="index.html#booking" class="btn btn-primary" style="display: inline-block;">Book a Tuition
+                        Session</a>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; text-align: center;">
+                <p style="color: #666; font-size: 0.9rem;">© 2026 MHMV. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
     <nav class="bottom-nav">
         <div class="bottom-nav-container">
             <a href="index.html#hero" class="nav-item">
@@ -415,13 +472,21 @@
                 <i class="ph ph-palette"></i>
                 <span>Corner</span>
             </a>
-            <a href="gallery.html" class="nav-item">
+            <a href="photos.html" class="nav-item">
                 <i class="ph ph-image"></i>
                 <span>Gallery</span>
+            </a>
+            <a href="index.html#booking" class="btn-book-nav">
+                <i class="ph ph-calendar-plus"></i>
+                Book Tuition
             </a>
             <a href="result.html" class="nav-item active">
                 <i class="ph ph-exam"></i>
                 <span>Result</span>
+            </a>
+            <a href="index.html#contact" class="nav-item">
+                <i class="ph ph-chat-circle"></i>
+                <span>Contact</span>
             </a>
         </div>
     </nav>

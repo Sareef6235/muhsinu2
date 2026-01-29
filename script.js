@@ -3,6 +3,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');
 
+    // Booking Modal Logic
+    const bookingLinks = document.querySelectorAll('a[href="#booking"]');
+    const bookingModal = document.querySelector('.dialog-lightbox-message');
+    const bookingModalInner = document.querySelector('.elementor-location-popup');
+
+    if (bookingModal && bookingModalInner) {
+        bookingLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                bookingModal.style.display = 'flex';
+                bookingModalInner.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            });
+        });
+
+        // Close when clicking outside content
+        bookingModal.addEventListener('click', (e) => {
+            if (e.target === bookingModal) {
+                bookingModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Ensure inner Elementor popup is visible when parent is shown
+        if (bookingModal.style.display !== 'none') {
+            bookingModalInner.style.display = 'block';
+        }
+    }
+
     if (mobileMenuBtn) {
         mobileMenuBtn.addEventListener('click', () => {
             navLinks.classList.toggle('active');
@@ -54,10 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let subjectTotal = 0;
         let multiplier = 1;
 
-        subjectCheckboxes.forEach(cb => {
-            if (cb.checked) {
-                subjectTotal += parseInt(cb.dataset.price) || 0;
-            }
+        const checkedCbs = document.querySelectorAll('#subject-checkboxes input[type="checkbox"]:checked');
+        checkedCbs.forEach(cb => {
+            subjectTotal += parseInt(cb.dataset.price) || 0;
         });
 
         const selectedClass = document.querySelector('input[name="class"]:checked');
@@ -70,11 +98,36 @@ document.addEventListener('DOMContentLoaded', () => {
         return total;
     }
 
-    if (tuitionForm) {
-        subjectCheckboxes.forEach(cb => {
-            cb.addEventListener('change', function () {
-                const checkedCount = document.querySelectorAll('#subject-checkboxes input[type="checkbox"]:checked').length;
+    function loadSubjects() {
+        const subjectGrid = document.getElementById('subject-checkboxes');
+        if (!subjectGrid) return;
 
+        const subjects = JSON.parse(localStorage.getItem("subjects")) || [
+            { name: "QURA'N HIFZ", value: "QURAN HIFZ", price: 800 },
+            { name: "FIQH", value: "FIQH", price: 100 },
+            { name: "LISAN QURA'N", value: "LISAN QURAN", price: 650 },
+            { name: "AQEEDA", value: "AQEEDA", price: 550 },
+            { name: "THAJVEETH", value: "THAJVEETH", price: 700 },
+            { name: "THAREEKH", value: "THAREEKH", price: 500 },
+            { name: "AQLAQH", value: "AQLAQH", price: 450 },
+            { name: "THAFHEEMU THILAVAH", value: "THAFHEEMU THILAVAH", price: 600 },
+            { name: "THAFSEER", value: "THAFSEER", price: 650 },
+            { name: "DUROOS – ARABIC – MALAYALAM", value: "DUROOS ARABIC MALAYALAM", price: 700 },
+            { name: "الدينيات – والأخلاق – والإملاء", value: "الدينيات والأخلاق والإملاء", price: 500, rtl: true }
+        ];
+
+        subjectGrid.innerHTML = subjects.map(s => `
+            <label ${s.rtl ? 'dir="rtl"' : ''}>
+                <input type="checkbox" name="subject[]" value="${s.value || s.name}" data-price="${s.price}">
+                ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
+            </label>
+        `).join('');
+
+        // Re-attach event listeners
+        const newCheckboxes = subjectGrid.querySelectorAll('input[type="checkbox"]');
+        newCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                const checkedCount = subjectGrid.querySelectorAll('input[type="checkbox"]:checked').length;
                 if (checkedCount > maxSubjects) {
                     this.checked = false;
                     alert("Maximum 8 subjects മാത്രം select ചെയ്യാം");
@@ -83,6 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 calculateTotal();
             });
         });
+    }
+
+    if (tuitionForm) {
+        loadSubjects();
 
         classRadios.forEach(radio => {
             radio.addEventListener('change', calculateTotal);
@@ -106,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const lname = document.getElementById('lname').value;
             const email = document.getElementById('email').value;
             const amount = calculateTotal();
-            const checkedSubjects = Array.from(subjectCheckboxes).filter(cb => cb.checked);
+            const checkedSubjects = Array.from(document.querySelectorAll('#subject-checkboxes input[type="checkbox"]:checked'));
             const selectedClass = document.querySelector('input[name="class"]:checked');
 
             if (checkedSubjects.length === 0) {
