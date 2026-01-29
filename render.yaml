@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: telegram-firebase-bot
+    name: muhsinu2
     env: node
     plan: free
     buildCommand: cd hn && npm install
