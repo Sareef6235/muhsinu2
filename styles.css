@@ -1816,6 +1816,12 @@ ul {
         }
     }
 
+    @media (min-width: 993px) {
+        .bottom-nav {
+            display: none;
+        }
+    }
+
     /* Creations Page Styles */
     .creations-page {
         padding-top: 80px;
