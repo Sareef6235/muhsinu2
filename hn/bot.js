@@ -18,7 +18,7 @@ import cors from 'cors';
 dotenv.config();
 
 // --- Configuration ---
-const botToken = process.env.BOT_TOKEN;
+const botToken = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN;
 const adminId = process.env.ADMIN_CHAT_ID;
 const githubToken = process.env.GITHUB_TOKEN;
 const repoOwner = process.env.REPO_OWNER;
@@ -36,7 +36,12 @@ if (!admin.apps.length) {
 const db = admin.database();
 
 // Telegram Bot Init
-const bot = new TelegramBot(botToken);
+let bot;
+if (botToken) {
+    bot = new TelegramBot(botToken);
+} else {
+    console.warn("⚠️ TELEGRAM_BOT_TOKEN is missing. Bot features will be disabled.");
+}
 const app = express();
 
 app.use(cors());
@@ -122,7 +127,9 @@ app.post('/api/submit-creation', upload.single('file'), async (req, res) => {
 
 // Handle Webhook POST requests (Telegram)
 app.post(`/bot${botToken}`, (req, res) => {
-    bot.processUpdate(req.body);
+    if (bot) {
+        bot.processUpdate(req.body);
+    }
     res.sendStatus(200);
 });
 
@@ -136,76 +143,77 @@ app.listen(port, () => {
 
     // Auto-connect Webhook on Render
     const externalUrl = process.env.RENDER_EXTERNAL_URL;
-    if (externalUrl && botToken) {
+    if (externalUrl && botToken && bot) {
         bot.setWebHook(`${externalUrl}/bot${botToken}`)
             .then(() => console.log(`🔗 Webhook successfully set to: ${externalUrl}/bot${botToken}`))
             .catch(err => console.error("❌ Failed to set webhook:", err.message));
     } else {
-        console.log("⚠️ RENDER_EXTERNAL_URL not found. Webhook not set (not on Render?)");
+        console.log("⚠️ Webhook skip: Missing token, external URL, or bot not initialized.");
     }
 });
 
 // --- BOT LOGIC ---
+if (bot) {
+    bot.on('message', (msg) => {
+        const chatId = msg.chat.id.toString();
+        const text = msg.text;
 
-bot.on('message', (msg) => {
-    const chatId = msg.chat.id.toString();
-    const text = msg.text;
+        if (text === '/id') {
+            bot.sendMessage(chatId, `🆔 Your Chat ID: ${chatId}`);
+            return;
+        }
 
-    if (text === '/id') {
-        bot.sendMessage(chatId, `🆔 Your Chat ID: ${chatId}`);
-        return;
-    }
+        // Live Notice Trigger for groups
+        if (msg.chat.type.includes("group")) {
+            db.ref("notice").set(true);
+        }
+    });
 
-    // Live Notice Trigger for groups
-    if (msg.chat.type.includes("group")) {
-        db.ref("notice").set(true);
-    }
-});
+    bot.on("photo", async (msg) => {
+        const chatId = msg.chat.id.toString();
 
-bot.on("photo", async (msg) => {
-    const chatId = msg.chat.id.toString();
+        // 🔒 Admin only check
+        if (chatId !== adminId) {
+            bot.sendMessage(chatId, "❌ Unauthorized. Only the Admin can upload images to the Gallery.");
+            return;
+        }
 
-    // 🔒 Admin only check
-    if (chatId !== adminId) {
-        bot.sendMessage(chatId, "❌ Unauthorized. Only the Admin can upload images to the Gallery.");
-        return;
-    }
+        try {
+            bot.sendMessage(chatId, "⏳ Processing image upload to GitHub...");
 
-    try {
-        bot.sendMessage(chatId, "⏳ Processing image upload to GitHub...");
+            const photo = msg.photo[msg.photo.length - 1];
+            const file = await bot.getFile(photo.file_id);
+            const fileUrl = `https://api.telegram.org/file/bot${botToken}/${file.file_path}`;
 
-        const photo = msg.photo[msg.photo.length - 1];
-        const file = await bot.getFile(photo.file_id);
-        const fileUrl = `https://api.telegram.org/file/bot${botToken}/${file.file_path}`;
+            const image = await axios.get(fileUrl, { responseType: "arraybuffer" });
+            const base64Image = Buffer.from(image.data).toString("base64");
+            const filename = `img_${Date.now()}.jpg`;
 
-        const image = await axios.get(fileUrl, { responseType: "arraybuffer" });
-        const base64Image = Buffer.from(image.data).toString("base64");
-        const filename = `img_${Date.now()}.jpg`;
-
-        // Upload to GitHub
-        await axios.put(
-            `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${uploadPath}/${filename}`,
-            {
-                message: "Upload image from Telegram admin",
-                content: base64Image,
-            },
-            {
-                headers: {
-                    Authorization: `token ${githubToken}`,
+            // Upload to GitHub
+            await axios.put(
+                `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${uploadPath}/${filename}`,
+                {
+                    message: "Upload image from Telegram admin",
+                    content: base64Image,
                 },
-            }
-        );
+                {
+                    headers: {
+                        Authorization: `token ${githubToken}`,
+                    },
+                }
+            );
 
-        // Update Firebase for live sync
-        const githubRawUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${uploadPath}/${filename}`;
-        db.ref("gallery").push({
-            url: githubRawUrl,
-            timestamp: Date.now()
-        });
+            // Update Firebase for live sync
+            const githubRawUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${uploadPath}/${filename}`;
+            db.ref("gallery").push({
+                url: githubRawUrl,
+                timestamp: Date.now()
+            });
 
-        bot.sendMessage(chatId, "✅ Success! Image uploaded to GitHub and live on Website Gallery.");
-    } catch (err) {
-        console.error("❌ Upload error:", err.message);
-        bot.sendMessage(chatId, "❌ Upload failed. Please check the logs.");
-    }
-});
+            bot.sendMessage(chatId, "✅ Success! Image uploaded to GitHub and live on Website Gallery.");
+        } catch (err) {
+            console.error("❌ Upload error:", err.message);
+            bot.sendMessage(chatId, "❌ Upload failed. Please check the logs.");
+        }
+    });
+}
