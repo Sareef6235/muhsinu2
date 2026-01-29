@@ -179,11 +179,48 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
-    <div class="container">
+    <header id="main-header">
+        <nav class="container">
+            <a href="index.html" class="logo">MHMV 2026.</a>
+            <ul class="nav-links">
+                <li><a href="index.html#hero">Home</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Gallery</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="index.html#gallerySection">Photo Gallery</a></li>
+                        <li><a href="gallery.html">Video Gallery</a></li>
+                    </ul>
+                </li>
+                <li><a href="creations.html">Creations</a></li>
+                <li><a href="creative.html">Creative Corner</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Result</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="result.html" class="active">Exam Result (New)</a></li>
+                        <li><a href="exam_result.html">Exam Result (Old)</a></li>
+                        <li><a href="meelad_result.html">Meelad Result</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#news-notice">News</a></li>
+                <li><a href="index.html#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-btn" aria-label="Toggle navigation">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </nav>
+    </header>
+
+    <div class="container" style="padding-top: 100px;">
 
         <div class="card">
             <h1>🏫 School Result Portal</h1>
@@ -364,6 +401,33 @@
         }
     </script>
 
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-container">
+            <a href="index.html#hero" class="nav-item">
+                <i class="ph ph-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="creations.html" class="nav-item">
+                <i class="ph ph-paint-brush"></i>
+                <span>Creations</span>
+            </a>
+            <a href="creative.html" class="nav-item">
+                <i class="ph ph-palette"></i>
+                <span>Corner</span>
+            </a>
+            <a href="gallery.html" class="nav-item">
+                <i class="ph ph-image"></i>
+                <span>Gallery</span>
+            </a>
+            <a href="result.html" class="nav-item active">
+                <i class="ph ph-exam"></i>
+                <span>Result</span>
+            </a>
+        </div>
+    </nav>
+
+    <script src="script.js"></script>
     <!-- WhatsApp Floating Button -->
     <div class="whatsapp-float-wrapper">
         <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp">
