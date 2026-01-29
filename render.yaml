@@ -7,7 +7,7 @@ services:
     startCommand: cd hn && npm start
     envVars:
       - key: TELEGRAM_BOT_TOKEN
-        sync: false
+        value: 5007427119:AAFM0YPjRKmUkdnHzXu5P-gIVDzuEZ9rmJM
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
       - key: FIREBASE_DATABASE_URL
