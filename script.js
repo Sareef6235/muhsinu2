@@ -10,6 +10,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Dropdown Toggle on Mobile
+    const dropdowns = document.querySelectorAll('.dropdown');
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', (e) => {
+                if (window.innerWidth <= 992) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('active');
+                }
+            });
+        }
+    });
+
+    // Close menu when clicking a link
+    const navItems = document.querySelectorAll('.nav-links a');
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            if (!item.classList.contains('dropdown-toggle')) {
+                navLinks.classList.remove('active');
+                mobileMenuBtn.classList.remove('active');
+            }
+        });
+    });
+
     // Creating a placeholder assets folder if not exists logic is handled by tool creation usually, 
     // but here we just ensure JS is ready.
     // Contact Form Handling (Now handled in index.html for Google Forms)
