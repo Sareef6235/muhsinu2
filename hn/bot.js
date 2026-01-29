@@ -44,11 +44,7 @@ if (botToken) {
 }
 const app = express();
 
-app.use(cors({
-    origin: '*', // For debugging connection issues
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 
 // Request Logger (for Render logs)
 app.use((req, res, next) => {
@@ -149,6 +145,12 @@ app.use(express.static(__dirname));
 // Serve index.html as the root
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Catch-all 404 (at the very bottom of routes)
+app.use((req, res) => {
+    console.warn(`[404] No route for ${req.url}`);
+    res.status(404).send(`Error Response: The page "${req.url}" could not be found on this server.`);
 });
 
 app.listen(port, () => {
