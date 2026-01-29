@@ -103,17 +103,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!subjectGrid) return;
 
         const subjects = JSON.parse(localStorage.getItem("subjects")) || [
-            { name: "QURA'N HIFZ", value: "QURAN HIFZ", price: 800 },
+            { name: "QURA'N HIFZ", value: "QURA'N HIFZ", price: 800 },
             { name: "FIQH", value: "FIQH", price: 100 },
-            { name: "LISAN QURA'N", value: "LISAN QURAN", price: 650 },
+            { name: "LISAN QURA'N", value: "LISAN QURA'N", price: 650 },
             { name: "AQEEDA", value: "AQEEDA", price: 550 },
             { name: "THAJVEETH", value: "THAJVEETH", price: 700 },
             { name: "THAREEKH", value: "THAREEKH", price: 500 },
             { name: "AQLAQH", value: "AQLAQH", price: 450 },
             { name: "THAFHEEMU THILAVAH", value: "THAFHEEMU THILAVAH", price: 600 },
             { name: "THAFSEER", value: "THAFSEER", price: 650 },
-            { name: "DUROOS – ARABIC – MALAYALAM", value: "DUROOS ARABIC MALAYALAM", price: 700 },
-            { name: "الدينيات – والأخلاق – والإملاء", value: "الدينيات والأخلاق والإملاء", price: 500, rtl: true }
+            { name: "DUROOS – ARABIC – MALAYALAM", value: "DUROOS – ARABIC – MALAYALAM", price: 700 },
+            { name: "الدينيات – والأخلاق – والإملاء", value: "الدينيات – والأخلاق – والإملاء", price: 500, rtl: true }
         ];
 
         subjectGrid.innerHTML = subjects.map(s => `

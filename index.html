@@ -153,11 +153,11 @@
             </div>
         </section>
 
-        <div class="dialog-message dialog-lightbox-message">
+        <div class="dialog-message dialog-lightbox-message" style="display: flex;">
             <div data-elementor-type="popup" data-elementor-id="748"
                 class="elementor elementor-748 elementor-location-popup"
-                data-elementor-settings='{"prevent_scroll":"yes","a11y_navigation":"yes","triggers":{"inactivity_time":5,"inactivity":"yes"},"timing":[]}'
-                data-elementor-post-type="elementor_library" style="display: none;">
+                data-elementor-settings="{&quot;prevent_scroll&quot;:&quot;yes&quot;,&quot;a11y_navigation&quot;:&quot;yes&quot;,&quot;triggers&quot;:{&quot;inactivity_time&quot;:5,&quot;inactivity&quot;:&quot;yes&quot;},&quot;timing&quot;:[]}"
+                data-elementor-post-type="elementor_library" style="display: block;">
                 <div class="elementor-element elementor-element-32902fd e-flex e-con-boxed e-con e-parent"
                     data-id="32902fd" data-element_type="container">
                     <div class="e-con-inner">
@@ -170,85 +170,90 @@
                                     <div class="form-group">
                                         <label for="fname">First Name</label>
                                         <input type="text" name="entry.819151435" id="fname" placeholder="First Name"
-                                            required>
+                                            required="">
                                     </div>
                                     <div class="form-group">
                                         <label for="lname">Last Name</label>
                                         <input type="text" name="entry.1242527177" id="lname" placeholder="Last Name"
-                                            required>
+                                            required="">
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="email">Email Address</label>
-                                    <input type="email" id="email" placeholder="Your Email" required>
+                                    <input type="email" id="email" placeholder="Your Email" required="">
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label">Subject (Max 8)</label>
                                     <!-- Hidden inputs for granular Google Form mapping -->
-                                    <input type="hidden" name="entry.63709490" id="booking-subjects-hidden">
-                                    <input type="hidden" name="entry.9885691" id="booking-class-hidden">
-                                    <input type="hidden" name="entry.116107118" id="booking-price-hidden">
+                                    <input type="hidden" name="entry.63709490" id="booking-subjects-hidden"
+                                        value="QURA'N HIFZ, LISAN QURA'N, DUROOS – ARABIC – MALAYALAM, الدينيات – والأخلاق – والإملاء">
+                                    <input type="hidden" name="entry.9885691" id="booking-class-hidden" value="3">
+                                    <input type="hidden" name="entry.116107118" id="booking-price-hidden" value="₹2650">
 
                                     <div class="checkbox-grid" id="subject-checkboxes">
                                         <label>
-                                            <input type="checkbox" name="subject[]" value="QURAN HIFZ" data-price="800">
-                                            QURA'N HIFZ
+                                            <input type="checkbox" name="subject[]" value="QURA'N HIFZ"
+                                                data-price="800">
+                                            QURA'N HIFZ <span style="font-size: 0.8rem; opacity: 0.6;">(₹800)</span>
                                         </label>
 
                                         <label>
-                                            <input type="checkbox" name="subject[]" value="FIQH" data-price="600">
-                                            FIQH
+                                            <input type="checkbox" name="subject[]" value="FIQH" data-price="100">
+                                            FIQH <span style="font-size: 0.8rem; opacity: 0.6;">(₹100)</span>
                                         </label>
 
                                         <label>
-                                            <input type="checkbox" name="subject[]" value="LISAN QURAN"
+                                            <input type="checkbox" name="subject[]" value="LISAN QURA'N"
                                                 data-price="650">
-                                            LISAN QURA'N
+                                            LISAN QURA'N <span style="font-size: 0.8rem; opacity: 0.6;">(₹650)</span>
                                         </label>
 
                                         <label>
                                             <input type="checkbox" name="subject[]" value="AQEEDA" data-price="550">
-                                            AQEEDA
+                                            AQEEDA <span style="font-size: 0.8rem; opacity: 0.6;">(₹550)</span>
                                         </label>
 
                                         <label>
                                             <input type="checkbox" name="subject[]" value="THAJVEETH" data-price="700">
-                                            THAJVEETH
+                                            THAJVEETH <span style="font-size: 0.8rem; opacity: 0.6;">(₹700)</span>
                                         </label>
 
                                         <label>
                                             <input type="checkbox" name="subject[]" value="THAREEKH" data-price="500">
-                                            THAREEKH
+                                            THAREEKH <span style="font-size: 0.8rem; opacity: 0.6;">(₹500)</span>
                                         </label>
 
                                         <label>
                                             <input type="checkbox" name="subject[]" value="AQLAQH" data-price="450">
-                                            AQLAQH
+                                            AQLAQH <span style="font-size: 0.8rem; opacity: 0.6;">(₹450)</span>
                                         </label>
 
                                         <label>
                                             <input type="checkbox" name="subject[]" value="THAFHEEMU THILAVAH"
                                                 data-price="600">
-                                            THAFHEEMU THILAVAH
+                                            THAFHEEMU THILAVAH <span
+                                                style="font-size: 0.8rem; opacity: 0.6;">(₹600)</span>
                                         </label>
 
                                         <label>
                                             <input type="checkbox" name="subject[]" value="THAFSEER" data-price="650">
-                                            THAFSEER
+                                            THAFSEER <span style="font-size: 0.8rem; opacity: 0.6;">(₹650)</span>
                                         </label>
 
                                         <label>
-                                            <input type="checkbox" name="subject[]" value="DUROOS ARABIC MALAYALAM"
+                                            <input type="checkbox" name="subject[]" value="DUROOS – ARABIC – MALAYALAM"
                                                 data-price="700">
-                                            DUROOS – ARABIC – MALAYALAM
+                                            DUROOS – ARABIC – MALAYALAM <span
+                                                style="font-size: 0.8rem; opacity: 0.6;">(₹700)</span>
                                         </label>
 
                                         <label dir="rtl">
-                                            <input type="checkbox" name="subject[]" value="الدينيات والأخلاق والإملاء"
-                                                data-price="500">
-                                            الدينيات – والأخلاق – والإملاء
+                                            <input type="checkbox" name="subject[]"
+                                                value="الدينيات – والأخلاق – والإملاء" data-price="500">
+                                            الدينيات – والأخلاق – والإملاء <span
+                                                style="font-size: 0.8rem; opacity: 0.6;">(₹500)</span>
                                         </label>
                                     </div>
                                 </div>
@@ -256,8 +261,8 @@
                                 <div class="form-group">
                                     <label class="form-label">Class</label>
                                     <div class="radio-group classes-grid" id="class-radios">
-                                        <label class="radio-label"><input type="radio" name="class" value="1" required
-                                                data-multiplier="1"> 1</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="1"
+                                                required="" data-multiplier="1"> 1</label>
                                         <label class="radio-label"><input type="radio" name="class" value="2"
                                                 data-multiplier="1">
                                             2</label>
@@ -285,10 +290,10 @@
                                         <label class="radio-label"><input type="radio" name="class" value="10"
                                                 data-multiplier="1.6">
                                             10</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="+1"
+                                        <label class="radio-label"><input type="radio" name="class" value="11"
                                                 data-multiplier="1.8">
                                             +1</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="+2"
+                                        <label class="radio-label"><input type="radio" name="class" value="12"
                                                 data-multiplier="2.0">
                                             +2</label>
                                     </div>
@@ -303,7 +308,7 @@
                                     <!-- QR Code -->
                                     <div class="upi-qr">
                                         <img src="assets/upi-qr.jpeg" alt="UPI QR Code">
-                                        <p><strong>Scan & Pay (UPI)</strong></p>
+                                        <p><strong>Scan &amp; Pay (UPI)</strong></p>
                                         <p>UPI ID: <b>mmuhsinu2-1@okaxis</b></p>
                                         <p>Name: Mo Mhn</p>
                                     </div>
