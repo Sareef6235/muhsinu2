@@ -353,11 +353,10 @@
                     .sort((a, b) => b.total - a.total)[0];
 
                 const studentName = getVal(studentRow, idxMap.name);
-                const rtl = isArabic(studentName) ? "rtl" : "ltr";
 
                 rb.innerHTML = `
     <div class="card" style="margin-top:20px">
-      <h2 style="direction:${rtl}; text-align:${rtl === "rtl" ? "right" : "left"}">
+      <h2 style="direction:ltr; text-align:left">
         ${studentName}
       </h2>
       <p>Reg No: ${getVal(studentRow, idxMap.id)} | Class: ${studentClass}</p>
