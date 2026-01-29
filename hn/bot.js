@@ -133,6 +133,16 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`📡 Server is listening on port ${port}`);
+
+    // Auto-connect Webhook on Render
+    const externalUrl = process.env.RENDER_EXTERNAL_URL;
+    if (externalUrl && botToken) {
+        bot.setWebHook(`${externalUrl}/bot${botToken}`)
+            .then(() => console.log(`🔗 Webhook successfully set to: ${externalUrl}/bot${botToken}`))
+            .catch(err => console.error("❌ Failed to set webhook:", err.message));
+    } else {
+        console.log("⚠️ RENDER_EXTERNAL_URL not found. Webhook not set (not on Render?)");
+    }
 });
 
 // --- BOT LOGIC ---
