@@ -287,19 +287,28 @@
             }
 
             try {
-                const response = await fetch(`${API_URL}/api/submit-creation`, {
+                const fetchUrl = `${API_URL}/api/submit-creation`;
+                console.log("Attempting submission to:", fetchUrl);
+
+                const response = await fetch(fetchUrl, {
                     method: 'POST',
-                    body: formData // Browser sets Content-Type: multipart/form-data
+                    body: formData
                 });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Server Error Response:", errorText);
+                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                }
 
                 const result = await response.json();
 
                 if (result.success) {
-                    alert(result.message);
+                    alert(result.message || 'Submitted successfully!');
                     this.reset();
                     document.getElementById('file-upload-group').style.display = 'none';
                 } else {
-                    throw new Error(result.error);
+                    throw new Error(result.error || 'Submission failed');
                 }
             } catch (err) {
                 console.error("Submission error:", err);
