@@ -324,10 +324,10 @@
         </section>
         <section id="video-gallery">
             <div class="container">
-                <h2 class="section-title">Video Gallery</h2>
+                <h2 class="section-title">Photo Highlights</h2>
                 <div class="video-grid" id="video-list">
                     <p class="no-items" style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">
-                        Loading official videos...</p>
+                        Loading photo highlights...</p>
                 </div>
             </div>
         </section>
@@ -590,24 +590,37 @@
                     }
                 }).catch(err => console.error("Image sync failed:", err));
 
-            // Fetch Videos
-            fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallary/videos")
+            // Fetch Photo Highlights (using same gallery folder)
+            fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallary")
                 .then(res => res.json())
                 .then(files => {
                     if (Array.isArray(files)) {
-                        const hasVideos = files.some(f => f.name.match(/\.(mp4|mov|webm)$/i));
-                        if (hasVideos) videoList.innerHTML = '';
-                        files.forEach(file => {
-                            if (file.type === "file" && file.name.match(/\.(mp4|mov|webm)$/i)) {
-                                addVideoToGallery(file.download_url);
-                            }
-                        });
+                        const imageFiles = files.filter(f => f.type === "file" && f.name.match(/\.(jpg|jpeg|png|webp|gif)$/i));
+                        if (imageFiles.length > 0) {
+                            videoList.innerHTML = '';
+                            // Display images in a grid format
+                            imageFiles.forEach(file => {
+                                const item = document.createElement("div");
+                                item.className = "gallery-item animate-fade-up";
+                                item.innerHTML = `
+                                    <img src="${file.download_url}" alt="Photo Highlight" class="gallery-img" loading="lazy">
+                                    <div class="media-info">
+                                        <a href="${file.download_url}" download target="_blank" class="download-btn">
+                                            ${downloadIcon} Download
+                                        </a>
+                                    </div>
+                                `;
+                                videoList.appendChild(item);
+                            });
+                        } else {
+                            videoList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #555;">No images found.</p>';
+                        }
                     } else {
-                        videoList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #555;">No videos found.</p>';
+                        videoList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #555;">No images found.</p>';
                     }
                 }).catch(err => {
-                    console.error("Video sync failed:", err);
-                    videoList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #555;">Video folder not found.</p>';
+                    console.error("Photo highlights sync failed:", err);
+                    videoList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #555;">Unable to load images.</p>';
                 });
 
             // 4. Automatic PDF Sync for "Latest Sessions"
