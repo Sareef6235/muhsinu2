@@ -40,7 +40,7 @@ app.post('/api/submit-creation', upload.single('file'), async (req, res) => {
             const timestamp = Date.now();
             const sanitizedTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
             const fileName = `${name.replace(/\s+/g, '_')}_${sanitizedTitle}_${timestamp}${path.extname(file.originalname)}`;
-            const filePath = `hn/assets/creations/drawings/${fileName}`;
+            const filePath = `assets/creations/drawings/${fileName}`;
             const githubApiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`;
 
             const response = await axios.put(githubApiUrl, {
@@ -56,7 +56,7 @@ app.post('/api/submit-creation', upload.single('file'), async (req, res) => {
             const timestamp = Date.now();
             const sanitizedTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
             const fileName = `${name.replace(/\s+/g, '_')}_${sanitizedTitle}_${timestamp}.txt`;
-            const filePath = `hn/assets/creations/stories/${fileName}`;
+            const filePath = `assets/creations/stories/${fileName}`;
             const fileContent = `Title: ${title}\nStudent: ${name}\nClass: ${className}\nType: ${type}\nDate: ${new Date().toLocaleDateString()}\n---\n\n${content}`;
             const githubApiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`;
 

@@ -182,7 +182,7 @@
 
         function syncDrawings() {
             const drawingList = document.getElementById('drawings-list');
-            fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/hn/assets/creations/drawings`)
+            fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/assets/creations/drawings`)
                 .then(res => res.json())
                 .then(files => {
                     if (Array.isArray(files) && files.length > 0) {
@@ -210,7 +210,7 @@
 
         function syncStories() {
             const storyList = document.getElementById('stories-list');
-            fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/hn/assets/creations/stories`)
+            fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/assets/creations/stories`)
                 .then(res => res.json())
                 .then(files => {
                     if (Array.isArray(files) && files.length > 0) {
