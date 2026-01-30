@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Madrasa Student Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --bg: #0b0b12;
+            --card: #161622;
+            --accent: #22c55e;
+            --muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui;
+            background: var(--bg);
+            color: #fff;
+        }
+
+        header {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem
+        }
+
+        header p {
+            opacity: .9
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        img,
+        video {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .primary {
+            background: var(--accent);
+            color: #000
+        }
+
+        .danger {
+            background: #ef4444;
+            color: #fff
+        }
+
+        .ghost {
+            background: #2a2a3a;
+            color: #fff
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 10px;
+            border: none;
+            background: #1f1f2d;
+            color: #fff;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: #222233;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: #000
+        }
+
+        .hidden {
+            display: none
+        }
+
+        .small {
+            font-size: .85rem;
+            color: var(--muted)
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>📚 Student Dashboard</h1>
+        <p>Class-wise Creative Gallery & Media Portal</p>
+    </header>
+
+    <div class="container">
+
+        <!-- 🔍 CLASS FILTER -->
+        <div class="tabs" id="classTabs">
+            <div class="tab active" data-class="All">All</div>
+            <div class="tab" data-class="Class 5">Class 5</div>
+            <div class="tab" data-class="Class 6">Class 6</div>
+            <div class="tab" data-class="Class 7">Class 7</div>
+            <div class="tab" data-class="Class 8">Class 8</div>
+        </div>
+
+        <!-- 🖼 GALLERY -->
+        <div id="gallery" class="grid"></div>
+
+        <hr style="margin:60px 0">
+
+        <!-- 🎒 STUDENT DASHBOARD -->
+        <div class="card">
+            <h2>👨🎓 Student Upload</h2>
+
+            <input id="sname" placeholder="Student Name">
+            <select id="sclass">
+                <option>Class 5</option>
+                <option>Class 6</option>
+                <option>Class 7</option>
+                <option>Class 8</option>
+            </select>
+
+            <select id="type">
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+            </select>
+
+            <input type="file" id="file">
+            <button class="btn primary" onclick="upload()">Submit for Approval</button>
+            <p id="msg" class="small"></p>
+        </div>
+
+        <hr style="margin:60px 0">
+
+        <!-- 🔐 ADMIN LOGIN -->
+        <div class="card">
+            <h2>🔐 Admin Login</h2>
+            <input id="email" placeholder="Email">
+            <input id="password" type="password" placeholder="Password">
+            <button class="btn primary" onclick="login()">Login</button>
+            <p id="adminMsg" class="small"></p>
+        </div>
+
+        <!-- 👨💼 ADMIN PANEL -->
+        <div id="adminPanel" class="hidden card">
+            <h2>👨💼 Admin Approval Panel</h2>
+            <div id="adminList" class="grid"></div>
+        </div>
+
+    </div>
+
+    <!-- 🔥 FIREBASE -->
+    <script type="module">
+        import { auth, db, storage } from "./firebase.js";
+        import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { collection, addDoc, onSnapshot, query, where, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        /* 🔴 FIREBASE CONFIG MOVED TO firebase.js */
+
+        /* 📤 STUDENT UPLOAD */
+        window.upload = async () => {
+            const fileInput = document.getElementById("file");
+            const sname = document.getElementById("sname");
+            const sclass = document.getElementById("sclass");
+            const type = document.getElementById("type");
+            const msg = document.getElementById("msg");
+
+            const file = fileInput.files[0];
+            if (!file) return alert("Select file");
+            const refS = ref(storage, `media/${Date.now()}-${file.name}`);
+            await uploadBytes(refS, file);
+            const url = await getDownloadURL(refS);
+
+            await addDoc(collection(db, "media"), {
+                name: sname.value,
+                class: sclass.value,
+                type: type.value,
+                url,
+                approved: false,
+                visible: true,
+                created: new Date()
+            });
+
+            msg.innerText = "Submitted! Waiting for admin approval";
+        }
+
+        /* 🖼 PUBLIC GALLERY */
+        let currentClass = "All";
+        const gallery = document.getElementById("gallery");
+
+        function loadGallery() {
+            const q = currentClass === "All"
+                ? query(collection(db, "media"), where("approved", "==", true))
+                : query(collection(db, "media"),
+                    where("approved", "==", true),
+                    where("class", "==", currentClass));
+
+            onSnapshot(q, snap => {
+                gallery.innerHTML = "";
+                snap.forEach(d => {
+                    const m = d.data();
+                    gallery.innerHTML += `
+    <div class="card">
+     ${m.type === "image"
+                            ? `<img src="${m.url}">`
+                            : `<video src="${m.url}" controls></video>`}
+     <p class="small">${m.name} • ${m.class}</p>
+    </div>`;
+                });
+            });
+        }
+        loadGallery();
+
+        /* 🔍 CLASS TABS */
+        document.querySelectorAll(".tab").forEach(t => {
+            t.onclick = () => {
+                document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+                t.classList.add("active");
+                currentClass = t.dataset.class;
+                loadGallery();
+            }
+        });
+
+        /* 🔐 ADMIN LOGIN */
+        window.login = () => {
+            const email = document.getElementById("email");
+            const password = document.getElementById("password");
+            const adminMsg = document.getElementById("adminMsg");
+
+            signInWithEmailAndPassword(auth, email.value, password.value)
+                .then(() => adminMsg.innerText = "Admin logged in")
+                .catch(e => adminMsg.innerText = e.message);
+        }
+
+        /* 👨💼 ADMIN PANEL */
+        const adminPanel = document.getElementById("adminPanel");
+        const adminList = document.getElementById("adminList");
+
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                adminPanel.classList.remove("hidden");
+                onSnapshot(collection(db, "media"), snap => {
+                    adminList.innerHTML = "";
+                    snap.forEach(d => {
+                        const m = d.data();
+                        adminList.innerHTML += `
+     <div class="card">
+      ${m.type === "image"
+                                ? `<img src="${m.url}">`
+                                : `<video src="${m.url}" controls></video>`}
+      <p class="small">${m.name} • ${m.class}</p>
+      <div class="admin-actions">
+       <button class="btn primary" onclick="approve('${d.id}')">Approve</button>
+       <button class="btn ghost" onclick="toggle('${d.id}',${m.visible})">Hide</button>
+       <button class="btn danger" onclick="removeItem('${d.id}')">Delete</button>
+      </div>
+     </div>`;
+                    });
+                });
+            }
+        });
+
+        /* ADMIN ACTIONS */
+        window.approve = id => updateDoc(doc(db, "media", id), { approved: true });
+        window.toggle = (id, v) => updateDoc(doc(db, "media", id), { visible: !v });
+        window.removeItem = id => deleteDoc(doc(db, "media", id));
+
+    </script>
+
+</body>
+
+</html>

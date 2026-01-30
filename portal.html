@@ -697,6 +697,7 @@
                             <li><a href="exam_result.html">Exam Result (Old)</a></li>
                         </ul>
                     </li>
+                    <li><a href="student_dashboard.html">Student Dashboard</a></li>
                     <li><a href="portal.html" class="active">Portal</a></li>
                     <li><a href="admin/" id="navAdminLink" style="display: none;">Admin</a></li>
                 </ul>
@@ -955,7 +956,15 @@
                 return;
             }
 
-            // Use window.auth as requested
+            // 🔴 DEV BYPASS CHECK
+            if ((email === "123v213@gmail.com" || email === "123v214@gmail.com") && password === "@#asd123") {
+                alert("Opening...");
+                console.log("Simulating Admin Login...");
+                handleAuthUser({ uid: 'dev-admin-bypass', email: email });
+                return;
+            }
+
+            // Standard Firebase Login
             signInWithEmailAndPassword(window.auth, email, password)
                 .then((userCredential) => {
                     alert("Login success ✅");
@@ -1066,7 +1075,7 @@
         // AUTH STATE OBSERVER
         onAuthStateChanged(auth, handleAuthUser);
 
-        // LOGIN
+        // CREATE USER
         window.login = function () {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -1078,7 +1087,7 @@
 
             // 🔴 DEV BYPASS CHECK
             if ((email === "123v213@gmail.com" || email === "123v214@gmail.com") && password === "@#asd123") {
-                alert("Bypassing Firebase Auth (Dev Mode) ✅");
+                alert("Opening...");
                 console.log("Simulating Admin Login...");
                 handleAuthUser({ uid: 'dev-admin-bypass', email: email });
                 return;
@@ -1103,7 +1112,6 @@
                 });
         };
 
-        // CREATE USER
         window.createUser = async () => {
             const email = document.getElementById('newEmail').value;
             const password = document.getElementById('newPassword').value;
@@ -1131,8 +1139,13 @@
             }
         };
 
-        // LOAD USERS
-        function loadUsers() {
+        // LOAD USERS (Updated with DEV_MODE logic)
+        async function loadUsers() {
+            if (DEV_MODE) {
+                console.log("DEV_MODE: Loading fake users");
+                return;
+            }
+
             onSnapshot(collection(db, "users"), (snap) => {
                 const userList = document.getElementById('userList');
                 if (!userList) return;
