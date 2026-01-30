@@ -72,19 +72,8 @@
                 <input id="email" type="email" placeholder="Your Email" required>
 
                 <h3>Subjects</h3>
-                <div class="checkbox-grid">
-                    <label><input type="checkbox" data-price="800" value="QURAN HIFZ"> QURAN HIFZ</label>
-                    <label><input type="checkbox" data-price="100" value="FIQH"> FIQH</label>
-                    <label><input type="checkbox" data-price="650" value="LISAN QURAN"> LISAN QURAN</label>
-                    <label><input type="checkbox" data-price="550" value="AQEEDA"> AQEEDA</label>
-                    <label><input type="checkbox" data-price="700" value="THAJVEETH"> THAJVEETH</label>
-                    <label><input type="checkbox" data-price="500" value="THAREEKH"> THAREEKH</label>
-                    <label><input type="checkbox" data-price="450" value="AQLAQH"> AQLAQH</label>
-                    <label><input type="checkbox" data-price="600" value="THAFHEEMU THILAVAH"> THAFHEEMU
-                        THILAVAH</label>
-                    <label><input type="checkbox" data-price="650" value="THAFSEER"> THAFSEER</label>
-                    <label dir="rtl"><input type="checkbox" data-price="500" value="الدينيات"> الدينيات والأخلاق
-                        والإملاء</label>
+                <div class="checkbox-grid" id="subjectsContainer">
+                    Loading subjects...
                 </div>
 
                 <input id="studentClass" placeholder="Class (1–12)" required>
@@ -122,37 +111,75 @@
         import { signInWithEmailAndPassword, onAuthStateChanged }
             from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        /* ===== PRICE CALC ===== */
+        /* ===== RENDER SUBJECTS ===== */
+        const subjectsContainer = document.getElementById("subjectsContainer");
         const totalEl = document.getElementById("total-price");
-        document.querySelectorAll("input[type=checkbox]").forEach(cb => {
-            cb.addEventListener("change", () => {
-                let total = 0;
-                document.querySelectorAll("input[type=checkbox]:checked")
-                    .forEach(c => total += Number(c.dataset.price));
-                totalEl.textContent = total;
-            });
-        });
+
+        async function loadSubjects() {
+            try {
+                const q = query(collection(db, "subjects"), orderBy("name"));
+                const snap = await getDocs(q);
+                subjectsContainer.innerHTML = "";
+
+                if (snap.empty) {
+                    subjectsContainer.innerHTML = "<p>No subjects available yet.</p>";
+                    return;
+                }
+
+                snap.forEach(d => {
+                    const s = d.data();
+                    const label = document.createElement("label");
+                    if (s.rtl) label.dir = "rtl";
+
+                    label.innerHTML = `
+                        <input type="checkbox" data-price="${s.price}" value="${s.name}">
+                        ${s.name} ${s.rtl ? '<span style="font-size: 0.7rem; color: #bc13fe; border: 1px solid #bc13fe; padding: 2px 5px; border-radius: 4px; margin: 0 5px;">Arabic</span>' : ''}
+                    `;
+
+                    const cb = label.querySelector("input");
+                    cb.addEventListener("change", updatePrice);
+                    subjectsContainer.appendChild(label);
+                });
+            } catch (err) {
+                console.error("Error loading subjects:", err);
+                subjectsContainer.innerHTML = "Error loading subjects.";
+            }
+        }
+
+        function updatePrice() {
+            let total = 0;
+            document.querySelectorAll("#subjectsContainer input[type=checkbox]:checked")
+                .forEach(c => total += Number(c.dataset.price));
+            totalEl.textContent = total;
+        }
+
+        loadSubjects();
 
         /* ===== FORM SUBMIT ===== */
         document.getElementById("bookingForm").addEventListener("submit", async e => {
             e.preventDefault();
             const subjects = [];
-            document.querySelectorAll("input[type=checkbox]:checked").forEach(c => subjects.push(c.value));
-            if (!subjects.length) { alert("Select subject"); return; }
+            document.querySelectorAll("#subjectsContainer input[type=checkbox]:checked").forEach(c => subjects.push(c.value));
+            if (!subjects.length) { alert("Select at least one subject"); return; }
 
-            await addDoc(collection(db, "bookings"), {
-                firstName: fname.value,
-                lastName: lname.value,
-                email: email.value,
-                class: studentClass.value,
-                subjects,
-                total: Number(totalEl.textContent),
-                createdAt: serverTimestamp()
-            });
+            try {
+                await addDoc(collection(db, "bookings"), {
+                    firstName: fname.value,
+                    lastName: lname.value,
+                    email: email.value,
+                    class: studentClass.value,
+                    subjects,
+                    total: Number(totalEl.textContent),
+                    createdAt: serverTimestamp()
+                });
 
-            alert("Booking Submitted");
-            e.target.reset();
-            totalEl.textContent = 0;
+                alert("Booking Submitted Successfully!");
+                e.target.reset();
+                totalEl.textContent = 0;
+            } catch (err) {
+                console.error("Error submitting booking:", err);
+                alert("Failed to submit booking. Please try again.");
+            }
         });
 
         /* ===== ADMIN LOGIN ===== */
@@ -175,13 +202,13 @@
             snap.forEach(d => {
                 const b = d.data();
                 list.innerHTML += `
-   <div class="card">
-   <b>${b.firstName} ${b.lastName}</b><br>
-   Email: ${b.email}<br>
-   Class: ${b.class}<br>
-   Subjects: ${b.subjects.join(", ")}<br>
-   <b>₹${b.total}</b>
-   </div>`;
+    <div class="card">
+    <b>${b.firstName} ${b.lastName}</b><br>
+    Email: ${b.email}<br>
+    Class: ${b.class}<br>
+    Subjects: ${b.subjects.join(", ")}<br>
+    <b>₹${b.total}</b>
+    </div>`;
             });
         }
 

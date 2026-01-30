@@ -697,25 +697,19 @@
         </div>
     </footer>
 
-    <script>
+    <script type="module">
+        import { db } from "../firebase.js";
+        import {
+            collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
         const ADMIN_EMAIL = "123v213@gmail.com";
         const ADMIN_PASS = "@#asd123";
 
-        let subjects = JSON.parse(localStorage.getItem("subjects")) || [
-            { name: "QURA'N HIFZ", price: 800 },
-            { name: "FIQH", price: 100 },
-            { name: "LISAN QURA'N", price: 650 },
-            { name: "AQEEDA", price: 550 },
-            { name: "THAJVEETH", price: 700 },
-            { name: "THAREEKH", price: 500 },
-            { name: "AQLAQH", price: 450 },
-            { name: "THAFHEEMU THILAVAH", price: 600 },
-            { name: "THAFSEER", price: 650 },
-            { name: "DUROOS – ARABIC – MALAYALAM", price: 700 },
-            { name: "الدينيات – والأخلاق – والإملاء", price: 500, rtl: true }
-        ];
+        let subjects = [];
+        let editingId = null;
 
-        let editingIndex = -1;
+        const subjectsRef = collection(db, "subjects");
 
         function checkAuth() {
             if (sessionStorage.getItem("adminLoggedIn") === "true") {
@@ -723,7 +717,7 @@
             }
         }
 
-        function handleLogin() {
+        window.handleLogin = function () {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
             if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
@@ -734,14 +728,20 @@
             }
         }
 
-        function logout() {
+        window.logout = function () {
             sessionStorage.removeItem("adminLoggedIn");
             window.location.reload();
         }
 
+        // Real-time synchronization with Firestore
+        onSnapshot(query(subjectsRef, orderBy("name")), (snapshot) => {
+            subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderAdminSubjects();
+        });
+
         function renderAdminSubjects() {
             const grid = document.getElementById('adminSubjectGrid');
-            grid.innerHTML = subjects.map((s, i) => `
+            grid.innerHTML = subjects.map((s) => `
                 <div class="subject-item">
                     <div class="subject-info">
                         <div class="subject-name ${s.rtl ? 'rtl' : ''}">
@@ -750,10 +750,10 @@
                         <div class="subject-price">₹${s.price}</div>
                     </div>
                     <div style="display: flex; gap: 12px;">
-                        <button class="admin-btn admin-btn-secondary" style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(${i})">
+                        <button class="admin-btn admin-btn-secondary" style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject('${s.id}')">
                             <i class="ph ph-pencil"></i> Edit
                         </button>
-                        <button class="admin-btn" style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;" onclick="deleteSubject(${i})">
+                        <button class="admin-btn" style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;" onclick="deleteSubject('${s.id}')">
                             <i class="ph ph-trash"></i>
                         </button>
                     </div>
@@ -761,48 +761,55 @@
             `).join('');
         }
 
-        function addOrUpdateSubject() {
+        window.addOrUpdateSubject = async function () {
             const nameEl = document.getElementById('subName');
             const priceEl = document.getElementById('subPrice');
             const rtlEl = document.getElementById('subRTL');
 
             if (!nameEl.value || !priceEl.value) return alert("Validation Failed: All fields required");
 
-            const newSub = {
+            const subjectData = {
                 name: nameEl.value,
                 price: parseFloat(priceEl.value),
                 rtl: rtlEl.checked
             };
 
-            if (editingIndex > -1) {
-                subjects[editingIndex] = newSub;
-                editingIndex = -1;
-            } else {
-                subjects.push(newSub);
+            try {
+                if (editingId) {
+                    await updateDoc(doc(db, "subjects", editingId), subjectData);
+                    editingId = null;
+                } else {
+                    await addDoc(subjectsRef, subjectData);
+                }
+
+                nameEl.value = "";
+                priceEl.value = "";
+                rtlEl.checked = false;
+            } catch (error) {
+                console.error("Error saving subject:", error);
+                alert("Failed to synchronize data with cloud.");
             }
-
-            localStorage.setItem("subjects", JSON.stringify(subjects));
-            renderAdminSubjects();
-
-            nameEl.value = "";
-            priceEl.value = "";
-            rtlEl.checked = false;
         }
 
-        function editSubject(i) {
-            editingIndex = i;
-            const s = subjects[i];
-            document.getElementById('subName').value = s.name;
-            document.getElementById('subPrice').value = s.price;
-            document.getElementById('subRTL').checked = s.rtl || false;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.editSubject = function (id) {
+            editingId = id;
+            const s = subjects.find(sub => sub.id === id);
+            if (s) {
+                document.getElementById('subName').value = s.name;
+                document.getElementById('subPrice').value = s.price;
+                document.getElementById('subRTL').checked = s.rtl || false;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
-        function deleteSubject(i) {
-            if (confirm("Confirm permanent removal of this subject?")) {
-                subjects.splice(i, 1);
-                localStorage.setItem("subjects", JSON.stringify(subjects));
-                renderAdminSubjects();
+        window.deleteSubject = async function (id) {
+            if (confirm("Confirm permanent removal of this subject from the cloud?")) {
+                try {
+                    await deleteDoc(doc(db, "subjects", id));
+                } catch (error) {
+                    console.error("Error deleting subject:", error);
+                    alert("Failed to delete subject.");
+                }
             }
         }
 
@@ -825,7 +832,6 @@
         });
 
         checkAuth();
-        renderAdminSubjects();
     </script>
 </body>
 
