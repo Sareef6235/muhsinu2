@@ -210,74 +210,7 @@
                                     <input type="hidden" name="entry.116107118" id="booking-price-hidden" value="">
 
                                     <div class="checkbox-grid" id="subject-checkboxes">
-                                        <label>
-                                            <input type="checkbox" name="subject[]" value="QURA'N HIFZ (₹800"
-                                                data-price="800">
-                                            QURA'N HIFZ <span style="font-size: 0.8rem; opacity: 0.6;">(₹800)</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="checkbox" name="subject[]" value="FIQH (₹100)"
-                                                data-price="100">
-                                            FIQH <span style="font-size: 0.8rem; opacity: 0.6;">(₹100)</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="checkbox" name="subject[]" value="LISAN QURA'N (₹650)"
-                                                data-price="650">
-                                            LISAN QURA'N <span style="font-size: 0.8rem; opacity: 0.6;">(₹650)</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="checkbox" name="subject[]" value="AQEEDA (₹550)"
-                                                data-price="550">
-                                            AQEEDA <span style="font-size: 0.8rem; opacity: 0.6;">(₹550)</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="checkbox" name="subject[]" value="THAJVEETH (₹700)"
-                                                data-price="700">
-                                            THAJVEETH <span style="font-size: 0.8rem; opacity: 0.6;">(₹700)</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="checkbox" name="subject[]" value="THAREEKH (₹500)"
-                                                data-price="500">
-                                            THAREEKH <span style="font-size: 0.8rem; opacity: 0.6;">(₹500)</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="checkbox" name="subject[]" value="AQLAQH (₹450)"
-                                                data-price="450">
-                                            AQLAQH <span style="font-size: 0.8rem; opacity: 0.6;">(₹450)</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="checkbox" name="subject[]" value="THAFHEEMU THILAVAH (₹600)"
-                                                data-price="600">
-                                            THAFHEEMU THILAVAH <span
-                                                style="font-size: 0.8rem; opacity: 0.6;">(₹600)</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="checkbox" name="subject[]" value="THAFSEER (₹650)"
-                                                data-price="650">
-                                            THAFSEER <span style="font-size: 0.8rem; opacity: 0.6;">(₹650)</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="checkbox" name="subject[]"
-                                                value="DUROOS – ARABIC – MALAYALAM (₹700)" data-price="700">
-                                            DUROOS – ARABIC – MALAYALAM <span
-                                                style="font-size: 0.8rem; opacity: 0.6;">(₹700)</span>
-                                        </label>
-
-                                        <label dir="rtl">
-                                            <input type="checkbox" name="subject[]"
-                                                value="الدينيات – والأخلاق – والإملاء(500₹)" data-price="500">
-                                            الدينيات – والأخلاق – والإملاء <span
-                                                style="font-size: 0.8rem; opacity: 0.6;">(₹500)</span>
-                                        </label>
+                                        Loading subjects...
                                     </div>
                                 </div>
 
@@ -577,10 +510,48 @@
 
         if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
             firebase.initializeApp(firebaseConfig);
-            const db = firebase.database();
+            const dbRef = firebase.database();
+
+            // Initialize Firestore for Dynamic Subjects
+            const db = firebase.firestore();
+
+            // 1. Dynamic Subject Loader
+            const subjectContainer = document.getElementById('subject-checkboxes');
+            const totalPriceEl = document.getElementById('total-price');
+
+            function updateTotalPrice() {
+                let total = 0;
+                document.querySelectorAll('#subject-checkboxes input:checked').forEach(cb => {
+                    total += Number(cb.dataset.price);
+                });
+                totalPriceEl.textContent = `₹${total}`;
+                document.getElementById('booking-price-hidden').value = total;
+            }
+
+            db.collection("subjects").where("active", "==", true).orderBy("name").onSnapshot(snap => {
+                subjectContainer.innerHTML = "";
+                snap.forEach(doc => {
+                    const s = doc.data();
+                    const label = document.createElement('label');
+                    if (s.rtl) label.dir = 'rtl';
+                    label.innerHTML = `
+                        <input type="checkbox" name="subject[]" value="${s.name} (₹${s.price})" data-price="${s.price}">
+                        ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
+                    `;
+                    const input = label.querySelector('input');
+                    input.addEventListener('change', () => {
+                        updateTotalPrice();
+                        // Update Google Form mapping
+                        const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
+                            .map(c => c.value).join(', ');
+                        document.getElementById('booking-subjects-hidden').value = selected;
+                    });
+                    subjectContainer.appendChild(label);
+                });
+            });
 
             // 2. Real-time Listeners
-            db.ref("notice").on("value", function (snapshot) {
+            dbRef.ref("notice").on("value", function (snapshot) {
                 if (snapshot.val() === true) {
                     const target = document.getElementById("gallerySection");
                     if (target) {

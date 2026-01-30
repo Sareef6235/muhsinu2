@@ -700,7 +700,7 @@
     <script type="module">
         import { db } from "../firebase.js";
         import {
-            collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy
+            collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const ADMIN_EMAIL = "123v213@gmail.com";
@@ -779,7 +779,11 @@
                     await updateDoc(doc(db, "subjects", editingId), subjectData);
                     editingId = null;
                 } else {
-                    await addDoc(subjectsRef, subjectData);
+                    await addDoc(subjectsRef, {
+                        ...subjectData,
+                        active: true,
+                        createdAt: serverTimestamp()
+                    });
                 }
 
                 nameEl.value = "";
