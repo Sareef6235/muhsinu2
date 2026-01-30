@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | MHMV</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -307,7 +307,7 @@
 <body>
 
     <!-- Login Screen -->
-    <div id="loginOverlay" class="admin-login-overlay">
+    <div id="loginOverlay" class="admin-login-overlay hidden">
         <div class="login-card">
             <div
                 style="width: 70px; height: 70px; background: var(--primary-gradient); border-radius: 20px; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center;">
@@ -327,32 +327,32 @@
 
     <header id="main-header">
         <nav class="container">
-            <a href="../index.html" class="logo">MHMV 2026.</a>
+            <a href="index.html" class="logo">MHMV 2026.</a>
             <ul class="nav-links">
-                <li><a href="../index.html">Home</a></li>
+                <li><a href="index.html">Home</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Gallery</a>
                     <ul class="dropdown-menu">
-                        <li><a href="../photos.html">Photo Gallery</a></li>
-                        <li><a href="../gallery.html">Video Gallery</a></li>
+                        <li><a href="photos.html">Photo Gallery</a></li>
+                        <li><a href="gallery.html">Video Gallery</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Creative</a>
                     <ul class="dropdown-menu">
-                        <li><a href="../creative.html">Creative Corner</a></li>
-                        <li><a href="../creations.html">Creations</a></li>
+                        <li><a href="creative.html">Creative Corner</a></li>
+                        <li><a href="creations.html">Creations</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Results</a>
                     <ul class="dropdown-menu">
-                        <li><a href="../result.html">Exam (New)</a></li>
-                        <li><a href="../exam_result.html">Exam (Old)</a></li>
-                        <li><a href="../meelad_result.html">Meelad</a></li>
+                        <li><a href="result.html">Exam (New)</a></li>
+                        <li><a href="exam_result.html">Exam (Old)</a></li>
+                        <li><a href="meelad_result.html">Meelad</a></li>
                     </ul>
                 </li>
-                <li><a href="./" style="font-weight: 600; color: var(--primary-color);">Admin</a></li>
+                <li><a href="admin_index.html" style="font-weight: 600; color: var(--primary-color);">Admin</a></li>
                 <li><button onclick="logout()" class="admin-btn-secondary"
                         style="padding: 10px 20px; font-size: 0.8rem; border-radius: 8px;">Logout</button></li>
             </ul>
@@ -389,17 +389,17 @@
                         </thead>
                         <tbody id="tbody">
                             <tr>
-                                <td><a href="../index.html" class="file-link"><i class="ph-bold ph-house"></i>
+                                <td><a href="index.html" class="file-link"><i class="ph-bold ph-house"></i>
                                         index.html</a></td>
                                 <td style="color: #888;">Main Homepage & Landing</td>
                                 <td style="color: #00ff88; font-weight: 600;">ACTIVE</td>
-                                <td style="text-align: right;"><a href="../index.html"
+                                <td style="text-align: right;"><a href="index.html"
                                         class="admin-btn admin-btn-secondary"
                                         style="padding: 8px 15px; font-size: 0.75rem;">Launch</a></td>
                             </tr>
                             <tr>
-                                <td><a href="./index.html" class="file-link"><i class="ph-bold ph-lock"></i>
-                                        admin/index.html</a></td>
+                                <td><a href="admin_index.html" class="file-link"><i class="ph-bold ph-lock"></i>
+                                        admin_index.html</a></td>
                                 <td style="color: #888;">Management Dashboard</td>
                                 <td style="color: #00ff88; font-weight: 600;">ACTIVE</td>
                                 <td style="text-align: right;"><span
@@ -407,29 +407,29 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><a href="../result.html" class="file-link"><i class="ph-bold ph-exam"></i>
+                                <td><a href="result.html" class="file-link"><i class="ph-bold ph-exam"></i>
                                         result.html</a></td>
                                 <td style="color: #888;">Generic Results Portal</td>
                                 <td style="color: #00ff88; font-weight: 600;">ACTIVE</td>
-                                <td style="text-align: right;"><a href="../result.html"
+                                <td style="text-align: right;"><a href="result.html"
                                         class="admin-btn admin-btn-secondary"
                                         style="padding: 8px 15px; font-size: 0.75rem;">Launch</a></td>
                             </tr>
                             <tr>
-                                <td><a href="../creations.html" class="file-link"><i class="ph-bold ph-paint-brush"></i>
+                                <td><a href="creations.html" class="file-link"><i class="ph-bold ph-paint-brush"></i>
                                         creations.html</a></td>
                                 <td style="color: #888;">Student Creation Gallery</td>
                                 <td style="color: #00ff88; font-weight: 600;">ACTIVE</td>
-                                <td style="text-align: right;"><a href="../creations.html"
+                                <td style="text-align: right;"><a href="creations.html"
                                         class="admin-btn admin-btn-secondary"
                                         style="padding: 8px 15px; font-size: 0.75rem;">Launch</a></td>
                             </tr>
                             <tr>
-                                <td><a href="../gallery.html" class="file-link"><i class="ph-bold ph-video"></i>
+                                <td><a href="gallery.html" class="file-link"><i class="ph-bold ph-video"></i>
                                         gallery.html</a></td>
                                 <td style="color: #888;">Video Archive</td>
                                 <td style="color: #00ff88; font-weight: 600;">ACTIVE</td>
-                                <td style="text-align: right;"><a href="../gallery.html"
+                                <td style="text-align: right;"><a href="gallery.html"
                                         class="admin-btn admin-btn-secondary"
                                         style="padding: 8px 15px; font-size: 0.75rem;">Launch</a></td>
                             </tr>
@@ -478,51 +478,84 @@
         </div>
     </footer>
 
-    <script>
-        const ADMIN_EMAIL = "123v213@gmail.com";
-        const ADMIN_PASS = "@#asd123";
+    <script type="module">
+        import { auth, db } from "./firebase.js";
+        import {
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import {
+            collection, addDoc, updateDoc, deleteDoc, doc, getDoc, onSnapshot, query, orderBy, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        let subjects = JSON.parse(localStorage.getItem("subjects")) || [
-            { name: "QURA'N HIFZ", price: 800 },
-            { name: "FIQH", price: 100 },
-            { name: "LISAN QURA'N", price: 650 },
-            { name: "AQEEDA", price: 550 },
-            { name: "THAJVEETH", price: 700 },
-            { name: "THAREEKH", price: 500 },
-            { name: "AQLAQH", price: 450 },
-            { name: "THAFHEEMU THILAVAH", price: 600 },
-            { name: "THAFSEER", price: 650 },
-            { name: "DUROOS – ARABIC – MALAYALAM", price: 700 },
-            { name: "الدينيات – والأخلاق – والإملاء", price: 500, rtl: true }
-        ];
+        let subjects = [];
+        let editingId = null;
 
-        let editingIndex = -1;
+        const subjectsRef = collection(db, "subjects");
 
-        function checkAuth() {
-            if (sessionStorage.getItem("adminLoggedIn") === "true") {
-                document.getElementById('loginOverlay').classList.add('hidden');
+        // CHECK AUTH STATE & ROLE
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const snap = await getDoc(doc(db, "users", user.uid));
+                    if (snap.exists() && snap.data().role === "admin") {
+                        document.getElementById('loginOverlay').classList.add('hidden');
+                        // Start real-time sync only if authorized
+                        startSync();
+                    } else {
+                        alert("Access Denied: Administrative privileges required.");
+                        await signOut(auth);
+                        showLogin();
+                    }
+                } catch (err) {
+                    console.error("Auth verification error:", err);
+                    showLogin();
+                }
+            } else {
+                showLogin();
             }
+        });
+
+        function showLogin() {
+            document.getElementById('loginOverlay').classList.remove('hidden');
         }
 
-        function handleLogin() {
+        window.handleLogin = async function () {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
-            if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
-                sessionStorage.setItem("adminLoggedIn", "true");
-                document.getElementById('loginOverlay').classList.add('hidden');
-            } else {
-                alert("Unauthorized Access Attempt Detected");
+
+            if (!email || !pass) return alert("Please enter both email and password.");
+
+            try {
+                const cred = await signInWithEmailAndPassword(auth, email, pass);
+                // Auth state observer above will handle role check and UI transition
+            } catch (err) {
+                console.error("Login failed:", err);
+                alert(err.message);
             }
         }
 
-        function logout() {
-            sessionStorage.removeItem("adminLoggedIn");
-            window.location.reload();
+        window.logout = async function () {
+            try {
+                await signOut(auth);
+                window.location.reload();
+            } catch (err) {
+                console.error("Logout error:", err);
+            }
+        }
+
+        // Real-time synchronization with Firestore
+        function startSync() {
+            onSnapshot(query(subjectsRef, orderBy("name")), (snapshot) => {
+                subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderAdminSubjects();
+            });
         }
 
         function renderAdminSubjects() {
             const grid = document.getElementById('adminSubjectGrid');
-            grid.innerHTML = subjects.map((s, i) => `
+            grid.innerHTML = subjects.map((s) => `
                 <div class="subject-item">
                     <div class="subject-info">
                         <div class="subject-name ${s.rtl ? 'rtl' : ''}">
@@ -531,10 +564,10 @@
                         <div class="subject-price">₹${s.price}</div>
                     </div>
                     <div style="display: flex; gap: 12px;">
-                        <button class="admin-btn admin-btn-secondary" style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(${i})">
+                        <button class="admin-btn admin-btn-secondary" style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject('${s.id}')">
                             <i class="ph ph-pencil"></i> Edit
                         </button>
-                        <button class="admin-btn" style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;" onclick="deleteSubject(${i})">
+                        <button class="admin-btn" style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;" onclick="deleteSubject('${s.id}')">
                             <i class="ph ph-trash"></i>
                         </button>
                     </div>
@@ -542,48 +575,59 @@
             `).join('');
         }
 
-        function addOrUpdateSubject() {
+        window.addOrUpdateSubject = async function () {
             const nameEl = document.getElementById('subName');
             const priceEl = document.getElementById('subPrice');
             const rtlEl = document.getElementById('subRTL');
 
             if (!nameEl.value || !priceEl.value) return alert("Validation Failed: All fields required");
 
-            const newSub = {
+            const subjectData = {
                 name: nameEl.value,
                 price: parseFloat(priceEl.value),
                 rtl: rtlEl.checked
             };
 
-            if (editingIndex > -1) {
-                subjects[editingIndex] = newSub;
-                editingIndex = -1;
-            } else {
-                subjects.push(newSub);
+            try {
+                if (editingId) {
+                    await updateDoc(doc(db, "subjects", editingId), subjectData);
+                    editingId = null;
+                } else {
+                    await addDoc(subjectsRef, {
+                        ...subjectData,
+                        active: true,
+                        createdAt: serverTimestamp()
+                    });
+                }
+
+                nameEl.value = "";
+                priceEl.value = "";
+                rtlEl.checked = false;
+            } catch (error) {
+                console.error("Error saving subject:", error);
+                alert("Failed to synchronize data with cloud.");
             }
-
-            localStorage.setItem("subjects", JSON.stringify(subjects));
-            renderAdminSubjects();
-
-            nameEl.value = "";
-            priceEl.value = "";
-            rtlEl.checked = false;
         }
 
-        function editSubject(i) {
-            editingIndex = i;
-            const s = subjects[i];
-            document.getElementById('subName').value = s.name;
-            document.getElementById('subPrice').value = s.price;
-            document.getElementById('subRTL').checked = s.rtl || false;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.editSubject = function (id) {
+            editingId = id;
+            const s = subjects.find(sub => sub.id === id);
+            if (s) {
+                document.getElementById('subName').value = s.name;
+                document.getElementById('subPrice').value = s.price;
+                document.getElementById('subRTL').checked = s.rtl || false;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
-        function deleteSubject(i) {
-            if (confirm("Confirm permanent removal of this subject?")) {
-                subjects.splice(i, 1);
-                localStorage.setItem("subjects", JSON.stringify(subjects));
-                renderAdminSubjects();
+        window.deleteSubject = async function (id) {
+            if (confirm("Confirm permanent removal of this subject from the cloud?")) {
+                try {
+                    await deleteDoc(doc(db, "subjects", id));
+                } catch (error) {
+                    console.error("Error deleting subject:", error);
+                    alert("Failed to delete subject.");
+                }
             }
         }
 
@@ -605,8 +649,6 @@
             });
         });
 
-        checkAuth();
-        renderAdminSubjects();
     </script>
 </body>
 
