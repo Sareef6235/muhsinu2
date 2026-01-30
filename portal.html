@@ -698,8 +698,14 @@
                         </ul>
                     </li>
                     <li><a href="student_dashboard.html">Student Dashboard</a></li>
-                    <li><a href="portal.html" class="active">Portal</a></li>
-                    <li><a href="admin/" id="navAdminLink" style="display: none;">Admin</a></li>
+                    <li><a href="booking.html">Booking</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">Portal</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="portal.html" class="active">Portal</a></li>
+                            <li><a href="admin/" id="navAdminLink" style="display: none;">Admin</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -730,8 +736,8 @@
                     </div>
 
                     <div class="btn-group" style="margin-top: 30px;">
-                        <button class="btn btn-primary btn-block" onclick="login()">
-                            <i class="ph-bold ph-sign-in"></i> Sign In
+                        <button class="btn btn-primary btn-block" onclick="handleAuth()">
+                            <i class="ph-bold ph-arrow-right"></i> Continue
                         </button>
                     </div>
 
@@ -882,7 +888,8 @@
             onAuthStateChanged,
             signOut,
             setPersistence,
-            browserLocalPersistence
+            browserLocalPersistence,
+            fetchSignInMethodsForEmail
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import {
             getFirestore,
@@ -1076,7 +1083,8 @@
         onAuthStateChanged(auth, handleAuthUser);
 
         // CREATE USER
-        window.login = function () {
+        // SMART AUTH
+        window.handleAuth = async function () {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
@@ -1093,23 +1101,43 @@
                 return;
             }
 
-            // Standard Firebase Login
-            signInWithEmailAndPassword(window.auth, email, password)
-                .then((userCredential) => {
-                    alert("Login success ✅");
-                    console.log(userCredential.user);
-                })
-                .catch((error) => {
-                    console.error("Login Error:", error.code);
-                    let friendlyMsg = error.message;
-                    if (error.code === 'auth/configuration-not-found') {
-                        friendlyMsg = "Configuration Error: Authentication is not enabled in Firebase Console (Email/Password provider).";
-                    } else if (error.code === 'auth/invalid-credential') {
-                        friendlyMsg = "Invalid email or password.";
-                    }
-                    alert(friendlyMsg);
-                    showMessage(friendlyMsg);
-                });
+            try {
+                // 🔍 Check email exists
+                const methods = await fetchSignInMethodsForEmail(auth, email);
+
+                if (methods.length === 0) {
+                    // 🆕 New user → Register
+                    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+                    // Connect to Firebase Database Backend (Save initial user data)
+                    await setDoc(doc(db, "users", userCred.user.uid), {
+                        email: email,
+                        role: "student", // Default role
+                        approved: false,
+                        active: true,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    alert("Registration successful! Waiting for admin approval.");
+                    console.log("New user:", userCred.user.uid);
+                } else {
+                    // 🔐 Existing user → Login
+                    const userCred = await signInWithEmailAndPassword(auth, email, password);
+                    alert("Login successful!");
+                    console.log("Existing user:", userCred.user.uid);
+                }
+            } catch (error) {
+                // Should handle "email-already-in-use" if enumeration protection is ON
+                if (error.code === 'auth/email-already-in-use') {
+                    // Try login as fallback
+                    signInWithEmailAndPassword(auth, email, password)
+                        .then((res) => { alert("Login successful!"); })
+                        .catch(e => alert(e.message));
+                } else {
+                    alert(error.message);
+                    console.error(error);
+                }
+            }
         };
 
         window.createUser = async () => {

@@ -202,8 +202,8 @@
     <!-- 🔥 FIREBASE -->
     <script type="module">
         import { auth, db, storage } from "./firebase.js";
-        import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { collection, addDoc, onSnapshot, query, where, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { collection, addDoc, onSnapshot, query, where, updateDoc, doc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         /* 🔴 FIREBASE CONFIG MOVED TO firebase.js */
@@ -227,12 +227,12 @@
                 class: sclass.value,
                 type: type.value,
                 url,
-                approved: false,
+                approved: true,
                 visible: true,
                 created: new Date()
             });
 
-            msg.innerText = "Submitted! Waiting for admin approval";
+            msg.innerText = "Submitted! Your work is now live in the gallery below. 🎉";
         }
 
         /* 🖼 PUBLIC GALLERY */
@@ -284,21 +284,59 @@
         }
 
         /* 👨💼 ADMIN PANEL */
+        /* 👨💼 ADMIN PANEL AUTH CHECK */
         const adminPanel = document.getElementById("adminPanel");
         const adminList = document.getElementById("adminList");
 
-        onAuthStateChanged(auth, user => {
+        /* Helper to get login card */
+        const loginCard = document.getElementById("email").parentElement;
+
+        onAuthStateChanged(auth, async user => {
+            const adminMsg = document.getElementById("adminMsg");
+
             if (user) {
-                adminPanel.classList.remove("hidden");
-                onSnapshot(collection(db, "media"), snap => {
-                    adminList.innerHTML = "";
-                    snap.forEach(d => {
-                        const m = d.data();
-                        adminList.innerHTML += `
+                // Check Role
+                const snap = await getDoc(doc(db, "users", user.uid));
+                const data = snap.data();
+
+                if (data && data.role === "admin") {
+                    adminPanel.classList.remove("hidden");
+                    loginCard.innerHTML = `
+                        <h2>🔓 Admin Access Granted</h2>
+                        <p style="color:var(--accent)">Logged in as ${user.email}</p>
+                        <button class="btn danger" onclick="logout()">Logout</button>
+                    `;
+
+                    // Load Admin Data
+                    loadAdminData();
+                } else {
+                    adminMsg.innerText = "Access Denied: Not an Admin";
+                    await signOut(auth);
+                }
+            } else {
+                adminPanel.classList.add("hidden");
+                // Restore Login Form if needed, but reloading might be easier. 
+                // For SPA feel:
+                loginCard.innerHTML = `
+                    <h2>🔐 Admin Login</h2>
+                    <input id="email" placeholder="Email">
+                    <input id="password" type="password" placeholder="Password">
+                    <button class="btn primary" onclick="login()">Login</button>
+                    <p id="adminMsg" class="small"></p>
+                `;
+            }
+        });
+
+        function loadAdminData() {
+            onSnapshot(collection(db, "media"), snap => {
+                adminList.innerHTML = "";
+                snap.forEach(d => {
+                    const m = d.data();
+                    adminList.innerHTML += `
      <div class="card">
       ${m.type === "image"
-                                ? `<img src="${m.url}">`
-                                : `<video src="${m.url}" controls></video>`}
+                            ? `<img src="${m.url}">`
+                            : `<video src="${m.url}" controls></video>`}
       <p class="small">${m.name} • ${m.class}</p>
       <div class="admin-actions">
        <button class="btn primary" onclick="approve('${d.id}')">Approve</button>
@@ -306,10 +344,11 @@
        <button class="btn danger" onclick="removeItem('${d.id}')">Delete</button>
       </div>
      </div>`;
-                    });
                 });
-            }
-        });
+            });
+        }
+
+        window.logout = () => signOut(auth);
 
         /* ADMIN ACTIONS */
         window.approve = id => updateDoc(doc(db, "media", id), { approved: true });

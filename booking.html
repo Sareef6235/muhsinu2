@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MHMV Booking + Admin</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #0a0a0a;
+            color: #fff
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 20px
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: none
+        }
+
+        button {
+            background: #00f3ff;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px
+        }
+
+        .price-box {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            color: #00f3ff
+        }
+
+        .hidden {
+            display: none
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- ================= STUDENT FORM ================= -->
+        <div class="card">
+            <h2>Student Booking</h2>
+
+            <form id="bookingForm">
+                <input id="fname" placeholder="First Name" required>
+                <input id="lname" placeholder="Last Name" required>
+                <input id="email" type="email" placeholder="Your Email" required>
+
+                <h3>Subjects</h3>
+                <div class="checkbox-grid">
+                    <label><input type="checkbox" data-price="800" value="QURAN HIFZ"> QURAN HIFZ</label>
+                    <label><input type="checkbox" data-price="100" value="FIQH"> FIQH</label>
+                    <label><input type="checkbox" data-price="650" value="LISAN QURAN"> LISAN QURAN</label>
+                    <label><input type="checkbox" data-price="550" value="AQEEDA"> AQEEDA</label>
+                    <label><input type="checkbox" data-price="700" value="THAJVEETH"> THAJVEETH</label>
+                    <label><input type="checkbox" data-price="500" value="THAREEKH"> THAREEKH</label>
+                    <label><input type="checkbox" data-price="450" value="AQLAQH"> AQLAQH</label>
+                    <label><input type="checkbox" data-price="600" value="THAFHEEMU THILAVAH"> THAFHEEMU
+                        THILAVAH</label>
+                    <label><input type="checkbox" data-price="650" value="THAFSEER"> THAFSEER</label>
+                    <label dir="rtl"><input type="checkbox" data-price="500" value="الدينيات"> الدينيات والأخلاق
+                        والإملاء</label>
+                </div>
+
+                <input id="studentClass" placeholder="Class (1–12)" required>
+
+                <div class="price-box">
+                    Total Price: ₹<span id="total-price">0</span>
+                </div>
+
+                <button type="submit">Submit Booking</button>
+            </form>
+        </div>
+
+        <!-- ================= ADMIN LOGIN ================= -->
+        <div class="card">
+            <h2>Admin Login</h2>
+            <input id="adminEmail" placeholder="Your Email">
+            <input id="adminPassword" type="password" placeholder="Your Password">
+            <button onclick="adminLogin()">Login</button>
+            <p id="loginStatus"></p>
+        </div>
+
+        <!-- ================= ADMIN PANEL ================= -->
+        <div class="card hidden" id="adminPanel">
+            <h2>Admin Panel – Bookings</h2>
+            <div id="bookingList"></div>
+        </div>
+
+    </div>
+
+    <!-- ================= FIREBASE LOGIC ================= -->
+    <script type="module">
+        import { auth, db } from "./firebase.js";
+        import { addDoc, collection, getDocs, orderBy, query, serverTimestamp }
+            from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { signInWithEmailAndPassword, onAuthStateChanged }
+            from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        /* ===== PRICE CALC ===== */
+        const totalEl = document.getElementById("total-price");
+        document.querySelectorAll("input[type=checkbox]").forEach(cb => {
+            cb.addEventListener("change", () => {
+                let total = 0;
+                document.querySelectorAll("input[type=checkbox]:checked")
+                    .forEach(c => total += Number(c.dataset.price));
+                totalEl.textContent = total;
+            });
+        });
+
+        /* ===== FORM SUBMIT ===== */
+        document.getElementById("bookingForm").addEventListener("submit", async e => {
+            e.preventDefault();
+            const subjects = [];
+            document.querySelectorAll("input[type=checkbox]:checked").forEach(c => subjects.push(c.value));
+            if (!subjects.length) { alert("Select subject"); return; }
+
+            await addDoc(collection(db, "bookings"), {
+                firstName: fname.value,
+                lastName: lname.value,
+                email: email.value,
+                class: studentClass.value,
+                subjects,
+                total: Number(totalEl.textContent),
+                createdAt: serverTimestamp()
+            });
+
+            alert("Booking Submitted");
+            e.target.reset();
+            totalEl.textContent = 0;
+        });
+
+        /* ===== ADMIN LOGIN ===== */
+        window.adminLogin = async () => {
+            try {
+                await signInWithEmailAndPassword(auth, adminEmail.value, adminPassword.value);
+                loginStatus.textContent = "Login success";
+            } catch (e) {
+                loginStatus.textContent = e.message;
+            }
+        };
+
+        /* ===== LOAD BOOKINGS ===== */
+        async function loadBookings() {
+            const list = document.getElementById("bookingList");
+            list.innerHTML = "Loading...";
+            const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
+            const snap = await getDocs(q);
+            list.innerHTML = "";
+            snap.forEach(d => {
+                const b = d.data();
+                list.innerHTML += `
+   <div class="card">
+   <b>${b.firstName} ${b.lastName}</b><br>
+   Email: ${b.email}<br>
+   Class: ${b.class}<br>
+   Subjects: ${b.subjects.join(", ")}<br>
+   <b>₹${b.total}</b>
+   </div>`;
+            });
+        }
+
+        /* ===== AUTH STATE ===== */
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                adminPanel.classList.remove("hidden");
+                loadBookings();
+            }
+        });
+    </script>
+</body>
+
+</html>
