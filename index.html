@@ -74,7 +74,9 @@
                     achievement and success in the future.
                 </p>
                 <div class="cta-group animate-fade-up delay-4">
-                    <a href="#gallery" class="btn btn-primary">View Gallery</a>
+                    <a href="#booking" class="btn btn-primary">Book Tuition</a>
+                    <a href="#gallery" class="btn btn-secondary"
+                        style="border-color: var(--primary-color); color: var(--primary-color);">View Gallery</a>
                     <a href="#contact" class="btn btn-secondary">Contact Us</a>
                 </div>
             </div>
@@ -153,7 +155,7 @@
             </div>
         </section>
 
-        <div class="dialog-message dialog-lightbox-message" style="display: flex;">
+        <div class="dialog-message dialog-lightbox-message" style="display: none;">
             <div data-elementor-type="popup" data-elementor-id="748"
                 class="elementor elementor-748 elementor-location-popup"
                 data-elementor-settings="{&quot;prevent_scroll&quot;:&quot;yes&quot;,&quot;a11y_navigation&quot;:&quot;yes&quot;,&quot;triggers&quot;:{&quot;inactivity_time&quot;:5,&quot;inactivity&quot;:&quot;yes&quot;},&quot;timing&quot;:[]}"
@@ -181,16 +183,16 @@
 
                                 <div class="form-group">
                                     <label for="email">Email Address</label>
-                                    <input type="email" id="email" placeholder="Your Email" required="">
+                                    <input type="email" name="entry.1739343054" id="email" placeholder="Your Email"
+                                        required="">
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label">Subject (Max 8)</label>
                                     <!-- Hidden inputs for granular Google Form mapping -->
-                                    <input type="hidden" name="entry.63709490" id="booking-subjects-hidden"
-                                        value="QURA'N HIFZ, LISAN QURA'N, DUROOS – ARABIC – MALAYALAM, الدينيات – والأخلاق – والإملاء">
-                                    <input type="hidden" name="entry.9885691" id="booking-class-hidden" value="3">
-                                    <input type="hidden" name="entry.116107118" id="booking-price-hidden" value="₹2650">
+                                    <input type="hidden" name="entry.63709490" id="booking-subjects-hidden" value="">
+                                    <input type="hidden" name="entry.9885691" id="booking-class-hidden" value="">
+                                    <input type="hidden" name="entry.116107118" id="booking-price-hidden" value="">
 
                                     <div class="checkbox-grid" id="subject-checkboxes">
                                         <label>
@@ -273,28 +275,28 @@
                                                 data-multiplier="1">
                                             4</label>
                                         <label class="radio-label"><input type="radio" name="class" value="5"
-                                                data-multiplier="1.1">
+                                                data-multiplier="1">
                                             5</label>
                                         <label class="radio-label"><input type="radio" name="class" value="6"
-                                                data-multiplier="1.2">
+                                                data-multiplier="1">
                                             6</label>
                                         <label class="radio-label"><input type="radio" name="class" value="7"
-                                                data-multiplier="1.3">
+                                                data-multiplier="1">
                                             7</label>
                                         <label class="radio-label"><input type="radio" name="class" value="8"
-                                                data-multiplier="1.4">
+                                                data-multiplier="1">
                                             8</label>
                                         <label class="radio-label"><input type="radio" name="class" value="9"
-                                                data-multiplier="1.5">
+                                                data-multiplier="1">
                                             9</label>
                                         <label class="radio-label"><input type="radio" name="class" value="10"
-                                                data-multiplier="1.6">
+                                                data-multiplier="1">
                                             10</label>
                                         <label class="radio-label"><input type="radio" name="class" value="11"
-                                                data-multiplier="1.8">
+                                                data-multiplier="1">
                                             +1</label>
                                         <label class="radio-label"><input type="radio" name="class" value="12"
-                                                data-multiplier="2.0">
+                                                data-multiplier="1">
                                             +2</label>
                                     </div>
                                 </div>
@@ -303,23 +305,12 @@
                                     <h3>Total Price: <span id="total-price">₹0</span></h3>
                                 </div>
 
-                                <div class="payment-section">
-
-                                    <!-- QR Code -->
-                                    <div class="upi-qr">
-                                        <img src="assets/upi-qr.jpeg" alt="UPI QR Code">
-                                        <p><strong>Scan &amp; Pay (UPI)</strong></p>
-                                        <p>UPI ID: <b>mmuhsinu2-1@okaxis</b></p>
-                                        <p>Name: Mo Mhn</p>
-                                    </div>
-
-                                    <!-- Buttons -->
-                                    <div class="payment-buttons-dual">
-                                        <button type="submit" id="btn-submit-only" class="btn-choice btn-outline">
-                                            Register Only
-                                        </button>
-                                    </div>
-
+                                <div class="form-group"
+                                    style="margin-top: 25px; display: flex; flex-direction: column; gap: 10px;">
+                                    <button type="submit" class="btn btn-primary" style="width: 100%;">Book Now</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        onclick="document.querySelector('.dialog-lightbox-message').style.display='none'; document.body.style.overflow='';"
+                                        style="width: 100%; border-radius: 5px; padding: 10px 25px; text-transform: uppercase; font-size: 0.9rem; font-weight: 600; letter-spacing: 1px;">Home</button>
                                 </div>
 
                             </form>
