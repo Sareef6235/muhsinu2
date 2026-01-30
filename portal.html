@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal | MIFTHAHUL HUDA MADRASA</title>
+    <meta name="description"
+        content="Admin & Student Portal for MIFTHAHUL HUDA MADRASA - Secure access to management and student features.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --secondary-color: #bc13fe;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --primary-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --card-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            --success-color: #00ff88;
+            --warning-color: #facc15;
+            --danger-color: #ff4d4d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: #050508;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(ellipse at 10% 20%, rgba(0, 243, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(188, 19, 254, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.9) 0%, #050508 100%);
+        }
+
+        /* Animated Background Orbs */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            z-index: -1;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-orb-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--primary-color);
+            top: -200px;
+            left: -200px;
+        }
+
+        .bg-orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--secondary-color);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(30px, 30px) scale(1.1);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Header */
+        .portal-header {
+            background: linear-gradient(180deg, rgba(5, 5, 8, 0.95), transparent);
+            backdrop-filter: blur(20px);
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .portal-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .portal-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .portal-nav {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            align-items: center;
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            color: var(--text-dim) !important;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .dropdown-toggle::after {
+            content: '▾';
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown:hover .dropdown-toggle::after {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            min-width: 180px;
+            padding: 10px 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 1010;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-menu li {
+            width: 100%;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            text-transform: capitalize;
+            color: #ccc !important;
+            transition: 0.3s;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            border-left: 2px solid transparent;
+        }
+
+        .dropdown-menu a:hover {
+            background: rgba(0, 243, 255, 0.05);
+            color: var(--primary-color) !important;
+            border-left-color: var(--primary-color);
+            padding-left: 25px;
+        }
+
+        .portal-nav a {
+            color: #888;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .portal-nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .portal-nav a.active {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .portal-main {
+            padding-top: 120px;
+            min-height: 100vh;
+        }
+
+        /* Cards */
+        .portal-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            opacity: 0.5;
+        }
+
+        .portal-card:hover {
+            border-color: rgba(0, 243, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .portal-card h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .portal-card h2 i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .portal-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+            background: rgba(0, 243, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #555;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23888' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 24px;
+        }
+
+        .form-select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 243, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00ff88, #00d67a);
+            color: #000;
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #facc15, #f59e0b);
+            color: #000;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4d4d, #dc2626);
+            color: #fff;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Grid */
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* User Cards */
+        .user-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            border-color: var(--secondary-color);
+            background: rgba(188, 19, 254, 0.05);
+        }
+
+        .user-card .user-email {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .user-card .user-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .user-card .user-status.approved {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--success-color);
+        }
+
+        .user-card .user-status.pending {
+            background: rgba(250, 204, 21, 0.1);
+            color: var(--warning-color);
+        }
+
+        /* Divider */
+        .divider {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+            margin: 40px 0;
+        }
+
+        /* Messages */
+        .msg {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .msg-error {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            color: var(--danger-color);
+        }
+
+        .msg-success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: var(--success-color);
+        }
+
+        /* Login Box Special */
+        .login-wrapper {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .login-icon {
+            width: 90px;
+            height: 90px;
+            background: var(--primary-gradient);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 20px 40px rgba(0, 243, 255, 0.3);
+        }
+
+        .login-icon i {
+            font-size: 2.5rem;
+            color: #000;
+        }
+
+        .login-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 0.95rem;
+        }
+
+        /* Profile Section */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .profile-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        /* Hidden Class */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            color: var(--danger-color);
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .logout-btn:hover {
+            background: var(--danger-color);
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .portal-header .container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .portal-nav {
+                gap: 20px;
+            }
+
+            .portal-card {
+                padding: 25px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn-group .btn {
+                width: 100%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Orbs -->
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+
+    <!-- Header -->
+    <header class="portal-header">
+        <div class="container">
+            <a href="index.html" class="portal-logo">MHMV 2026.</a>
+            <nav>
+                <ul class="portal-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li class="dropdown">
+                        <a href="gallery.html" class="dropdown-toggle">Gallery</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
+                            <li><a href="gallery.html?tab=video">Video Gallery</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">Creative Corner</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="creative.html">Creative Corner</a></li>
+                            <li><a href="creations.html">Creations</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">Result</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="result.html">Exam Result (New)</a></li>
+                            <li><a href="exam_result.html">Exam Result (Old)</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="portal.html" class="active">Portal</a></li>
+                    <li><a href="admin/" id="navAdminLink" style="display: none;">Admin</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="portal-main">
+        <div class="container">
+
+            <!-- LOGIN BOX -->
+            <div id="loginBox" class="login-wrapper animate-in">
+                <div class="portal-card">
+                    <div class="login-icon">
+                        <i class="ph-bold ph-lock-key"></i>
+                    </div>
+                    <h1 class="login-title">Welcome Back</h1>
+                    <p class="login-subtitle">Sign in to access your portal</p>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="email" class="form-input" placeholder="Your Email"
+                            autocomplete="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="password" class="form-input" placeholder="Your Password"
+                            autocomplete="current-password" required>
+                    </div>
+
+                    <div class="btn-group" style="margin-top: 30px;">
+                        <button class="btn btn-primary btn-block" onclick="login()">
+                            <i class="ph-bold ph-sign-in"></i> Sign In
+                        </button>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="resetPassword()" style="padding: 12px 24px;">
+                            <i class="ph ph-question"></i> Forgot Password?
+                        </button>
+                    </div>
+
+                    <div id="msg" class="msg hidden"></div>
+                </div>
+            </div>
+
+            <!-- ADMIN PANEL -->
+            <div id="adminPanel" class="hidden animate-in">
+                <div class="portal-card">
+                    <h2><i class="ph-bold ph-shield-star"></i> Admin Control Center</h2>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalUsers">0</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="pendingApprovals">0</div>
+                            <div class="stat-label">Pending Approvals</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="activeStudents">0</div>
+                            <div class="stat-label">Active Students</div>
+                        </div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <h3><i class="ph ph-user-plus" style="margin-right: 10px;"></i>Create New User</h3>
+
+                    <div class="portal-grid" style="margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Role</label>
+                            <select id="role" class="form-select">
+                                <option value="student">Student</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="newEmail" class="form-input" placeholder="user@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" id="newPassword" class="form-input" placeholder="Secure password">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success" onclick="createUser()">
+                        <i class="ph-bold ph-user-plus"></i> Create User
+                    </button>
+                </div>
+
+                <div class="portal-card">
+                    <h2><i class="ph-bold ph-users-three"></i> Student Management</h2>
+                    <p style="color: #888; margin-bottom: 25px;">Approve and manage student accounts</p>
+
+                    <div id="userList" class="portal-grid">
+                        <!-- Dynamic user cards will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- STUDENT DASHBOARD -->
+            <div id="studentPanel" class="hidden animate-in">
+                <div class="portal-card">
+                    <h2><i class="ph-bold ph-graduation-cap"></i> Student Dashboard</h2>
+
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="profileInitial">S</div>
+                        <div class="profile-info">
+                            <h3 id="welcomeName">Welcome, Student!</h3>
+                            <p>Manage your profile and academic information</p>
+                        </div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <h3><i class="ph ph-identification-card" style="margin-right: 10px;"></i>My Profile</h3>
+
+                    <div class="portal-grid">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" id="pname" class="form-input" placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Class</label>
+                            <input type="text" id="pclass" class="form-input" placeholder="e.g., Class 10">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Roll Number</label>
+                            <input type="text" id="proll" class="form-input" placeholder="Your roll number">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="saveProfile()" style="margin-top: 20px;">
+                        <i class="ph-bold ph-floppy-disk"></i> Save Profile
+                    </button>
+
+                    <hr class="divider">
+
+                    <div
+                        style="background: rgba(0, 243, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.2); padding: 20px; border-radius: 16px;">
+                        <p style="display: flex; align-items: center; gap: 10px; color: var(--primary-color);">
+                            <i class="ph ph-info" style="font-size: 1.5rem;"></i>
+                            Uploads & gallery access will be visible after admin approval.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WAITING FOR APPROVAL -->
+            <div id="waitingPanel" class="hidden animate-in">
+                <div class="portal-card" style="text-align: center; padding: 60px 40px;">
+                    <div
+                        style="width: 100px; height: 100px; background: rgba(250, 204, 21, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px;">
+                        <i class="ph ph-hourglass-medium" style="font-size: 3rem; color: var(--warning-color);"></i>
+                    </div>
+                    <h2 style="margin-bottom: 15px;">Awaiting Approval</h2>
+                    <p style="color: #888; max-width: 400px; margin: 0 auto;">Your account is pending admin approval.
+                        You'll get full access to the student portal once approved.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Logout Button (hidden by default) -->
+    <button id="logoutBtn" class="logout-btn hidden" onclick="logout()">
+        <i class="ph ph-sign-out"></i> Logout
+    </button>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            sendPasswordResetEmail,
+            onAuthStateChanged,
+            signOut,
+            setPersistence,
+            browserLocalPersistence
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            getDoc,
+            updateDoc,
+            collection,
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        /* 🔴 FIREBASE CONFIG - Replace with your credentials */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDY3La232JPHrnwPL_VfwQKJ07JLIEHAZE",
+            authDomain: "my-pc-895cd.firebaseapp.com",
+            databaseURL: "https://my-pc-895cd-default-rtdb.firebaseio.com",
+            projectId: "my-pc-895cd",
+            storageBucket: "my-pc-895cd.firebasestorage.app",
+            messagingSenderId: "970176385787",
+            appId: "1:970176385787:web:d21a6d1ef8079934fb565e",
+            measurementId: "G-NKFHNQ88XG"
+        };
+
+        let app, auth, db;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            // 🔴 IMPORTANT: Attach to window as requested
+            window.auth = auth;
+            window.db = db;
+            window.app = app;
+
+            console.log("Firebase Initialized Successfully");
+            console.log("Auth Status:", auth);
+        } catch (e) {
+            console.error("Firebase Initialization Error:", e);
+            alert("Critical Error: Firebase failed to initialize. Check console for details.");
+        }
+
+        // DOM Elements
+        const loginBox = document.getElementById('loginBox');
+        const adminPanel = document.getElementById('adminPanel');
+        const studentPanel = document.getElementById('studentPanel');
+        const waitingPanel = document.getElementById('waitingPanel');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const msg = document.getElementById('msg');
+
+        // Show message
+        function showMessage(text, type = 'error') {
+            const msgEl = document.getElementById('msg');
+            if (msgEl) {
+                msgEl.classList.remove('hidden', 'msg-error', 'msg-success');
+                msgEl.classList.add(type === 'error' ? 'msg-error' : 'msg-success');
+                msgEl.innerText = text;
+            } else {
+                console.warn("Message element not found:", text);
+                alert(text);
+            }
+        }
+
+        // LOGIN
+        window.login = function () {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Use window.auth as requested
+            signInWithEmailAndPassword(window.auth, email, password)
+                .then((userCredential) => {
+                    alert("Login success ✅");
+                    console.log(userCredential.user);
+                })
+                .catch((error) => {
+                    console.error("Login Error:", error.code);
+                    let friendlyMsg = error.message;
+                    if (error.code === 'auth/configuration-not-found') {
+                        friendlyMsg = "Configuration Error: Authentication is not enabled in Firebase Console (Email/Password provider).";
+                    } else if (error.code === 'auth/invalid-credential') {
+                        friendlyMsg = "Invalid email or password.";
+                    }
+                    alert(friendlyMsg);
+                    showMessage(friendlyMsg);
+                });
+        };
+
+        // PASSWORD RESET
+        window.resetPassword = async () => {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                showMessage('Please enter your email address first');
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showMessage('Password reset email sent! Check your inbox.', 'success');
+            } catch (e) {
+                showMessage(e.message);
+            }
+        };
+
+        // LOGOUT
+        window.logout = async () => {
+            await signOut(auth);
+            location.reload();
+        };
+
+        // AUTH STATE OBSERVER
+        // HANDLE AUTH USER (Refactored for Bypass)
+        async function handleAuthUser(user) {
+            if (!user) {
+                if (loginBox) loginBox.classList.remove('hidden');
+                if (adminPanel) adminPanel.classList.add('hidden');
+                if (studentPanel) studentPanel.classList.add('hidden');
+                if (waitingPanel) waitingPanel.classList.add('hidden');
+                if (logoutBtn) logoutBtn.classList.add('hidden');
+                return;
+            }
+
+            if (loginBox) loginBox.classList.add('hidden');
+            if (logoutBtn) logoutBtn.classList.remove('hidden');
+
+            // BYPASS: Mock Admin Logic
+            if (user.uid === 'dev-admin-bypass') {
+                console.warn("⚠️ USING DEV BYPASS MODE");
+                if (adminPanel) {
+                    adminPanel.classList.remove('hidden');
+                    const navAdminLink = document.getElementById('navAdminLink');
+                    if (navAdminLink) navAdminLink.style.display = 'block';
+                    // Mock user loading for dev
+                    const userList = document.getElementById('userList');
+                    if (userList) userList.innerHTML = '<div style="padding:20px; text-align:center;">Dev Mode: User list loading mocked.</div>';
+                }
+                return;
+            }
+
+            try {
+                const snap = await getDoc(doc(db, "users", user.uid));
+                const data = snap.data();
+
+                if (!data) {
+                    console.warn("User data missing in Firestore");
+                    return;
+                }
+
+                if (data.role === "admin" && adminPanel) {
+                    adminPanel.classList.remove('hidden');
+                    const navAdminLink = document.getElementById('navAdminLink');
+                    if (navAdminLink) navAdminLink.style.display = 'block';
+                    loadUsers();
+                }
+
+                if (data.role === "student" && studentPanel) {
+                    if (!data.approved) {
+                        if (waitingPanel) waitingPanel.classList.remove('hidden');
+                        return;
+                    }
+                    studentPanel.classList.remove('hidden');
+                    if (document.getElementById('pname')) document.getElementById('pname').value = data.name || "";
+                    if (document.getElementById('pclass')) document.getElementById('pclass').value = data.class || "";
+                    if (document.getElementById('proll')) document.getElementById('proll').value = data.roll || "";
+
+                    if (data.name) {
+                        const welcomeEl = document.getElementById('welcomeName');
+                        if (welcomeEl) welcomeEl.textContent = `Welcome, ${data.name}!`;
+                        const initEl = document.getElementById('profileInitial');
+                        if (initEl) initEl.textContent = data.name.charAt(0).toUpperCase();
+                    }
+                }
+            } catch (e) {
+                console.error("Auth State Error:", e);
+                showMessage('Error loading user profile');
+            }
+        }
+
+        // AUTH STATE OBSERVER
+        onAuthStateChanged(auth, handleAuthUser);
+
+        // LOGIN
+        window.login = function () {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // 🔴 DEV BYPASS CHECK
+            if ((email === "123v213@gmail.com" || email === "123v214@gmail.com") && password === "@#asd123") {
+                alert("Bypassing Firebase Auth (Dev Mode) ✅");
+                console.log("Simulating Admin Login...");
+                handleAuthUser({ uid: 'dev-admin-bypass', email: email });
+                return;
+            }
+
+            // Standard Firebase Login
+            signInWithEmailAndPassword(window.auth, email, password)
+                .then((userCredential) => {
+                    alert("Login success ✅");
+                    console.log(userCredential.user);
+                })
+                .catch((error) => {
+                    console.error("Login Error:", error.code);
+                    let friendlyMsg = error.message;
+                    if (error.code === 'auth/configuration-not-found') {
+                        friendlyMsg = "Configuration Error: Authentication is not enabled in Firebase Console (Email/Password provider).";
+                    } else if (error.code === 'auth/invalid-credential') {
+                        friendlyMsg = "Invalid email or password.";
+                    }
+                    alert(friendlyMsg);
+                    showMessage(friendlyMsg);
+                });
+        };
+
+        // CREATE USER
+        window.createUser = async () => {
+            const email = document.getElementById('newEmail').value;
+            const password = document.getElementById('newPassword').value;
+            const role = document.getElementById('role').value;
+
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    email: email,
+                    role: role,
+                    approved: role === "admin",
+                    active: true,
+                    createdAt: new Date().toISOString()
+                });
+                alert('User created successfully!');
+                document.getElementById('newEmail').value = '';
+                document.getElementById('newPassword').value = '';
+            } catch (e) {
+                alert(e.message);
+            }
+        };
+
+        // LOAD USERS
+        function loadUsers() {
+            onSnapshot(collection(db, "users"), (snap) => {
+                const userList = document.getElementById('userList');
+                if (!userList) return;
+
+                userList.innerHTML = "";
+
+                let total = 0, pending = 0, active = 0;
+
+                snap.forEach((d) => {
+                    const u = d.data();
+                    total++;
+
+                    if (u.role !== "student") return;
+
+                    if (u.approved) {
+                        active++;
+                    } else {
+                        pending++;
+                    }
+
+                    userList.innerHTML += `
+                        <div class="user-card">
+                            <div class="user-email">${u.email}</div>
+                            <div class="user-status ${u.approved ? 'approved' : 'pending'}">
+                                <i class="ph ${u.approved ? 'ph-check-circle' : 'ph-clock'}"></i>
+                                ${u.approved ? 'Approved' : 'Pending'}
+                            </div>
+                            ${u.name ? `<p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Name: ${u.name}</p>` : ''}
+                            <div class="btn-group">
+                                ${!u.approved ? `<button class="btn btn-success" onclick="approve('${d.id}')" style="flex: 1; padding: 12px;">
+                                    <i class="ph ph-check"></i> Approve
+                                </button>` : ''}
+                                <button class="btn btn-danger" onclick="removeUser('${d.id}')" style="padding: 12px;">
+                                    <i class="ph ph-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (document.getElementById('totalUsers')) document.getElementById('totalUsers').textContent = total;
+                if (document.getElementById('pendingApprovals')) document.getElementById('pendingApprovals').textContent = pending;
+                if (document.getElementById('activeStudents')) document.getElementById('activeStudents').textContent = active;
+            });
+        }
+
+        // APPROVE STUDENT
+        window.approve = async (uid) => {
+            await updateDoc(doc(db, "users", uid), { approved: true });
+            alert('Student approved successfully!');
+        };
+
+        // REMOVE USER (for admin)
+        window.removeUser = async (uid) => {
+            if (confirm('Are you sure you want to remove this user?')) {
+                await updateDoc(doc(db, "users", uid), { active: false });
+                alert('User deactivated');
+            }
+        };
+
+        // SAVE PROFILE
+        window.saveProfile = async () => {
+            const name = document.getElementById('pname').value;
+            const pclass = document.getElementById('pclass').value;
+            const roll = document.getElementById('proll').value;
+
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    name: name,
+                    class: pclass,
+                    roll: roll
+                });
+                alert('Profile saved successfully!');
+
+                if (name) {
+                    document.getElementById('welcomeName').textContent = `Welcome, ${name}!`;
+                    document.getElementById('profileInitial').textContent = name.charAt(0).toUpperCase();
+                }
+            } catch (e) {
+                alert(e.message);
+            }
+        };
+
+        // Handle Enter key on login
+        document.getElementById('password')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') window.login();
+        });
+    </script>
+</body>
+
+</html>

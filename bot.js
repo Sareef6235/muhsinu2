@@ -4,9 +4,24 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import multer from 'multer';
 import axios from 'axios';
+import admin from 'firebase-admin';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Firebase Admin initialization
+const serviceAccountPath = path.join(__dirname, 'my-pc-895cd-firebase-adminsdk-fbsvc-b34d8c77ec.json');
+if (fs.existsSync(serviceAccountPath)) {
+    const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: "https://my-pc-895cd-default-rtdb.firebaseio.com"
+    });
+    console.log("Firebase Admin initialized successfully.");
+} else {
+    console.warn("Firebase Service Account file not found. Database features will be limited.");
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;

@@ -124,7 +124,6 @@
             display: flex;
             gap: 30px;
             list-style: none;
-            align-items: center;
         }
 
         .nav-links a {
@@ -138,93 +137,6 @@
         .nav-links a:hover,
         .nav-links a.active {
             color: var(--primary-color);
-        }
-
-        /* Dropdown Menu Styles */
-        .dropdown {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .dropdown-toggle {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-
-        .dropdown-toggle::after {
-            content: '▾';
-            font-size: 0.8rem;
-            transition: transform 0.3s ease;
-        }
-
-        .dropdown:hover .dropdown-toggle::after {
-            transform: rotate(180deg);
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            min-width: 180px;
-            padding: 10px 0;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 1010;
-        }
-
-        .dropdown:hover .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .dropdown-menu li {
-            width: 100%;
-        }
-
-        .dropdown-menu a {
-            display: block;
-            padding: 10px 20px;
-            font-size: 0.85rem;
-            text-transform: capitalize;
-            color: #ccc;
-            transition: 0.3s;
-            letter-spacing: 0.5px;
-            border-left: 2px solid transparent;
-        }
-
-        .dropdown-menu a:hover {
-            background: rgba(0, 243, 255, 0.05);
-            color: var(--primary-color);
-            border-left-color: var(--primary-color);
-            padding-left: 25px;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            border: 1px solid var(--glass-border);
-            border-radius: 5px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: 0.3s;
-            text-decoration: none;
-        }
-
-        .btn-secondary:hover {
-            background: var(--primary-color);
-            color: #000;
-            box-shadow: 0 0 15px var(--primary-color);
         }
 
         /* Hero Section */
@@ -530,29 +442,10 @@
             <a href="index.html" class="logo">MHMV<span>2026.</span></a>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
-                <li class="dropdown">
-                    <a href="gallery.html" class="active">Gallery</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
-                        <li><a href="gallery.html?tab=video">Video Gallery</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">Creative Corner</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="creative.html">Creative Corner</a></li>
-                        <li><a href="creations.html">Creations</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">Result</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="result.html">Exam Result (New)</a></li>
-                        <li><a href="exam_result.html">Exam Result (Old)</a></li>
-                    </ul>
-                </li>
+                <li><a href="gallery.html" class="active">Gallery</a></li>
+                <li><a href="creative.html">Creative Corner</a></li>
+                <li><a href="result.html">Results</a></li>
                 <li><a href="portal.html">Portal</a></li>
-                <li><a href="index.html#contact" class="btn btn-secondary" style="padding: 8px 15px;">Contact</a></li>
             </ul>
         </div>
     </header>
@@ -700,17 +593,8 @@
             if (e.target === lightbox) lightboxClose.onclick();
         };
 
-        // Initial Load - default to photo for photos.html
-        const params = new URLSearchParams(window.location.search);
-        const tab = params.get('tab') || 'photo';
-        if (tab === 'photo' || tab === 'video') {
-            tabBtns.forEach(b => b.classList.remove('active'));
-            const activeBtn = Array.from(tabBtns).find(b => b.dataset.filter === tab);
-            if (activeBtn) activeBtn.classList.add('active');
-            loadMedia(tab);
-        } else {
-            loadMedia();
-        }
+        // Initial Load
+        loadMedia();
 
         // Reveal animations on scroll
         window.addEventListener('scroll', () => {

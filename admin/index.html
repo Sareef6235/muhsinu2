@@ -352,6 +352,7 @@
                         <li><a href="../meelad_result.html">Meelad</a></li>
                     </ul>
                 </li>
+                <li><a href="../portal.html">Portal</a></li>
                 <li><a href="./" style="font-weight: 600; color: var(--primary-color);">Admin</a></li>
                 <li><button onclick="logout()" class="admin-btn-secondary"
                         style="padding: 10px 20px; font-size: 0.8rem; border-radius: 8px;">Logout</button></li>
@@ -465,7 +466,225 @@
             <div class="admin-card">
                 <h2><i class="ph-bold ph-list-bullets"></i> Active Subjects List</h2>
                 <div id="adminSubjectGrid" class="admin-grid">
-                    <!-- Loaded via JS -->
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name ">
+                                QURA'N HIFZ
+                            </div>
+                            <div class="subject-price">₹800</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(0)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(0)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name ">
+                                FIQH
+                            </div>
+                            <div class="subject-price">₹100</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(1)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(1)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name ">
+                                LISAN QURA'N
+                            </div>
+                            <div class="subject-price">₹650</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(2)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(2)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name ">
+                                AQEEDA
+                            </div>
+                            <div class="subject-price">₹550</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(3)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(3)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name ">
+                                THAJVEETH
+                            </div>
+                            <div class="subject-price">₹700</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(4)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(4)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name ">
+                                THAREEKH
+                            </div>
+                            <div class="subject-price">₹500</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(5)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(5)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name ">
+                                AQLAQH
+                            </div>
+                            <div class="subject-price">₹450</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(6)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(6)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name ">
+                                THAFHEEMU THILAVAH
+                            </div>
+                            <div class="subject-price">₹600</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(7)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(7)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name ">
+                                THAFSEER
+                            </div>
+                            <div class="subject-price">₹650</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(8)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(8)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name ">
+                                DUROOS – ARABIC – MALAYALAM
+                            </div>
+                            <div class="subject-price">₹700</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(9)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(9)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name rtl">
+                                الدينيات – والأخلاق – والإملاء <span class="subject-rtl-tag">Arabic</span>
+                            </div>
+                            <div class="subject-price">₹500</div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="admin-btn admin-btn-secondary"
+                                style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject(10)">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <button class="admin-btn"
+                                style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;"
+                                onclick="deleteSubject(10)">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 

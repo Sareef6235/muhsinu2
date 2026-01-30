@@ -20,10 +20,10 @@
             <ul class="nav-links">
                 <li><a href="index.html#hero">Home</a></li>
                 <li class="dropdown">
-                    <a href="#gallery" class="dropdown-toggle">Gallery</a>
+                    <a href="gallery.html" class="dropdown-toggle">Gallery</a>
                     <ul class="dropdown-menu">
-                        <li><a href="photos.html">Photo Gallery</a></li>
-                        <li><a href="gallery.html">Video Gallery</a></li>
+                        <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
+                        <li><a href="gallery.html?tab=video">Video Gallery</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
@@ -38,11 +38,10 @@
                     <ul class="dropdown-menu">
                         <li><a href="result.html">Exam Result (New)</a></li>
                         <li><a href="exam_result.html">Exam Result (Old)</a></li>
-                        <li><a href="meelad_result.html">Meelad Result</a></li>
                     </ul>
                 </li>
-                <li><a href="#news-notice">News</a></li>
-                <li><a href="admin/" style="font-weight: 600; color: var(--primary-color);">Admin</a></li>
+                <li><a href="portal.html">Portal</a></li>
+                <li><a href="admin/">Admin</a></li>
                 <li><a href="#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
             </ul>
             <button class="mobile-menu-btn" aria-label="Toggle navigation">
@@ -490,9 +489,9 @@
                 <i class="ph ph-calendar-plus"></i>
                 Book Tuition
             </a>
-            <a href="admin/" class="nav-item">
-                <i class="ph ph-lock-key"></i>
-                <span>Admin</span>
+            <a href="portal.html" class="nav-item">
+                <i class="ph ph-user-circle"></i>
+                <span>Portal</span>
             </a>
             <a href="result.html" class="nav-item">
                 <i class="ph ph-exam"></i>
@@ -559,10 +558,14 @@
     <script>
         // Firebase Config for MIFTHAHUL HUDA MADRASA
         var firebaseConfig = {
-            apiKey: "AIzaSyD4mpleKey12345abcdef67890",
+            apiKey: "AIzaSyDY3La232JPHrnwPL_VfwQKJ07JLIEHAZE",
             authDomain: "my-pc-895cd.firebaseapp.com",
             databaseURL: "https://my-pc-895cd-default-rtdb.firebaseio.com",
-            projectId: "my-pc-895cd"
+            projectId: "my-pc-895cd",
+            storageBucket: "my-pc-895cd.firebasestorage.app",
+            messagingSenderId: "970176385787",
+            appId: "1:970176385787:web:d21a6d1ef8079934fb565e",
+            measurementId: "G-NKFHNQ88XG"
         };
 
         if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
@@ -853,9 +856,9 @@
                 <i class="ph ph-calendar-plus"></i>
                 Book Tuition
             </a>
-            <a href="admin/" class="nav-item">
-                <i class="ph ph-lock-key"></i>
-                <span>Admin</span>
+            <a href="portal.html" class="nav-item">
+                <i class="ph ph-user-circle"></i>
+                <span>Portal</span>
             </a>
             <a href="result.html" class="nav-item">
                 <i class="ph ph-exam"></i>
@@ -864,6 +867,10 @@
             <a href="#contact" class="nav-item">
                 <i class="ph ph-chat-circle"></i>
                 <span>Contact</span>
+            </a>
+            <a href="admin/" class="nav-item">
+                <i class="ph ph-shield-star"></i>
+                <span>Admin</span>
             </a>
         </div>
     </nav>

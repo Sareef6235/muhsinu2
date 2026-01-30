@@ -4,26 +4,537 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Gallery - MIFTHAHUL HUDA MADRASA</title>
-    <meta name="description"
-        content="Video gallery showcasing events, activities, and highlights from MIFTHAHUL HUDA MADRASA.">
-    <link rel="stylesheet" href="styles.css">
+    <title>Media Gallery | MIFTHAHUL HUDA MADRASA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --secondary-color: #bc13fe;
+            --accent-color: #ff00c1;
+            --bg-dark: #050505;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-dim: #888888;
+            --primary-gradient: linear-gradient(135deg, #00f3ff 0%, #bc13fe 100%);
+            --secondary-gradient: linear-gradient(135deg, #bc13fe 0%, #ff00c1 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animated Background Orbs */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.15;
+            animation: orbFloat 20s infinite alternate ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--primary-color);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--secondary-color);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-color);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-duration: 25s;
+        }
+
+        @keyframes orbFloat {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(50px, 50px) scale(1.1);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 30px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary-color);
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .dropdown-toggle::after {
+            content: '▾';
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown:hover .dropdown-toggle::after {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            min-width: 180px;
+            padding: 10px 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 1010;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-menu li {
+            width: 100%;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            text-transform: capitalize;
+            color: #ccc;
+            transition: 0.3s;
+            letter-spacing: 0.5px;
+            border-left: 2px solid transparent;
+        }
+
+        .dropdown-menu a:hover {
+            background: rgba(0, 243, 255, 0.05);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            padding-left: 25px;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid var(--glass-border);
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+
+        /* Hero Section */
+        .gallery-hero {
+            padding: 180px 0 80px;
+            text-align: center;
+        }
+
+        .gallery-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, var(--primary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gallery-hero p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        /* Tabs Filter */
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            padding: 12px 30px;
+            border-radius: 50px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-btn i {
+            font-size: 1.2rem;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            background: var(--primary-gradient);
+            color: #000;
+            border: none;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Media Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 100px;
+        }
+
+        .gallery-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-media {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+        .gallery-card:hover .card-media img {
+            transform: scale(1.1);
+        }
+
+        .card-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-content p {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 243, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 1.5rem;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+
+        .gallery-card:hover .play-overlay {
+            transform: translate(-50%, -50%) scale(1.2);
+            background: var(--primary-color);
+            opacity: 1;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 8px 15px;
+            border-radius: 50px;
+            display: flex;
+            gap: 5px;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 65px;
+            height: 55px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.7rem;
+            transition: 0.3s;
+            border-radius: 15px;
+        }
+
+        .nav-item i {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-book-nav {
+            background: var(--primary-gradient);
+            color: #000;
+            padding: 0 20px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin: 0 5px;
+            transition: 0.3s;
+        }
+
+        .btn-book-nav:hover {
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 10px;
+            border: 2px solid var(--glass-border);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: #fff;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .lightbox-close:hover {
+            color: var(--primary-color);
+            transform: rotate(90deg);
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .gallery-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-nav {
+                width: 95%;
+                overflow-x: auto;
+                justify-content: flex-start;
+            }
+
+            .nav-item {
+                min-width: 60px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <header id="main-header">
-        <nav class="container">
-            <a href="index.html#hero" class="logo">MHMV 2026.</a>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">MHMV<span>2026.</span></a>
             <ul class="nav-links">
-                <li><a href="index.html#hero">Home</a></li>
+                <li><a href="index.html">Home</a></li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">Gallery</a>
+                    <a href="gallery.html" class="active">Gallery</a>
                     <ul class="dropdown-menu">
-                        <li><a href="photos.html">Photo Gallery</a></li>
-                        <li><a href="gallery.html">Video Gallery</a></li>
+                        <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
+                        <li><a href="gallery.html?tab=video">Video Gallery</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
@@ -38,133 +549,180 @@
                     <ul class="dropdown-menu">
                         <li><a href="result.html">Exam Result (New)</a></li>
                         <li><a href="exam_result.html">Exam Result (Old)</a></li>
-                        <li><a href="meelad_result.html">Meelad Result</a></li>
                     </ul>
                 </li>
-                <li><a href="index.html#news-notice">News</a></li>
-                <li><a href="admin/" style="font-weight: 600; color: var(--primary-color);">Admin</a></li>
-                <li><a href="index.html#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
+                <li><a href="portal.html">Portal</a></li>
+                <li><a href="index.html#contact" class="btn btn-secondary" style="padding: 8px 15px;">Contact</a></li>
             </ul>
-            <button class="mobile-menu-btn" aria-label="Toggle navigation">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-        </nav>
+        </div>
     </header>
 
-    <main style="padding-top: 100px;">
-        <section id="video-gallery" style="padding: 80px 0;">
-            <div class="container">
-                <h2 class="section-title">Video Gallery</h2>
-                <p
-                    style="text-align: center; color: #888; margin-bottom: 40px; max-width: 700px; margin-left: auto; margin-right: auto;">
-                    Watch highlights from our events, programs, and special moments at MIFTHAHUL HUDA MADRASA.</p>
-                <div class="video-grid" id="video-list">
-                    <!-- Video Gallery Items -->
-                    <div class="video-item animate-fade-up">
-                        <video controls preload="metadata" poster="assets/gallary/1920x1080-1.jpg"
-                            style="width: 100%; border-radius: 15px; background: #000;">
-                            <source src="assets/gallary/videos/WhatsApp Video 2025-11-20 at 11.51.28 AM.mp4"
-                                type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <div class="media-info" style="padding: 15px 0;">
-                            <p style="color: #fff; margin: 0; font-weight: 600;">Recent Event Highlight</p>
-                        </div>
-                    </div>
+    <main class="container">
+        <section class="gallery-hero animate">
+            <h1>Moments & Memories</h1>
+            <p>Explore our visual journey. From academic excellence to cultural celebrations at MIFTHAHUL HUDA MADRASA.
+            </p>
 
-                </div>
+            <div class="filter-tabs">
+                <button class="tab-btn active" data-filter="all">
+                    <i class="ph-bold ph-grid-four"></i> All Media
+                </button>
+                <button class="tab-btn" data-filter="photo">
+                    <i class="ph-bold ph-image"></i> Photos
+                </button>
+                <button class="tab-btn" data-filter="video">
+                    <i class="ph-bold ph-video-camera"></i> Videos
+                </button>
             </div>
         </section>
+
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- Media items will be loaded here -->
+        </div>
     </main>
 
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="script.js"></script>
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close">&times;</span>
+        <div id="lightboxMedia"></div>
+    </div>
 
+    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-        <div class="bottom-nav-container">
-            <a href="index.html#hero" class="nav-item">
-                <i class="ph ph-house"></i>
-                <span>Home</span>
-            </a>
-            <a href="creations.html" class="nav-item">
-                <i class="ph ph-paint-brush"></i>
-                <span>Creations</span>
-            </a>
-            <a href="creative.html" class="nav-item">
-                <i class="ph ph-palette"></i>
-                <span>Corner</span>
-            </a>
-            <a href="photos.html" class="nav-item">
-                <i class="ph ph-image"></i>
-                <span>Gallery</span>
-            </a>
-            <a href="index.html#booking" class="btn-book-nav">
-                <i class="ph ph-calendar-plus"></i>
-                Book Tuition
-            </a>
-            <a href="admin/" class="nav-item">
-                <i class="ph ph-lock-key"></i>
-                <span>Admin</span>
-            </a>
-            <a href="result.html" class="nav-item">
-                <i class="ph ph-exam"></i>
-                <span>Result</span>
-            </a>
-            <a href="index.html#contact" class="nav-item">
-                <i class="ph ph-chat-circle"></i>
-                <span>Contact</span>
-            </a>
-        </div>
+        <a href="index.html" class="nav-item">
+            <i class="ph ph-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="gallery.html" class="nav-item active">
+            <i class="ph ph-image"></i>
+            <span>Gallery</span>
+        </a>
+        <a href="index.html#booking" class="btn-book-nav">
+            <i class="ph ph-calendar-plus"></i>
+            Book Tuition
+        </a>
+        <a href="portal.html" class="nav-item">
+            <i class="ph ph-user-circle"></i>
+            <span>Portal</span>
+        </a>
+        <a href="result.html" class="nav-item">
+            <i class="ph ph-exam"></i>
+            <span>Result</span>
+        </a>
     </nav>
 
-    <footer
-        style="background: #0a0a0a; border-top: 1px solid var(--glass-border); padding: 80px 0 40px; margin-top: 60px;">
-        <div class="container">
-            <div
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 50px;">
-                <div>
-                    <h3
-                        style="color: var(--primary-color); margin-bottom: 25px; font-size: 1.4rem; letter-spacing: 1px;">
-                        MIFTHAHUL HUDA</h3>
-                    <p style="color: #666; line-height: 1.8;">Quality education and Islamic values at Vengara S S Road.
-                        Empowering the next generation.</p>
-                </div>
-                <div>
-                    <h4 style="color: #fff; margin-bottom: 25px;">Quick Links</h4>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 12px;"><a href="index.html#hero"
-                                style="color: #888; transition: 0.3s;">Home</a></li>
-                        <li style="margin-bottom: 12px;"><a href="result.html"
-                                style="color: #888; transition: 0.3s;">Results</a></li>
-                        <li style="margin-bottom: 12px;"><a href="photos.html"
-                                style="color: #888; transition: 0.3s;">Gallery</a></li>
-                        <li style="margin-bottom: 12px;"><a href="admin/" style="color: #888; transition: 0.3s;">Admin
-                                Access</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 style="color: #fff; margin-bottom: 25px;">Contact</h4>
-                    <p style="color: #888; margin-bottom: 12px;">📍 Vengara S S Road</p>
-                    <p style="color: #888;">📞 +91 6235989198</p>
-                </div>
-            </div>
-            <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 30px; text-align: center;">
-                <p style="color: #444; font-size: 0.85rem;">© 2026 MHMV. All rights reserved.</p>
-                <a href="admin/"
-                    style="color: #222; font-size: 0.7rem; text-decoration: none; margin-top: 10px; display: inline-block;">Platform
-                    Administration</a>
-            </div>
-        </div>
-    </footer>
+    <script>
+        const mediaData = [
+            { type: 'photo', src: 'assets/gallary/1920x1080-1.jpg', title: 'Campus View', desc: 'Main school building at sunset' },
+            { type: 'photo', src: 'assets/gallary/1920x1080-2.jpg', title: 'Classroom Life', desc: 'Students engaging in interactive learning' },
+            { type: 'photo', src: 'assets/gallary/800-1.jpg', title: 'Meelad Program', desc: 'Highlights from our cultural festival' },
+            { type: 'photo', src: 'assets/gallary/800-2.jpg', title: 'Sports Day', desc: 'Celebration of athletic spirit' },
+            { type: 'video', src: 'assets/gallary/videos/WhatsApp Video 2025-11-20 at 11.51.28 AM.mp4', title: 'Event Highlight', desc: 'Short clip from recent celebrations', poster: 'assets/gallary/1920x1080-1.jpg' },
+            { type: 'photo', src: 'assets/gallary/800-3 copy.jpg', title: 'Madrasa Activity', desc: 'Student collaboration' },
+            { type: 'photo', src: 'assets/gallary/800-4.jpg', title: 'Evening Assembly', desc: 'A spiritual start to the day' },
+            { type: 'photo', src: 'assets/gallary/WhatsApp Image 2025-11-21 at 23.29.40_8ea24adc.jpg', title: 'Notice Board', desc: 'Stay updated with latest news' }
+        ];
 
-    <!-- WhatsApp Floating Button -->
-    <div class="whatsapp-float-wrapper">
-        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp">
-            <i class="ph-fill ph-whatsapp-logo"></i>
-        </a>
-    </div>
+        const grid = document.getElementById('galleryGrid');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxMedia = document.getElementById('lightboxMedia');
+        const lightboxClose = document.querySelector('.lightbox-close');
+
+        function loadMedia(filter = 'all') {
+            grid.innerHTML = '';
+            const filtered = filter === 'all' ? mediaData : mediaData.filter(m => m.type === filter);
+
+            filtered.forEach((media, index) => {
+                const card = document.createElement('div');
+                card.className = 'gallery-card animate';
+                card.style.animationDelay = `${index * 0.1}s`;
+
+                if (media.type === 'photo') {
+                    card.innerHTML = `
+                        <div class="card-media" onclick="openLightbox('photo', '${media.src}')">
+                            <img src="${media.src}" alt="${media.title}" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <h3>${media.title}</h3>
+                            <p>${media.desc}</p>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="card-media" onclick="openLightbox('video', '${media.src}')">
+                            <img src="${media.poster}" alt="${media.title}">
+                            <div class="play-overlay"><i class="ph-fill ph-play"></i></div>
+                        </div>
+                        <div class="card-content">
+                            <h3>${media.title}</h3>
+                            <p>${media.desc}</p>
+                        </div>
+                    `;
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                loadMedia(btn.dataset.filter);
+            });
+        });
+
+        function openLightbox(type, src) {
+            lightboxMedia.innerHTML = '';
+            if (type === 'photo') {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = 'lightbox-content';
+                lightboxMedia.appendChild(img);
+            } else {
+                const video = document.createElement('video');
+                video.src = src;
+                video.controls = true;
+                video.autoplay = true;
+                video.className = 'lightbox-content';
+                lightboxMedia.appendChild(video);
+            }
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        lightboxClose.onclick = () => {
+            lightbox.classList.remove('active');
+            lightboxMedia.innerHTML = '';
+            document.body.style.overflow = 'auto';
+        };
+
+        lightbox.onclick = (e) => {
+            if (e.target === lightbox) lightboxClose.onclick();
+        };
+
+        // Initial Load
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        if (tab === 'photo' || tab === 'video') {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            const activeBtn = Array.from(tabBtns).find(b => b.dataset.filter === tab);
+            if (activeBtn) activeBtn.classList.add('active');
+            loadMedia(tab);
+        } else {
+            loadMedia();
+        }
+
+        // Reveal animations on scroll
+        window.addEventListener('scroll', () => {
+            const cards = document.querySelectorAll('.gallery-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 100) {
+                    card.classList.add('animate');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
