@@ -214,10 +214,29 @@
         <nav class="container">
             <a href="../index.html" class="logo">MHMV ADMIN.</a>
             <ul class="nav-links">
-                <li><a href="../index.html">Main Site</a></li>
-                <li><a href="../creations.html">Creations</a></li>
-                <li><a href="../creative.html">Creative Corner</a></li>
-                <li><a href="../result.html">Results</a></li>
+                <li><a href="../index.html">Home</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Gallery</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../photos.html">Photo Gallery</a></li>
+                        <li><a href="../gallery.html">Video Gallery</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Creative Corner</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../creative.html">Creative Corner</a></li>
+                        <li><a href="../creations.html">Creations</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Result</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../result.html">Exam Result (New)</a></li>
+                        <li><a href="../exam_result.html">Exam Result (Old)</a></li>
+                        <li><a href="../meelad_result.html">Meelad Result</a></li>
+                    </ul>
+                </li>
                 <li><a href="./" style="font-weight: 600; color: var(--primary-color);">Admin</a></li>
                 <li><button onclick="logout()"
                         style="background:none; border:none; color:inherit; font:inherit; cursor:pointer; text-transform:uppercase; letter-spacing:1px; font-weight:500;">Logout</button>
@@ -477,6 +496,86 @@
                 </div>
             </div>
 
+            <div class="admin-card">
+                <h2 style="margin-bottom: 25px;"><i class="ph ph-files"></i> Site Pages Summary</h2>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; color: #fff;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--glass-border); text-align: left;">
+                                <th style="padding: 15px;">File Name</th>
+                                <th style="padding: 15px;">Size</th>
+                                <th style="padding: 15px;">Last Modified</th>
+                                <th style="padding: 15px; text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 15px;"><a href="../index.html"
+                                        style="color: var(--primary-color); text-decoration: none;"><i
+                                            class="ph ph-file-html"></i> index.html</a></td>
+                                <td style="padding: 15px; color: #888;">48.1 kB</td>
+                                <td style="padding: 15px; color: #888;">Today</td>
+                                <td style="padding: 15px; text-align: right;"><a href="../index.html" class="admin-btn"
+                                        style="display: inline-flex; padding: 5px 15px; font-size: 0.8rem;">View</a>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 15px;"><a href="./index.html"
+                                        style="color: var(--primary-color); text-decoration: none;"><i
+                                            class="ph ph-file-lock"></i> admin/index.html</a></td>
+                                <td style="padding: 15px; color: #888;">28.6 kB</td>
+                                <td style="padding: 15px; color: #888;">Just now</td>
+                                <td style="padding: 15px; text-align: right;"><a href="./index.html" class="admin-btn"
+                                        style="display: inline-flex; padding: 5px 15px; font-size: 0.8rem;">View</a>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 15px;"><a href="../creations.html"
+                                        style="color: var(--primary-color); text-decoration: none;"><i
+                                            class="ph ph-file-html"></i> creations.html</a></td>
+                                <td style="padding: 15px; color: #888;">21.4 kB</td>
+                                <td style="padding: 15px; color: #888;">Today</td>
+                                <td style="padding: 15px; text-align: right;"><a href="../creations.html"
+                                        class="admin-btn"
+                                        style="display: inline-flex; padding: 5px 15px; font-size: 0.8rem;">View</a>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 15px;"><a href="../gallery.html"
+                                        style="color: var(--primary-color); text-decoration: none;"><i
+                                            class="ph ph-file-html"></i> gallery.html</a></td>
+                                <td style="padding: 15px; color: #888;">9.2 kB</td>
+                                <td style="padding: 15px; color: #888;">Today</td>
+                                <td style="padding: 15px; text-align: right;"><a href="../gallery.html"
+                                        class="admin-btn"
+                                        style="display: inline-flex; padding: 5px 15px; font-size: 0.8rem;">View</a>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 15px;"><a href="../result.html"
+                                        style="color: var(--primary-color); text-decoration: none;"><i
+                                            class="ph ph-file-html"></i> result.html</a></td>
+                                <td style="padding: 15px; color: #888;">15.2 kB</td>
+                                <td style="padding: 15px; color: #888;">Today</td>
+                                <td style="padding: 15px; text-align: right;"><a href="../result.html" class="admin-btn"
+                                        style="display: inline-flex; padding: 5px 15px; font-size: 0.8rem;">View</a>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 15px;"><a href="../photos.html"
+                                        style="color: var(--primary-color); text-decoration: none;"><i
+                                            class="ph ph-file-html"></i> photos.html</a></td>
+                                <td style="padding: 15px; color: #888;">12.4 kB</td>
+                                <td style="padding: 15px; color: #888;">Today</td>
+                                <td style="padding: 15px; text-align: right;"><a href="../photos.html" class="admin-btn"
+                                        style="display: inline-flex; padding: 5px 15px; font-size: 0.8rem;">View</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div style="text-align: center;">
                 <button class="admin-btn" style="background: transparent; color: #555;" onclick="logout()">
                     <i class="ph ph-sign-out"></i> Logout Admin
@@ -650,6 +749,20 @@
                 mobileMenuBtn.classList.toggle('active');
             });
         }
+
+        // Dropdown Toggle on Mobile
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            if (toggle) {
+                toggle.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 992) {
+                        e.preventDefault();
+                        dropdown.classList.toggle('active');
+                    }
+                });
+            }
+        });
 
         // Close menu when clicking a link (or button)
         const navItems = document.querySelectorAll('.nav-links a, .nav-links button');
