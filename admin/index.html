@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Subject Management | MHMV</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -211,12 +211,12 @@
 
     <header id="main-header">
         <nav class="container">
-            <a href="index.html#hero" class="logo">MHMV ADMIN.</a>
+            <a href="../index.html" class="logo">MHMV ADMIN.</a>
             <ul class="nav-links">
-                <li><a href="index.html">Main Site</a></li>
-                <li><a href="creations.html">Creations</a></li>
-                <li><a href="creative.html">Creative Corner</a></li>
-                <li><a href="result.html">Results</a></li>
+                <li><a href="../index.html">Main Site</a></li>
+                <li><a href="../creations.html">Creations</a></li>
+                <li><a href="../creative.html">Creative Corner</a></li>
+                <li><a href="../result.html">Results</a></li>
                 <li><button onclick="logout()"
                         style="background:none; border:none; color:inherit; font:inherit; cursor:pointer; text-transform:uppercase; letter-spacing:1px; font-weight:500;">Logout</button>
                 </li>
@@ -275,6 +275,47 @@
             </div>
         </div>
     </main>
+
+    <footer
+        style="background: #0a0a0a; border-top: 1px solid var(--glass-border); padding: 60px 0 30px; margin-top: 80px;">
+        <div class="container">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <div>
+                    <h3 style="color: var(--primary-color); margin-bottom: 20px; font-size: 1.3rem;">MIFTHAHUL HUDA
+                        MADRASA</h3>
+                    <p style="color: #888; line-height: 1.8;">Empowering students through quality education and Islamic
+                        values at Vengara S S Road.</p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Quick Links</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 12px;"><a href="../index.html#about"
+                                style="color: #888; text-decoration: none; transition: 0.3s;">About Us</a></li>
+                        <li style="margin-bottom: 12px;"><a href="../index.html#booking"
+                                style="color: #888; text-decoration: none; transition: 0.3s;">Book Tuition</a></li>
+                        <li style="margin-bottom: 12px;"><a href="../result.html"
+                                style="color: #888; text-decoration: none; transition: 0.3s;">Exam Results</a></li>
+                        <li style="margin-bottom: 12px;"><a href="../index.html#gallery"
+                                style="color: #888; text-decoration: none; transition: 0.3s;">Gallery</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Contact</h4>
+                    <p style="color: #888; margin-bottom: 10px;">📍 Vengara S S Road</p>
+                    <p style="color: #888; margin-bottom: 10px;">📞 <a href="https://wa.me/916235989198"
+                            style="color: #888; text-decoration: none;">+91 6235989198</a></p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Support</h4>
+                    <p style="color: #888; line-height: 1.6;">Start your learning journey with us today!</p>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; text-align: center;">
+                <p style="color: #666; font-size: 0.9rem;">© 2026 MHMV. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <script>
         const ADMIN_EMAIL = "123v213@gmail.com";
