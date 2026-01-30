@@ -484,46 +484,79 @@
     </footer>
 
     <script type="module">
-        import { db } from "../firebase.js";
+        import { auth, db } from "../firebase.js";
         import {
-            collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import {
+            collection, addDoc, updateDoc, deleteDoc, doc, getDoc, onSnapshot, query, orderBy, serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const ADMIN_EMAIL = "123v213@gmail.com";
-        const ADMIN_PASS = "@#asd123";
 
         let subjects = [];
         let editingId = null;
 
         const subjectsRef = collection(db, "subjects");
 
-        function checkAuth() {
-            if (localStorage.getItem("adminLoggedIn") === "true") {
-                document.getElementById('loginOverlay').classList.add('hidden');
+        // CHECK AUTH STATE & ROLE
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const snap = await getDoc(doc(db, "users", user.uid));
+                    if (snap.exists() && snap.data().role === "admin") {
+                        document.getElementById('loginOverlay').classList.add('hidden');
+                        // Start real-time sync only if authorized
+                        startSync();
+                    } else {
+                        alert("Access Denied: Administrative privileges required.");
+                        await signOut(auth);
+                        showLogin();
+                    }
+                } catch (err) {
+                    console.error("Auth verification error:", err);
+                    showLogin();
+                }
+            } else {
+                showLogin();
             }
+        });
+
+        function showLogin() {
+            document.getElementById('loginOverlay').classList.remove('hidden');
         }
 
-        window.handleLogin = function () {
+        window.handleLogin = async function () {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
-            if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
-                localStorage.setItem("adminLoggedIn", "true");
-                document.getElementById('loginOverlay').classList.add('hidden');
-            } else {
-                alert("Unauthorized Access Attempt Detected");
+
+            if (!email || !pass) return alert("Please enter both email and password.");
+
+            try {
+                const cred = await signInWithEmailAndPassword(auth, email, pass);
+                // Auth state observer above will handle role check and UI transition
+            } catch (err) {
+                console.error("Login failed:", err);
+                alert(err.message);
             }
         }
 
-        window.logout = function () {
-            localStorage.removeItem("adminLoggedIn");
-            window.location.reload();
+        window.logout = async function () {
+            try {
+                await signOut(auth);
+                window.location.reload();
+            } catch (err) {
+                console.error("Logout error:", err);
+            }
         }
 
         // Real-time synchronization with Firestore
-        onSnapshot(query(subjectsRef, orderBy("name")), (snapshot) => {
-            subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderAdminSubjects();
-        });
+        function startSync() {
+            onSnapshot(query(subjectsRef, orderBy("name")), (snapshot) => {
+                subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderAdminSubjects();
+            });
+        }
 
         function renderAdminSubjects() {
             const grid = document.getElementById('adminSubjectGrid');
@@ -621,7 +654,6 @@
             });
         });
 
-        checkAuth();
     </script>
 </body>
 
