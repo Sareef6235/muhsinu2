@@ -3,144 +3,437 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>MHMV Booking + Admin</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Tuition | MIFTHAHUL HUDA MADRASA</title>
+    <meta name="description"
+        content="Secure your tuition sessions with professional instructors at MIFTHAHUL HUDA MADRASA.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
         body {
-            font-family: Arial;
-            background: #0a0a0a;
-            color: #fff
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1100px;
-            margin: auto;
-            padding: 20px
+        /* Hero Section for Booking */
+        .booking-hero {
+            padding: 180px 0 60px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px
+        .booking-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            letter-spacing: -1.5px;
         }
 
-        input,
-        button {
+        .booking-hero p {
+            color: #888;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Form Styling Overrides */
+        .booking-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 50px;
+            margin-bottom: 100px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-section-title i {
+            color: var(--primary-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-input {
             width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: none
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
-        button {
-            background: #00f3ff;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
         }
 
         .checkbox-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 10px
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
         }
 
-        .price-box {
-            margin-top: 15px;
-            font-size: 1.2rem;
-            color: #00f3ff
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        .hidden {
-            display: none
+        .checkbox-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .checkbox-item input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-color);
+        }
+
+        .checkbox-item span {
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+
+        .price-summary-card {
+            background: var(--primary-gradient);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            color: #000;
+            margin-top: 40px;
+        }
+
+        .price-summary-card h3 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        .price-summary-card .total-price {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+        }
+
+        /* RTL Handling for Arabic */
+        .rtl {
+            direction: rtl;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Background Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary-color);
+            top: 10%;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--secondary-color);
+            bottom: 10%;
+            right: -100px;
+        }
+
+        @media (max-width: 768px) {
+            .booking-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .booking-card {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
 
-        <!-- ================= STUDENT FORM ================= -->
-        <div class="card">
-            <h2>Student Booking</h2>
+    <header id="main-header">
+        <nav class="container">
+            <a href="index.html#hero" class="logo">MHMV 2026.</a>
+            <ul class="nav-links">
+                <li><a href="index.html#hero">Home</a></li>
+                <li class="dropdown">
+                    <a href="gallery.html" class="dropdown-toggle">Gallery</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
+                        <li><a href="gallery.html?tab=video">Video Gallery</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Creative Corner</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="creative.html">Creative Corner</a></li>
+                        <li><a href="creations.html">Creations</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Result</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="result.html">Exam Result (New)</a></li>
+                        <li><a href="exam_result.html">Exam Result (Old)</a></li>
+                    </ul>
+                </li>
+                <li><a href="student_dashboard.html">Student Dashboard</a></li>
+                <li><a href="booking.html" style="color: #00f3ff;">Booking</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Portal</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="portal.html">Portal</a></li>
+                        <li><a href="admin/" style="font-weight: 600; color: var(--primary-color);">Admin</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <button class="mobile-menu-btn" aria-label="Toggle navigation">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </nav>
+    </header>
 
+    <main class="container">
+        <section class="booking-hero">
+            <h1 class="animate-fade-up">Guided Excellence</h1>
+            <p class="animate-fade-up delay-1">Secure your path to knowledge. Fill out the application below to book
+                your specialized tuition sessions.</p>
+        </section>
+
+        <section class="booking-card animate-fade-up delay-2">
             <form id="bookingForm">
-                <input id="fname" placeholder="First Name" required>
-                <input id="lname" placeholder="Last Name" required>
-                <input id="email" type="email" placeholder="Your Email" required>
+                <div class="form-section-title"><i class="ph-bold ph-user"></i> Personal Information</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" id="fname" class="form-input" placeholder="Enter first name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" id="lname" class="form-input" placeholder="Enter last name" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="Your primary email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Academic Class</label>
+                    <input type="text" id="studentClass" class="form-input" placeholder="e.g. Class 10 or +2" required>
+                </div>
 
-                <h3>Subjects</h3>
+                <div class="form-section-title" style="margin-top: 40px;"><i class="ph-bold ph-book-open"></i> Select
+                    Subjects</div>
                 <div class="checkbox-grid" id="subjectsContainer">
-                    Loading subjects...
+                    <!-- Dynamic subjects load here -->
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+                        <i class="ph ph-circle-notch ph-spin"
+                            style="font-size: 2rem; margin-bottom: 15px; color: var(--primary-color);"></i>
+                        <p>Synchronizing subjects from Cloud Firestore...</p>
+                    </div>
                 </div>
 
-                <input id="studentClass" placeholder="Class (1–12)" required>
-
-                <div class="price-box">
-                    Total Price: ₹<span id="total-price">0</span>
+                <div class="price-summary-card">
+                    <h3>Investment in Knowledge</h3>
+                    <div class="total-price">₹<span id="total-price">0</span></div>
+                    <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 5px;">One-time payment for selected modules
+                    </p>
                 </div>
 
-                <button type="submit">Submit Booking</button>
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; margin-top: 40px; padding: 18px; font-size: 1.1rem;">Confirm Booking</button>
             </form>
-        </div>
+        </section>
+    </main>
 
-        <!-- ================= ADMIN LOGIN ================= -->
-        <div class="card">
-            <h2>Admin Login</h2>
-            <input id="adminEmail" placeholder="Your Email">
-            <input id="adminPassword" type="password" placeholder="Your Password">
-            <button onclick="adminLogin()">Login</button>
-            <p id="loginStatus"></p>
-        </div>
+    <!-- Booking Confirmation Modal -->
+    <div id="booking-modal" class="modal-overlay hidden">
+        <div class="modal-content animate-fade-up">
+            <div class="modal-icon">
+                <i class="ph ph-check-circle"></i>
+            </div>
+            <h2>Booking Summary</h2>
+            <div class="modal-body">
+                <p>Hello <span id="modal-name"></span>,</p>
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin: 15px 0;">
+                    <p style="margin: 0; color: #888; font-size: 0.85rem;">Subjects:</p>
+                    <p id="modal-subjects" style="color: #fff; font-weight: 600;"></p>
+                    <div style="height: 1px; background: var(--glass-border); margin: 10px 0;"></div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #888;">Class: <strong id="modal-class" style="color: #fff;"></strong></span>
+                        <span style="color: #888;">Total: <strong id="modal-price"
+                                style="color: var(--primary-color);"></strong></span>
+                    </div>
+                </div>
 
-        <!-- ================= ADMIN PANEL ================= -->
-        <div class="card hidden" id="adminPanel">
-            <h2>Admin Panel – Bookings</h2>
-            <div id="bookingList"></div>
+                <div class="modal-qr-section"
+                    style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--glass-border); text-align: center;">
+                    <p style="margin-bottom: 15px; color: #bbb; font-size: 0.9rem;">Scan to Pay via UPI</p>
+                    <div class="modal-qr-container"
+                        style="background: white; padding: 15px; border-radius: 15px; display: inline-block;">
+                        <img src="assets/upi-qr.jpeg" alt="UPI QR Code" class="modal-qr-img"
+                            style="max-width: 180px; width: 100%; display: block; height: auto; border-radius: 8px;">
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <p style="font-size: 0.9rem; color: #fff; margin-bottom: 5px;">UPI ID: <b>mmuhsinu2-1@okaxis</b>
+                        </p>
+                        <p style="font-size: 0.8rem; color: #888;">Name: Mo Mhn</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="modal-pay-btn" style="width: 100%; padding: 15px;">Proceed to
+                    Pay</button>
+                <button onclick="closeBookingModal()"
+                    style="margin-top: 15px; background: none; border: none; color: #666; cursor: pointer; font-size: 0.9rem; width: 100%;">Cancel</button>
+            </div>
         </div>
-
     </div>
 
-    <!-- ================= FIREBASE LOGIC ================= -->
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-container">
+            <a href="index.html#hero" class="nav-item">
+                <i class="ph ph-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="creations.html" class="nav-item">
+                <i class="ph ph-paint-brush"></i>
+                <span>Creations</span>
+            </a>
+            <a href="photos.html" class="nav-item">
+                <i class="ph ph-image"></i>
+                <span>Gallery</span>
+            </a>
+            <a href="booking.html" class="nav-item active">
+                <i class="ph ph-calendar-plus"></i>
+                <span>Booking</span>
+            </a>
+            <a href="portal.html" class="nav-item">
+                <i class="ph ph-user-circle"></i>
+                <span>Portal</span>
+            </a>
+            <a href="admin/" class="nav-item">
+                <i class="ph ph-shield-star"></i>
+                <span>Admin</span>
+            </a>
+        </div>
+    </nav>
+
     <script type="module">
         import { auth, db } from "./firebase.js";
-        import { addDoc, collection, onSnapshot, getDocs, query, orderBy, serverTimestamp }
+        import { addDoc, collection, onSnapshot, query, orderBy, serverTimestamp }
             from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { signInWithEmailAndPassword, onAuthStateChanged }
-            from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        /* ===== REALTIME SUBJECTS ===== */
+        /* ===== STATE & ELEMENTS ===== */
         const subjectsContainer = document.getElementById("subjectsContainer");
         const totalEl = document.getElementById("total-price");
+        const bookingForm = document.getElementById("bookingForm");
+        const modal = document.getElementById("booking-modal");
 
+        /* ===== REALTIME SUBJECTS ===== */
         const q = query(collection(db, "subjects"), orderBy("name"));
 
         onSnapshot(q, (snap) => {
             subjectsContainer.innerHTML = "";
-            totalEl.textContent = 0;
-
             if (snap.empty) {
-                subjectsContainer.innerHTML = "<p>No subjects available yet.</p>";
+                subjectsContainer.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #888;'>No subjects available yet.</p>";
                 return;
             }
 
             snap.forEach(doc => {
                 const s = doc.data();
+                if (!s.active) return;
 
                 const label = document.createElement("label");
-                label.style.display = "flex";
-                label.style.alignItems = "center";
-                label.style.gap = "8px";
-
-                if (s.rtl) label.dir = "rtl";
-
+                label.className = `checkbox-item ${s.rtl ? 'rtl' : ''}`;
                 label.innerHTML = `
                     <input type="checkbox" data-price="${s.price}" value="${s.name}">
                     <span>
                         ${s.name}
-                        ${s.rtl ? `<small style="color:#bc13fe;">(Arabic)</small>` : ""}
+                        ${s.rtl ? `<small style="color:var(--secondary-color); margin-right: 5px;">(Arabic)</small>` : ""}
                         – ₹${s.price}
                     </span>
                 `;
@@ -150,78 +443,74 @@
             });
         });
 
-        /* ===== PRICE UPDATE ===== */
         function updatePrice() {
             let total = 0;
-            document
-                .querySelectorAll("#subjectsContainer input[type=checkbox]:checked")
-                .forEach(c => total += Number(c.dataset.price));
+            document.querySelectorAll("#subjectsContainer input:checked").forEach(c => total += Number(c.dataset.price));
             totalEl.textContent = total;
         }
 
         /* ===== FORM SUBMIT ===== */
-        document.getElementById("bookingForm").addEventListener("submit", async e => {
+        bookingForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const subjects = [];
-            document.querySelectorAll("#subjectsContainer input[type=checkbox]:checked").forEach(c => subjects.push(c.value));
-            if (!subjects.length) { alert("Select at least one subject"); return; }
+            const checkedSubjects = Array.from(document.querySelectorAll("#subjectsContainer input:checked")).map(c => c.value);
+            if (!checkedSubjects.length) return alert("Please select at least one subject.");
+
+            const bookingData = {
+                firstName: document.getElementById("fname").value,
+                lastName: document.getElementById("lname").value,
+                email: document.getElementById("email").value,
+                class: document.getElementById("studentClass").value,
+                subjects: checkedSubjects,
+                total: Number(totalEl.textContent),
+                createdAt: serverTimestamp()
+            };
 
             try {
-                await addDoc(collection(db, "bookings"), {
-                    firstName: fname.value,
-                    lastName: lname.value,
-                    email: email.value,
-                    class: studentClass.value,
-                    subjects,
-                    total: Number(totalEl.textContent),
-                    createdAt: serverTimestamp()
-                });
-
-                alert("Booking Submitted Successfully!");
-                e.target.reset();
-                totalEl.textContent = 0;
+                await addDoc(collection(db, "bookings"), bookingData);
+                showBookingModal(bookingData);
             } catch (err) {
-                console.error("Error submitting booking:", err);
-                alert("Failed to submit booking. Please try again.");
+                console.error("Booking failed:", err);
+                alert("Submission failed. Check your connection.");
             }
         });
 
-        /* ===== ADMIN LOGIN ===== */
-        window.adminLogin = async () => {
-            try {
-                await signInWithEmailAndPassword(auth, adminEmail.value, adminPassword.value);
-                loginStatus.textContent = "Login success";
-            } catch (e) {
-                loginStatus.textContent = e.message;
-            }
-        };
+        /* ===== MODAL LOGIC ===== */
+        function showBookingModal(data) {
+            document.getElementById("modal-name").textContent = data.firstName;
+            document.getElementById("modal-subjects").textContent = data.subjects.join(", ");
+            document.getElementById("modal-class").textContent = data.class;
+            document.getElementById("modal-price").textContent = `₹${data.total}`;
 
-        /* ===== LOAD BOOKINGS ===== */
-        async function loadBookings() {
-            const list = document.getElementById("bookingList");
-            list.innerHTML = "Loading...";
-            const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
-            const snap = await getDocs(q);
-            list.innerHTML = "";
-            snap.forEach(d => {
-                const b = d.data();
-                list.innerHTML += `
-    <div class="card">
-    <b>${b.firstName} ${b.lastName}</b><br>
-    Email: ${b.email}<br>
-    Class: ${b.class}<br>
-    Subjects: ${b.subjects.join(", ")}<br>
-    <b>₹${b.total}</b>
-    </div>`;
-            });
+            modal.classList.add("active");
+
+            document.getElementById("modal-pay-btn").onclick = () => {
+                const upiUrl = `upi://pay?pa=mmuhsinu2-1@okaxis&pn=Mo%20Mhn&am=${data.total}&cu=INR&tn=Tuition%20Booking%20for%20${data.firstName}`;
+                window.location.href = upiUrl;
+            };
         }
 
-        /* ===== AUTH STATE ===== */
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                adminPanel.classList.remove("hidden");
-                loadBookings();
-            }
+        window.closeBookingModal = () => {
+            modal.classList.remove("active");
+            bookingForm.reset();
+            totalEl.textContent = "0";
+        };
+
+        /* ===== MENU TOGGLE ===== */
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileMenuBtn?.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenuBtn.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                if (window.innerWidth <= 992) {
+                    e.preventDefault();
+                    toggle.parentElement.classList.toggle('active');
+                }
+            });
         });
     </script>
 </body>
