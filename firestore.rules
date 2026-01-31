@@ -1,36 +1,64 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // 🔴 DEVELOPMENT RULES - VERY PERMISSIVE
-    // ⚠️  WARNING: These rules are for development only!
-    // ⚠️  DO NOT use in production - they allow too much access
-    
-    // Users collection - Allow authenticated users to manage
+
+    // 🛡️ SECURITY HELPERS
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
+      return isSignedIn() &&
+             exists(userPath) &&
+             get(userPath).data.role == 'admin';
+    }
+
+    // 👤 USERS COLLECTION
     match /users/{userId} {
-      // Any authenticated user can read any user document
-      allow read: if request.auth != null;
-      
-      // Users can create their own document
-      allow create: if request.auth != null && request.auth.uid == userId;
-      
-      // Users can update their own document, or any if they exist in users collection
-      allow update: if request.auth != null;
-      
-      // Allow delete for authenticated users (admins)
-      allow delete: if request.auth != null;
+      // Users can always read their own document
+      allow read: if isSignedIn() && request.auth.uid == userId;
+
+      // Self-registration for new students
+      allow create: if isSignedIn() &&
+                    request.auth.uid == userId &&
+                    request.resource.data.role == 'student' &&
+                    request.resource.data.approved == false;
+
+      // Restricted updates: Users can only change specific profile fields
+      // Use .diff() to ensure role and approved status aren't modified
+      allow update: if isSignedIn() &&
+                    request.auth.uid == userId &&
+                    request.resource.data.diff(resource.data).affectedKeys()
+                    .hasOnly(['name', 'class', 'roll', 'updatedAt']);
+
+      // Admin Bypass: Admins can do everything
+      allow read, write: if isAdmin();
     }
 
-    // Subjects collection - Open access for development
-    match /subjects/{subjectId} {
-      // Anyone can read/write subjects during development
-      allow read, write: if true;
-    }
-
-    // Bookings collection - Open for testing
+    // 📅 BOOKINGS COLLECTION
     match /bookings/{bookingId} {
-      // Anyone can create/read/manage bookings during development
-      allow read, write: if true;
+      // Basic schema validation for public booking creation
+      allow create: if request.resource.data.email is string &&
+                    request.resource.data.name is string &&
+                    request.resource.data.subjectId is string;
+      
+      allow read, write: if isAdmin();
     }
+
+    // 📚 SUBJECTS COLLECTION
+    match /subjects/{subjectId} {
+      allow read: if true; // Public read access for the booking form
+      allow write: if isAdmin();
+    }
+
+    // 🖼️ IMAGES COLLECTION
+    match /images/{imageId} {
+      allow read: if true; // Publicly viewable
+      allow write: if isSignedIn() &&
+                    (request.auth.uid == request.resource.data.userId || isAdmin());
+    }
+
+    // ❌ REMOVED: connection_test for security
   }
 }

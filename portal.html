@@ -713,9 +713,20 @@
 
     <main class="portal-main">
         <div class="container">
+            <!-- Portal Loader -->
+            <div id="portalLoader" style="text-align: center; padding: 100px 0;">
+                <div class="spinner"
+                    style="width: 50px; height: 50px; margin: 0 auto 20px; border-width: 4px; border-top-color: var(--primary-color);">
+                </div>
+                <p style="color: #888; font-size: 1.1rem;">Initializing Secure Portal...</p>
+                <button class="btn btn-secondary" onclick="location.reload()"
+                    style="margin-top: 20px; font-size: 0.8rem;">
+                    <i class="ph ph-arrows-clockwise"></i> Force Reload
+                </button>
+            </div>
 
             <!-- LOGIN BOX -->
-            <div id="loginBox" class="login-wrapper animate-in">
+            <div id="loginBox" class="login-wrapper animate-in hidden">
                 <div class="portal-card">
                     <div class="login-icon">
                         <i class="ph-bold ph-lock-key"></i>
@@ -1159,34 +1170,6 @@
             }
         }
 
-        // LOGIN
-        window.login = function () {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (!email || !password) {
-                alert('Please fill in all fields');
-                return;
-            }
-
-            // Standard Firebase Login
-            signInWithEmailAndPassword(window.auth, email, password)
-                .then((userCredential) => {
-                    alert("Login success ✅");
-                    console.log(userCredential.user);
-                })
-                .catch((error) => {
-                    console.error("Login Error:", error.code);
-                    let friendlyMsg = error.message;
-                    if (error.code === 'auth/configuration-not-found') {
-                        friendlyMsg = "Configuration Error: Authentication is not enabled in Firebase Console (Email/Password provider).";
-                    } else if (error.code === 'auth/invalid-credential') {
-                        friendlyMsg = "Invalid email or password.";
-                    }
-                    alert(friendlyMsg);
-                    showMessage(friendlyMsg);
-                });
-        };
 
         // PASSWORD RESET
         window.resetPassword = async () => {
@@ -1226,6 +1209,10 @@
                 if (studentPanel) studentPanel.classList.add('hidden');
                 if (waitingPanel) waitingPanel.classList.add('hidden');
                 if (logoutBtn) logoutBtn.classList.add('hidden');
+
+                // Hide loading spinner if it exists
+                const loader = document.getElementById('portalLoader');
+                if (loader) loader.classList.add('hidden');
                 return;
             }
 
@@ -1260,10 +1247,13 @@
 
                     if (isDev) {
                         alert("Dev Admin detected. Auto-registering...");
-                        location.reload(); // Reload to pick up new document
-                    } else if (waitingPanel) {
-                        waitingPanel.classList.remove('hidden');
+                        location.reload();
+                        return;
                     }
+
+                    if (waitingPanel) waitingPanel.classList.remove('hidden');
+                    const loader = document.getElementById('portalLoader');
+                    if (loader) loader.classList.add('hidden');
                     return;
                 }
 
@@ -1329,13 +1319,50 @@
                         const initEl = document.getElementById('profileInitial');
                         if (initEl) initEl.textContent = data.name.charAt(0).toUpperCase();
                     }
-                    console.log("  ✅ Student panel fully loaded");
                 }
+                console.log("  ✅ Profile path resolved");
             } catch (e) {
                 console.error("Auth State Error:", e);
-                showMessage('Error loading user profile');
+                console.error("  Error Code:", e.code);
+                console.error("  Error Message:", e.message);
+
+                // 🔴 Show login box again if Firestore fails so user isn't stuck
+                if (loginBox) loginBox.classList.remove('hidden');
+                if (logoutBtn) logoutBtn.classList.add('hidden');
+
+                let errorMsg = "Failed to load profile. ";
+                if (e.code === 'permission-denied') {
+                    errorMsg = "<strong>Access Denied:</strong> Your Firestore security rules are blocking this request. ";
+                    errorMsg += "<br><small>Ensure your UID is correctly set in the 'users' collection or that rules allow your read.</small>";
+                } else if (e.code === 'unavailable') {
+                    errorMsg = "Firestore is currently unreachable. Check your internet connection.";
+                } else {
+                    errorMsg += e.message;
+                }
+
+                showMessage(errorMsg, 'error');
+
+                // Add a "Help" button to the message area if it exists
+                const msgEl = document.getElementById('msg');
+                if (msgEl && e.code === 'permission-denied') {
+                    const helpBtn = document.createElement('button');
+                    helpBtn.className = 'btn btn-secondary';
+                    helpBtn.style.marginTop = '10px';
+                    helpBtn.style.fontSize = '0.7rem';
+                    helpBtn.innerHTML = '<i class="ph ph-question"></i> How to fix this?';
+                    helpBtn.onclick = () => {
+                        alert("FIX STEPS:\n1. Check if rules_version = '2' is at the top of your rules.\n2. Ensure the 'users' collection exists.\n3. Verify your UID in the 'users' collection matches your Auth UID.");
+                    };
+                    msgEl.appendChild(document.createElement('br'));
+                    msgEl.appendChild(helpBtn);
+                }
+            } finally {
+                // Final Loader Cleanup
+                const loader = document.getElementById('portalLoader');
+                if (loader) loader.classList.add('hidden');
             }
         }
+
 
         // AUTH STATE OBSERVER
         onAuthStateChanged(auth, (user) => {
@@ -1359,20 +1386,26 @@
         window.handleAuth = async function () {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const btn = event?.target?.closest('button') || document.querySelector('#loginBox .btn-primary');
 
             if (!email || !password) {
                 alert('Please fill in all fields');
                 return;
             }
 
+            // Show loading state on button
+            const originalContent = btn ? btn.innerHTML : null;
+            if (btn) btn.innerHTML = '<span class="spinner"></span> Logging in...';
+            if (btn) btn.disabled = true;
+
             try {
                 // Real Firebase Login
                 await signInWithEmailAndPassword(auth, email, password);
-                alert("Login successful!");
+                console.log("Login successful!");
             } catch (error) {
+                console.error("Auth Error:", error.code);
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
-                    // Try to register if login fails with "not found" (or invalid, depending on enumeration)
-                    if (confirm("Email not found or password incorrect. Would you like to create a new account?")) {
+                    if (confirm("Email not found or password incorrect. Would you like to create a new account with these credentials?")) {
                         try {
                             const isDev = (email === "123v213@gmail.com" || email === "123v214@gmail.com");
                             const userCred = await createUserWithEmailAndPassword(auth, email, password);
@@ -1385,11 +1418,17 @@
                             });
                             alert(isDev ? "Dev Admin account created! Logging in..." : "Account created! Waiting for admin approval.");
                         } catch (regErr) {
-                            alert(regErr.message);
+                            alert("Registration failed: " + regErr.message);
                         }
                     }
                 } else {
                     alert(error.message);
+                    showMessage(error.message);
+                }
+            } finally {
+                if (btn) {
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
                 }
             }
         };
@@ -1820,7 +1859,10 @@
 
         // Handle Enter key on login
         document.getElementById('password')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') window.login();
+            if (e.key === 'Enter') window.handleAuth();
+        });
+        document.getElementById('email')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('password').focus();
         });
     </script>
 </body>
