@@ -806,6 +806,132 @@
                         <!-- Dynamic user cards will be loaded here -->
                     </div>
                 </div>
+
+                <hr class="divider">
+
+                <!-- Site Pages Summary -->
+                <div class="portal-card">
+                    <h2><i class="ph-bold ph-files"></i> Site Pages Management</h2>
+                    <div class="pages-table-wrapper"
+                        style="width: 100%; overflow-x: auto; border-radius: 15px; background: rgba(255, 255, 255, 0.02);">
+                        <table class="pages-table"
+                            style="width: 100%; border-collapse: collapse; color: #fff; min-width: 600px;">
+                            <thead>
+                                <tr>
+                                    <th
+                                        style="text-align: left; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                                        Page Name</th>
+                                    <th
+                                        style="text-align: left; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                                        Description</th>
+                                    <th
+                                        style="text-align: left; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                                        Status</th>
+                                    <th
+                                        style="text-align: right; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                                        Operations</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody">
+                                <tr>
+                                    <td style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);"><a
+                                            href="index.html" class="file-link"
+                                            style="color: var(--primary-color); display: flex; align-items: center; gap: 12px; font-weight: 600;"><i
+                                                class="ph-bold ph-house" style="font-size: 1.4rem;"></i> index.html</a>
+                                    </td>
+                                    <td
+                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #888;">
+                                        Main Homepage & Landing</td>
+                                    <td
+                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #00ff88; font-weight: 600;">
+                                        ACTIVE</td>
+                                    <td
+                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
+                                        <a href="index.html" class="btn btn-secondary"
+                                            style="padding: 8px 15px; font-size: 0.75rem;">Launch</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);"><a
+                                            href="portal.html" class="file-link"
+                                            style="color: var(--primary-color); display: flex; align-items: center; gap: 12px; font-weight: 600;"><i
+                                                class="ph-bold ph-lock" style="font-size: 1.4rem;"></i> portal.html</a>
+                                    </td>
+                                    <td
+                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #888;">
+                                        Management Dashboard</td>
+                                    <td
+                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #00ff88; font-weight: 600;">
+                                        ACTIVE</td>
+                                    <td
+                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
+                                        <span
+                                            style="color: #444; font-weight: 700; font-size: 0.75rem; padding-right: 15px;">CURRENT</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);"><a
+                                            href="result.html" class="file-link"
+                                            style="color: var(--primary-color); display: flex; align-items: center; gap: 12px; font-weight: 600;"><i
+                                                class="ph-bold ph-exam" style="font-size: 1.4rem;"></i> result.html</a>
+                                    </td>
+                                    <td
+                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #888;">
+                                        Generic Results Portal</td>
+                                    <td
+                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #00ff88; font-weight: 600;">
+                                        ACTIVE</td>
+                                    <td
+                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
+                                        <a href="result.html" class="btn btn-secondary"
+                                            style="padding: 8px 15px; font-size: 0.75rem;">Launch</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Subject Configuration -->
+                <div class="portal-card">
+                    <h2 id="subjectFormTitle"><i class="ph-bold ph-plus-circle"></i> Add New Subject</h2>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 30px;">
+                        <div class="form-group">
+                            <label class="form-label">Subject Title</label>
+                            <input type="text" id="subName" class="form-input" placeholder="e.g. TAJWEED">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tuition Fee (₹)</label>
+                            <input type="number" id="subPrice" class="form-input" placeholder="700">
+                        </div>
+                        <div class="form-group"
+                            style="padding-top: 35px; display: flex; align-items: center; gap: 15px;">
+                            <input type="checkbox" id="subRTL"
+                                style="width: 24px; height: 24px; accent-color: var(--primary-color);">
+                            <label class="form-label" style="margin: 0;">Right-to-Left (Arabic)</label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addOrUpdateSubject()">
+                        <i class="ph-bold ph-floppy-disk"></i> Synchronize Data
+                    </button>
+                    <button id="cancelEditBtn" class="btn btn-secondary hidden" onclick="cancelSubjectEdit()"
+                        style="margin-left: 10px;">
+                        Cancel Edit
+                    </button>
+                </div>
+
+                <div class="portal-card">
+                    <h2><i class="ph-bold ph-list-bullets"></i> Active Subjects List</h2>
+                    <div id="adminSubjectGrid" class="portal-grid">
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+                            <i class="ph ph-circle-notch ph-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <p>Synchronizing with Cloud...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- STUDENT DASHBOARD -->
@@ -897,8 +1023,13 @@
             setDoc,
             getDoc,
             updateDoc,
+            deleteDoc,
+            addDoc,
             collection,
-            onSnapshot
+            onSnapshot,
+            query,
+            orderBy,
+            serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         /* 🔴 FIREBASE CONFIG - Replace with your credentials */
@@ -920,17 +1051,24 @@
             auth = getAuth(app);
             db = getFirestore(app);
 
+            // Use device language for localized auth/verification
+            auth.useDeviceLanguage();
+
             // 🔴 IMPORTANT: Attach to window as requested
             window.auth = auth;
             window.db = db;
             window.app = app;
 
             console.log("Firebase Initialized Successfully");
-            console.log("Auth Status:", auth);
         } catch (e) {
             console.error("Firebase Initialization Error:", e);
             alert("Critical Error: Firebase failed to initialize. Check console for details.");
         }
+
+        // Subject Management State
+        let subjects = [];
+        let editingSubjectId = null;
+        const subjectsRef = collection(db, "subjects");
 
         // DOM Elements
         const loginBox = document.getElementById('loginBox');
@@ -1056,6 +1194,7 @@
                     const navAdminLink = document.getElementById('navAdminLink');
                     if (navAdminLink) navAdminLink.style.display = 'block';
                     loadUsers();
+                    startSubjectSync();
                 }
 
                 if (data.role === "student" && studentPanel) {
@@ -1236,28 +1375,111 @@
             }
         };
 
-        // SAVE PROFILE
-        window.saveProfile = async () => {
-            const name = document.getElementById('pname').value;
-            const pclass = document.getElementById('pclass').value;
-            const roll = document.getElementById('proll').value;
+        // SUBJECT MANAGEMENT LOGIC
+        function startSubjectSync() {
+            onSnapshot(query(subjectsRef, orderBy("name")), (snapshot) => {
+                subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderAdminSubjects();
+            });
+        }
+
+        function renderAdminSubjects() {
+            const grid = document.getElementById('adminSubjectGrid');
+            if (!grid) return;
+            grid.innerHTML = subjects.map((s) => `
+                <div class="user-card" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div class="subject-info">
+                        <div class="user-email ${s.rtl ? 'rtl' : ''}" style="font-size: 1.2rem;">
+                            ${s.name} ${s.rtl ? '<span style="font-size: 0.65rem; padding: 4px 10px; background: rgba(188, 19, 254, 0.15); color: #e0b0ff; border-radius: 6px; margin-left: 10px; vertical-align: middle; font-weight: 600;">Arabic</span>' : ''}
+                        </div>
+                        <div style="color: var(--primary-color); font-weight: 700; font-size: 1.3rem;">₹${s.price}</div>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-top: auto;">
+                        <button class="btn btn-secondary" style="flex:1; padding: 10px; font-size: 0.8rem;" onclick="editSubject('${s.id}')">
+                            <i class="ph ph-pencil"></i> Edit
+                        </button>
+                        <button class="btn" style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px;" onclick="deleteSubject('${s.id}')">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.addOrUpdateSubject = async function () {
+            const nameEl = document.getElementById('subName');
+            const priceEl = document.getElementById('subPrice');
+            const rtlEl = document.getElementById('subRTL');
+            const titleEl = document.getElementById('subjectFormTitle');
+            const cancelBtn = document.getElementById('cancelEditBtn');
+
+            if (!nameEl.value || !priceEl.value) return alert("Validation Failed: All fields required");
+
+            const subjectData = {
+                name: nameEl.value,
+                price: parseFloat(priceEl.value),
+                rtl: rtlEl.checked
+            };
 
             try {
-                await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                    name: name,
-                    class: pclass,
-                    roll: roll
-                });
-                alert('Profile saved successfully!');
-
-                if (name) {
-                    document.getElementById('welcomeName').textContent = `Welcome, ${name}!`;
-                    document.getElementById('profileInitial').textContent = name.charAt(0).toUpperCase();
+                if (editingSubjectId) {
+                    await updateDoc(doc(db, "subjects", editingSubjectId), subjectData);
+                    editingSubjectId = null;
+                    if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-plus-circle"></i> Add New Subject';
+                    if (cancelBtn) cancelBtn.classList.add('hidden');
+                } else {
+                    await addDoc(subjectsRef, {
+                        ...subjectData,
+                        active: true,
+                        createdAt: serverTimestamp()
+                    });
                 }
-            } catch (e) {
-                alert(e.message);
+
+                nameEl.value = "";
+                priceEl.value = "";
+                rtlEl.checked = false;
+            } catch (error) {
+                console.error("Error saving subject:", error);
+                alert("Failed to synchronize data with cloud.");
             }
-        };
+        }
+
+        window.editSubject = function (id) {
+            editingSubjectId = id;
+            const s = subjects.find(sub => sub.id === id);
+            if (s) {
+                document.getElementById('subName').value = s.name;
+                document.getElementById('subPrice').value = s.price;
+                document.getElementById('subRTL').checked = s.rtl || false;
+
+                const titleEl = document.getElementById('subjectFormTitle');
+                if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-pencil"></i> Edit Subject';
+                const cancelBtn = document.getElementById('cancelEditBtn');
+                if (cancelBtn) cancelBtn.classList.remove('hidden');
+
+                window.scrollTo({ top: document.getElementById('subjectFormTitle').offsetTop - 100, behavior: 'smooth' });
+            }
+        }
+
+        window.cancelSubjectEdit = function () {
+            editingSubjectId = null;
+            document.getElementById('subName').value = "";
+            document.getElementById('subPrice').value = "";
+            document.getElementById('subRTL').checked = false;
+            document.getElementById('subjectFormTitle').innerHTML = '<i class="ph-bold ph-plus-circle"></i> Add New Subject';
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
+        window.deleteSubject = async function (id) {
+            if (confirm("Confirm permanent removal of this subject from the cloud?")) {
+                try {
+                    await deleteDoc(doc(db, "subjects", id));
+                } catch (error) {
+                    console.error("Error deleting subject:", error);
+                    alert("Failed to delete subject.");
+                }
+            }
+        }
 
         // Handle Enter key on login
         document.getElementById('password')?.addEventListener('keypress', (e) => {
