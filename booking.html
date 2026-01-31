@@ -407,14 +407,9 @@
         import { addDoc, collection, onSnapshot, query, orderBy, serverTimestamp }
             from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        /* ===== STATE & ELEMENTS ===== */
-        const subjectsContainer = document.getElementById("subjectsContainer");
-        const totalEl = document.getElementById("total-price");
-        const bookingForm = document.getElementById("bookingForm");
-        const modal = document.getElementById("booking-modal");
-
         /* ===== REALTIME SUBJECTS ===== */
-        const q = query(collection(db, "subjects"), orderBy("name"));
+        import { where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        const q = query(collection(db, "subjects"), where("active", "==", true), orderBy("name"));
 
         onSnapshot(q, (snap) => {
             subjectsContainer.innerHTML = "";

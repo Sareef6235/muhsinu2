@@ -8,14 +8,12 @@ service cloud.firestore {
     // Helper function to check if user is admin
     function isAdmin() {
       return request.auth != null && 
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
     // Helper function to check if user is approved
     function isApproved() {
       return request.auth != null && 
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.approved == true;
     }
 
@@ -27,8 +25,7 @@ service cloud.firestore {
       // Users can create their own document on first login
       allow create: if request.auth != null && 
                        request.auth.uid == userId &&
-                       request.resource.data.role == 'student' &&
-                       request.resource.data.approved == false;
+                       request.resource.data.role == 'student';
       
       // Users can update their own profile fields only (not role/approved)
       allow update: if request.auth != null && 
@@ -46,9 +43,10 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Subjects collection - Public read, admin write
+    // Subjects collection - Public read (active only), admin write
     match /subjects/{subjectId} {
       // Anyone can read active subjects (for booking form)
+      // IMPORTANT: Query must include where("active", "==", true)
       allow read: if resource.data.active == true;
       
       // Admins can read all subjects (including inactive)
@@ -68,6 +66,11 @@ service cloud.firestore {
       
       // Only admins can update or delete bookings
       allow update, delete: if isAdmin();
+    }
+
+    // Connection Test collection - Public for verification tool
+    match /connection_test/{docId} {
+      allow read, write: if true;
     }
   }
 }

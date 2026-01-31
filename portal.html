@@ -1191,14 +1191,15 @@
 
             // BYPASS: Mock Admin Logic
             if (user.uid === 'dev-admin-bypass') {
-                console.warn("⚠️ USING DEV BYPASS MODE");
+                console.warn("⚠️ USING DEV BYPASS MODE - CLOUD SYNC DISABLED");
+                alert("⚠️ Dev Bypass Mode: UI unlocked but Cloud Firestore sync will fail due to dummy permissions.");
                 if (adminPanel) {
                     adminPanel.classList.remove('hidden');
                     const navAdminLink = document.getElementById('navAdminLink');
                     if (navAdminLink) navAdminLink.style.display = 'block';
                     // Mock user loading for dev
                     const userList = document.getElementById('userList');
-                    if (userList) userList.innerHTML = '<div style="padding:20px; text-align:center;">Dev Mode: User list loading mocked.</div>';
+                    if (userList) userList.innerHTML = '<div style="padding:20px; text-align:center; color: #facc15;">Dev Mode: UI only. Please login with a real admin account to sync with cloud.</div>';
                 }
                 return;
             }
@@ -1433,6 +1434,10 @@
                 if (document.getElementById('totalUsers')) document.getElementById('totalUsers').textContent = total;
                 if (document.getElementById('pendingApprovals')) document.getElementById('pendingApprovals').textContent = pending;
                 if (document.getElementById('activeStudents')) document.getElementById('activeStudents').textContent = active;
+            }, (error) => {
+                console.error("🔴 User Sync Error:", error);
+                const userList = document.getElementById('userList');
+                if (userList) userList.innerHTML = `<div style="padding:20px; color: #ff4d4d;">Access Denied: Could not load user list. Admin permissions required.</div>`;
             });
         }
 
@@ -1511,6 +1516,10 @@
                         </div>
                     `;
                 });
+            }, (error) => {
+                console.error("🔴 Booking Sync Error:", error);
+                const list = document.getElementById('bookingList');
+                if (list) list.innerHTML = `<div style="grid-column: 1/-1; padding: 20px; color: #ff4d4d; text-align: center;">Permission Denied: Could not sync bookings from cloud.</div>`;
             });
         }
 
@@ -1522,10 +1531,18 @@
 
         // SUBJECT MANAGEMENT LOGIC
         function startSubjectSync() {
-            onSnapshot(query(subjectsRef, orderBy("name")), (snapshot) => {
-                subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderAdminSubjects();
-            });
+            try {
+                onSnapshot(query(subjectsRef, orderBy("name")), (snapshot) => {
+                    subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderAdminSubjects();
+                }, (error) => {
+                    console.error("🔴 Subject Sync Error:", error);
+                    const grid = document.getElementById('adminSubjectGrid');
+                    if (grid) grid.innerHTML = `<div style="grid-column: 1/-1; padding: 20px; color: #ff4d4d;">Permission Denied: Ensure you are logged in with an Admin account. Cloud sync is disabled for Dev Bypass UID.</div>`;
+                });
+            } catch (e) {
+                console.error("Subject Sync Setup Error:", e);
+            }
         }
 
         function renderAdminSubjects() {
