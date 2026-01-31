@@ -537,7 +537,7 @@
                     }
                 } catch (err) {
                     console.error("Firestore connection error:", err);
-                    setStatus("Connection Error: Check console.", true);
+                    setStatus("Connection Error: " + (err.message || "Unknown error"), true);
                 }
             } else {
                 showLogin();
