@@ -1014,6 +1014,7 @@
         // AUTH STATE OBSERVER
         // HANDLE AUTH USER (Refactored for Bypass)
         async function handleAuthUser(user) {
+            console.log("User UID:", user?.uid);
             if (!user) {
                 if (loginBox) loginBox.classList.remove('hidden');
                 if (adminPanel) adminPanel.classList.add('hidden');
@@ -1042,6 +1043,7 @@
 
             try {
                 const snap = await getDoc(doc(db, "users", user.uid));
+                console.log("Role doc:", snap.exists(), snap.data());
                 const data = snap.data();
 
                 if (!data) {

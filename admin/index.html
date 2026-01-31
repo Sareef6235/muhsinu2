@@ -501,21 +501,17 @@
 
         // CHECK AUTH STATE & ROLE
         onAuthStateChanged(auth, async (user) => {
+            console.log("User UID:", user?.uid);
             if (user) {
-                try {
-                    const snap = await getDoc(doc(db, "users", user.uid));
-                    if (snap.exists() && snap.data().role === "admin") {
-                        document.getElementById('loginOverlay').classList.add('hidden');
-                        // Start real-time sync only if authorized
-                        startSync();
-                    } else {
-                        alert("Access Denied: Administrative privileges required.");
-                        await signOut(auth);
-                        showLogin();
-                    }
-                } catch (err) {
-                    console.error("Auth verification error:", err);
-                    showLogin();
+                const snap = await getDoc(doc(db, "users", user.uid));
+                console.log("Role doc:", snap.exists(), snap.data());
+
+                if (snap.exists() && snap.data().role === "admin") {
+                    document.getElementById('loginOverlay').classList.add('hidden');
+                    startSync();
+                } else {
+                    alert("Access Denied");
+                    await signOut(auth);
                 }
             } else {
                 showLogin();
