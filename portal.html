@@ -719,350 +719,347 @@
                     style="width: 50px; height: 50px; margin: 0 auto 20px; border-width: 4px; border-top-color: var(--primary-color);">
                 </div>
                 <p style="color: #888; font-size: 1.1rem;">Initializing Secure Portal...</p>
-                <button class="btn btn-secondary" onclick="location.reload()"
-                    style="margin-top: 20px; font-size: 0.8rem;">
-                    <i class="ph ph-arrows-clockwise"></i> Force Reload
+            </div>
+            <p style="color: #888; font-size: 1.1rem;">Initializing Secure Portal...</p>
+        </div>
+
+        <!-- LOGIN BOX -->
+        <div id="loginBox" class="login-wrapper animate-in hidden">
+            <div class="portal-card">
+                <div class="login-icon">
+                    <i class="ph-bold ph-lock-key"></i>
+                </div>
+                <h1 class="login-title">Welcome Back</h1>
+                <p class="login-subtitle">Sign in to access your portal</p>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="Your Email" autocomplete="username"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Your Password"
+                        autocomplete="current-password" required>
+                </div>
+
+                <div class="btn-group" style="margin-top: 30px;">
+                    <button class="btn btn-primary btn-block" onclick="handleAuth()">
+                        Login
+                    </button>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="resetPassword()" style="padding: 12px 24px;">
+                        <i class="ph ph-question"></i> Forgot Password?
+                    </button>
+                </div>
+
+                <div id="msg" class="msg hidden"></div>
+            </div>
+        </div>
+
+        <!-- ADMIN PANEL -->
+        <div id="adminPanel" class="hidden animate-in">
+            <div class="portal-card">
+                <h2><i class="ph-bold ph-shield-star"></i> Admin Control Center</h2>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pendingApprovals">0</div>
+                        <div class="stat-label">Pending Approvals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeStudents">0</div>
+                        <div class="stat-label">Active Students</div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <h3><i class="ph ph-user-plus" style="margin-right: 10px;"></i>Create New User</h3>
+
+                <div class="portal-grid" style="margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select id="role" class="form-select">
+                            <option value="student">Student</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="newEmail" class="form-input" placeholder="user@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="newPassword" class="form-input" placeholder="Secure password">
+                    </div>
+                </div>
+
+                <button class="btn btn-success" onclick="createUser()">
+                    <i class="ph-bold ph-user-plus"></i> Create User
                 </button>
             </div>
 
-            <!-- LOGIN BOX -->
-            <div id="loginBox" class="login-wrapper animate-in hidden">
-                <div class="portal-card">
-                    <div class="login-icon">
-                        <i class="ph-bold ph-lock-key"></i>
-                    </div>
-                    <h1 class="login-title">Welcome Back</h1>
-                    <p class="login-subtitle">Sign in to access your portal</p>
+            <div class="portal-card">
+                <h2><i class="ph-bold ph-users-three"></i> Student Management</h2>
+                <p style="color: #888; margin-bottom: 25px;">Approve and manage student accounts</p>
 
-                    <div class="form-group">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" id="email" class="form-input" placeholder="Your Email"
-                            autocomplete="username" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" id="password" class="form-input" placeholder="Your Password"
-                            autocomplete="current-password" required>
-                    </div>
-
-                    <div class="btn-group" style="margin-top: 30px;">
-                        <button class="btn btn-primary btn-block" onclick="handleAuth()">
-                            <i class="ph-bold ph-arrow-right"></i> Continue
-                        </button>
-                    </div>
-
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn btn-secondary" onclick="resetPassword()" style="padding: 12px 24px;">
-                            <i class="ph ph-question"></i> Forgot Password?
-                        </button>
-                    </div>
-
-                    <div id="msg" class="msg hidden"></div>
+                <div id="userList" class="portal-grid">
+                    <!-- Dynamic user cards will be loaded here -->
                 </div>
             </div>
 
-            <!-- ADMIN PANEL -->
-            <div id="adminPanel" class="hidden animate-in">
-                <div class="portal-card">
-                    <h2><i class="ph-bold ph-shield-star"></i> Admin Control Center</h2>
+            <hr class="divider">
 
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalUsers">0</div>
-                            <div class="stat-label">Total Users</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="pendingApprovals">0</div>
-                            <div class="stat-label">Pending Approvals</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="activeStudents">0</div>
-                            <div class="stat-label">Active Students</div>
-                        </div>
-                    </div>
-
-                    <hr class="divider">
-
-                    <h3><i class="ph ph-user-plus" style="margin-right: 10px;"></i>Create New User</h3>
-
-                    <div class="portal-grid" style="margin-bottom: 20px;">
-                        <div class="form-group">
-                            <label class="form-label">Role</label>
-                            <select id="role" class="form-select">
-                                <option value="student">Student</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" id="newEmail" class="form-input" placeholder="user@example.com">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Password</label>
-                            <input type="password" id="newPassword" class="form-input" placeholder="Secure password">
-                        </div>
-                    </div>
-
-                    <button class="btn btn-success" onclick="createUser()">
-                        <i class="ph-bold ph-user-plus"></i> Create User
-                    </button>
+            <!-- Site Pages Summary -->
+            <div class="portal-card">
+                <h2><i class="ph-bold ph-files"></i> Site Pages Management</h2>
+                <div class="pages-table-wrapper"
+                    style="width: 100%; overflow-x: auto; border-radius: 15px; background: rgba(255, 255, 255, 0.02);">
+                    <table class="pages-table"
+                        style="width: 100%; border-collapse: collapse; color: #fff; min-width: 600px;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="text-align: left; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                                    Page Name</th>
+                                <th
+                                    style="text-align: left; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                                    Description</th>
+                                <th
+                                    style="text-align: left; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                                    Status</th>
+                                <th
+                                    style="text-align: right; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                                    Operations</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                            <tr>
+                                <td style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);"><a
+                                        href="index.html" class="file-link"
+                                        style="color: var(--primary-color); display: flex; align-items: center; gap: 12px; font-weight: 600;"><i
+                                            class="ph-bold ph-house" style="font-size: 1.4rem;"></i> index.html</a>
+                                </td>
+                                <td
+                                    style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #888;">
+                                    Main Homepage & Landing</td>
+                                <td
+                                    style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #00ff88; font-weight: 600;">
+                                    ACTIVE</td>
+                                <td
+                                    style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
+                                    <a href="index.html" class="btn btn-secondary"
+                                        style="padding: 8px 15px; font-size: 0.75rem;">Launch</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);"><a
+                                        href="portal.html" class="file-link"
+                                        style="color: var(--primary-color); display: flex; align-items: center; gap: 12px; font-weight: 600;"><i
+                                            class="ph-bold ph-lock" style="font-size: 1.4rem;"></i> portal.html</a>
+                                </td>
+                                <td
+                                    style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #888;">
+                                    Management Dashboard</td>
+                                <td
+                                    style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #00ff88; font-weight: 600;">
+                                    ACTIVE</td>
+                                <td
+                                    style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
+                                    <span
+                                        style="color: #444; font-weight: 700; font-size: 0.75rem; padding-right: 15px;">CURRENT</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);"><a
+                                        href="result.html" class="file-link"
+                                        style="color: var(--primary-color); display: flex; align-items: center; gap: 12px; font-weight: 600;"><i
+                                            class="ph-bold ph-exam" style="font-size: 1.4rem;"></i> result.html</a>
+                                </td>
+                                <td
+                                    style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #888;">
+                                    Generic Results Portal</td>
+                                <td
+                                    style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #00ff88; font-weight: 600;">
+                                    ACTIVE</td>
+                                <td
+                                    style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
+                                    <a href="result.html" class="btn btn-secondary"
+                                        style="padding: 8px 15px; font-size: 0.75rem;">Launch</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
-                <div class="portal-card">
-                    <h2><i class="ph-bold ph-users-three"></i> Student Management</h2>
-                    <p style="color: #888; margin-bottom: 25px;">Approve and manage student accounts</p>
+            <!-- Bookings Management -->
+            <div class="portal-card">
+                <h2><i class="ph-bold ph-calendar-check"></i> Recent Bookings</h2>
+                <p style="color: #888; margin-bottom: 25px;">Track and manage student tuition bookings</p>
+                <div id="bookingList" class="portal-grid">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+                        <i class="ph ph-circle-notch ph-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Loading bookings...</p>
+                    </div>
+                </div>
+            </div>
 
-                    <div id="userList" class="portal-grid">
-                        <!-- Dynamic user cards will be loaded here -->
+            <hr class="divider">
+
+            <!-- Subject Configuration -->
+            <div class="portal-card">
+                <h2 id="subjectFormTitle"><i class="ph-bold ph-plus-circle"></i> Add New Subject</h2>
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 30px;">
+                    <div class="form-group">
+                        <label class="form-label">Subject Title</label>
+                        <input type="text" id="subName" class="form-input" placeholder="e.g. TAJWEED">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tuition Fee (₹)</label>
+                        <input type="number" id="subPrice" class="form-input" placeholder="700">
+                    </div>
+                    <div class="form-group" style="padding-top: 35px; display: flex; align-items: center; gap: 15px;">
+                        <input type="checkbox" id="subRTL"
+                            style="width: 24px; height: 24px; accent-color: var(--primary-color);">
+                        <label class="form-label" style="margin: 0;">Right-to-Left (Arabic)</label>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="addOrUpdateSubject()">
+                    <i class="ph-bold ph-floppy-disk"></i> Synchronize Data
+                </button>
+                <button id="cancelEditBtn" class="btn btn-secondary hidden" onclick="cancelSubjectEdit()"
+                    style="margin-left: 10px;">
+                    Cancel Edit
+                </button>
+            </div>
+
+            <div class="portal-card">
+                <h2><i class="ph-bold ph-list-bullets"></i> Active Subjects List</h2>
+                <div id="adminSubjectGrid" class="portal-grid">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+                        <i class="ph ph-circle-notch ph-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Synchronizing with Cloud...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STUDENT DASHBOARD -->
+        <div id="studentPanel" class="hidden animate-in">
+            <div class="portal-card">
+                <h2><i class="ph-bold ph-graduation-cap"></i> Student Dashboard</h2>
+
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileInitial">S</div>
+                    <div class="profile-info">
+                        <h3 id="welcomeName">Welcome, Student!</h3>
+                        <p>Manage your profile and academic information</p>
                     </div>
                 </div>
 
                 <hr class="divider">
 
-                <!-- Site Pages Summary -->
-                <div class="portal-card">
-                    <h2><i class="ph-bold ph-files"></i> Site Pages Management</h2>
-                    <div class="pages-table-wrapper"
-                        style="width: 100%; overflow-x: auto; border-radius: 15px; background: rgba(255, 255, 255, 0.02);">
-                        <table class="pages-table"
-                            style="width: 100%; border-collapse: collapse; color: #fff; min-width: 600px;">
-                            <thead>
-                                <tr>
-                                    <th
-                                        style="text-align: left; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
-                                        Page Name</th>
-                                    <th
-                                        style="text-align: left; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
-                                        Description</th>
-                                    <th
-                                        style="text-align: left; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
-                                        Status</th>
-                                    <th
-                                        style="text-align: right; padding: 20px; background: rgba(255, 255, 255, 0.03); color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
-                                        Operations</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody">
-                                <tr>
-                                    <td style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);"><a
-                                            href="index.html" class="file-link"
-                                            style="color: var(--primary-color); display: flex; align-items: center; gap: 12px; font-weight: 600;"><i
-                                                class="ph-bold ph-house" style="font-size: 1.4rem;"></i> index.html</a>
-                                    </td>
-                                    <td
-                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #888;">
-                                        Main Homepage & Landing</td>
-                                    <td
-                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #00ff88; font-weight: 600;">
-                                        ACTIVE</td>
-                                    <td
-                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
-                                        <a href="index.html" class="btn btn-secondary"
-                                            style="padding: 8px 15px; font-size: 0.75rem;">Launch</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);"><a
-                                            href="portal.html" class="file-link"
-                                            style="color: var(--primary-color); display: flex; align-items: center; gap: 12px; font-weight: 600;"><i
-                                                class="ph-bold ph-lock" style="font-size: 1.4rem;"></i> portal.html</a>
-                                    </td>
-                                    <td
-                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #888;">
-                                        Management Dashboard</td>
-                                    <td
-                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #00ff88; font-weight: 600;">
-                                        ACTIVE</td>
-                                    <td
-                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
-                                        <span
-                                            style="color: #444; font-weight: 700; font-size: 0.75rem; padding-right: 15px;">CURRENT</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);"><a
-                                            href="result.html" class="file-link"
-                                            style="color: var(--primary-color); display: flex; align-items: center; gap: 12px; font-weight: 600;"><i
-                                                class="ph-bold ph-exam" style="font-size: 1.4rem;"></i> result.html</a>
-                                    </td>
-                                    <td
-                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #888;">
-                                        Generic Results Portal</td>
-                                    <td
-                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #00ff88; font-weight: 600;">
-                                        ACTIVE</td>
-                                    <td
-                                        style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
-                                        <a href="result.html" class="btn btn-secondary"
-                                            style="padding: 8px 15px; font-size: 0.75rem;">Launch</a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <h3><i class="ph ph-identification-card" style="margin-right: 10px;"></i>My Profile</h3>
+
+                <div class="portal-grid">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="pname" class="form-input" placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Class</label>
+                        <input type="text" id="pclass" class="form-input" placeholder="e.g., Class 10">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Roll Number</label>
+                        <input type="text" id="proll" class="form-input" placeholder="Your roll number">
                     </div>
                 </div>
 
-                <!-- Bookings Management -->
-                <div class="portal-card">
-                    <h2><i class="ph-bold ph-calendar-check"></i> Recent Bookings</h2>
-                    <p style="color: #888; margin-bottom: 25px;">Track and manage student tuition bookings</p>
-                    <div id="bookingList" class="portal-grid">
-                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
-                            <i class="ph ph-circle-notch ph-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                            <p>Loading bookings...</p>
-                        </div>
-                    </div>
-                </div>
+                <button class="btn btn-primary" onclick="saveProfile()" style="margin-top: 20px;">
+                    <i class="ph-bold ph-floppy-disk"></i> Save Profile
+                </button>
 
                 <hr class="divider">
 
-                <!-- Subject Configuration -->
-                <div class="portal-card">
-                    <h2 id="subjectFormTitle"><i class="ph-bold ph-plus-circle"></i> Add New Subject</h2>
-                    <div
-                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 30px;">
-                        <div class="form-group">
-                            <label class="form-label">Subject Title</label>
-                            <input type="text" id="subName" class="form-input" placeholder="e.g. TAJWEED">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Tuition Fee (₹)</label>
-                            <input type="number" id="subPrice" class="form-input" placeholder="700">
-                        </div>
-                        <div class="form-group"
-                            style="padding-top: 35px; display: flex; align-items: center; gap: 15px;">
-                            <input type="checkbox" id="subRTL"
-                                style="width: 24px; height: 24px; accent-color: var(--primary-color);">
-                            <label class="form-label" style="margin: 0;">Right-to-Left (Arabic)</label>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" onclick="addOrUpdateSubject()">
-                        <i class="ph-bold ph-floppy-disk"></i> Synchronize Data
-                    </button>
-                    <button id="cancelEditBtn" class="btn btn-secondary hidden" onclick="cancelSubjectEdit()"
-                        style="margin-left: 10px;">
-                        Cancel Edit
-                    </button>
+                <div
+                    style="background: rgba(0, 243, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.2); padding: 20px; border-radius: 16px;">
+                    <p style="display: flex; align-items: center; gap: 10px; color: var(--primary-color);">
+                        <i class="ph ph-info" style="font-size: 1.5rem;"></i>
+                        Uploads & gallery access will be visible after admin approval.
+                    </p>
                 </div>
 
-                <div class="portal-card">
-                    <h2><i class="ph-bold ph-list-bullets"></i> Active Subjects List</h2>
-                    <div id="adminSubjectGrid" class="portal-grid">
-                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
-                            <i class="ph ph-circle-notch ph-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                            <p>Synchronizing with Cloud...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <!-- ===== IMAGE UPLOAD UI START ===== -->
+                <div class="portal-card" style="margin-top: 20px; background: rgba(255,255,255,0.01);">
+                    <h3><i class="ph ph-image"></i> Image Gallery Upload</h3>
+                    <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Upload images to your personal
+                        gallery. Max 5MB.</p>
 
-            <!-- STUDENT DASHBOARD -->
-            <div id="studentPanel" class="hidden animate-in">
-                <div class="portal-card">
-                    <h2><i class="ph-bold ph-graduation-cap"></i> Student Dashboard</h2>
-
-                    <div class="profile-header">
-                        <div class="profile-avatar" id="profileInitial">S</div>
-                        <div class="profile-info">
-                            <h3 id="welcomeName">Welcome, Student!</h3>
-                            <p>Manage your profile and academic information</p>
-                        </div>
-                    </div>
-
-                    <hr class="divider">
-
-                    <h3><i class="ph ph-identification-card" style="margin-right: 10px;"></i>My Profile</h3>
-
-                    <div class="portal-grid">
-                        <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" id="pname" class="form-input" placeholder="Your full name">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Class</label>
-                            <input type="text" id="pclass" class="form-input" placeholder="e.g., Class 10">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Roll Number</label>
-                            <input type="text" id="proll" class="form-input" placeholder="Your roll number">
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary" onclick="saveProfile()" style="margin-top: 20px;">
-                        <i class="ph-bold ph-floppy-disk"></i> Save Profile
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('imageInput').click()">
+                        <i class="ph ph-plus"></i> Select Image
                     </button>
 
-                    <hr class="divider">
-
-                    <div
-                        style="background: rgba(0, 243, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.2); padding: 20px; border-radius: 16px;">
-                        <p style="display: flex; align-items: center; gap: 10px; color: var(--primary-color);">
-                            <i class="ph ph-info" style="font-size: 1.5rem;"></i>
-                            Uploads & gallery access will be visible after admin approval.
-                        </p>
+                    <div id="previewContainer" class="hidden"
+                        style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Original</p>
+                            <img id="originalPreview"
+                                style="width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <p id="originalSize" style="font-size: 0.75rem; color: #444; margin-top: 5px;"></p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Compressed (70%)</p>
+                            <img id="compressedPreview"
+                                style="width: 100%; border-radius: 12px; border: 1px solid var(--primary-color);">
+                            <p id="compressedSize"
+                                style="font-size: 0.75rem; color: var(--primary-color); margin-top: 5px;"></p>
+                        </div>
                     </div>
 
-                    <!-- ===== IMAGE UPLOAD UI START ===== -->
-                    <div class="portal-card" style="margin-top: 20px; background: rgba(255,255,255,0.01);">
-                        <h3><i class="ph ph-image"></i> Image Gallery Upload</h3>
-                        <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Upload images to your personal
-                            gallery. Max 5MB.</p>
-
-                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
-                        <button class="btn btn-secondary" onclick="document.getElementById('imageInput').click()">
-                            <i class="ph ph-plus"></i> Select Image
-                        </button>
-
-                        <div id="previewContainer" class="hidden"
-                            style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div>
-                                <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Original</p>
-                                <img id="originalPreview"
-                                    style="width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
-                                <p id="originalSize" style="font-size: 0.75rem; color: #444; margin-top: 5px;"></p>
-                            </div>
-                            <div>
-                                <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Compressed (70%)</p>
-                                <img id="compressedPreview"
-                                    style="width: 100%; border-radius: 12px; border: 1px solid var(--primary-color);">
-                                <p id="compressedSize"
-                                    style="font-size: 0.75rem; color: var(--primary-color); margin-top: 5px;"></p>
+                    <div id="uploadStatusUI" class="hidden" style="margin-top: 20px;">
+                        <div
+                            style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
+                            <div id="uploadProgress"
+                                style="width: 0%; height: 100%; background: var(--primary-gradient); transition: width 0.3s;">
                             </div>
                         </div>
-
-                        <div id="uploadStatusUI" class="hidden" style="margin-top: 20px;">
-                            <div
-                                style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
-                                <div id="uploadProgress"
-                                    style="width: 0%; height: 100%; background: var(--primary-gradient); transition: width 0.3s;">
-                                </div>
-                            </div>
-                            <p id="statusText"
-                                style="font-size: 0.8rem; color: #888; margin-top: 10px; text-align: center;"></p>
-                        </div>
-
-                        <button id="uploadBtn" class="btn btn-primary hidden" onclick="handleImageUpload()"
-                            style="margin-top: 20px; width: 100%;">
-                            <i class="ph ph-upload-simple"></i> Upload Compressed Image
-                        </button>
+                        <p id="statusText"
+                            style="font-size: 0.8rem; color: #888; margin-top: 10px; text-align: center;"></p>
                     </div>
-                    <!-- ===== IMAGE UPLOAD UI END ===== -->
-                </div>
-            </div>
 
-            <!-- WAITING FOR APPROVAL -->
-            <div id="waitingPanel" class="hidden animate-in">
-                <div class="portal-card" style="text-align: center; padding: 60px 40px;">
-                    <div
-                        style="width: 100px; height: 100px; background: rgba(250, 204, 21, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px;">
-                        <i class="ph ph-hourglass-medium" style="font-size: 3rem; color: var(--warning-color);"></i>
-                    </div>
-                    <h2 style="margin-bottom: 15px;">Awaiting Approval</h2>
-                    <p style="color: #888; max-width: 400px; margin: 0 auto;">Your account is pending admin approval.
-                        You'll get full access to the student portal once approved.</p>
+                    <button id="uploadBtn" class="btn btn-primary hidden" onclick="handleImageUpload()"
+                        style="margin-top: 20px; width: 100%;">
+                        <i class="ph ph-upload-simple"></i> Upload Compressed Image
+                    </button>
                 </div>
+                <!-- ===== IMAGE UPLOAD UI END ===== -->
             </div>
+        </div>
+
+        <!-- WAITING FOR APPROVAL -->
+        <div id="waitingPanel" class="hidden animate-in">
+            <div class="portal-card" style="text-align: center; padding: 60px 40px;">
+                <div
+                    style="width: 100px; height: 100px; background: rgba(250, 204, 21, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px;">
+                    <i class="ph ph-hourglass-medium" style="font-size: 3rem; color: var(--warning-color);"></i>
+                </div>
+                <h2 style="margin-bottom: 15px;">Awaiting Approval</h2>
+                <p style="color: #888; max-width: 400px; margin: 0 auto;">Your account is pending admin approval.
+                    You'll get full access to the student portal once approved.</p>
+            </div>
+        </div>
 
         </div>
     </main>
@@ -1351,21 +1348,6 @@
                 }
 
                 showMessage(errorMsg, 'error');
-
-                // Add a "Help" button to the message area if it exists
-                const msgEl = document.getElementById('msg');
-                if (msgEl && e.code === 'permission-denied') {
-                    const helpBtn = document.createElement('button');
-                    helpBtn.className = 'btn btn-secondary';
-                    helpBtn.style.marginTop = '10px';
-                    helpBtn.style.fontSize = '0.7rem';
-                    helpBtn.innerHTML = '<i class="ph ph-question"></i> How to fix this?';
-                    helpBtn.onclick = () => {
-                        alert("FIX STEPS:\n1. Check if rules_version = '2' is at the top of your rules.\n2. Ensure the 'users' collection exists.\n3. Verify your UID in the 'users' collection matches your Auth UID.");
-                    };
-                    msgEl.appendChild(document.createElement('br'));
-                    msgEl.appendChild(helpBtn);
-                }
             } finally {
                 // Final Loader Cleanup
                 const loader = document.getElementById('portalLoader');

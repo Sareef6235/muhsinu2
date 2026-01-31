@@ -460,77 +460,54 @@
                                 <div class="form-group"
                                     style="margin-top: 25px; display: flex; flex-direction: column; gap: 10px;">
                                     <button type="submit" class="btn btn-primary" style="width: 100%;">Book Now</button>
-                                    <button type="button" class="btn btn-secondary"
-                                        onclick="document.querySelector('.dialog-lightbox-message').style.display='none'; document.body.style.overflow='';"
-                                        style="width: 100%; border-radius: 5px; padding: 10px 25px; text-transform: uppercase; font-size: 0.9rem; font-weight: 600; letter-spacing: 1px;">Home</button>
                                 </div>
 
                             </form>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        </div>
-        </section>
+                </section>
 
-        <section id="latest-sessions">
-            <div class="container">
-                <h2 class="section-title">My Latest Sessions</h2>
-                <div class="sessions-list">
-                    <!-- Section for Dynamic PDFs -->
-                    <div id="pdf-list" class="pdf-category-list">
-                        <!-- Dynamic PDF cards -->
-                    </div>
+                <section id="contact">
+                    <div class="container">
+                        <div class="contact-content">
+                            <h2 class="section-title">Get In Touch</h2>
+                            <p>Interested in collaborating or having me speak at your event? Let's connect.</p>
 
-                    <!-- Section for Local Bookings -->
-                    <div id="sessions-list" class="booking-category-list">
-                        <p class="no-sessions hidden">No sessions booked yet.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+                            <!-- Form Submission Feedback -->
+                            <script type="text/javascript">var submitted = false;</script>
+                            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"
+                                onload="if(submitted) {document.getElementById('contact-status').innerHTML = 'Message Sent Successfully!'; document.getElementById('contact-form-el').reset(); submitted=false;}"></iframe>
 
+                            <form class="contact-form" id="contact-form-el"
+                                action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfq5PjEIs83m4gq7_-ihVbqAWJa_KNKgtQ2huzvKCQSfesDYQ/formResponse"
+                                method="POST" target="hidden_iframe" onsubmit="submitted=true;">
+                                <div class="form-group">
+                                    <input type="text" name="entry.456300294" placeholder="Your Name" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" name="entry.1582502936" placeholder="Your Email" required>
+                                </div>
+                                <div class="form-group">
+                                    <textarea name="entry.1231984071" placeholder="Your Message" rows="5"
+                                        required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Send Message</button>
+                                <div id="contact-status"
+                                    style="margin-top: 15px; color: var(--primary-color); font-weight: 600; min-height: 24px;">
+                                </div>
+                            </form>
 
-        <section id="contact">
-            <div class="container">
-                <div class="contact-content">
-                    <h2 class="section-title">Get In Touch</h2>
-                    <p>Interested in collaborating or having me speak at your event? Let's connect.</p>
-
-                    <!-- Form Submission Feedback -->
-                    <script type="text/javascript">var submitted = false;</script>
-                    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"
-                        onload="if(submitted) {document.getElementById('contact-status').innerHTML = 'Message Sent Successfully!'; document.getElementById('contact-form-el').reset(); submitted=false;}"></iframe>
-
-                    <form class="contact-form" id="contact-form-el"
-                        action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfq5PjEIs83m4gq7_-ihVbqAWJa_KNKgtQ2huzvKCQSfesDYQ/formResponse"
-                        method="POST" target="hidden_iframe" onsubmit="submitted=true;">
-                        <div class="form-group">
-                            <input type="text" name="entry.456300294" placeholder="Your Name" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" name="entry.1582502936" placeholder="Your Email" required>
-                        </div>
-                        <div class="form-group">
-                            <textarea name="entry.1231984071" placeholder="Your Message" rows="5" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Send Message</button>
-                        <div id="contact-status"
-                            style="margin-top: 15px; color: var(--primary-color); font-weight: 600; min-height: 24px;">
-                        </div>
-                    </form>
-
-                    <div class="contact-info">
-                        <p>WhatsApp: <a href="https://wa.me/916235989198">+91 6235989198</a></p>
-                        <div class="social-links-large">
-                            <a href="https://github.com/sareef6235" class="social-icon">GitHub</a>
-                            <a href="https://wa.me/916235989198" class="social-icon">WhatsApp</a>
+                            <div class="contact-info">
+                                <p>WhatsApp: <a href="https://wa.me/916235989198">+91 6235989198</a></p>
+                                <div class="social-links-large">
+                                    <a href="https://github.com/sareef6235" class="social-icon">GitHub</a>
+                                    <a href="https://wa.me/916235989198" class="social-icon">WhatsApp</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
 
     </main>
