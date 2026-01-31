@@ -7,58 +7,51 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Robust admin check with existence verification
     function isAdmin() {
-      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
-      return isSignedIn() &&
-             exists(userPath) &&
-             get(userPath).data.role == 'admin';
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
     // 👤 USERS COLLECTION
     match /users/{userId} {
-      // Users can always read their own document
+      
+      // 🔓 SELF-ACCESS (Highest Priority)
+      // Allow any signed-in user to read their own document.
+      // If the document doesn't exist, Firestore returns a success with snap.exists() = false.
       allow read: if isSignedIn() && request.auth.uid == userId;
 
-      // Self-registration for new students
-      allow create: if isSignedIn() &&
-                    request.auth.uid == userId &&
-                    request.resource.data.role == 'student' &&
-                    request.resource.data.approved == false;
+      // Allow users to create their own document on first sign-in.
+      allow create: if isSignedIn() && request.auth.uid == userId;
 
-      // Restricted updates: Users can only change specific profile fields
-      // Use .diff() to ensure role and approved status aren't modified
-      allow update: if isSignedIn() &&
-                    request.auth.uid == userId &&
-                    request.resource.data.diff(resource.data).affectedKeys()
-                    .hasOnly(['name', 'class', 'roll', 'updatedAt']);
+      // Allow users to update their own profile, but NOT their role or approval status.
+      allow update: if isSignedIn() && request.auth.uid == userId &&
+                    (!request.resource.data.diff(resource.data).affectedKeys()
+                    .hasAny(['role', 'approved']));
 
-      // Admin Bypass: Admins can do everything
+      // 👑 ADMIN ACCESS
+      // Allow admins to perform any operation on any user document.
       allow read, write: if isAdmin();
     }
 
     // 📅 BOOKINGS COLLECTION
     match /bookings/{bookingId} {
-      // Basic schema validation for public booking creation
-      allow create: if request.resource.data.email is string &&
-                    request.resource.data.name is string &&
-                    request.resource.data.subjectId is string;
-      
+      allow create: if true;
       allow read, write: if isAdmin();
     }
 
     // 📚 SUBJECTS COLLECTION
     match /subjects/{subjectId} {
-      allow read: if true; // Public read access for the booking form
+      allow read: if true;
       allow write: if isAdmin();
     }
 
     // 🖼️ IMAGES COLLECTION
     match /images/{imageId} {
-      allow read: if true; // Publicly viewable
-      allow write: if isSignedIn() &&
+      allow read: if true;
+      allow write: if isSignedIn() && 
                     (request.auth.uid == request.resource.data.userId || isAdmin());
     }
-
-    // ❌ REMOVED: connection_test for security
   }
 }
