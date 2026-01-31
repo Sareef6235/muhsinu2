@@ -892,6 +892,18 @@
                     </div>
                 </div>
 
+                <!-- Bookings Management -->
+                <div class="portal-card">
+                    <h2><i class="ph-bold ph-calendar-check"></i> Recent Bookings</h2>
+                    <p style="color: #888; margin-bottom: 25px;">Track and manage student tuition bookings</p>
+                    <div id="bookingList" class="portal-grid">
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+                            <i class="ph ph-circle-notch ph-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <p>Loading bookings...</p>
+                        </div>
+                    </div>
+                </div>
+
                 <hr class="divider">
 
                 <!-- Subject Configuration -->
@@ -1060,6 +1072,9 @@
             window.app = app;
 
             console.log("Firebase Initialized Successfully");
+
+            // Define Global Constants
+            window.DEV_MODE = false; // Set to true for local testing without Firebase
         } catch (e) {
             console.error("Firebase Initialization Error:", e);
             alert("Critical Error: Firebase failed to initialize. Check console for details.");
@@ -1195,6 +1210,7 @@
                     if (navAdminLink) navAdminLink.style.display = 'block';
                     loadUsers();
                     startSubjectSync();
+                    startBookingSync();
                 }
 
                 if (data.role === "student" && studentPanel) {
@@ -1237,46 +1253,34 @@
             // 🔴 DEV BYPASS CHECK
             if ((email === "123v213@gmail.com" || email === "123v214@gmail.com") && password === "@#asd123") {
                 alert("Opening...");
-                console.log("Simulating Admin Login...");
                 handleAuthUser({ uid: 'dev-admin-bypass', email: email });
                 return;
             }
 
             try {
-                // 🔍 Check email exists
-                const methods = await fetchSignInMethodsForEmail(auth, email);
-
-                if (methods.length === 0) {
-                    // 🆕 New user → Register
-                    const userCred = await createUserWithEmailAndPassword(auth, email, password);
-
-                    // Connect to Firebase Database Backend (Save initial user data)
-                    await setDoc(doc(db, "users", userCred.user.uid), {
-                        email: email,
-                        role: "student", // Default role
-                        approved: false,
-                        active: true,
-                        createdAt: new Date().toISOString()
-                    });
-
-                    alert("Registration successful! Waiting for admin approval.");
-                    console.log("New user:", userCred.user.uid);
-                } else {
-                    // 🔐 Existing user → Login
-                    const userCred = await signInWithEmailAndPassword(auth, email, password);
-                    alert("Login successful!");
-                    console.log("Existing user:", userCred.user.uid);
-                }
+                // Try login first
+                await signInWithEmailAndPassword(auth, email, password);
+                alert("Login successful!");
             } catch (error) {
-                // Should handle "email-already-in-use" if enumeration protection is ON
-                if (error.code === 'auth/email-already-in-use') {
-                    // Try login as fallback
-                    signInWithEmailAndPassword(auth, email, password)
-                        .then((res) => { alert("Login successful!"); })
-                        .catch(e => alert(e.message));
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+                    // Try to register if login fails with "not found" (or invalid, depending on enumeration)
+                    if (confirm("Email not found or password incorrect. Would you like to create a new account?")) {
+                        try {
+                            const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                            await setDoc(doc(db, "users", userCred.user.uid), {
+                                email: email,
+                                role: "student",
+                                approved: false,
+                                active: true,
+                                createdAt: serverTimestamp()
+                            });
+                            alert("Account created! Waiting for admin approval.");
+                        } catch (regErr) {
+                            alert(regErr.message);
+                        }
+                    }
                 } else {
                     alert(error.message);
-                    console.error(error);
                 }
             }
         };
@@ -1310,7 +1314,7 @@
 
         // LOAD USERS (Updated with DEV_MODE logic)
         async function loadUsers() {
-            if (DEV_MODE) {
+            if (window.DEV_MODE) {
                 console.log("DEV_MODE: Loading fake users");
                 return;
             }
@@ -1325,6 +1329,8 @@
 
                 snap.forEach((d) => {
                     const u = d.data();
+                    if (u.active === false) return; // Skip inactive
+
                     total++;
 
                     if (u.role !== "student") return;
@@ -1372,6 +1378,76 @@
             if (confirm('Are you sure you want to remove this user?')) {
                 await updateDoc(doc(db, "users", uid), { active: false });
                 alert('User deactivated');
+            }
+        };
+
+        // SAVE PROFILE (for students)
+        window.saveProfile = async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const name = document.getElementById('pname').value;
+            const uClass = document.getElementById('pclass').value;
+            const roll = document.getElementById('proll').value;
+
+            try {
+                await updateDoc(doc(db, "users", user.uid), {
+                    name: name,
+                    class: uClass,
+                    roll: roll
+                });
+                alert('Profile updated successfully! ✅');
+                // Refresh local state/UI if needed
+                handleAuthUser(user);
+            } catch (e) {
+                console.error(e);
+                alert('Failed to update profile.');
+            }
+        };
+
+        // BOOKING MANAGEMENT
+        function startBookingSync() {
+            onSnapshot(query(collection(db, "bookings"), orderBy("createdAt", "desc")), (snap) => {
+                const list = document.getElementById('bookingList');
+                if (!list) return;
+
+                if (snap.empty) {
+                    list.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 20px; color: #888;">No bookings found.</div>';
+                    return;
+                }
+
+                list.innerHTML = "";
+                snap.forEach(d => {
+                    const b = d.data();
+                    const date = b.createdAt?.toDate ? b.createdAt.toDate().toLocaleDateString() : 'N/A';
+                    list.innerHTML += `
+                        <div class="user-card">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                                <div>
+                                    <div class="user-email">${b.firstName} ${b.lastName}</div>
+                                    <div style="font-size: 0.8rem; color: #666;">${b.email}</div>
+                                </div>
+                                <div style="color: var(--primary-color); font-weight: 800; font-size: 1.1rem;">₹${b.total}</div>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <div style="font-size: 0.75rem; color: #888; margin-bottom: 5px;">CLASS: ${b.class}</div>
+                                <div style="font-size: 0.85rem; color: #ccc;">${b.subjects.join(", ")}</div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); pt-15; padding-top: 15px;">
+                                <span style="font-size: 0.7rem; color: #444;">${date}</span>
+                                <button class="btn btn-secondary" onclick="deleteBooking('${d.id}')" style="padding: 10px; font-size: 0.7rem; background: rgba(255,77,77,0.05); color: #ff4d4d; border: 1px solid rgba(255,77,77,0.1);">
+                                    <i class="ph ph-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        window.deleteBooking = async (id) => {
+            if (confirm("Delete this booking record?")) {
+                await deleteDoc(doc(db, "bookings", id));
             }
         };
 
