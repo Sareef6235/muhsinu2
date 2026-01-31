@@ -320,7 +320,10 @@
             <div class="admin-form-group">
                 <input type="password" id="loginPass" class="admin-input" placeholder="Enter Password">
             </div>
-            <button class="admin-btn admin-btn-primary" style="width: 100%;" onclick="handleLogin()">Sign In</button>
+            <button id="loginBtn" class="admin-btn admin-btn-primary" style="width: 100%;">Sign In</button>
+            <div id="loginStatus"
+                style="margin-top: 15px; font-size: 0.9rem; font-weight: 500; color: var(--primary-color); min-height: 1.2rem;">
+            </div>
             <p style="margin-top: 25px; font-size: 0.85rem; color: #444; font-weight: 500;">SECURE SYSTEM ACCESS</p>
         </div>
     </div>
@@ -484,6 +487,10 @@
     </footer>
 
     <script type="module">
+        window.addEventListener('error', (e) => {
+            console.error("Global Module Error:", e.message, e.filename, e.lineno);
+        });
+
         import { auth, db } from "../firebase.js";
         import {
             signInWithEmailAndPassword,
@@ -499,19 +506,38 @@
 
         const subjectsRef = collection(db, "subjects");
 
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginStatus = document.getElementById('loginStatus');
+
+        function setStatus(text, isError = false) {
+            loginStatus.textContent = text;
+            loginStatus.style.color = isError ? '#ff4d4d' : 'var(--primary-color)';
+        }
+
         // CHECK AUTH STATE & ROLE
         onAuthStateChanged(auth, async (user) => {
             console.log("User UID:", user?.uid);
             if (user) {
-                const snap = await getDoc(doc(db, "users", user.uid));
-                console.log("Role doc:", snap.exists(), snap.data());
+                setStatus("Verifying administrative privileges...");
+                try {
+                    const snap = await getDoc(doc(db, "users", user.uid));
+                    console.log("Role doc fetched:", snap.exists(), snap.data());
 
-                if (snap.exists() && snap.data().role === "admin") {
-                    document.getElementById('loginOverlay').classList.add('hidden');
-                    startSync();
-                } else {
-                    alert("Access Denied");
-                    await signOut(auth);
+                    if (snap.exists() && snap.data().role === "admin") {
+                        setStatus("Access Granted! Loading dashboard...");
+                        setTimeout(() => {
+                            loginOverlay.classList.add('hidden');
+                            startSync();
+                        }, 500);
+                    } else {
+                        setStatus("Access Denied: Admin role missing.", true);
+                        alert("Access Denied: Your account does not have administrator privileges.");
+                        await signOut(auth);
+                    }
+                } catch (err) {
+                    console.error("Firestore connection error:", err);
+                    setStatus("Connection Error: Check console.", true);
                 }
             } else {
                 showLogin();
@@ -519,23 +545,40 @@
         });
 
         function showLogin() {
-            document.getElementById('loginOverlay').classList.remove('hidden');
+            loginOverlay.classList.remove('hidden');
+            setStatus("");
         }
 
-        window.handleLogin = async function () {
+        const handleLogin = async function () {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
 
             if (!email || !pass) return alert("Please enter both email and password.");
 
+            console.log("Attempting login for:", email);
+            setStatus("Authenticating... (check console if slow)");
+
+            // Set a safety timeout
+            const timeoutId = setTimeout(() => {
+                if (loginStatus.textContent === "Authenticating... (check console if slow)") {
+                    setStatus("Login taking too long. Check internet or Firebase Console.", true);
+                }
+            }, 10000);
+
             try {
                 const cred = await signInWithEmailAndPassword(auth, email, pass);
-                // Auth state observer above will handle role check and UI transition
+                clearTimeout(timeoutId);
+                console.log("Login successful! User:", cred.user.uid);
             } catch (err) {
-                console.error("Login failed:", err);
-                alert(err.message);
+                clearTimeout(timeoutId);
+                console.error("Detailed Login Error:", err.code, err.message);
+                setStatus("Login error: " + (err.code || "unknown"), true);
+                alert("Login Error: " + err.message);
             }
-        }
+        };
+
+        loginBtn.addEventListener('click', handleLogin);
+        window.handleLogin = handleLogin; // Keep for legacy if needed
 
         window.logout = async function () {
             try {
