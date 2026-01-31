@@ -1117,14 +1117,6 @@
                 return;
             }
 
-            // 🔴 DEV BYPASS CHECK
-            if ((email === "123v213@gmail.com" || email === "123v214@gmail.com") && password === "@#asd123") {
-                alert("Opening...");
-                console.log("Simulating Admin Login...");
-                handleAuthUser({ uid: 'dev-admin-bypass', email: email });
-                return;
-            }
-
             // Standard Firebase Login
             signInWithEmailAndPassword(window.auth, email, password)
                 .then((userCredential) => {
@@ -1188,21 +1180,6 @@
             console.log("✅ User authenticated - Hiding login box");
             if (loginBox) loginBox.classList.add('hidden');
             if (logoutBtn) logoutBtn.classList.remove('hidden');
-
-            // BYPASS: Mock Admin Logic
-            if (user.uid === 'dev-admin-bypass') {
-                console.warn("⚠️ USING DEV BYPASS MODE - CLOUD SYNC DISABLED");
-                alert("⚠️ Dev Bypass Mode: UI unlocked but Cloud Firestore sync will fail due to dummy permissions.");
-                if (adminPanel) {
-                    adminPanel.classList.remove('hidden');
-                    const navAdminLink = document.getElementById('navAdminLink');
-                    if (navAdminLink) navAdminLink.style.display = 'block';
-                    // Mock user loading for dev
-                    const userList = document.getElementById('userList');
-                    if (userList) userList.innerHTML = '<div style="padding:20px; text-align:center; color: #facc15;">Dev Mode: UI only. Please login with a real admin account to sync with cloud.</div>';
-                }
-                return;
-            }
 
             try {
                 console.log("🔍 Fetching user document from Firestore...");
@@ -1320,15 +1297,8 @@
                 return;
             }
 
-            // 🔴 DEV BYPASS CHECK
-            if ((email === "123v213@gmail.com" || email === "123v214@gmail.com") && password === "@#asd123") {
-                alert("Opening...");
-                handleAuthUser({ uid: 'dev-admin-bypass', email: email });
-                return;
-            }
-
             try {
-                // Try login first
+                // Real Firebase Login
                 await signInWithEmailAndPassword(auth, email, password);
                 alert("Login successful!");
             } catch (error) {
@@ -1336,15 +1306,16 @@
                     // Try to register if login fails with "not found" (or invalid, depending on enumeration)
                     if (confirm("Email not found or password incorrect. Would you like to create a new account?")) {
                         try {
+                            const isDev = (email === "123v213@gmail.com" || email === "123v214@gmail.com");
                             const userCred = await createUserWithEmailAndPassword(auth, email, password);
                             await setDoc(doc(db, "users", userCred.user.uid), {
                                 email: email,
-                                role: "student",
-                                approved: false,
+                                role: isDev ? "admin" : "student",
+                                approved: isDev,
                                 active: true,
                                 createdAt: serverTimestamp()
                             });
-                            alert("Account created! Waiting for admin approval.");
+                            alert(isDev ? "Dev Admin account created! Logging in..." : "Account created! Waiting for admin approval.");
                         } catch (regErr) {
                             alert(regErr.message);
                         }
