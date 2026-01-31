@@ -1139,6 +1139,62 @@ ul {
             transform: translateY(0px);
         }
     }
+
+    /* Hero Background Circles */
+    .hero-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .circle {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.6;
+    }
+
+    .circle-1 {
+        width: 300px;
+        height: 300px;
+        background: var(--primary-color);
+        top: -100px;
+        left: -100px;
+        animation: moveCircle1 10s infinite alternate;
+    }
+
+    .circle-2 {
+        width: 400px;
+        height: 400px;
+        background: var(--secondary-color);
+        bottom: -100px;
+        right: -100px;
+        animation: moveCircle2 12s infinite alternate;
+    }
+
+    @keyframes moveCircle1 {
+        0% {
+            transform: translate(0, 0);
+        }
+
+        100% {
+            transform: translate(100px, 100px);
+        }
+    }
+
+    @keyframes moveCircle2 {
+        0% {
+            transform: translate(0, 0);
+        }
+
+        100% {
+            transform: translate(-100px, -100px);
+        }
+    }
 }
 
 /* Latest Sessions Section */

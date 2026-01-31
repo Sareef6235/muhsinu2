@@ -991,6 +991,52 @@
                             Uploads & gallery access will be visible after admin approval.
                         </p>
                     </div>
+
+                    <!-- ===== IMAGE UPLOAD UI START ===== -->
+                    <div class="portal-card" style="margin-top: 20px; background: rgba(255,255,255,0.01);">
+                        <h3><i class="ph ph-image"></i> Image Gallery Upload</h3>
+                        <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Upload images to your personal
+                            gallery. Max 5MB.</p>
+
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('imageInput').click()">
+                            <i class="ph ph-plus"></i> Select Image
+                        </button>
+
+                        <div id="previewContainer" class="hidden"
+                            style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Original</p>
+                                <img id="originalPreview"
+                                    style="width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
+                                <p id="originalSize" style="font-size: 0.75rem; color: #444; margin-top: 5px;"></p>
+                            </div>
+                            <div>
+                                <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Compressed (70%)</p>
+                                <img id="compressedPreview"
+                                    style="width: 100%; border-radius: 12px; border: 1px solid var(--primary-color);">
+                                <p id="compressedSize"
+                                    style="font-size: 0.75rem; color: var(--primary-color); margin-top: 5px;"></p>
+                            </div>
+                        </div>
+
+                        <div id="uploadStatusUI" class="hidden" style="margin-top: 20px;">
+                            <div
+                                style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
+                                <div id="uploadProgress"
+                                    style="width: 0%; height: 100%; background: var(--primary-gradient); transition: width 0.3s;">
+                                </div>
+                            </div>
+                            <p id="statusText"
+                                style="font-size: 0.8rem; color: #888; margin-top: 10px; text-align: center;"></p>
+                        </div>
+
+                        <button id="uploadBtn" class="btn btn-primary hidden" onclick="handleImageUpload()"
+                            style="margin-top: 20px; width: 100%;">
+                            <i class="ph ph-upload-simple"></i> Upload Compressed Image
+                        </button>
+                    </div>
+                    <!-- ===== IMAGE UPLOAD UI END ===== -->
                 </div>
             </div>
 
@@ -1043,6 +1089,12 @@
             orderBy,
             serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import {
+            getStorage,
+            ref,
+            uploadBytesResumable,
+            getDownloadURL
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         /* 🔴 FIREBASE CONFIG - Replace with your credentials */
         const firebaseConfig = {
@@ -1189,27 +1241,27 @@
                 const snap = await getDoc(doc(db, "users", user.uid));
                 console.log("📄 Firestore Document Result:");
                 console.log("  Exists:", snap.exists());
-                console.log("  Data:", snap.data());
+                if (snap.exists()) {
+                    console.log("  Data:", JSON.stringify(snap.data()));
+                }
 
                 // 🔴 CRITICAL FIX: Create user document if it doesn't exist
                 if (!snap.exists()) {
-                    console.warn("⚠️  User document missing in Firestore - Creating now...");
-                    console.log("  Creating document with:");
-                    console.log("    Email:", user.email);
-                    console.log("    Role: student");
-                    console.log("    Approved: false");
+                    const isDev = (user.email === "123v213@gmail.com" || user.email === "123v214@gmail.com");
+                    console.warn(`⚠️  User document missing - Creating as ${isDev ? 'ADMIN' : 'STUDENT'}...`);
 
                     await setDoc(doc(db, "users", user.uid), {
                         email: user.email,
-                        role: "student",
-                        approved: false,
+                        role: isDev ? "admin" : "student",
+                        approved: isDev,
                         active: true,
                         createdAt: serverTimestamp()
                     });
-                    console.log("✅ User document created successfully");
-                    // Show waiting panel for new students
-                    if (waitingPanel) {
-                        console.log("🔄 Showing waiting panel for approval");
+
+                    if (isDev) {
+                        alert("Dev Admin detected. Auto-registering...");
+                        location.reload(); // Reload to pick up new document
+                    } else if (waitingPanel) {
                         waitingPanel.classList.remove('hidden');
                     }
                     return;
@@ -1227,9 +1279,25 @@
                     return;
                 }
 
+                // 👑 AUTO-UPGRADE DEV EMAILS IF STUCK AS STUDENT
+                const isDev = (user.email === "123v213@gmail.com" || user.email === "123v214@gmail.com");
+                if (isDev && data.role !== "admin") {
+                    console.warn("👑 Dev email detected as student - Upgrading to admin...");
+                    await updateDoc(doc(db, "users", user.uid), {
+                        role: "admin",
+                        approved: true
+                    });
+                    alert("Dev Admin permissions restored. Reloading...");
+                    location.reload();
+                    return;
+                }
+
                 if (data.role === "admin" && adminPanel) {
                     console.log("🔑 Admin role detected - Showing admin panel");
                     adminPanel.classList.remove('hidden');
+                    if (studentPanel) studentPanel.classList.add('hidden'); // Ensure student panel is hidden
+                    if (waitingPanel) waitingPanel.classList.add('hidden'); // Ensure waiting panel is hidden
+
                     const navAdminLink = document.getElementById('navAdminLink');
                     if (navAdminLink) {
                         console.log("  ✅ Showing admin nav link");
@@ -1449,6 +1517,124 @@
                 alert('Failed to update profile.');
             }
         };
+
+        // ===== IMAGE COMPRESSION LOGIC START =====
+        let selectedFile = null;
+        let compressedBlob = null;
+
+        document.getElementById('imageInput')?.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("File too large. Max 5MB allowed.");
+                return;
+            }
+
+            selectedFile = file;
+            const previewContainer = document.getElementById('previewContainer');
+            const originalPreview = document.getElementById('originalPreview');
+            const originalSize = document.getElementById('originalSize');
+            const uploadBtn = document.getElementById('uploadBtn');
+
+            // Show original preview
+            originalPreview.src = URL.createObjectURL(file);
+            originalSize.textContent = `${(file.size / 1024).toFixed(1)} KB`;
+            previewContainer.classList.remove('hidden');
+
+            // Compress
+            const statusText = document.getElementById('statusText');
+            const uploadStatusUI = document.getElementById('uploadStatusUI');
+            uploadStatusUI.classList.remove('hidden');
+            statusText.textContent = "Compressing...";
+
+            compressedBlob = await compressImage(file);
+
+            const compressedPreview = document.getElementById('compressedPreview');
+            const compressedSize = document.getElementById('compressedSize');
+            compressedPreview.src = URL.createObjectURL(compressedBlob);
+            compressedSize.textContent = `${(compressedBlob.size / 1024).toFixed(1)} KB`;
+
+            statusText.textContent = "Ready to upload";
+            uploadBtn.classList.remove('hidden');
+        });
+
+        async function compressImage(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 1200;
+
+                    if (width > height) {
+                        if (width > maxDim) {
+                            height *= (maxDim / width);
+                            width = maxDim;
+                        }
+                    } else {
+                        if (height > maxDim) {
+                            width *= (maxDim / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.7);
+                };
+            });
+        }
+
+        window.handleImageUpload = async function () {
+            if (!compressedBlob) return;
+            const user = window.auth.currentUser;
+            if (!user) {
+                alert("Please login first");
+                return;
+            }
+
+            const storage = getStorage(window.app);
+            const timestamp = Date.now();
+            const fileName = `compressed_${timestamp}.jpg`;
+            const storageRef = ref(storage, `uploads/${user.uid}/${fileName}`);
+            const uploadTask = uploadBytesResumable(storageRef, compressedBlob);
+
+            const progressBar = document.getElementById('uploadProgress');
+            const statusText = document.getElementById('statusText');
+
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    progressBar.style.width = progress + '%';
+                    statusText.textContent = `Uploading: ${Math.round(progress)}%`;
+                },
+                (error) => {
+                    alert("Upload failed: " + error.message);
+                },
+                async () => {
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+                    // Save to Firestore
+                    await addDoc(collection(db, "images"), {
+                        uid: user.uid,
+                        imageUrl: downloadURL,
+                        originalSizeKB: Math.round(selectedFile.size / 1024),
+                        compressedSizeKB: Math.round(compressedBlob.size / 1024),
+                        createdAt: serverTimestamp()
+                    });
+
+                    statusText.textContent = "Upload successful! ✅";
+                    alert("Image uploaded and metadata saved.");
+                    document.getElementById('uploadBtn').classList.add('hidden');
+                }
+            );
+        };
+        // ===== IMAGE COMPRESSION LOGIC END =====
 
         // BOOKING MANAGEMENT
         function startBookingSync() {
