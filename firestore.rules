@@ -3,51 +3,72 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // 🛡️ SECURITY HELPERS
+    
+    // Check if the user is authenticated
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // Robust admin check with existence verification
+    // Robust admin check (prevents rule crashes on missing docs)
     function isAdmin() {
-      return isSignedIn() && 
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // 1. Must be signed in
+      // 2. Document MUST exist (prevents get() from throwing an error)
+      // 3. User role field must match 'admin'
+      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
+      return isSignedIn() &&
+             exists(userPath) &&
+             get(userPath).data.role == 'admin';
     }
 
     // 👤 USERS COLLECTION
     match /users/{userId} {
       
-      // 🔓 SELF-ACCESS (Highest Priority)
-      // Allow any signed-in user to read their own document.
-      // If the document doesn't exist, Firestore returns a success with snap.exists() = false.
+      /**
+       * 1. SELF-READ (Independent of Admin logic)
+       * If doc doesn't exist, Firestore returns snap.exists() = false
+       * This rule must NOT use any helper that calls get() on the user doc
+       */
       allow read: if isSignedIn() && request.auth.uid == userId;
 
-      // Allow users to create their own document on first sign-in.
-      allow create: if isSignedIn() && request.auth.uid == userId;
+      /**
+       * 2. SELF-CREATE (First Login)
+       * Allow users to initialize their profile.
+       * We restrict fields to prevent self-elevation to admin.
+       */
+      allow create: if isSignedIn() && 
+                    request.auth.uid == userId &&
+                    request.resource.data.role == 'student' && 
+                    request.resource.data.approved == false;
 
-      // Allow users to update their own profile, but NOT their role or approval status.
-      allow update: if isSignedIn() && request.auth.uid == userId &&
-                    (!request.resource.data.diff(resource.data).affectedKeys()
-                    .hasAny(['role', 'approved']));
+      /**
+       * 3. SELF-UPDATE (Profile Management)
+       * Allow editing name/class/roll but NOT role or approval status.
+       */
+      allow update: if isSignedIn() && 
+                    request.auth.uid == userId &&
+                    request.resource.data.role == resource.data.role &&
+                    request.resource.data.approved == resource.data.approved;
 
-      // 👑 ADMIN ACCESS
-      // Allow admins to perform any operation on any user document.
+      /**
+       * 4. ADMIN BYPASS
+       * Admins can perform any operation on any user document.
+       */
       allow read, write: if isAdmin();
     }
 
-    // 📅 BOOKINGS COLLECTION
+    // 📅 BOOKINGS
     match /bookings/{bookingId} {
-      allow create: if true;
+      allow create: if true; // Public booking
       allow read, write: if isAdmin();
     }
 
-    // 📚 SUBJECTS COLLECTION
+    // 📚 SUBJECTS
     match /subjects/{subjectId} {
-      allow read: if true;
+      allow read: if true; // Public list
       allow write: if isAdmin();
     }
 
-    // 🖼️ IMAGES COLLECTION
+    // 🖼️ IMAGES
     match /images/{imageId} {
       allow read: if true;
       allow write: if isSignedIn() && 

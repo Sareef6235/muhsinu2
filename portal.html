@@ -1221,60 +1221,58 @@
             if (logoutBtn) logoutBtn.classList.remove('hidden');
 
             try {
-                console.log("🔍 [Firestore] Attempting to fetch profile for UID:", user.uid);
-
+                console.log("🔍 [Firestore] Initializing profile sequence...");
                 const userDocRef = doc(db, "users", user.uid);
+
                 let snap;
-
                 try {
+                    // Try to read the document
                     snap = await getDoc(userDocRef);
-                    console.log("📄 [Firestore] Document snapshot received. Exists:", snap.exists());
                 } catch (readErr) {
-                    console.error("❌ [Firestore] Read Operation Failed:", readErr.code, readErr.message);
-
                     if (readErr.code === 'permission-denied') {
-                        console.warn("⚠️  [Firestore] Permission Denied on Read. Attempting to check if self-creation is possible...");
-                        // This usually means the rule is blocking the READ even for the owner, 
-                        // sometimes happens if the rule is too complex or misconfigured.
-                        // We'll jump to the creation logic if the user is authenticated.
-                        throw readErr; // Re-throw to be caught by the outer block
+                        console.error("⛔ [Firestore] Access Denied on Read. This happens if rules are not deployed or misconfigured.");
+                        // Handle the error specifically for the UI
+                        throw readErr;
                     }
                     throw readErr;
                 }
 
-                // 🔴 CRITICAL FIX: Create user document if it doesn't exist
-                if (!snap || !snap.exists()) {
-                    const isDev = (user.email === "123v213@gmail.com" || user.email === "123v214@gmail.com");
-                    console.log(`✨ [Firestore] Profile missing. Initializing as ${isDev ? 'ADMIN' : 'STUDENT'}...`);
+                // CASE 1: Document missing (New User)
+                if (!snap.exists()) {
+                    console.log("🆕 [Firestore] No profile found. Starting automatic creation...");
 
-                    await setDoc(userDocRef, {
+                    const isDev = (user.email === "123v213@gmail.com" || user.email === "123v214@gmail.com");
+                    const initialData = {
                         email: user.email,
                         role: isDev ? "admin" : "student",
                         approved: isDev,
                         active: true,
                         createdAt: serverTimestamp()
-                    });
+                    };
 
-                    console.log("✅ [Firestore] New profile successfully created.");
+                    try {
+                        await setDoc(userDocRef, initialData);
+                        console.log("✅ [Firestore] Profile successfully created.");
 
-                    if (isDev) {
-                        alert("Initial Admin Account setup complete. Reloading...");
-                        location.reload();
+                        // If it's a dev admin, reload to bypass UI logic
+                        if (isDev) {
+                            alert("Initial Admin registered! Reloading portal...");
+                            location.reload();
+                            return;
+                        }
+
+                        // Redirect students to waiting panel
+                        if (waitingPanel) waitingPanel.classList.remove('hidden');
                         return;
+                    } catch (createErr) {
+                        console.error("⛔ [Firestore] Failed to create profile:", createErr.code);
+                        throw createErr;
                     }
-
-                    if (waitingPanel) waitingPanel.classList.remove('hidden');
-                    const loader = document.getElementById('portalLoader');
-                    if (loader) loader.classList.add('hidden');
-                    return;
                 }
 
+                // CASE 2: Document exists
                 const data = snap.data();
-                console.log("👤 [Firestore] Profile Data:", {
-                    role: data?.role,
-                    approved: data?.approved,
-                    active: data?.active
-                });
+                console.log("👤 [Firestore] Profile loaded successfully for role:", data.role);
 
                 if (!data) {
                     console.error("❌ User data is null despite document existing");
