@@ -1072,6 +1072,7 @@
             window.app = app;
 
             console.log("Firebase Initialized Successfully");
+            console.log("ENV:", location.protocol);
 
             // Define Global Constants
             window.DEV_MODE = false; // Set to true for local testing without Firebase
@@ -1082,7 +1083,7 @@
 
         // Subject Management State
         let subjects = [];
-        let editingSubjectId = null;
+        let editingId = null;
         const subjectsRef = collection(db, "subjects");
 
         // DOM Elements
@@ -1167,8 +1168,15 @@
         // AUTH STATE OBSERVER
         // HANDLE AUTH USER (Refactored for Bypass)
         async function handleAuthUser(user) {
-            console.log("User UID:", user?.uid);
+            console.log("═══════════════════════════════════════");
+            console.log("🔄 handleAuthUser() CALLED");
+            console.log("  User UID:", user?.uid);
+            console.log("  User Email:", user?.email);
+            console.log("  User Null:", user === null);
+            console.log("═══════════════════════════════════════");
+
             if (!user) {
+                console.log("❌ No user - Showing login box");
                 if (loginBox) loginBox.classList.remove('hidden');
                 if (adminPanel) adminPanel.classList.add('hidden');
                 if (studentPanel) studentPanel.classList.add('hidden');
@@ -1177,6 +1185,7 @@
                 return;
             }
 
+            console.log("✅ User authenticated - Hiding login box");
             if (loginBox) loginBox.classList.add('hidden');
             if (logoutBtn) logoutBtn.classList.remove('hidden');
 
@@ -1195,29 +1204,74 @@
             }
 
             try {
+                console.log("🔍 Fetching user document from Firestore...");
+                console.log("  Collection: users");
+                console.log("  Document ID:", user.uid);
+
                 const snap = await getDoc(doc(db, "users", user.uid));
-                console.log("Role doc:", snap.exists(), snap.data());
+                console.log("📄 Firestore Document Result:");
+                console.log("  Exists:", snap.exists());
+                console.log("  Data:", snap.data());
+
+                // 🔴 CRITICAL FIX: Create user document if it doesn't exist
+                if (!snap.exists()) {
+                    console.warn("⚠️  User document missing in Firestore - Creating now...");
+                    console.log("  Creating document with:");
+                    console.log("    Email:", user.email);
+                    console.log("    Role: student");
+                    console.log("    Approved: false");
+
+                    await setDoc(doc(db, "users", user.uid), {
+                        email: user.email,
+                        role: "student",
+                        approved: false,
+                        active: true,
+                        createdAt: serverTimestamp()
+                    });
+                    console.log("✅ User document created successfully");
+                    // Show waiting panel for new students
+                    if (waitingPanel) {
+                        console.log("🔄 Showing waiting panel for approval");
+                        waitingPanel.classList.remove('hidden');
+                    }
+                    return;
+                }
+
                 const data = snap.data();
+                console.log("👤 User Data Retrieved:");
+                console.log("  Role:", data?.role);
+                console.log("  Approved:", data?.approved);
+                console.log("  Active:", data?.active);
+                console.log("  Name:", data?.name);
 
                 if (!data) {
-                    console.warn("User data missing in Firestore");
+                    console.error("❌ User data is null despite document existing");
                     return;
                 }
 
                 if (data.role === "admin" && adminPanel) {
+                    console.log("🔑 Admin role detected - Showing admin panel");
                     adminPanel.classList.remove('hidden');
                     const navAdminLink = document.getElementById('navAdminLink');
-                    if (navAdminLink) navAdminLink.style.display = 'block';
+                    if (navAdminLink) {
+                        console.log("  ✅ Showing admin nav link");
+                        navAdminLink.style.display = 'block';
+                    }
+                    console.log("  📊 Loading admin data...");
                     loadUsers();
                     startSubjectSync();
                     startBookingSync();
+                    console.log("  ✅ Admin panel fully loaded");
                 }
 
                 if (data.role === "student" && studentPanel) {
+                    console.log("🎓 Student role detected");
                     if (!data.approved) {
+                        console.log("  ⏳ Student not approved - Showing waiting panel");
                         if (waitingPanel) waitingPanel.classList.remove('hidden');
                         return;
                     }
+                    console.log("  ✅ Student approved - Showing student panel");
                     studentPanel.classList.remove('hidden');
                     if (document.getElementById('pname')) document.getElementById('pname').value = data.name || "";
                     if (document.getElementById('pclass')) document.getElementById('pclass').value = data.class || "";
@@ -1229,6 +1283,7 @@
                         const initEl = document.getElementById('profileInitial');
                         if (initEl) initEl.textContent = data.name.charAt(0).toUpperCase();
                     }
+                    console.log("  ✅ Student panel fully loaded");
                 }
             } catch (e) {
                 console.error("Auth State Error:", e);
@@ -1237,7 +1292,21 @@
         }
 
         // AUTH STATE OBSERVER
-        onAuthStateChanged(auth, handleAuthUser);
+        onAuthStateChanged(auth, (user) => {
+            console.log("🔴 LIVE USER AUTH STATE CHANGED:");
+            console.log("  User Object:", user);
+            console.log("  UID:", user?.uid);
+            console.log("  Email:", user?.email);
+            console.log("  Email Verified:", user?.emailVerified);
+            console.log("  Is Anonymous:", user?.isAnonymous);
+            console.log("  Provider Data:", user?.providerData);
+            console.log("  Metadata:", user?.metadata);
+            console.log("  Environment:", location.protocol, location.host);
+            console.log("  Timestamp:", new Date().toISOString());
+
+            // Call the handler
+            handleAuthUser(user);
+        });
 
         // CREATE USER
         // SMART AUTH
@@ -1302,7 +1371,7 @@
                     role: role,
                     approved: role === "admin",
                     active: true,
-                    createdAt: new Date().toISOString()
+                    createdAt: serverTimestamp()
                 });
                 alert('User created successfully!');
                 document.getElementById('newEmail').value = '';
@@ -1491,18 +1560,29 @@
 
             if (!nameEl.value || !priceEl.value) return alert("Validation Failed: All fields required");
 
+            if (window.DEV_MODE) {
+                console.log("🛠️ DEV_MODE: Mocking subject save success");
+                alert("DEV MODE: Subject data synchronized (Mocked)");
+                nameEl.value = "";
+                priceEl.value = "";
+                rtlEl.checked = false;
+                if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-plus-circle"></i> Add New Subject';
+                if (cancelBtn) cancelBtn.classList.add('hidden');
+                return;
+            }
+
             const subjectData = {
                 name: nameEl.value,
                 price: parseFloat(priceEl.value),
                 rtl: rtlEl.checked
             };
 
+            console.log("☁️ Attempting cloud sync...", subjectData);
+
             try {
-                if (editingSubjectId) {
-                    await updateDoc(doc(db, "subjects", editingSubjectId), subjectData);
-                    editingSubjectId = null;
-                    if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-plus-circle"></i> Add New Subject';
-                    if (cancelBtn) cancelBtn.classList.add('hidden');
+                if (editingId) {
+                    await updateDoc(doc(db, "subjects", editingId), subjectData);
+                    editingId = null;
                 } else {
                     await addDoc(subjectsRef, {
                         ...subjectData,
@@ -1511,17 +1591,20 @@
                     });
                 }
 
+                if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-plus-circle"></i> Add New Subject';
+                if (cancelBtn) cancelBtn.classList.add('hidden');
                 nameEl.value = "";
                 priceEl.value = "";
                 rtlEl.checked = false;
+                console.log("✅ Cloud sync success!");
             } catch (error) {
-                console.error("Error saving subject:", error);
-                alert("Failed to synchronize data with cloud.");
+                console.error("❌ Firebase Sync Error:", error);
+                alert("Failed to synchronize data with cloud:\n" + error.message);
             }
         }
 
         window.editSubject = function (id) {
-            editingSubjectId = id;
+            editingId = id;
             const s = subjects.find(sub => sub.id === id);
             if (s) {
                 document.getElementById('subName').value = s.name;
@@ -1538,7 +1621,7 @@
         }
 
         window.cancelSubjectEdit = function () {
-            editingSubjectId = null;
+            editingId = null;
             document.getElementById('subName').value = "";
             document.getElementById('subPrice').value = "";
             document.getElementById('subRTL').checked = false;
@@ -1548,11 +1631,15 @@
 
         window.deleteSubject = async function (id) {
             if (confirm("Confirm permanent removal of this subject from the cloud?")) {
+                if (window.DEV_MODE) {
+                    alert("DEV MODE: Subject deletion mocked.");
+                    return;
+                }
                 try {
                     await deleteDoc(doc(db, "subjects", id));
                 } catch (error) {
                     console.error("Error deleting subject:", error);
-                    alert("Failed to delete subject.");
+                    alert("Failed to delete subject:\n" + error.message);
                 }
             }
         }

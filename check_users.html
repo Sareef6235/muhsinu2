@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firestore User Document Checker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .container {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #00f3ff;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #00f3ff, #bc13fe);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #output {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            min-height: 200px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            border: 1px solid #333;
+        }
+
+        .success {
+            color: #00ff88;
+        }
+
+        .warning {
+            color: #facc15;
+        }
+
+        .error {
+            color: #ff4d4d;
+        }
+
+        .info {
+            color: #00f3ff;
+        }
+
+        .admin-section {
+            background: rgba(188, 19, 254, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid rgba(188, 19, 254, 0.3);
+        }
+
+        .admin-section h3 {
+            color: #bc13fe;
+            margin-top: 0;
+        }
+
+        input {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔧 Firestore User Document Manager</h1>
+        <p class="subtitle">Ensure all Firebase Auth users have corresponding Firestore documents</p>
+
+        <button onclick="checkAllUsers()" id="checkBtn">🔍 Check All Users</button>
+        <button onclick="createMissingDocs()" id="createBtn" disabled>✅ Create Missing Documents</button>
+
+        <div class="admin-section">
+            <h3>👑 Grant Admin Role</h3>
+            <input type="text" id="adminEmail" placeholder="Enter user email to make admin">
+            <button onclick="grantAdminRole()">Grant Admin Access</button>
+        </div>
+
+        <div id="output">Click "Check All Users" to scan for missing Firestore documents...</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            doc,
+            getDoc,
+            setDoc,
+            getDocs,
+            query,
+            updateDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDY3La232JPHrnwPL_VfwQKJ07JLIEHAZE",
+            authDomain: "my-pc-895cd.firebaseapp.com",
+            databaseURL: "https://my-pc-895cd-default-rtdb.firebaseio.com",
+            projectId: "my-pc-895cd",
+            storageBucket: "my-pc-895cd.firebasestorage.app",
+            messagingSenderId: "970176385787",
+            appId: "1:970176385787:web:d21a6d1ef8079934fb565e",
+            measurementId: "G-NKFHNQ88XG"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.auth = auth;
+        window.db = db;
+
+        let missingUsers = [];
+        const output = document.getElementById('output');
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            output.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Check authentication
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                log(`✅ Authenticated as: ${user.email}`, 'success');
+            } else {
+                log(`⚠️  Not authenticated. Please login to portal.html first.`, 'warning');
+            }
+        });
+
+        window.checkAllUsers = async function () {
+            output.innerHTML = '';
+            log('🔍 Scanning Firestore users collection...', 'info');
+
+            try {
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                log(`📊 Found ${usersSnapshot.size} user documents in Firestore`, 'info');
+
+                let adminCount = 0;
+                let studentCount = 0;
+                let pendingCount = 0;
+                let activeCount = 0;
+
+                usersSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    log(`\n👤 ${data.email || 'No email'}`, 'info');
+                    log(`   UID: ${doc.id}`, 'info');
+                    log(`   Role: ${data.role || 'MISSING'}`, data.role ? 'success' : 'error');
+                    log(`   Approved: ${data.approved}`, data.approved ? 'success' : 'warning');
+                    log(`   Active: ${data.active}`, data.active ? 'success' : 'error');
+
+                    if (data.role === 'admin') adminCount++;
+                    if (data.role === 'student') studentCount++;
+                    if (!data.approved) pendingCount++;
+                    if (data.active) activeCount++;
+                });
+
+                log(`\n📈 Summary:`, 'info');
+                log(`   👑 Admins: ${adminCount}`, 'success');
+                log(`   🎓 Students: ${studentCount}`, 'info');
+                log(`   ⏳ Pending Approval: ${pendingCount}`, 'warning');
+                log(`   ✅ Active Users: ${activeCount}`, 'success');
+
+                log(`\n✅ Scan complete!`, 'success');
+
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                console.error(error);
+            }
+        };
+
+        window.grantAdminRole = async function () {
+            const email = document.getElementById('adminEmail').value.trim();
+            if (!email) {
+                alert('Please enter an email address');
+                return;
+            }
+
+            try {
+                log(`\n🔍 Searching for user: ${email}`, 'info');
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                let found = false;
+
+                for (const userDoc of usersSnapshot.docs) {
+                    const data = userDoc.data();
+                    if (data.email === email) {
+                        found = true;
+                        log(`✅ Found user: ${email}`, 'success');
+
+                        await updateDoc(doc(db, 'users', userDoc.id), {
+                            role: 'admin',
+                            approved: true,
+                            active: true,
+                            updatedAt: serverTimestamp()
+                        });
+
+                        log(`👑 Successfully granted admin role to ${email}`, 'success');
+                        document.getElementById('adminEmail').value = '';
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    log(`❌ User not found: ${email}`, 'error');
+                    log(`   Make sure the user has logged in at least once.`, 'warning');
+                }
+
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                console.error(error);
+            }
+        };
+
+    </script>
+</body>
+
+</html>

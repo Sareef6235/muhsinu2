@@ -68,13 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // but here we just ensure JS is ready.
     // Contact Form Handling (Now handled in index.html for Google Forms)
 
-    // Tuition Booking Logic
     // Tuition Booking Logic (Checkboxes + UPI)
     const tuitionForm = document.getElementById('tuition-form');
-    const totalPriceDisplay = document.getElementById('total-price');
-    const subjectCheckboxes = document.querySelectorAll('#subject-checkboxes input[type="checkbox"]');
-    const classRadios = document.querySelectorAll('input[name="class"]');
     const totalPriceEl = document.getElementById('total-price');
+    const classRadios = document.querySelectorAll('input[name="class"]');
     const sessionsList = document.getElementById('sessions-list');
     const maxSubjects = 8;
 
@@ -98,61 +95,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return total;
     }
 
-    function loadSubjects() {
-        const subjectGrid = document.getElementById('subject-checkboxes');
-        if (!subjectGrid) return;
-
-        const subjects = JSON.parse(localStorage.getItem("subjects")) || [
-            { name: "QURA'N HIFZ", value: "QURA'N HIFZ (₹800", price: 800 },
-            { name: "FIQH", value: "FIQH (₹100)", price: 100 },
-            { name: "LISAN QURA'N", value: "LISAN QURA'N (₹650)", price: 650 },
-            { name: "AQEEDA", value: "AQEEDA (₹550)", price: 550 },
-            { name: "THAJVEETH", value: "THAJVEETH (₹700)", price: 700 },
-            { name: "THAREEKH", value: "THAREEKH (₹500)", price: 500 },
-            { name: "AQLAQH", value: "AQLAQH (₹450)", price: 450 },
-            { name: "THAFHEEMU THILAVAH", value: "THAFHEEMU THILAVAH (₹600)", price: 600 },
-            { name: "THAFSEER", value: "THAFSEER (₹650)", price: 650 },
-            { name: "DUROOS – ARABIC – MALAYALAM", value: "DUROOS – ARABIC – MALAYALAM (₹700)", price: 700 },
-            { name: "الدينيات – والأخلاق – والإملاء", value: "الدينيات – والأخلاق – والإملاء(500₹)", price: 500, rtl: true }
-        ];
-
-        subjectGrid.innerHTML = subjects.map(s => `
-            <label ${s.rtl ? 'dir="rtl"' : ''}>
-                <input type="checkbox" name="subject[]" value="${s.value || s.name}" data-price="${s.price}">
-                ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
-            </label>
-        `).join('');
-
-        // Re-attach event listeners
-        const newCheckboxes = subjectGrid.querySelectorAll('input[type="checkbox"]');
-        newCheckboxes.forEach(cb => {
-            cb.addEventListener('change', function () {
-                const checkedCount = subjectGrid.querySelectorAll('input[type="checkbox"]:checked').length;
-                if (checkedCount > maxSubjects) {
-                    this.checked = false;
-                    alert("Maximum 8 subjects മാത്രം select ചെയ്യാം");
-                    return;
-                }
-                calculateTotal();
-            });
-        });
-    }
-
     if (tuitionForm) {
-        loadSubjects();
-
         classRadios.forEach(radio => {
             radio.addEventListener('change', calculateTotal);
         });
 
-        const BOOKING_FORM_URL = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSfzhjNS8F_8_BvbwYFFZMxqfmdJqMTJx2rik6C29szqPPc9EA/formResponse";
-
-        tuitionForm.addEventListener("submit", (e) => {
-            // We allow the natural form submission to happen for Google Forms, 
-            // but we need to populate the hidden fields first.
-
+        tuitionForm.addEventListener("submit", async (e) => {
             const checkedSubjects = Array.from(document.querySelectorAll('#subject-checkboxes input[type="checkbox"]:checked'));
             const selectedClass = document.querySelector('input[name="class"]:checked');
+            const firstName = document.getElementById('fname').value;
+            const lastName = document.getElementById('lname').value;
+            const email = document.getElementById('email').value;
 
             if (checkedSubjects.length === 0) {
                 e.preventDefault();
@@ -160,26 +113,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const subjectsText = checkedSubjects.map(cb => cb.value).join(", ");
+            const subjectsList = checkedSubjects.map(cb => cb.value.split(' (₹')[0]);
             const amount = calculateTotal();
 
             // Populate Hidden Google Form Fields
-            document.getElementById('booking-subjects-hidden').value = subjectsText;
+            document.getElementById('booking-subjects-hidden').value = checkedSubjects.map(cb => cb.value).join(", ");
             document.getElementById('booking-class-hidden').value = selectedClass.value;
             document.getElementById('booking-price-hidden').value = "₹" + amount;
 
-            // Set global 'submitted' if needed for iframe feedback
-            window.submitted = true;
+            // 1. Write to Firestore asynchronously
+            if (window.db && window.firestoreUtils) {
+                try {
+                    const { collection, addDoc, serverTimestamp } = window.firestoreUtils;
+                    await addDoc(collection(window.db, "bookings"), {
+                        firstName,
+                        lastName,
+                        email,
+                        subjects: subjectsList,
+                        class: selectedClass.value,
+                        total: amount,
+                        createdAt: serverTimestamp()
+                    });
+                    console.log("Booking saved to Firestore ✅");
+                } catch (err) {
+                    console.error("Firestore Save Error:", err);
+                }
+            }
 
             // Success feedback
             alert("Booking Submitted Successfully! We will contact you soon.");
 
-            // The form will now submit to the hidden iframe because of the target="hidden_iframe"
-            // We reset after a brief delay so the data has time to send
+            // Allow Google Form submission via iframe to proceed
+            window.submitted = true;
+
+            // Reset after delay
             setTimeout(() => {
                 tuitionForm.reset();
                 if (totalPriceEl) totalPriceEl.textContent = '₹0';
-                // Close modal if it's the popup
                 const dialog = document.querySelector('.dialog-lightbox-message');
                 if (dialog) {
                     dialog.style.display = 'none';

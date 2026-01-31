@@ -444,11 +444,6 @@
         </div>
     </nav>
 
-    <!-- Firebase Realtime & Firestore Logic -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
     <!-- Booking Confirmation Modal -->
     <div id="booking-modal" class="modal-overlay">
         <div class="modal-content animate-fade-up">
@@ -469,7 +464,7 @@
                     </div>
                 </div>
 
-                <!-- UPI QR Code Section (Using User's Specific Info) -->
+                <!-- UPI QR Code Section -->
                 <div class="modal-qr-section"
                     style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--glass-border);">
                     <p style="margin-bottom: 15px; color: #bbb; font-size: 0.9rem;">Scan to Pay via UPI</p>
@@ -496,9 +491,13 @@
         </div>
     </div>
 
-    <script>
-        // Firebase Config for MIFTHAHUL HUDA MADRASA
-        var firebaseConfig = {
+    <!-- Firebase SDK v10 (Modular) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
             apiKey: "AIzaSyDY3La232JPHrnwPL_VfwQKJ07JLIEHAZE",
             authDomain: "my-pc-895cd.firebaseapp.com",
             databaseURL: "https://my-pc-895cd-default-rtdb.firebaseio.com",
@@ -509,189 +508,114 @@
             measurementId: "G-NKFHNQ88XG"
         };
 
-        if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
-            firebase.initializeApp(firebaseConfig);
-            const dbRef = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const rtdb = getDatabase(app);
 
-            // Initialize Firestore for Dynamic Subjects
-            const db = firebase.firestore();
+        // Expose to window for external access
+        window.firebaseApp = app;
+        window.db = db;
+        window.rtdb = rtdb;
+        window.firestoreUtils = { collection, addDoc, serverTimestamp };
 
-            // 1. Dynamic Subject Loader
-            const subjectContainer = document.getElementById('subject-checkboxes');
-            const totalPriceEl = document.getElementById('total-price');
+        const subjectContainer = document.getElementById('subject-checkboxes');
+        const totalPriceEl = document.getElementById('total-price');
 
-            function updateTotalPrice() {
-                let total = 0;
-                document.querySelectorAll('#subject-checkboxes input:checked').forEach(cb => {
-                    total += Number(cb.dataset.price);
-                });
-                totalPriceEl.textContent = `₹${total}`;
-                document.getElementById('booking-price-hidden').value = total;
-            }
-
-            db.collection("subjects").where("active", "==", true).orderBy("name").onSnapshot(snap => {
-                subjectContainer.innerHTML = "";
-                snap.forEach(doc => {
-                    const s = doc.data();
-                    const label = document.createElement('label');
-                    if (s.rtl) label.dir = 'rtl';
-                    label.innerHTML = `
-                        <input type="checkbox" name="subject[]" value="${s.name} (₹${s.price})" data-price="${s.price}">
-                        ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
-                    `;
-                    const input = label.querySelector('input');
-                    input.addEventListener('change', () => {
-                        updateTotalPrice();
-                        // Update Google Form mapping
-                        const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
-                            .map(c => c.value).join(', ');
-                        document.getElementById('booking-subjects-hidden').value = selected;
-                    });
-                    subjectContainer.appendChild(label);
-                });
+        // 1. Dynamic Subject Loader
+        function updateTotalPrice() {
+            let total = 0;
+            document.querySelectorAll('#subject-checkboxes input:checked').forEach(cb => {
+                total += Number(cb.dataset.price);
             });
-
-            // 2. Real-time Listeners
-            dbRef.ref("notice").on("value", function (snapshot) {
-                if (snapshot.val() === true) {
-                    const target = document.getElementById("gallerySection");
-                    if (target) {
-                        target.scrollIntoView({ behavior: "smooth" });
-                        setTimeout(() => db.ref("notice").set(false), 5000);
-                    }
-                }
-            });
-
-            // 3. Automatic GitHub Media Sync
-            const galleryList = document.getElementById('gallery-list');
-            const videoList = document.getElementById('video-list');
-
-            const downloadIcon = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
-
-            function addImageToGallery(url) {
-                const existing = Array.from(galleryList.querySelectorAll('img')).some(img => img.src === url);
-                if (existing) return;
-
-                const item = document.createElement("div");
-                item.className = "gallery-item animate-fade-up";
-                item.innerHTML = `
-                    <img src="${url}" alt="Gallery Photo" class="gallery-img" loading="lazy">
-                    <div class="media-info">
-                        <a href="${url}" download target="_blank" class="download-btn">
-                            ${downloadIcon} Download Image
-                        </a>
-                    </div>
-                `;
-                galleryList.appendChild(item);
-            }
-
-            function addVideoToGallery(url) {
-                const existing = Array.from(videoList.querySelectorAll('source')).some(src => src.src === url);
-                if (existing) return;
-
-                const item = document.createElement("div");
-                item.className = "video-item animate-fade-up";
-                item.innerHTML = `
-                    <video controls preload="none">
-                        <source src="${url}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                `;
-                videoList.appendChild(item);
-            }
-
-            // Fetch Images
-            fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallary")
-                .then(res => res.json())
-                .then(files => {
-                    if (Array.isArray(files)) {
-                        const hasImages = files.some(f => f.name.match(/\.(jpg|jpeg|png|webp|gif)$/i));
-                        // Don't clear hardcoded images - just skip dynamic loading
-                        // if (hasImages) galleryList.innerHTML = '';
-                        // Dynamic loading disabled to preserve hardcoded gallery images
-                        /* files.forEach(file => {
-                            if (file.type === "file" && file.name.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
-                                addImageToGallery(file.download_url);
-                            }
-                        }); */
-                    }
-                }).catch(err => console.error("Image sync failed:", err));
-
-            // Photo Highlights - Disabled to use hardcoded images only
-            // The dynamic loading was clearing existing content
-            /* 
-            fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallary")
-                .then(res => res.json())
-                .then(files => {
-                    if (Array.isArray(files)) {
-                        const imageFiles = files.filter(f => f.type === "file" && f.name.match(/\.(jpg|jpeg|png|webp|gif)$/i));
-                        if (imageFiles.length > 0) {
-                            videoList.innerHTML = '';
-                            // Display images in a grid format
-                            imageFiles.forEach(file => {
-                                const item = document.createElement("div");
-                                item.className = "gallery-item animate-fade-up";
-                                item.innerHTML = `
-                                    <img src="${file.download_url}" alt="Photo Highlight" class="gallery-img" loading="lazy">
-                                    <div class="media-info">
-                                        <a href="${file.download_url}" download target="_blank" class="download-btn">
-                                            ${downloadIcon} Download
-                                        </a>
-                                    </div>
-                                `;
-                                videoList.appendChild(item);
-                            });
-                        } else {
-                            videoList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #555;">No images found.</p>';
-                        }
-                    } else {
-                        videoList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #555;">No images found.</p>';
-                    }
-                }).catch(err => {
-                    console.error("Photo highlights sync failed:", err);
-                    videoList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #555;">Unable to load images.</p>';
-                });
-            */
-
-            // 4. Automatic PDF Sync for "Latest Sessions"
-            const pdfList = document.getElementById('pdf-list');
-
-            function addPdfToSessions(name, url) {
-                const item = document.createElement("div");
-                item.className = "session-card pdf-card animate-fade-up";
-                item.innerHTML = `
-                    <div class="pdf-info">
-                        <i class="ph ph-file-pdf" style="font-size: 2rem; color: #ff4d4d;"></i>
-                        <div>
-                            <h4>${name.replace(/\.pdf$/i, '')}</h4>
-                            <p>Official Document / Certificate</p>
-                        </div>
-                    </div>
-                    <a href="${url}" target="_blank" class="btn-pdf">View Document</a>
-                `;
-                pdfList.appendChild(item);
-            }
-
-            fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/pdfs")
-                .then(res => res.json())
-                .then(files => {
-                    if (Array.isArray(files)) {
-                        const hasPdfs = files.some(f => f.name.match(/\.(pdf)$/i));
-                        if (hasPdfs) pdfList.innerHTML = '';
-                        files.forEach(file => {
-                            if (file.type === "file" && file.name.match(/\.(pdf)$/i)) {
-                                addPdfToSessions(file.name, file.download_url);
-                            }
-                        });
-                    }
-                }).catch(err => console.error("PDF sync failed:", err));
+            if (totalPriceEl) totalPriceEl.textContent = `₹${total}`;
+            const hiddenPrice = document.getElementById('booking-price-hidden');
+            if (hiddenPrice) hiddenPrice.value = total;
         }
 
-        // Exam Result Logic for Homepage
+        onSnapshot(query(collection(db, "subjects"), where("active", "==", true), orderBy("name")), snap => {
+            if (!subjectContainer) return;
+            subjectContainer.innerHTML = "";
+            snap.forEach(doc => {
+                const s = doc.data();
+                const label = document.createElement('label');
+                if (s.rtl) label.dir = 'rtl';
+                label.innerHTML = `
+                    <input type="checkbox" name="subject[]" value="${s.name} (₹${s.price})" data-price="${s.price}">
+                    ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
+                `;
+                const input = label.querySelector('input');
+                input.addEventListener('change', () => {
+                    updateTotalPrice();
+                    const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
+                        .map(c => c.value).join(', ');
+                    const hiddenSub = document.getElementById('booking-subjects-hidden');
+                    if (hiddenSub) hiddenSub.value = selected;
+                });
+                subjectContainer.appendChild(label);
+            });
+        });
+
+        // 2. Real-time Listeners (RTDB)
+        onValue(ref(rtdb, "notice"), (snapshot) => {
+            if (snapshot.val() === true) {
+                const target = document.getElementById("gallerySection");
+                if (target) {
+                    target.scrollIntoView({ behavior: "smooth" });
+                    setTimeout(() => set(ref(rtdb, "notice"), false), 5000);
+                }
+            }
+        });
+
+        // 3. GitHub Media Sync
+        const galleryList = document.getElementById('gallery-list');
+        const videoList = document.getElementById('video-list');
+        const downloadIcon = `<svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+
+        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallary")
+            .then(res => res.json())
+            .then(files => {
+                if (Array.isArray(files) && galleryList) {
+                    // Dynamic loading logic if needed
+                }
+            }).catch(err => console.error("Image sync failed:", err));
+
+        // 4. PDF Sync
+        const pdfList = document.getElementById('pdf-list');
+        function addPdfToSessions(name, url) {
+            const item = document.createElement("div");
+            item.className = "session-card pdf-card animate-fade-up";
+            item.innerHTML = `
+                <div class="pdf-info">
+                    <i class="ph ph-file-pdf" style="font-size: 2rem; color: #ff4d4d;"></i>
+                    <div>
+                        <h4>${name.replace(/\.pdf$/i, '')}</h4>
+                        <p>Official Document / Certificate</p>
+                    </div>
+                </div>
+                <a href="${url}" target="_blank" class="btn-pdf">View Document</a>
+            `;
+            if (pdfList) pdfList.appendChild(item);
+        }
+
+        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/pdfs")
+            .then(res => res.json())
+            .then(files => {
+                if (Array.isArray(files)) {
+                    const hasPdfs = files.some(f => f.name.match(/\.(pdf)$/i));
+                    if (hasPdfs && pdfList) pdfList.innerHTML = '';
+                    files.forEach(file => {
+                        if (file.type === "file" && file.name.match(/\.(pdf)$/i)) {
+                            addPdfToSessions(file.name, file.download_url);
+                        }
+                    });
+                }
+            }).catch(err => console.error("PDF sync failed:", err));
+
+        // 5. Exam Result Logic
         const RESULT_SHEET_ID = "1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU";
         const RESULT_TAB_NAME = "class1";
 
-        async function fetchHomeResult() {
+        window.fetchHomeResult = async function () {
             const regnoInput = document.getElementById('home-regno');
             const regno = regnoInput.value.trim().toUpperCase();
             const status = document.getElementById('home-status');
@@ -699,7 +623,6 @@
             const area = document.getElementById('home-result-area');
 
             if (!regno) return;
-
             status.innerHTML = "Syncing with database...";
             container.style.display = "none";
 
@@ -712,43 +635,34 @@
                 const cols = json.table.cols;
                 const rows = json.table.rows;
 
-                const findIdx = (keywords) => cols.findIndex(c => keywords.some(k => (c.label || "").toLowerCase().includes(k)));
-                const idxMap = {
-                    id: findIdx(['id', 'reg']),
-                    name: findIdx(['name']),
-                };
-
-                const getVal = (row, idx) => {
-                    if (!row || !row.c[idx]) return "";
-                    return row.c[idx].f || String(row.c[idx].v) || "";
-                };
+                const findIdx = (keywords) => cols.findIndex(c => (c.label || "").toLowerCase().includes(keywords[0]));
+                const idxMap = { id: findIdx(['id', 'reg']), name: findIdx(['name']) };
+                const getVal = (row, idx) => (row && row.c[idx]) ? (row.c[idx].f || String(row.c[idx].v) || "") : "";
 
                 const student = rows.find(r => getVal(r, idxMap.id).trim().toUpperCase() === regno);
 
                 if (student) {
                     const name = getVal(student, idxMap.name);
-                    const result = "PUBLISHED";
-
                     status.innerHTML = "✅ Record Found";
                     area.innerHTML = `
                         <div style="font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 8px; direction: rtl;">${name}</div>
                         <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 8px;">
                             <span style="color: #888; font-size: 0.9rem;">Exam Status:</span>
-                            <span style="color: #00ff88; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">${result}</span>
+                            <span style="color: #00ff88; font-weight: 700; text-transform: uppercase;">PUBLISHED</span>
                         </div>
                     `;
                     container.style.display = "block";
                 } else {
-                    status.innerHTML = "❌ ID not found in database";
+                    status.innerHTML = "❌ ID not found";
                 }
             } catch (err) {
                 console.error(err);
-                status.innerHTML = "⚠️ Connection Error";
+                status.innerHTML = "⚠️ Error";
             }
-        }
+        };
 
         document.getElementById('home-regno')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') fetchHomeResult();
+            if (e.key === 'Enter') window.fetchHomeResult();
         });
     </script>
 

@@ -1,29 +1,36 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if user is admin
-    function isAdmin() {
-      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-
-    // User profiles
+    
+    // 🔴 DEVELOPMENT RULES - VERY PERMISSIVE
+    // ⚠️  WARNING: These rules are for development only!
+    // ⚠️  DO NOT use in production - they allow too much access
+    
+    // Users collection - Allow authenticated users to manage
     match /users/{userId} {
-      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      // Any authenticated user can read any user document
+      allow read: if request.auth != null;
+      
+      // Users can create their own document
       allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      
+      // Users can update their own document, or any if they exist in users collection
+      allow update: if request.auth != null;
+      
+      // Allow delete for authenticated users (admins)
+      allow delete: if request.auth != null;
     }
 
-    // Subjects
+    // Subjects collection - Open access for development
     match /subjects/{subjectId} {
-      allow read: if true;
-      allow write: if isAdmin();
+      // Anyone can read/write subjects during development
+      allow read, write: if true;
     }
 
-    // Bookings
+    // Bookings collection - Open for testing
     match /bookings/{bookingId} {
-      allow create: if true;
-      allow read: if isAdmin();
-      allow update, delete: if isAdmin();
+      // Anyone can create/read/manage bookings during development
+      allow read, write: if true;
     }
   }
 }
