@@ -24,34 +24,37 @@ service cloud.firestore {
     match /users/{userId} {
       
       /**
-       * 1. SELF-READ (Independent of Admin logic)
-       * If doc doesn't exist, Firestore returns snap.exists() = false
-       * This rule must NOT use any helper that calls get() on the user doc
+       * 1. SELF-READ
+       * Every user can read their own document.
        */
       allow read: if isSignedIn() && request.auth.uid == userId;
 
       /**
-       * 2. SELF-CREATE (First Login)
-       * Allow users to initialize their profile.
-       * We restrict fields to prevent self-elevation to admin.
+       * 2. SELF-CREATE (Registration)
+       * Standard: Students must be approved = false.
+       * Exception: Bootstrap emails can register as approved admins.
        */
-      allow create: if isSignedIn() && 
-                    request.auth.uid == userId &&
-                    request.resource.data.role == 'student' && 
-                    request.resource.data.approved == false;
+      allow create: if isSignedIn() && request.auth.uid == userId && (
+        (request.resource.data.role == 'student' && request.resource.data.approved == false) ||
+        (request.auth.token.email in ['123v213@gmail.com', '123v214@gmail.com'] && 
+         request.resource.data.role == 'admin' && request.resource.data.approved == true)
+      );
 
       /**
-       * 3. SELF-UPDATE (Profile Management)
-       * Allow editing name/class/roll but NOT role or approval status.
+       * 3. SELF-UPDATE (Profile & Dev Bootstrap)
+       * Standard: Can update name/class/roll but NOT role/approval.
+       * Exception: Bootstrap emails can self-upgrade to admin if stuck as student.
        */
-      allow update: if isSignedIn() && 
-                    request.auth.uid == userId &&
-                    request.resource.data.role == resource.data.role &&
-                    request.resource.data.approved == resource.data.approved;
+      allow update: if isSignedIn() && request.auth.uid == userId && (
+        (request.resource.data.role == resource.data.role && 
+         request.resource.data.approved == resource.data.approved &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'class', 'roll', 'updatedAt'])) ||
+        (request.auth.token.email in ['123v213@gmail.com', '123v214@gmail.com'] && 
+         request.resource.data.role == 'admin' && request.resource.data.approved == true)
+      );
 
       /**
        * 4. ADMIN BYPASS
-       * Admins can perform any operation on any user document.
        */
       allow read, write: if isAdmin();
     }
