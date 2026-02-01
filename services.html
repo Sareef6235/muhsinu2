@@ -306,34 +306,52 @@
         </div>
 
         <script type="module">
-            import { SERVICES_DATA } from './services-data.js';
+            import { services } from './services-data.js';
             const container = document.getElementById('services-detail-container');
             if (container) {
-                container.innerHTML = SERVICES_DATA.map((service, index) => {
+                container.innerHTML = services.map((service, index) => {
                     const isEven = index % 2 === 0;
                     const directionStyle = isEven ? '' : 'style="direction: rtl;"';
                     const contentStyle = isEven ? '' : 'style="direction: ltr;"';
+
+                    // Floating card content logic (simplified for maintainability)
+                    let floatingTitle = "Excellence";
+                    let floatingText = "We are committed to providing the best educational experience.";
+
+                    if (service.id === 'education') {
+                        floatingTitle = 'Structured Learning';
+                        floatingText = 'Step-by-step guidance through complex Islamic Jurisprudence and Modern Sciences.';
+                    } else if (service.id === 'mentoring') {
+                        floatingTitle = 'Individual Attention';
+                        floatingText = 'Personalized paths for every learner, ensuring emotional and academic growth.';
+                    } else if (service.id === 'success') {
+                        floatingTitle = 'Proven Excellence';
+                        floatingText = 'Year after year, we maintain 100% success rates in major certifications.';
+                    }
+
+                    // Default accent color if not present in new schema (optional, but good for safety)
+                    const accentColor = index === 0 ? 'var(--primary-color)' : index === 1 ? 'var(--secondary-color)' : 'var(--primary-color)';
 
                     return `
                         <section id="${service.id}" class="service-detail-section">
                             <div class="container service-container" ${directionStyle}>
                                 <div class="service-content animate-fade-up" ${contentStyle}>
                                     <h2><i class="${service.icon}"></i> ${service.title}</h2>
-                                    <p>${service.detailedDesc}</p>
+                                    <p>${service.fullDescription}</p>
                                     <div class="detail-list">
-                                        ${service.points.map(point => `
+                                        ${service.bulletPoints.map(text => `
                                             <div class="detail-item">
-                                                <i class="${point.icon}"></i>
-                                                <span>${point.text}</span>
+                                                <i class="ph-fill ph-check-circle"></i>
+                                                <span>${text}</span>
                                             </div>
                                         `).join('')}
                                     </div>
                                 </div>
                                 <div class="service-visual animate-fade-up delay-2">
-                                    <i class="${service.visualIcon}"></i>
+                                    <i class="${service.icon}" style="font-size: 10rem; opacity: 0.1; color: var(--primary-color); position: absolute;"></i>
                                     <div class="floating-card">
-                                        <h3 style="color: ${service.accent}; margin-bottom: 15px;">${service.id === 'education' ? 'Structured Learning' : service.id === 'mentoring' ? 'Individual Attention' : 'Proven Excellence'}</h3>
-                                        <p style="font-size: 0.9rem; color: #888;">${service.id === 'education' ? 'Step-by-step guidance through complex Islamic Jurisprudence and Modern Sciences.' : service.id === 'mentoring' ? 'Personalized paths for every learner, ensuring emotional and academic growth.' : 'Year after year, we maintain 100% success rates in major certifications.'}</p>
+                                        <h3 style="color: ${accentColor}; margin-bottom: 15px;">${floatingTitle}</h3>
+                                        <p style="font-size: 0.9rem; color: #888;">${floatingText}</p>
                                     </div>
                                 </div>
                             </div>

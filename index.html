@@ -48,8 +48,8 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Portal</a>
                     <ul class="dropdown-menu">
-                        <li><a href="admin/">Portal</a></li>
-                        <li class="admin-only" style="display: none;"><a href="admin/"
+                        <li><a href="portal/">Portal</a></li>
+                        <li class="admin-only" style="display: none;"><a href="portal/"
                                 style="font-weight: 600; color: var(--primary-color);">Admin
                                 Panel</a></li>
                     </ul>
@@ -195,16 +195,16 @@
                 </div>
 
                 <script type="module">
-                    import { SERVICES_DATA } from './services-data.js';
+                    import { services } from './services-data.js';
                     const grid = document.getElementById('services-grid-home');
                     if (grid) {
-                        grid.innerHTML = SERVICES_DATA.map(service => `
+                        grid.innerHTML = services.map(service => `
                             <a href="services.html#${service.id}" class="service-card animate-fade-up">
                                 <i class="${service.icon} service-icon"></i>
                                 <h3>${service.title}</h3>
-                                <p>${service.shortDesc}</p>
+                                <p>${service.shortDescription}</p>
                                 <ul class="service-list">
-                                    ${service.points.slice(0, 2).map(p => `<li>${p.text}</li>`).join('')}
+                                    ${service.bulletPoints.slice(0, 2).map(text => `<li>${text}</li>`).join('')}
                                 </ul>
                             </a>
                         `).join('');
