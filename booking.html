@@ -264,7 +264,6 @@
                     <a href="#" class="dropdown-toggle" style="color: #00f3ff;">Booking</a>
                     <ul class="dropdown-menu">
                         <li><a href="#bookingForm">Book Tuition</a></li>
-                        <li><a href="#fee-receipt">Submit Receipt</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
@@ -335,86 +334,8 @@
             </form>
         </section>
 
-        <!-- RECEIPT SUBMISSION SECTION -->
-        <section id="fee-receipt" class="booking-card animate-fade-up delay-3">
-            <div class="form-section-title">
-                <i class="ph-bold ph-receipt"></i> Submit Fee Receipt Proof
-            </div>
 
-            <div class="form-group">
-                <label class="form-label">Student Name</label>
-                <input id="name" class="form-input" placeholder="Student Name">
-            </div>
 
-            <!-- CLASS RADIO BUTTONS -->
-            <div class="form-group">
-                <label class="form-label">Class</label>
-                <div id="class-radios" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
-                    <!-- JS will populate this -->
-                </div>
-            </div>
-
-            <!-- RECEIPT NUMBER -->
-            <div class="form-group">
-                <label class="form-label">Receipt / Reference Number</label>
-                <input id="receiptNo" type="number" class="form-input" placeholder="Receipt / Reference Number">
-            </div>
-
-            <!-- DATE -->
-            <div class="form-group">
-                <label class="form-label">Payment Date</label>
-                <input id="payDate" type="date" class="form-input">
-            </div>
-
-            <!-- MESSAGE -->
-            <div class="form-group">
-                <label class="form-label">Payment details / remarks</label>
-                <textarea id="content" class="form-input" placeholder="Payment details / remarks" rows="4"></textarea>
-            </div>
-
-            <!-- IMAGE -->
-            <div style="margin-top:15px; margin-bottom: 25px;">
-                <label
-                    style="color:var(--primary-color);font-weight:600; display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-                    <i class="ph ph-image" style="font-size: 1.2rem;"></i> Upload Receipt Image (Max 200KB)
-                </label>
-                <input type="file" id="file" accept="image/*" class="form-input" style="padding: 10px;"
-                    onchange="validateFileSize(this)">
-            </div>
-
-            <script>
-                function validateFileSize(input) {
-                    const file = input.files[0];
-                    if (file && file.size > 204800) { // 200KB in bytes
-                        alert("File size exceeds 200KB. Please upload a smaller image.");
-                        input.value = ""; // Clear the input
-                    }
-                }
-            </script>
-
-            <button onclick="submitWork()" class="btn btn-primary"
-                style="width: 100%; padding: 18px; font-size: 1.1rem;">Submit for Review</button>
-            <div id="status-msg" class="submission-status"
-                style="margin-top: 15px; text-align: center; font-weight: 600;"></div>
-        </section>
-        <!-- ADMIN PANEL (Hidden by default, for testing) -->
-        <section id="admin-panel"
-            style="margin-top: 50px; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 20px; display: none;">
-            <h3 style="color: #fff; margin-bottom: 20px;">Admin Dashboard (Simulation)</h3>
-            <div style="margin-bottom: 20px;">
-                <label style="color: #ccc; margin-right: 10px;">Filter by Class:</label>
-                <select id="admin-class-filter" onchange="renderAdmin(this.value === 'all' ? null : this.value)"
-                    style="padding: 8px; border-radius: 6px; background: #333; color: white; border: 1px solid #555;">
-                    <option value="all">All Classes</option>
-                    <script>
-                        for (let i = 1; i <= 12; i++) document.write(`<option value="${i}">Class ${i}</option>`);
-                    </script>
-                </select>
-                <button onclick="document.getElementById('admin-panel').style.display='none'"
-                    style="float: right; background: none; border: none; color: #ff4757; cursor: pointer;">Close</button>
-            </div>
-            <div id="pending"></div>
-        </section>
     </main>
 
     <!-- Booking Confirmation Modal -->
@@ -468,25 +389,23 @@
                 <i class="ph ph-house"></i>
                 <span>Home</span>
             </a>
-            <a href="creations.html" class="nav-item">
-                <i class="ph ph-paint-brush"></i>
-                <span>Creations</span>
-            </a>
-            <a href="photos.html" class="nav-item">
+            <a href="gallery.html" class="nav-item">
                 <i class="ph ph-image"></i>
                 <span>Gallery</span>
             </a>
-            <a href="booking.html" class="nav-item active">
-                <i class="ph ph-calendar-plus"></i>
-                <span>Booking</span>
+
+            <!-- CENTER ACTION BUTTON -->
+            <a href="index.html#booking" class="btn-book-nav" aria-label="Book Tuition">
+                <i class="ph-bold ph-calendar-plus" style="color: #000; font-size: 1.6rem;"></i>
             </a>
-            <a href="portal.html" class="nav-item">
-                <i class="ph ph-user-circle"></i>
-                <span>Portal</span>
+
+            <a href="creative.html" class="nav-item">
+                <i class="ph ph-student"></i>
+                <span>Student</span>
             </a>
-            <a href="portal.html" class="nav-item">
-                <i class="ph ph-shield-star"></i>
-                <span>Admin</span>
+            <a href="index.html#contact" class="nav-item">
+                <i class="ph ph-chat-circle"></i>
+                <span>Contact</span>
             </a>
         </div>
     </nav>
@@ -598,103 +517,7 @@
             });
         });
 
-        /* ===== RECEIPT SUBMISSION ===== */
-        // Populate Class Radios
-        const classRadiosContainer = document.getElementById('class-radios');
-        if (classRadiosContainer) {
-            for (let i = 1; i <= 12; i++) {
-                classRadiosContainer.innerHTML += `
-                  <label style="font-size:0.9rem; display: flex; align-items: center; gap: 8px; color: #ccc; cursor: pointer; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px;">
-                    <input type="radio" name="cls" value="${i}" style="accent-color: var(--primary-color);"> Class ${i}
-                  </label>
-                `;
-            }
-        }
 
-        // File Validation (Updated to be global above)
-        // const fileInput = document.getElementById('receipt-file'); ...
-
-        // Submit Logic
-        // Initialize works array from localStorage
-        let works = JSON.parse(localStorage.getItem("works")) || [];
-
-        // Submit Logic (LocalStorage)
-        window.submitWork = function () {
-            const name = document.getElementById("name").value;
-            const receiptNo = document.getElementById("receiptNo").value;
-            const date = document.getElementById("payDate").value;
-            const content = document.getElementById("content").value;
-            const file = document.getElementById("file").files[0];
-            const cls = document.querySelector('input[name="cls"]:checked');
-            const statusMsg = document.getElementById("status-msg");
-
-            if (!name || !cls || !receiptNo || !date) {
-                alert("Please fill all required fields");
-                return;
-            }
-
-            const reader = new FileReader();
-
-            reader.onload = () => {
-                works.push({
-                    name,
-                    cls: cls.value,
-                    receiptNo,
-                    date,
-                    content,
-                    img: reader.result || "",
-                    approved: false,
-                    submittedAt: new Date().toLocaleString()
-                });
-
-                localStorage.setItem("works", JSON.stringify(works));
-
-                statusMsg.innerHTML = "✅ Receipt submitted. Waiting for verification.";
-                statusMsg.style.color = "var(--primary-color)";
-
-                setTimeout(() => location.reload(), 1500);
-            };
-
-            if (file) reader.readAsDataURL(file);
-            else reader.onload();
-        };
-
-        /* ===== ADMIN VIEW (Optional) ===== */
-        window.renderAdmin = function (filterClass = null) {
-            const pendingContainer = document.getElementById("pending");
-            if (!pendingContainer) return;
-
-            pendingContainer.innerHTML = "";
-
-            // Use logical index to ensure approval works on correct item
-            works.forEach((w, index) => {
-                if (!w.approved && (!filterClass || w.cls == filterClass)) {
-                    pendingContainer.innerHTML += `
-                    <div class="card" style="background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                        <h4 style="color:var(--primary-color); margin-bottom:5px;">Class ${w.cls} | Receipt #${w.receiptNo}</h4>
-                        <p style="color:#ccc; margin:5px 0;">${w.name}</p>
-                        <p style="font-size:0.85rem; color:#888;">Date: ${w.date}</p>
-                        ${w.img ? `<img src="${w.img}" style="max-width:100px; margin: 10px 0; border-radius: 8px;">` : ``}
-                        <button onclick="approve(${index})" style="background:var(--primary-color); border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:600;">Approve</button>
-                    </div>`;
-                }
-            });
-
-            if (pendingContainer.innerHTML === "") {
-                pendingContainer.innerHTML = "<p style='color:#888; text-align:center;'>No pending submissions.</p>";
-            }
-        };
-
-        window.approve = function (index) {
-            if (works[index]) {
-                works[index].approved = true;
-                localStorage.setItem("works", JSON.stringify(works));
-                alert(`Receipt #${works[index].receiptNo} Approved!`);
-                // Re-render if admin view is active
-                const clsFilter = document.getElementById('admin-class-filter')?.value || null;
-                renderAdmin(clsFilter === "all" ? null : clsFilter);
-            }
-        };
     </script>
 </body>
 

@@ -68,18 +68,34 @@
             </div>
 
             <!-- CLASS SELECTION -->
+            <!-- CLASS SELECTION -->
             <div class="creative-input-group">
-                <label style="display:block; margin-bottom: 8px; color: #aaa;">Select Class:</label>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                    <script>
-                        for (let i = 1; i <= 12; i++) {
-                            document.write(`
-                                <label style="font-size: 0.9rem; color: #ccc; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                                    <input type="radio" name="cls" value="${i}" style="accent-color: var(--primary-color);"> Class ${i}
-                                </label>
-                            `);
-                        }
-                    </script>
+                <label style="display:block; margin-bottom:10px; color:#aaa;">Select Class</label>
+                <div class="class-radio-grid">
+                    <div class="class-radio"><input type="radio" name="cls" id="c1" value="1"><label for="c1">Class
+                            1</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c2" value="2"><label for="c2">Class
+                            2</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c3" value="3"><label for="c3">Class
+                            3</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c4" value="4"><label for="c4">Class
+                            4</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c5" value="5"><label for="c5">Class
+                            5</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c6" value="6"><label for="c6">Class
+                            6</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c7" value="7"><label for="c7">Class
+                            7</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c8" value="8"><label for="c8">Class
+                            8</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c9" value="9"><label for="c9">Class
+                            9</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c10" value="10"><label for="c10">Class
+                            10</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c11" value="11"><label for="c11">Class
+                            11</label></div>
+                    <div class="class-radio"><input type="radio" name="cls" id="c12" value="12"><label for="c12">Class
+                            12</label></div>
                 </div>
             </div>
 
@@ -88,10 +104,11 @@
                 <input id="payDate" type="date" placeholder="Payment Date">
             </div>
 
-            <textarea id="content" placeholder="Remarks / Payment Details (optional)" rows="3"></textarea>
+            <div class="creative-input-group">
+                <textarea id="content" placeholder="Remarks / Payment Details (optional)" rows="3"></textarea>
+            </div>
 
-            <div
-                style="margin-top: 15px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
+            <div class="file-upload-box">
                 <label for="file"
                     style="display: block; color: var(--primary-color); font-size: 0.95rem; margin-bottom: 10px; font-weight: 600;">
                     <i class="ph ph-image"></i> Upload Receipt Image (Max 200KB)
@@ -212,29 +229,19 @@
                 <i class="ph ph-house"></i>
                 <span>Home</span>
             </a>
-            <a href="creations.html" class="nav-item">
-                <i class="ph ph-paint-brush"></i>
-                <span>Creations</span>
-            </a>
-            <a href="creative.html" class="nav-item active">
-                <i class="ph ph-palette"></i>
-                <span>Corner</span>
-            </a>
-            <a href="photos.html" class="nav-item">
+            <a href="gallery.html" class="nav-item">
                 <i class="ph ph-image"></i>
                 <span>Gallery</span>
             </a>
-            <a href="index.html#booking" class="btn-book-nav">
-                <i class="ph ph-calendar-plus"></i>
-                Book Tuition
+
+            <!-- CENTER ACTION BUTTON -->
+            <a href="index.html#booking" class="btn-book-nav" aria-label="Book Tuition">
+                <i class="ph-bold ph-calendar-plus" style="color: #000; font-size: 1.6rem;"></i>
             </a>
-            <a href="result.html" class="nav-item">
-                <i class="ph ph-exam"></i>
-                <span>Result</span>
-            </a>
-            <a href="portal.html" class="nav-item">
-                <i class="ph ph-user-circle"></i>
-                <span>Portal</span>
+
+            <a href="creative.html" class="nav-item">
+                <i class="ph ph-student"></i>
+                <span>Student</span>
             </a>
             <a href="index.html#contact" class="nav-item">
                 <i class="ph ph-chat-circle"></i>

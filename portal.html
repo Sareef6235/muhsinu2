@@ -1202,54 +1202,40 @@
         };
 
         // AUTH STATE OBSERVER
-        // HANDLE AUTH USER (Refactored for Bypass)
+        // HANDLE AUTH USER (Refactored for Secure Role-Based Access)
         async function handleAuthUser(user) {
-            console.log("═══════════════════════════════════════");
-            console.log("🔄 handleAuthUser() CALLED");
-            console.log("  User UID:", user?.uid);
-            console.log("  User Email:", user?.email);
-            console.log("  User Null:", user === null);
-            console.log("═══════════════════════════════════════");
+            console.log("🔄 Auth state changed for user:", user?.email);
 
+            const loader = document.getElementById('portalLoader');
+            const portalMain = document.querySelector('.portal-main');
+
+            // 1. Initial State: Non-authenticated
             if (!user) {
-                console.log("❌ No user - Showing login box");
+                if (loader) loader.classList.add('hidden');
                 if (loginBox) loginBox.classList.remove('hidden');
                 if (adminPanel) adminPanel.classList.add('hidden');
                 if (studentPanel) studentPanel.classList.add('hidden');
                 if (waitingPanel) waitingPanel.classList.add('hidden');
                 if (logoutBtn) logoutBtn.classList.add('hidden');
-
-                // Hide loading spinner if it exists
-                const loader = document.getElementById('portalLoader');
-                if (loader) loader.classList.add('hidden');
+                const navAdminLink = document.getElementById('navAdminLink');
+                if (navAdminLink) navAdminLink.style.display = 'none';
                 return;
             }
 
-            console.log("✅ User authenticated - Hiding login box");
+            // 2. Authenticated State: Verify Role from Firestore
             if (loginBox) loginBox.classList.add('hidden');
             if (logoutBtn) logoutBtn.classList.remove('hidden');
+            if (loader) loader.classList.remove('hidden');
 
             try {
-                console.log("🔍 [Firestore] Initializing profile sequence...");
                 const userDocRef = doc(db, "users", user.uid);
+                let snap = await getDoc(userDocRef);
 
-                let snap;
-                try {
-                    // Try to read the document
-                    snap = await getDoc(userDocRef);
-                } catch (readErr) {
-                    if (readErr.code === 'permission-denied') {
-                        console.error("⛔ [Firestore] Access Denied on Read. This happens if rules are not deployed or misconfigured.");
-                        // Handle the error specifically for the UI
-                        throw readErr;
-                    }
-                    throw readErr;
-                }
-
-                // CASE 1: Document missing (New User)
+                // 2a. Auto-create document if missing
                 if (!snap.exists()) {
-                    console.log("🆕 [Firestore] No profile found. Starting automatic creation...");
+                    console.log("🆕 New user detected. Creating Firestore profile...");
 
+                    // Allow specific dev emails to be admin by default
                     const isDev = (user.email === "123v213@gmail.com" || user.email === "123v214@gmail.com");
                     const initialData = {
                         email: user.email,
@@ -1259,139 +1245,86 @@
                         createdAt: serverTimestamp()
                     };
 
-                    try {
-                        await setDoc(userDocRef, initialData);
-                        console.log("✅ [Firestore] Profile successfully created.");
-
-                        // If it's a dev admin, reload to bypass UI logic
-                        if (isDev) {
-                            alert("Initial Admin registered! Reloading portal...");
-                            location.reload();
-                            return;
-                        }
-
-                        // Redirect students to waiting panel
-                        if (waitingPanel) waitingPanel.classList.remove('hidden');
-                        return;
-                    } catch (createErr) {
-                        console.error("⛔ [Firestore] Failed to create profile:", createErr.code);
-                        throw createErr;
-                    }
+                    await setDoc(userDocRef, initialData);
+                    snap = await getDoc(userDocRef); // Re-fetch
                 }
 
-                // CASE 2: Document exists
                 const data = snap.data();
-                console.log("👤 [Firestore] Profile loaded successfully for role:", data.role);
 
-                if (!data) {
-                    console.error("❌ User data is null despite document existing");
-                    return;
-                }
+                // 3. Role-Based Redirection & UI Control
 
-                // 👑 AUTO-UPGRADE DEV EMAILS IF STUCK AS STUDENT
-                const isDev = (user.email === "123v213@gmail.com" || user.email === "123v214@gmail.com");
-                if (isDev && data.role !== "admin") {
-                    console.warn("👑 Dev email detected as student - Upgrading to admin...");
-                    await updateDoc(doc(db, "users", user.uid), {
-                        role: "admin",
-                        approved: true
-                    });
-                    alert("Dev Admin permissions restored. Reloading...");
-                    location.reload();
-                    return;
-                }
-
-                if (data.role === "admin" && adminPanel) {
-                    console.log("🔑 Admin role detected - Showing admin panel");
-                    adminPanel.classList.remove('hidden');
-                    if (studentPanel) studentPanel.classList.add('hidden'); // Ensure student panel is hidden
-                    if (waitingPanel) waitingPanel.classList.add('hidden'); // Ensure waiting panel is hidden
+                // 👑 ADMIN ACCESS
+                if (data.role === "admin") {
+                    console.log("🔑 Admin Access Granted");
+                    if (loader) loader.classList.add('hidden');
+                    if (adminPanel) adminPanel.classList.remove('hidden');
+                    if (waitingPanel) waitingPanel.classList.add('hidden');
+                    if (studentPanel) studentPanel.classList.add('hidden');
 
                     const navAdminLink = document.getElementById('navAdminLink');
-                    if (navAdminLink) {
-                        console.log("  ✅ Showing admin nav link");
-                        navAdminLink.style.display = 'block';
-                    }
-                    console.log("  📊 Loading admin data...");
+                    if (navAdminLink) navAdminLink.style.display = 'block';
+
                     loadUsers();
                     startSubjectSync();
                     startBookingSync();
-                    console.log("  ✅ Admin panel fully loaded");
+                    return;
                 }
 
-                if (data.role === "student" && studentPanel) {
-                    console.log("🎓 Student role detected");
+                // 🎓 STUDENT ACCESS
+                if (data.role === "student") {
                     if (!data.approved) {
-                        console.log("  ⏳ Student not approved - Showing waiting panel");
+                        console.log("⏳ Student Access: Awaiting Approval");
+                        if (loader) loader.classList.add('hidden');
                         if (waitingPanel) waitingPanel.classList.remove('hidden');
-                        return;
+                        if (adminPanel) adminPanel.classList.add('hidden');
+                        if (studentPanel) studentPanel.classList.add('hidden');
+                    } else {
+                        console.log("🎓 Approved Student: Redirecting to Dashboard");
+                        // Strict Redirection for approved students to prevent admin access
+                        window.location.href = "student_dashboard.html";
                     }
-                    console.log("  ✅ Student approved - Showing student panel");
-                    studentPanel.classList.remove('hidden');
-                    if (document.getElementById('pname')) document.getElementById('pname').value = data.name || "";
-                    if (document.getElementById('pclass')) document.getElementById('pclass').value = data.class || "";
-                    if (document.getElementById('proll')) document.getElementById('proll').value = data.roll || "";
-
-                    if (data.name) {
-                        const welcomeEl = document.getElementById('welcomeName');
-                        if (welcomeEl) welcomeEl.textContent = `Welcome, ${data.name}!`;
-                        const initEl = document.getElementById('profileInitial');
-                        if (initEl) initEl.textContent = data.name.charAt(0).toUpperCase();
-                    }
+                    return;
                 }
-                console.log("  ✅ Profile path resolved");
+
+                // 🚫 UNKNOWN ROLE / DEACTIVATED
+                throw { code: 'permission-denied', message: 'Unknown role or deactivated account.' };
+
             } catch (e) {
-                console.error("Auth State Error:", e);
-                console.error("  Error Code:", e.code);
-                console.error("  Error Message:", e.message);
+                console.error("⛔ Access Control Error:", e);
+                if (loader) loader.classList.add('hidden');
 
-                // � Auth Recovery UI
-                if (loginBox) loginBox.classList.remove('hidden');
-                if (logoutBtn) logoutBtn.classList.add('hidden');
-
-                // 🔄 Reset Login Button State
-                const authBtn = document.querySelector('#loginBox .btn-primary');
-                if (authBtn) {
-                    authBtn.disabled = false;
-                    authBtn.innerHTML = '<i class="ph ph-arrow-right"></i> Continue';
-                }
-
-                let errorTitle = "Connection Error";
-                let errorDesc = "We couldn't retrieve your profile data. This might be due to a slow connection or missing permissions.";
+                let errorTitle = "Access Denied / Connection Error";
+                let errorDesc = "We couldn't verify your access permissions. Please ensure your connection is stable.";
 
                 if (e.code === 'permission-denied') {
-                    errorTitle = "Access Denied";
-                    errorDesc = "Your account is not yet authorized to access this section. If you are a student, please wait for admin approval.";
-                } else if (e.code === 'unavailable') {
-                    errorDesc = "The service is currently unreachable. Please check your internet connection.";
+                    errorTitle = "Access Restricted";
+                    errorDesc = "Your account does not have permission to view this section. If you believe this is an error, please contact the administrator.";
                 }
 
                 const recoveryHtml = `
-                    <div class="error-recovery-card" style="text-align: center; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
-                        <h4 style="color: #fff; margin-bottom: 10px;">${errorTitle}</h4>
-                        <p style="font-size: 0.85rem; color: #888; margin-bottom: 20px;">${errorDesc}</p>
+                    <div class="portal-card animate-in" style="text-align: center; max-width: 500px; margin: 40px auto;">
+                        <div style="width: 80px; height: 80px; background: rgba(255, 77, 77, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px;">
+                            <i class="ph ph-warning-circle" style="font-size: 2.5rem; color: #ff4d4d;"></i>
+                        </div>
+                        <h2 style="font-size: 1.5rem; margin-bottom: 10px;">${errorTitle}</h2>
+                        <p style="color: #888; margin-bottom: 30px; line-height: 1.6;">${errorDesc}</p>
                         
-                        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
-                            <button class="btn btn-secondary" onclick="location.reload()" style="font-size: 0.75rem; padding: 10px 15px;">
-                                <i class="ph ph-arrows-clockwise"></i> Retry Connection
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <button class="btn btn-secondary" onclick="location.reload()">
+                                <i class="ph ph-arrows-clockwise"></i> Retry
                             </button>
-                            <button class="btn" onclick="window.logout()" style="background: rgba(255,255,255,0.03); color: #fff; border: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; padding: 10px 15px;">
-                                <i class="ph ph-sign-out"></i> Log Out
+                            <button class="btn btn-danger" onclick="window.logout()">
+                                <i class="ph ph-sign-out"></i> Logout
                             </button>
                         </div>
-
-                        <details style="text-align: left; opacity: 0.4;">
-                            <summary style="font-size: 0.7rem; cursor: pointer; color: #666;">Technical Details</summary>
-                            <pre style="font-size: 0.6rem; color: #ff4d4d; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-top: 10px; white-space: pre-wrap;">${e.code}: ${e.message}</pre>
-                        </details>
                     </div>
                 `;
 
-                showMessage(recoveryHtml, 'error');
-            } finally {
-                // Final Loader Cleanup
-                const loader = document.getElementById('portalLoader');
-                if (loader) loader.classList.add('hidden');
+                if (portalMain) {
+                    portalMain.innerHTML = `<div class="container">${recoveryHtml}</div>`;
+                } else {
+                    showMessage(recoveryHtml, 'error');
+                }
             }
         }
 

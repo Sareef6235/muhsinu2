@@ -1,0 +1,138 @@
+/* ================================
+   FORM GLOBAL STYLE
+================================ */
+.creative-input-group {
+    margin-bottom: 20px;
+}
+
+.creative-input-group input,
+.creative-input-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.creative-input-group input::placeholder,
+.creative-input-group textarea::placeholder {
+    color: #777;
+}
+
+.creative-input-group input:focus,
+.creative-input-group textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.35);
+    transform: translateY(-1px);
+}
+
+/* ================================
+   RADIO BUTTON – CLASS SELECT
+================================ */
+.class-radio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 12px;
+}
+
+.class-radio {
+    position: relative;
+}
+
+.class-radio input {
+    display: none;
+}
+
+.class-radio label {
+    display: block;
+    padding: 10px 0;
+    text-align: center;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #bbb;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+/* Hover */
+.class-radio label:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* Checked */
+.class-radio input:checked+label {
+    background: linear-gradient(135deg,
+            rgba(0, 243, 255, 0.25),
+            rgba(188, 19, 254, 0.25));
+    border-color: var(--primary-color);
+    color: #fff;
+    box-shadow: 0 0 18px rgba(0, 243, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+/* ================================
+   FILE UPLOAD BOX
+================================ */
+.file-upload-box {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.file-upload-box:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.25);
+}
+
+/* ================================
+   SUBMIT BUTTON
+================================ */
+.submission-card button {
+    width: 100%;
+    margin-top: 25px;
+    padding: 14px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg,
+            var(--primary-color),
+            var(--secondary-color));
+    color: #000;
+    transition: all 0.3s ease;
+}
+
+.submission-card button:hover {
+    box-shadow: 0 0 25px rgba(0, 243, 255, 0.6);
+    transform: translateY(-3px);
+}
+
+/* ================================
+   STATUS MESSAGE
+================================ */
+.submission-status {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* ================================
+   MOBILE TUNING
+================================ */
+@media (max-width: 600px) {
+    .class-radio-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
