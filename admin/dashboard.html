@@ -235,16 +235,48 @@
         }
 
         /* Mobile */
+        /* --- Mobile Responsiveness --- */
+
+        /* Mobile Hamburger & Overlay */
         .mobile-toggle {
             display: none;
-            font-size: 1.5rem;
-            color: #fff;
+            font-size: 1.8rem;
+            color: var(--primary-color);
             cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Sidebar Backdrop Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
         }
 
         @media (max-width: 992px) {
+            :root {
+                --dashboard-sidebar-width: 250px;
+            }
+
             .sidebar {
                 transform: translateX(-100%);
+                width: var(--dashboard-sidebar-width);
+                box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
             }
 
             .sidebar.active {
@@ -254,16 +286,96 @@
             .main-content {
                 margin-left: 0;
                 padding: 20px;
+                width: 100%;
             }
 
             .mobile-toggle {
                 display: block;
+            }
+
+            /* Header Stack */
+            .header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+
+            .header-bar>div:last-child {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+
+            /* Tables Responsiveness */
+            .data-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Grids */
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            #creative-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .panel-header div {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            /* UX Adjustments */
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+
+            .nav-item {
+                padding: 12px 15px;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-bar h2 {
+                font-size: 1.5rem;
+            }
+
+            .user-profile {
+                gap: 10px;
+            }
+
+            .user-profile>div:first-child {
+                display: none;
+                /* Hide admin name on very small screens */
             }
         }
     </style>
 </head>
 
 <body>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
@@ -303,7 +415,7 @@
     <!-- Main Content -->
     <main class="main-content">
         <div class="header-bar">
-            <div class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('active')">
+            <div class="mobile-toggle" onclick="toggleSidebar()">
                 <i class="ph ph-list"></i>
             </div>
             <div>
@@ -486,6 +598,14 @@
         let feeReceipts = JSON.parse(localStorage.getItem("fee_receipts") || "[]");
         let creations = JSON.parse(localStorage.getItem("works") || "[]");
 
+        // MOBILE SIDEBAR TOGGLE
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
         function saveData() {
             localStorage.setItem("fee_receipts", JSON.stringify(feeReceipts));
             localStorage.setItem("works", JSON.stringify(creations));
@@ -503,7 +623,7 @@
             }
 
             if (window.innerWidth <= 992) {
-                document.getElementById('sidebar').classList.remove('active');
+                toggleSidebar();
             }
 
             if (panelId === 'fee') renderFeeTable();
