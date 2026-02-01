@@ -44,7 +44,13 @@
                     </ul>
                 </li>
                 <li><a href="student_dashboard.html">Student Dashboard</a></li>
-                <li><a href="#news">News</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">News</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="index.html#news">Latest Updates</a></li>
+                        <li><a href="news.html">All News</a></li>
+                    </ul>
+                </li>
                 <li><a href="booking.html" style="color: #00f3ff;">Booking</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Portal</a>
@@ -90,7 +96,7 @@
                     achievement and success in the future.
                 </p>
                 <div class="cta-group animate-fade-up delay-4">
-                    <a href="creative.html#creative" class="btn btn-primary">Book Buy</a>
+                    <a href="creation_receipt.html" class="btn btn-primary">Receipt</a>
                     <a href="#gallery.html" class="btn btn-secondary"
                         style="border-color: var(--primary-color); color: var(--primary-color);">View Gallery</a>
                     <a href="#contact" class="btn btn-secondary">Contact Us</a>
@@ -192,7 +198,14 @@
         <section id="news" class="section">
             <div class="container" style="text-align: center;">
                 <div class="section-badge animate-fade-up">Updates</div>
-                <h2 class="section-title animate-fade-up" style="margin-bottom: 50px;">Latest News & Notices</h2>
+                <h2 class="section-title animate-fade-up" style="margin-bottom: 25px;">Latest News & Notices</h2>
+
+                <!-- Language Toggle -->
+                <div class="lang-toggle-wrapper animate-fade-up">
+                    <button class="lang-btn active" onclick="setNewsLang('en')">EN</button>
+                    <button class="lang-btn" onclick="setNewsLang('ml')">ML</button>
+                    <button class="lang-btn" onclick="setNewsLang('ar')">AR</button>
+                </div>
 
                 <div id="home-news-grid" class="grid"
                     style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; text-align: left;">
@@ -817,50 +830,102 @@
             if (e.key === 'Enter') window.fetchHomeResult();
         });
 
-        // --- NEWS SYSTEM INTEGRATION (Fixed Placement) ---
-        (async () => {
+        // --- ADVANCED NEWS SYSTEM ---
+        let currentNewsLang = 'en';
+
+        window.setNewsLang = (lang) => {
+            currentNewsLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.toggle('active', b.innerText.toLowerCase() === lang);
+            });
+            window.loadNews();
+        };
+
+        window.loadNews = async () => {
             try {
                 const newsService = new NewsService();
                 const newsGrid = document.getElementById('home-news-grid');
-                const viewAllBtn = document.getElementById('view-all-news-btn');
-
                 if (!newsGrid) return;
 
                 const latestNews = newsService.getPublishedNews().slice(0, 3);
+                const lastId = localStorage.getItem('mhm_last_news_id');
 
                 if (latestNews.length === 0) {
                     newsGrid.innerHTML = `
-                        <div class="animate-fade-up" style="grid-column: 1/-1; text-align: center; padding: 40px; background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border);">
-                            <i class="ph ph-newspaper-clipping" style="font-size: 3rem; color: #444; margin-bottom: 15px;"></i>
-                            <p style="color: #888;">No recent updates available.</p>
+                        <div class="animate-fade-up" style="grid-column: 1/-1; text-align: center; padding: 60px; background: rgba(255,255,255,0.02); border-radius: 30px; border: 1px solid var(--glass-border);">
+                            <i class="ph ph-newspaper-clipping" style="font-size: 4rem; color: #222; margin-bottom: 20px;"></i>
+                            <p style="color: #666; font-size: 1.1rem;">No updates at the moment.</p>
                         </div>
                     `;
-                } else {
-                    newsGrid.innerHTML = latestNews.map((item, index) => {
-                        const date = new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-                        const imgDisplay = item.image
-                            ? `<div style="height: 180px; overflow: hidden;"><img src="${item.image}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"></div>`
-                            : `<div style="height: 180px; background: #111; display: flex; align-items: center; justify-content: center; color: #333;"><i class="ph ph-newspaper" style="font-size: 3rem;"></i></div>`;
-
-                        return `
-                        <article class="service-card animate-fade-up" style="padding: 0; overflow: hidden; border: 1px solid var(--glass-border); transition: transform 0.3s; cursor: pointer; display: flex; flex-direction: column;" onclick="window.location.href='news.html?id=${item.id}'">
-                            ${imgDisplay}
-                            <div style="padding: 25px; flex: 1; display: flex; flex-direction: column;">
-                                <div style="font-size: 0.8rem; color: var(--primary-color); margin-bottom: 10px; font-weight: 600; letter-spacing: 1px;">${date}</div>
-                                <h3 style="margin-bottom: 10px; font-size: 1.25rem; line-height: 1.4;">${item.title}</h3>
-                                <p style="color: #888; font-size: 0.95rem; margin-bottom: 20px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${item.shortDescription}</p>
-                                <div style="margin-top: auto; color: #fff; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 5px;">
-                                    Read More <i class="ph-bold ph-arrow-right"></i>
-                                </div>
-                            </div>
-                        </article>
-                        `;
-                    }).join('');
-
-                    if (viewAllBtn) viewAllBtn.style.display = 'inline-block';
+                    return;
                 }
-            } catch (e) { console.error("News load error", e); }
-        })();
+
+                newsGrid.innerHTML = latestNews.map((item, index) => {
+                    const title = item.title[currentNewsLang] || item.title.en || item.title.ml || "Untitled";
+                    const shortDesc = item.shortDescription[currentNewsLang] || item.shortDescription.en || item.shortDescription.ml || "";
+                    const date = new Date(item.date).toLocaleDateString(currentNewsLang === 'ml' ? 'ml-IN' : 'en-US', {
+                        month: 'short', day: 'numeric', year: 'numeric'
+                    });
+
+                    const isNew = item.id === lastId;
+                    const isRtl = currentNewsLang === 'ar';
+
+                    return `
+                    <article class="news-card-premium animate-fade-up ${isNew ? 'news-highlight' : ''}" 
+                             style="animation-delay: ${index * 0.1}s; direction: ${isRtl ? 'rtl' : 'ltr'};" 
+                             onclick="window.location.href='news.html?id=${item.id}'">
+                        <div class="img-wrapper">
+                            ${item.image ? `<img src="${item.image}" alt="${title}" loading="lazy">` : `<div style="height:100%; display:flex; align-items:center; justify-content:center; background:#111; color:#222;"><i class="ph ph-newspaper" style="font-size:4rem;"></i></div>`}
+                            <div style="position: absolute; top: 15px; left: 15px; background: var(--primary-color); color: #000; padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 0.7rem; box-shadow: 0 4px 15px rgba(0,243,255,0.3);">
+                                ${date}
+                            </div>
+                        </div>
+                        <div style="padding: 25px; flex: 1; display: flex; flex-direction: column;">
+                            <h3 style="margin-bottom: 15px; font-size: 1.3rem; line-height: 1.3; color: #fff;">${title}</h3>
+                            <p style="color: #888; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                ${shortDesc}
+                            </p>
+                            <div style="margin-top: auto; color: var(--primary-color); font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                ${currentNewsLang === 'en' ? 'Read Full Article' : (currentNewsLang === 'ml' ? 'കൂടുതൽ വായിക്കുക' : 'قراءة المزيد')} 
+                                <i class="ph-bold ph-arrow-right"></i>
+                            </div>
+                        </div>
+                    </article>
+                    `;
+                }).join('');
+
+            } catch (e) { console.error("News sync error", e); }
+        };
+
+        // Badge & Sync Logic
+        window.updateBadges = () => {
+            const count = parseInt(localStorage.getItem('mhm_unread_news') || '0');
+            const badges = [document.getElementById('news-badge-nav'), document.getElementById('news-badge-mobile')];
+            badges.forEach(b => {
+                if (b) {
+                    b.innerText = count > 9 ? '9+' : count;
+                    b.style.display = count > 0 ? 'flex' : 'none';
+                }
+            });
+        };
+
+        window.addEventListener('news-updated', window.updateBadges);
+        window.addEventListener('DOMContentLoaded', () => {
+            window.loadNews();
+            window.updateBadges();
+        });
+
+        // Clear badge when visiting news section
+        const newsSection = document.getElementById('news');
+        if (newsSection) {
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    localStorage.setItem('mhm_unread_news', '0');
+                    window.updateBadges();
+                }
+            }, { threshold: 0.5 });
+            observer.observe(newsSection);
+        }
     </script>
 
 
@@ -950,6 +1015,12 @@
             <!-- CENTER ACTION BUTTON -->
             <a href="index.html#booking" class="btn-book-nav" aria-label="Book Tuition">
                 <i class="ph-bold ph-calendar-plus" style="color: #000; font-size: 1.6rem;"></i>
+            </a>
+
+            <a href="#news" class="nav-item" style="position: relative;">
+                <i class="ph ph-newspaper"></i>
+                <span>News</span>
+                <span id="news-badge-mobile" class="news-badge" style="display: none; top: -5px; right: 5px;">0</span>
             </a>
 
             <a href="creative.html" class="nav-item">

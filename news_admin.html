@@ -23,6 +23,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            font-family: 'Outfit', sans-serif;
         }
 
         .cms-header {
@@ -40,10 +41,9 @@
 
         .cms-layout {
             display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 2px;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
             flex: 1;
-            background: var(--cms-border);
         }
 
         @media (max-width: 1100px) {
@@ -52,12 +52,12 @@
             }
         }
 
-        /* Forms Section */
         .cms-panel {
             background: var(--cms-bg);
             padding: 40px;
             overflow-y: auto;
-            max-height: calc(100vh - 80px);
+            max-height: calc(100vh - 85px);
+            border-right: 1px solid var(--cms-border);
         }
 
         .form-group {
@@ -95,37 +95,53 @@
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
         }
 
-        /* Rich Text Fake Editor */
-        .editor-toolbar {
+        /* Tabs System */
+        .lang-tabs {
             display: flex;
             gap: 10px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--cms-border);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--cms-border);
-            border-bottom: none;
-            border-radius: 12px 12px 0 0;
-        }
-
-        .tool-btn {
-            background: none;
-            border: none;
             color: #888;
+            padding: 8px 16px;
+            border-radius: 8px;
             cursor: pointer;
-            padding: 5px;
-            border-radius: 4px;
+            font-weight: 600;
+            transition: 0.3s;
         }
 
-        .tool-btn:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.1);
+        .tab-btn.active {
+            background: var(--cms-primary);
+            color: #000;
+            border-color: var(--cms-primary);
         }
 
-        .editor-content {
-            min-height: 250px;
-            border-radius: 0 0 12px 12px;
+        .lang-content {
+            display: none;
         }
 
-        /* Image Upload Box */
+        .lang-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .upload-box {
             border: 2px dashed var(--cms-border);
             border-radius: 12px;
@@ -149,11 +165,15 @@
             display: none;
         }
 
-        /* Controls */
         .btn-group {
             display: flex;
             gap: 15px;
             margin-top: 40px;
+            position: sticky;
+            bottom: 0;
+            background: var(--cms-bg);
+            padding-top: 20px;
+            border-top: 1px solid var(--cms-border);
         }
 
         .btn-cms {
@@ -179,37 +199,27 @@
             border: 1px solid var(--cms-border);
         }
 
-        .btn-cms-outline {
-            background: transparent;
-            border: 1px solid var(--cms-border);
-            color: #888;
+        .btn-cms:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
         }
 
-        .btn-cms:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        /* List Section */
+        /* List Styling */
         .news-item {
             background: var(--cms-glass);
             border: 1px solid var(--cms-border);
             border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
+            padding: 15px;
+            margin-bottom: 12px;
             display: flex;
-            gap: 20px;
+            gap: 15px;
             transition: 0.3s;
-            position: relative;
-        }
-
-        .news-item:hover {
-            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .news-item-img {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             border-radius: 10px;
             object-fit: cover;
             background: #111;
@@ -219,62 +229,19 @@
             flex: 1;
         }
 
-        .status-tag {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .status-published {
-            background: rgba(0, 243, 255, 0.1);
-            color: var(--cms-primary);
-        }
-
-        .status-draft {
-            background: rgba(255, 170, 0, 0.1);
-            color: #ffa500;
-        }
-
-        .news-item-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .action-btn {
-            background: none;
-            border: 1px solid var(--cms-border);
-            color: #888;
-            padding: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .action-edit:hover {
-            color: var(--cms-primary);
-            border-color: var(--cms-primary);
-        }
-
-        .action-delete:hover {
-            color: #ff4444;
-            border-color: #ff4444;
-        }
-
-        /* Toast Notifications */
+        /* Toast Improvement */
         #toast {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            padding: 15px 30px;
-            border-radius: 10px;
+            padding: 18px 30px;
+            border-radius: 12px;
             background: #111;
             border: 1px solid var(--cms-primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             color: #fff;
-            transform: translateY(100px);
-            transition: 0.5s;
+            transform: translateY(150px);
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 1000;
             display: flex;
             align-items: center;
@@ -283,31 +250,6 @@
 
         #toast.show {
             transform: translateY(0);
-        }
-
-        /* JetEngine-style Preview Panel */
-        .preview-sticky {
-            position: sticky;
-            top: 100px;
-        }
-
-        .preview-card {
-            background: #000;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid var(--cms-border);
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .preview-header {
-            height: 180px;
-            background: #111;
-            position: relative;
-        }
-
-        .preview-body {
-            padding: 25px;
         }
     </style>
 </head>
@@ -318,12 +260,12 @@
         <div style="display: flex; align-items: center; gap: 15px;">
             <a href="admin/dashboard.html" class="action-btn"><i class="ph ph-arrow-left"></i></a>
             <div>
-                <h1 style="font-size: 1.2rem; font-weight: 700;">NEWS CMS</h1>
-                <p style="font-size: 0.8rem; color: #666;">JetEngine-style Management System</p>
+                <h1 style="font-size: 1.2rem; font-weight: 700;">NEWS & NOTICE CMS</h1>
+                <p style="font-size: 0.8rem; color: #666;">Multilingual Admin Panel</p>
             </div>
         </div>
         <div style="display: flex; gap: 15px;">
-            <a href="news.html" target="_blank" class="btn-cms btn-cms-outline" style="padding: 10px 20px;">
+            <a href="index.html#news" target="_blank" class="btn-cms btn-cms-outline" style="padding: 10px 20px;">
                 <i class="ph ph-eye"></i> View Live
             </a>
             <button class="btn-cms btn-cms-primary" style="padding: 10px 20px;" onclick="location.reload()">
@@ -335,42 +277,76 @@
     <div class="cms-layout">
         <!-- FORM PANEL -->
         <div class="cms-panel">
-            <h2 style="margin-bottom: 30px; font-size: 1.5rem;" id="form-title">Create New Article</h2>
+            <h2 style="margin-bottom: 25px; font-size: 1.5rem;" id="form-title">Create New Article</h2>
 
             <form id="news-form">
                 <input type="hidden" id="post-id">
 
-                <div class="form-group">
-                    <label class="form-label">Article Title</label>
-                    <input type="text" id="post-title" class="cms-input" placeholder="e.g. Admission Open for 2026"
-                        required>
+                <div class="lang-tabs">
+                    <button type="button" class="tab-btn active" onclick="switchLang('en')">English</button>
+                    <button type="button" class="tab-btn" onclick="switchLang('ml')">Malayalam</button>
+                    <button type="button" class="tab-btn" onclick="switchLang('ar')">Arabic</button>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Short Description</label>
-                    <textarea id="post-short" class="cms-textarea" style="height: 80px;" maxlength="150"
-                        placeholder="A brief summary for cards..."></textarea>
-                    <div style="text-align: right; font-size: 0.7rem; color: #666; margin-top: 5px;" id="char-count">
-                        0/150</div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Full Content</label>
-                    <div class="editor-toolbar">
-                        <button type="button" class="tool-btn" title="Bold"><i class="ph ph-text-b"></i></button>
-                        <button type="button" class="tool-btn" title="Italic"><i class="ph ph-text-italic"></i></button>
-                        <button type="button" class="tool-btn" title="List"><i class="ph ph-list-bullets"></i></button>
-                        <button type="button" class="tool-btn" title="Link"><i class="ph ph-link"></i></button>
+                <!-- ENGLISH CONTENT -->
+                <div id="lang-en" class="lang-content active">
+                    <div class="form-group">
+                        <label class="form-label">Article Title (English)</label>
+                        <input type="text" id="title-en" class="cms-input" placeholder="Enter English title..."
+                            required>
                     </div>
-                    <textarea id="post-content" class="cms-textarea editor-content"
-                        placeholder="Write your full article using HTML or plain text..."></textarea>
+                    <div class="form-group">
+                        <label class="form-label">Short Summary (English)</label>
+                        <textarea id="short-en" class="cms-textarea" style="height: 80px;" maxlength="150"
+                            placeholder="Brief summary..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Full Article (English)</label>
+                        <textarea id="content-en" class="cms-textarea" style="height: 200px;"
+                            placeholder="Full content..."></textarea>
+                    </div>
                 </div>
 
-                <div class="cms-layout"
-                    style="background: none; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0;">
+                <!-- MALAYALAM CONTENT -->
+                <div id="lang-ml" class="lang-content">
+                    <div class="form-group">
+                        <label class="form-label">ലേഖനത്തിന്റെ തലക്കെട്ട് (Malayalam)</label>
+                        <input type="text" id="title-ml" class="cms-input" placeholder="മലയാളം ടൈറ്റിൽ നൽകുക...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ചുരുക്കം (Malayalam)</label>
+                        <textarea id="short-ml" class="cms-textarea" style="height: 80px;" maxlength="150"
+                            placeholder="വിവരണം..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">പൂർണ്ണമായ ഉള്ളടക്കം (Malayalam)</label>
+                        <textarea id="content-ml" class="cms-textarea" style="height: 200px;"
+                            placeholder="മുഴുവൻ വാർത്തയും..."></textarea>
+                    </div>
+                </div>
+
+                <!-- ARABIC CONTENT -->
+                <div id="lang-ar" class="lang-content">
+                    <div class="form-group" dir="rtl">
+                        <label class="form-label">عنوان المقال (Arabic)</label>
+                        <input type="text" id="title-ar" class="cms-input" placeholder="أدخل العنوان بالعربية...">
+                    </div>
+                    <div class="form-group" dir="rtl">
+                        <label class="form-label">ملخص قصير (Arabic)</label>
+                        <textarea id="short-ar" class="cms-textarea" style="height: 80px;" maxlength="150"
+                            placeholder="ملخص..."></textarea>
+                    </div>
+                    <div class="form-group" dir="rtl">
+                        <label class="form-label">المحتوى الكامل (Arabic)</label>
+                        <textarea id="content-ar" class="cms-textarea" style="height: 200px;"
+                            placeholder="المحتوى الكامل هنا..."></textarea>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="form-group">
                         <label class="form-label">Publication Date</label>
-                        <input type="date" id="post-date" class="cms-input">
+                        <input type="date" id="post-date" class="cms-input" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Status</label>
@@ -385,7 +361,7 @@
                     <label class="form-label">Featured Image (Max 100KB)</label>
                     <div class="upload-box" onclick="document.getElementById('post-image').click()">
                         <i class="ph ph-cloud-arrow-up" style="font-size: 2rem; color: var(--cms-primary);"></i>
-                        <p style="margin-top: 10px; color: #888;">Click to upload image</p>
+                        <p style="margin-top: 10px; color: #888;">Select Image To Upload</p>
                         <input type="file" id="post-image" hidden accept="image/*">
                         <div class="preview-img-container" id="preview-img-container">
                             <img src="" id="form-img-preview" style="width: 100%;">
@@ -396,9 +372,9 @@
                 <div class="btn-group">
                     <button type="button" class="btn-cms btn-cms-primary" id="publish-btn"
                         onclick="saveData('published')">
-                        <i class="ph ph-paper-plane-tilt"></i> Publish Now
+                        <i class="ph ph-paper-plane-tilt"></i> <span>Publish Now</span>
                     </button>
-                    <button type="button" class="btn-cms btn-cms-secondary" onclick="saveData('draft')">
+                    <button type="button" class="btn-cms btn-cms-secondary" id="draft-btn" onclick="saveData('draft')">
                         <i class="ph ph-file-text"></i> Save Draft
                     </button>
                     <button type="button" class="btn-cms btn-cms-outline" onclick="resetForm()">
@@ -408,8 +384,8 @@
             </form>
         </div>
 
-        <!-- LIST & PREVIEW PANEL -->
-        <div class="cms-panel" style="background: rgba(0,0,0,0.15);">
+        <!-- LIST PANEL -->
+        <div class="cms-panel" style="background: rgba(0,0,0,0.15); border-right: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                 <h2 style="font-size: 1.5rem;">Article Management</h2>
                 <div style="position: relative;">
@@ -421,26 +397,7 @@
             </div>
 
             <div id="posts-list">
-                <!-- Data will be loaded here -->
-            </div>
-
-            <!-- LIVE PREVIEW AREA -->
-            <div style="margin-top: 60px; border-top: 1px solid var(--cms-border); padding-top: 40px;">
-                <h3 style="margin-bottom: 25px; color: #666; font-size: 0.9rem; text-transform: uppercase;">Live Preview
-                    (Card View)</h3>
-                <div class="preview-sticky">
-                    <div class="preview-card" id="live-preview-card">
-                        <div class="preview-header" id="prev-img-bg">
-                            <div style="position: absolute; bottom: 15px; left: 20px; background: var(--cms-primary); color: #000; padding: 4px 12px; border-radius: 5px; font-weight: 700; font-size: 0.7rem;"
-                                id="prev-date">DATE</div>
-                        </div>
-                        <div class="preview-body">
-                            <h4 style="font-size: 1.2rem; margin-bottom: 15px;" id="prev-title">New Article Title</h4>
-                            <p style="color: #888; font-size: 0.9rem; line-height: 1.6;" id="prev-short">Your short
-                                description will appear here as a summary...</p>
-                        </div>
-                    </div>
-                </div>
+                <!-- Loaded via JS -->
             </div>
         </div>
     </div>
@@ -448,18 +405,29 @@
     <!-- TOAST -->
     <div id="toast">
         <i class="ph ph-check-circle" style="color: var(--cms-primary); font-size: 1.5rem;"></i>
-        <span id="toast-msg">Success Message!</span>
+        <span id="toast-msg">Action Successful!</span>
     </div>
 
     <script type="module">
         import { NewsService } from './news-service.js';
 
         const newsService = new NewsService();
-        const form = document.getElementById('news-form');
         const postsList = document.getElementById('posts-list');
         const searchBox = document.getElementById('search-box');
+        const imgContainer = document.getElementById('preview-img-container');
+        const imgPreview = document.getElementById('form-img-preview');
+        let currentCompressedBase64 = null;
 
-        // Initial Load
+        // --- TABS LOGIC ---
+        window.switchLang = (lang) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.lang-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(`lang-${lang}`).classList.add('active');
+        };
+
+        // --- INITIAL LOAD ---
         window.addEventListener('load', () => {
             renderList();
             resetForm();
@@ -469,8 +437,7 @@
         function renderList() {
             const news = newsService.getAllNews();
             const searchTerm = searchBox.value.toLowerCase();
-
-            const filtered = news.filter(n => n.title.toLowerCase().includes(searchTerm));
+            const filtered = news.filter(n => (n.title.en || '').toLowerCase().includes(searchTerm) || (n.title.ml || '').toLowerCase().includes(searchTerm));
 
             if (filtered.length === 0) {
                 postsList.innerHTML = `<div style="text-align: center; color: #444; padding: 50px;">No articles found.</div>`;
@@ -481,16 +448,16 @@
                 <div class="news-item">
                     <img src="${item.image || 'https://via.placeholder.com/150'}" class="news-item-img">
                     <div class="news-item-info">
-                        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
+                        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 5px;">
                             <span class="status-tag status-${item.status}">${item.status}</span>
-                            <span style="color: #666; font-size: 0.75rem;">${new Date(item.createdAt).toLocaleDateString()}</span>
+                            <span style="color: #555; font-size: 0.7rem;">${new Date(item.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <h4 style="margin-bottom: 5px;">${item.title}</h4>
-                        <p style="color: #888; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">${item.shortDescription}</p>
+                        <h4 style="margin-bottom: 3px; font-size: 0.95rem;">${item.title.en || item.title.ml || 'Untitled'}</h4>
+                        <p style="color: #666; font-size: 0.75rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">${item.shortDescription.en || item.shortDescription.ml || ''}</p>
                     </div>
-                    <div class="news-item-actions">
-                        <button class="action-btn action-edit" onclick="editPost('${item.id}')" title="Edit"><i class="ph ph-pencil"></i></button>
-                        <button class="action-btn action-delete" onclick="deletePost('${item.id}')" title="Delete"><i class="ph ph-trash"></i></button>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <button class="action-btn action-edit" onclick="editPost('${item.id}')"><i class="ph ph-pencil"></i></button>
+                        <button class="action-btn action-delete" onclick="deletePost('${item.id}')"><i class="ph ph-trash"></i></button>
                     </div>
                 </div>
             `).join('');
@@ -498,57 +465,99 @@
 
         searchBox.addEventListener('input', renderList);
 
-        // --- FORM LOGIC ---
-
-        // Image Handling with Compression
-        const imageInput = document.getElementById('post-image');
-        const imgPreview = document.getElementById('form-img-preview');
-        const imgContainer = document.getElementById('preview-img-container');
-        const prevBg = document.getElementById('prev-img-bg');
-        let currentCompressedBase64 = null;
-
-        imageInput.addEventListener('change', async (e) => {
+        // --- IMAGE HANDLING ---
+        document.getElementById('post-image').addEventListener('change', async (e) => {
             if (e.target.files.length > 0) {
                 const file = e.target.files[0];
                 try {
                     currentCompressedBase64 = await NewsService.compressImage(file);
                     imgPreview.src = currentCompressedBase64;
                     imgContainer.style.display = 'block';
-                    prevBg.style.backgroundImage = `url(${currentCompressedBase64})`;
-                    prevBg.style.backgroundSize = 'cover';
                 } catch (err) {
-                    showToast("Error compressing image", true);
+                    showToast("Compression failed", true);
                 }
             }
         });
 
-        // Live Preview Sync
-        const titleIn = document.getElementById('post-title');
-        const shortIn = document.getElementById('post-short');
-        const dateIn = document.getElementById('post-date');
+        // --- SAVE DATA ---
+        window.saveData = async (statusOverride) => {
+            const btn = document.getElementById('publish-btn');
+            const draftBtn = document.getElementById('draft-btn');
+            const id = document.getElementById('post-id').value;
 
-        titleIn.addEventListener('input', () => document.getElementById('prev-title').innerText = titleIn.value || "New Article Title");
-        shortIn.addEventListener('input', () => {
-            document.getElementById('prev-short').innerText = shortIn.value || "Your short description will appear here...";
-            document.getElementById('char-count').innerText = `${shortIn.value.length}/150`;
-        });
-        dateIn.addEventListener('change', () => {
-            if (dateIn.value) {
-                const d = new Date(dateIn.value);
-                document.getElementById('prev-date').innerText = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            const data = {
+                id: id || null,
+                title: {
+                    en: document.getElementById('title-en').value,
+                    ml: document.getElementById('title-ml').value,
+                    ar: document.getElementById('title-ar').value
+                },
+                shortDescription: {
+                    en: document.getElementById('short-en').value,
+                    ml: document.getElementById('short-ml').value,
+                    ar: document.getElementById('short-ar').value
+                },
+                fullContent: {
+                    en: document.getElementById('content-en').value,
+                    ml: document.getElementById('content-ml').value,
+                    ar: document.getElementById('content-ar').value
+                },
+                image: currentCompressedBase64,
+                date: document.getElementById('post-date').value || new Date().toISOString(),
+                status: statusOverride || document.getElementById('post-status').value,
+                createdAt: id ? newsService.getNewsById(id).createdAt : new Date().toISOString()
+            };
+
+            if (!data.title.en && !data.title.ml && !data.title.ar) {
+                showToast("Please provide a title in at least one language.", true);
+                return;
             }
-        });
 
-        // Global functions for editing/deleting
+            // UI Feedback
+            btn.disabled = true;
+            draftBtn.disabled = true;
+            btn.querySelector('span').innerText = "Saving...";
+
+            try {
+                await newsService.saveNews(data);
+                showToast(statusOverride === 'published' ? "News Published Successfully!" : "Draft Saved!");
+
+                if (statusOverride === 'published') {
+                    setTimeout(() => {
+                        window.location.href = 'index.html#news';
+                    }, 1500);
+                } else {
+                    renderList();
+                    resetForm();
+                }
+            } catch (err) {
+                showToast(err.message, true);
+            } finally {
+                btn.disabled = false;
+                draftBtn.disabled = false;
+                btn.querySelector('span').innerText = id ? "Update Article" : "Publish Now";
+            }
+        };
+
         window.editPost = (id) => {
             const item = newsService.getNewsById(id);
             if (!item) return;
 
             document.getElementById('form-title').innerText = "Edit Article";
             document.getElementById('post-id').value = item.id;
-            document.getElementById('post-title').value = item.title;
-            document.getElementById('post-short').value = item.shortDescription;
-            document.getElementById('post-content').value = item.fullContent;
+
+            document.getElementById('title-en').value = item.title.en || '';
+            document.getElementById('title-ml').value = item.title.ml || '';
+            document.getElementById('title-ar').value = item.title.ar || '';
+
+            document.getElementById('short-en').value = item.shortDescription.en || '';
+            document.getElementById('short-ml').value = item.shortDescription.ml || '';
+            document.getElementById('short-ar').value = item.shortDescription.ar || '';
+
+            document.getElementById('content-en').value = item.fullContent.en || '';
+            document.getElementById('content-ml').value = item.fullContent.ml || '';
+            document.getElementById('content-ar').value = item.fullContent.ar || '';
+
             document.getElementById('post-date').value = item.date ? item.date.split('T')[0] : '';
             document.getElementById('post-status').value = item.status || 'published';
 
@@ -556,87 +565,42 @@
                 currentCompressedBase64 = item.image;
                 imgPreview.src = item.image;
                 imgContainer.style.display = 'block';
-                prevBg.style.backgroundImage = `url(${item.image})`;
-                prevBg.style.backgroundSize = 'cover';
             } else {
-                currentCompressedBase64 = null;
                 imgContainer.style.display = 'none';
-                prevBg.style.backgroundImage = 'none';
             }
 
-            // Sync Preview
-            document.getElementById('prev-title').innerText = item.title;
-            document.getElementById('prev-short').innerText = item.shortDescription;
-            document.getElementById('publish-btn').innerHTML = '<i class="ph ph-check"></i> Update Article';
-
-            // Scroll to form
+            document.getElementById('publish-btn').querySelector('span').innerText = "Update Article";
             document.querySelector('.cms-panel').scrollTop = 0;
         };
 
         window.deletePost = (id) => {
-            if (confirm("Permanently delete this article? This cannot be undone.")) {
+            if (confirm("Delete this article?")) {
                 newsService.deleteNews(id);
                 renderList();
-                showToast("Article deleted permanently.");
-            }
-        };
-
-        window.saveData = async (statusOverride) => {
-            const id = document.getElementById('post-id').value;
-            const title = titleIn.value;
-            const short = shortIn.value;
-            const content = document.getElementById('post-content').value;
-            const date = dateIn.value;
-            const status = statusOverride || document.getElementById('post-status').value;
-
-            if (!title) { showToast("Please enter a title.", true); return; }
-
-            const data = {
-                id: id || null,
-                title,
-                shortDescription: short,
-                fullContent: content,
-                image: currentCompressedBase64,
-                date: date ? new Date(date).toISOString() : new Date().toISOString(),
-                status: status,
-                createdAt: id ? newsService.getNewsById(id).createdAt : new Date().toISOString()
-            };
-
-            try {
-                await newsService.saveNews(data);
-                showToast(id ? "Changes saved successfully!" : "Article published!");
-                resetForm();
-                renderList();
-            } catch (err) {
-                showToast(err.message, true);
+                showToast("Deleted");
             }
         };
 
         window.resetForm = () => {
-            form.reset();
+            document.getElementById('news-form').reset();
             document.getElementById('post-id').value = '';
             document.getElementById('form-title').innerText = "Create New Article";
-            document.getElementById('publish-btn').innerHTML = '<i class="ph ph-paper-plane-tilt"></i> Publish Now';
+            document.getElementById('publish-btn').querySelector('span').innerText = "Publish Now";
             imgContainer.style.display = 'none';
             currentCompressedBase64 = null;
-            prevBg.style.backgroundImage = 'none';
-
-            // Reset preview
-            document.getElementById('prev-title').innerText = "New Article Title";
-            document.getElementById('prev-short').innerText = "Your short description will appear here...";
-            document.getElementById('prev-date').innerText = "DATE";
-            document.getElementById('char-count').innerText = "0/150";
         };
 
         function showToast(msg, isError = false) {
             const t = document.getElementById('toast');
-            const m = document.getElementById('toast-msg');
-            m.innerText = msg;
+            document.getElementById('toast-msg').innerText = msg;
             t.style.borderColor = isError ? '#ff4444' : 'var(--cms-primary)';
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
         }
     </script>
+</body>
+
+</html>
 </body>
 
 </html>

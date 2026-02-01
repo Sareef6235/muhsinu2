@@ -8,6 +8,7 @@ export class NewsService {
     constructor() {
         this.STORAGE_KEY = 'mhm_news_data';
         this.news = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
+        this.LAST_ID_KEY = 'mhm_last_news_id';
     }
 
     /**
@@ -37,14 +38,15 @@ export class NewsService {
      * Create or Update a news item
      */
     async saveNews(newsItem) {
-        // Validation
-        if (!newsItem.title || !newsItem.shortDescription) {
-            throw new Error("Title and Short Description are required.");
+        // Validation - Basic check for main title
+        if (!newsItem.title || (!newsItem.title.en && !newsItem.title.ml && !newsItem.title.ar)) {
+            throw new Error("Title is required (at least one language).");
         }
 
         // Auto-generate ID if missing
         if (!newsItem.id) {
-            newsItem.id = this._generateSlug(newsItem.title);
+            const seedTitle = newsItem.title.en || newsItem.title.ml || "news";
+            newsItem.id = this._generateSlug(seedTitle);
             newsItem.createdAt = new Date().toISOString();
         }
 
@@ -57,6 +59,13 @@ export class NewsService {
         }
 
         this._persist();
+
+        // Track last published for highlight effect
+        if (newsItem.status === 'published') {
+            localStorage.setItem(this.LAST_ID_KEY, newsItem.id);
+            this._incrementBadgeCount();
+        }
+
         return newsItem;
     }
 
@@ -75,8 +84,24 @@ export class NewsService {
         try {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.news));
         } catch (e) {
+            console.error("Storage Error:", e);
             alert("Storage Quota Exceeded! Please delete old news or use smaller images.");
         }
+    }
+
+    _incrementBadgeCount() {
+        const count = parseInt(localStorage.getItem('mhm_unread_news') || '0');
+        localStorage.setItem('mhm_unread_news', count + 1);
+        window.dispatchEvent(new Event('news-updated'));
+    }
+
+    static getBadgeCount() {
+        return parseInt(localStorage.getItem('mhm_unread_news') || '0');
+    }
+
+    static clearBadgeCount() {
+        localStorage.setItem('mhm_unread_news', '0');
+        window.dispatchEvent(new Event('news-updated'));
     }
 
     /**
@@ -84,16 +109,15 @@ export class NewsService {
      */
     _generateSlug(text) {
         return text.toString().toLowerCase()
-            .replace(/\s+/g, '-')           // Replace spaces with -
-            .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-            .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-            .replace(/^-+/, '')             // Trim - from start of text
-            .replace(/-+$/, '') + '-' + Date.now().toString().slice(-4);
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '') + '-' + Math.random().toString(36).substring(2, 6);
     }
 
     /**
      * IMAGE COMPRESSION UTILITY
-     * Compresses image to ensure it's under ~100KB
      */
     static async compressImage(file) {
         return new Promise((resolve, reject) => {
@@ -110,7 +134,6 @@ export class NewsService {
                     let width = img.width;
                     let height = img.height;
 
-                    // Resize if too big (max width 800px)
                     const MAX_WIDTH = 800;
                     if (width > MAX_WIDTH) {
                         height *= MAX_WIDTH / width;
@@ -123,8 +146,7 @@ export class NewsService {
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Quality reduction loop
-                    let quality = 0.9;
+                    let quality = 0.8;
                     let dataUrl = canvas.toDataURL('image/jpeg', quality);
 
                     while (dataUrl.length > MAX_SIZE_KB * 1024 && quality > 0.1) {
@@ -139,3 +161,4 @@ export class NewsService {
         });
     }
 }
+

@@ -2532,3 +2532,192 @@ footer {
     background: var(--primary-color);
     color: #000;
 }
+
+/* --- NEW NEWS & CMS STYLES --- */
+
+/* Language Toggle */
+.lang-toggle-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.lang-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    color: #666;
+    padding: 8px 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lang-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.lang-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #000;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+}
+
+/* Glassmorphism News Card */
+.news-card-premium {
+    background: rgba(10, 10, 15, 0.4) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    text-decoration: none;
+    padding: 0 !important;
+}
+
+.news-card-premium:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 243, 255, 0.1);
+}
+
+.news-card-premium .img-wrapper {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #111;
+}
+
+.news-card-premium img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover !important;
+    transition: transform 0.6s ease;
+}
+
+.news-card-premium:hover img {
+    transform: scale(1.15);
+}
+
+/* New Highlight Animation */
+.news-highlight {
+    animation: glowPulse 2s infinite alternate;
+}
+
+.news-highlight::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--primary-color));
+    background-size: 400%;
+    z-index: -1;
+    border-radius: 22px;
+    opacity: 0.6;
+    animation: neonBorder 3s linear infinite;
+    filter: blur(5px);
+}
+
+@keyframes glowPulse {
+    0% {
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+    }
+
+    100% {
+        box-shadow: 0 0 25px rgba(0, 243, 255, 0.4);
+    }
+}
+
+@keyframes neonBorder {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Notification Badge */
+.news-badge {
+    background: #ff3e3e;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    animation: popScale 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
+    pointer-events: none;
+    z-index: 10;
+}
+
+@keyframes popScale {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Skeleton Loader */
+.skeleton-card {
+    height: 400px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* RTL Helpers */
+[dir="rtl"] {
+    text-align: right;
+}
+
+[dir="rtl"] .ph-arrow-right {
+    transform: rotate(180deg);
+}
