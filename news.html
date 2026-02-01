@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News & Updates | MIFTHAHUL HUDA MADRASA</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        .news-hero {
+            padding-top: 150px;
+            padding-bottom: 60px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(5, 5, 8, 0.8) 0%, transparent 100%);
+        }
+
+        .news-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px 80px;
+        }
+
+        .news-meta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .news-featured-img {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+        }
+
+        .news-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #ddd;
+        }
+
+        /* Typography for Rich Text Content */
+        .news-content h1,
+        .news-content h2,
+        .news-content h3 {
+            color: #fff;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .news-content p {
+            margin-bottom: 20px;
+        }
+
+        .news-content ul,
+        .news-content ol {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+
+        .news-content blockquote {
+            border-left: 3px solid var(--primary-color);
+            padding-left: 20px;
+            margin: 30px 0;
+            font-style: italic;
+            color: #aaa;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #888;
+            text-decoration: none;
+            margin-bottom: 40px;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* 404 State */
+        .not-found {
+            text-align: center;
+            padding: 100px 0;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER (Same as Index) -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">MHMV 2026.</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#news">News</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <!-- Dynamic Content Loaded Here -->
+        <div class="not-found">
+            <i class="ph ph-spinner" style="font-size: 3rem; animation: spin 1s linear infinite;"></i>
+            <p>Loading news...</p>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 MIFTHAHUL HUDA MADRASA. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { NewsService } from './news-service.js';
+
+        const newsService = new NewsService();
+        const mainContent = document.getElementById('main-content');
+
+        // Parse URL ID
+        const params = new URLSearchParams(window.location.search);
+        const newsId = params.get('id') || params.get('slug');
+
+        function render404(msg = "News article not found.") {
+            mainContent.innerHTML = `
+                <div class="container not-found">
+                    <i class="ph ph-warning-circle" style="font-size: 3rem; margin-bottom: 20px; color: #555;"></i>
+                    <h2>Oops!</h2>
+                    <p>${msg}</p>
+                    <a href="index.html" class="btn-primary" style="margin-top: 20px; display: inline-block;">Back to Home</a>
+                </div>
+            `;
+        }
+
+        if (!newsId) {
+            render404("No article selected.");
+        } else {
+            const article = newsService.getNewsById(newsId);
+
+            if (article) {
+                // Determine layout
+                const isPublished = article.status === 'published';
+
+                // Format Date
+                const dateStr = new Date(article.date).toLocaleDateString(undefined, {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                });
+
+                document.title = `${article.title} | MHMV News`;
+
+                mainContent.innerHTML = `
+                    <div class="container" style="margin-top: 100px;">
+                        <a href="index.html#news" class="back-btn"><i class="ph ph-arrow-left"></i> Back to All News</a>
+                    </div>
+
+                    <article>
+                        <div class="news-hero">
+                            <div class="container">
+                                <div class="news-meta">
+                                    <span><i class="ph ph-calendar-blank"></i> ${dateStr}</span>
+                                    ${!isPublished ? '<span style="color: #ffaa00; border: 1px solid #ffaa00; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;">DRAFT</span>' : ''}
+                                </div>
+                                <h1 class="gradient-text" style="font-size: 2.5rem; margin-bottom: 20px;">${article.title}</h1>
+                                <p style="color: #bbb; font-size: 1.2rem; max-width: 600px; margin: 0 auto;">${article.shortDescription}</p>
+                            </div>
+                        </div>
+
+                        <div class="news-container">
+                            ${article.image ? `<img src="${article.image}" alt="${article.title}" class="news-featured-img animate-fade-up">` : ''}
+                            
+                            <div class="news-content animate-fade-up delay-1">
+                                ${article.fullContent}
+                            </div>
+                        </div>
+                    </article>
+                `;
+            } else {
+                render404();
+            }
+        }
+    </script>
+</body>
+
+</html>

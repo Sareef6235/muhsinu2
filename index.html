@@ -44,12 +44,14 @@
                     </ul>
                 </li>
                 <li><a href="student_dashboard.html">Student Dashboard</a></li>
+                <li><a href="#news">News</a></li>
                 <li><a href="booking.html" style="color: #00f3ff;">Booking</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Portal</a>
                     <ul class="dropdown-menu">
-                        <li><a href="portal/">Portal</a></li>
-                        <li class="admin-only" style="display: none;"><a href="portal/"
+                        <li><a href="admin/dashboard.html">Portal</a></li>
+
+                        <li class="admin-only" style="display: none;"><a href="admin/dashboard.html"
                                 style="font-weight: 600; color: var(--primary-color);">Admin
                                 Panel</a></li>
                     </ul>
@@ -89,7 +91,7 @@
                 </p>
                 <div class="cta-group animate-fade-up delay-4">
                     <a href="creative.html#creative" class="btn btn-primary">Book Buy</a>
-                    <a href="#gallery" class="btn btn-secondary"
+                    <a href="#gallery.html" class="btn btn-secondary"
                         style="border-color: var(--primary-color); color: var(--primary-color);">View Gallery</a>
                     <a href="#contact" class="btn btn-secondary">Contact Us</a>
                 </div>
@@ -186,8 +188,25 @@
         </section>
 
         <section id="dashboard" style="padding: 0; margin-top: -100px;"></section>
+        <!-- NEWS & UPDATES SECTION -->
+        <section id="news" class="section">
+            <div class="container" style="text-align: center;">
+                <div class="section-badge animate-fade-up">Updates</div>
+                <h2 class="section-title animate-fade-up" style="margin-bottom: 50px;">Latest News & Notices</h2>
+
+                <div id="home-news-grid" class="grid"
+                    style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; text-align: left;">
+                    <!-- Filled dynamically by JS -->
+                    <p style="color: #666; text-align: center; width: 100%;">Loading news...</p>
+                </div>
+
+                <a href="news.html" class="btn-primary animate-fade-up" style="margin-top: 40px; display: none;"
+                    id="view-all-news-btn">View All Updates</a>
+            </div>
+        </section>
+
         <!-- Services Section -->
-        <section id="services">
+        <section id="services" class="section" style="background: rgba(10, 10, 10, 0.5);">
             <div class="container">
                 <h2 class="section-title">Our Services</h2>
                 <div class="services-grid" id="services-grid-home">
@@ -625,6 +644,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { NewsService } from './news-service.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDY3La232JPHrnwPL_VfwQKJ07JLIEHAZE",
@@ -675,6 +695,9 @@
                 const input = label.querySelector('input');
                 input.addEventListener('change', () => {
                     updateTotalPrice();
+
+
+                    // --- EXISTING SERVICES LOGIC ---
                     const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
                         .map(c => c.value).join(', ');
                     const hiddenSub = document.getElementById('booking-subjects-hidden');
@@ -793,6 +816,51 @@
         document.getElementById('home-regno')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') window.fetchHomeResult();
         });
+
+        // --- NEWS SYSTEM INTEGRATION (Fixed Placement) ---
+        (async () => {
+            try {
+                const newsService = new NewsService();
+                const newsGrid = document.getElementById('home-news-grid');
+                const viewAllBtn = document.getElementById('view-all-news-btn');
+
+                if (!newsGrid) return;
+
+                const latestNews = newsService.getPublishedNews().slice(0, 3);
+
+                if (latestNews.length === 0) {
+                    newsGrid.innerHTML = `
+                        <div class="animate-fade-up" style="grid-column: 1/-1; text-align: center; padding: 40px; background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border);">
+                            <i class="ph ph-newspaper-clipping" style="font-size: 3rem; color: #444; margin-bottom: 15px;"></i>
+                            <p style="color: #888;">No recent updates available.</p>
+                        </div>
+                    `;
+                } else {
+                    newsGrid.innerHTML = latestNews.map((item, index) => {
+                        const date = new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                        const imgDisplay = item.image
+                            ? `<div style="height: 180px; overflow: hidden;"><img src="${item.image}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"></div>`
+                            : `<div style="height: 180px; background: #111; display: flex; align-items: center; justify-content: center; color: #333;"><i class="ph ph-newspaper" style="font-size: 3rem;"></i></div>`;
+
+                        return `
+                        <article class="service-card animate-fade-up" style="padding: 0; overflow: hidden; border: 1px solid var(--glass-border); transition: transform 0.3s; cursor: pointer; display: flex; flex-direction: column;" onclick="window.location.href='news.html?id=${item.id}'">
+                            ${imgDisplay}
+                            <div style="padding: 25px; flex: 1; display: flex; flex-direction: column;">
+                                <div style="font-size: 0.8rem; color: var(--primary-color); margin-bottom: 10px; font-weight: 600; letter-spacing: 1px;">${date}</div>
+                                <h3 style="margin-bottom: 10px; font-size: 1.25rem; line-height: 1.4;">${item.title}</h3>
+                                <p style="color: #888; font-size: 0.95rem; margin-bottom: 20px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${item.shortDescription}</p>
+                                <div style="margin-top: auto; color: #fff; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 5px;">
+                                    Read More <i class="ph-bold ph-arrow-right"></i>
+                                </div>
+                            </div>
+                        </article>
+                        `;
+                    }).join('');
+
+                    if (viewAllBtn) viewAllBtn.style.display = 'inline-block';
+                }
+            } catch (e) { console.error("News load error", e); }
+        })();
     </script>
 
 
