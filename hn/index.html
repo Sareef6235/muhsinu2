@@ -7,7 +7,7 @@
     <title>Portal | MIFTHAHUL HUDA MADRASA</title>
     <meta name="description"
         content="Admin & Student Portal for MIFTHAHUL HUDA MADRASA - Secure access to management and student features.">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -672,38 +672,38 @@
     <!-- Header -->
     <header class="portal-header">
         <div class="container">
-            <a href="index.html" class="portal-logo">MHMV 2026.</a>
+            <a href="../index.html" class="portal-logo">MHMV 2026.</a>
             <nav>
                 <ul class="portal-nav">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="../index.html">Home</a></li>
                     <li class="dropdown">
-                        <a href="gallery.html" class="dropdown-toggle">Gallery</a>
+                        <a href="../gallery.html" class="dropdown-toggle">Gallery</a>
                         <ul class="dropdown-menu">
-                            <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
-                            <li><a href="gallery.html?tab=video">Video Gallery</a></li>
+                            <li><a href="../gallery.html?tab=photo">Photo Gallery</a></li>
+                            <li><a href="../gallery.html?tab=video">Video Gallery</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle">Creative Corner</a>
                         <ul class="dropdown-menu">
-                            <li><a href="creative.html">Creative Corner</a></li>
-                            <li><a href="creations.html">Creations</a></li>
+                            <li><a href="../creative.html">Creative Corner</a></li>
+                            <li><a href="../creations.html">Creations</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle">Result</a>
                         <ul class="dropdown-menu">
-                            <li><a href="result.html">Exam Result (New)</a></li>
-                            <li><a href="exam_result.html">Exam Result (Old)</a></li>
+                            <li><a href="../result.html">Exam Result (New)</a></li>
+                            <li><a href="../exam_result.html">Exam Result (Old)</a></li>
                         </ul>
                     </li>
-                    <li><a href="student_dashboard.html">Student Dashboard</a></li>
-                    <li><a href="booking.html">Booking</a></li>
+                    <li><a href="../student_dashboard.html">Student Dashboard</a></li>
+                    <li><a href="../booking.html">Booking</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle">Portal</a>
                         <ul class="dropdown-menu">
-                            <li><a href="portal.html" class="active">Portal</a></li>
-                            <li class="admin-only" style="display: none;"><a href="portal.html"
+                            <li><a href="index.html" class="active">Portal</a></li>
+                            <li class="admin-only" style="display: none;"><a href="index.html"
                                     style="font-weight: 600; color: var(--primary-color);">Admin Panel</a></li>
                         </ul>
                     </li>
@@ -857,7 +857,7 @@
                                     ACTIVE</td>
                                 <td
                                     style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
-                                    <a href="index.html" class="btn btn-secondary"
+                                    <a href="../index.html" class="btn btn-secondary"
                                         style="padding: 8px 15px; font-size: 0.75rem;">Launch</a>
                                 </td>
                             </tr>
@@ -865,7 +865,7 @@
                                 <td style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);"><a
                                         href="portal.html" class="file-link"
                                         style="color: var(--primary-color); display: flex; align-items: center; gap: 12px; font-weight: 600;"><i
-                                            class="ph-bold ph-lock" style="font-size: 1.4rem;"></i> portal.html</a>
+                                            class="ph-bold ph-lock" style="font-size: 1.4rem;"></i> index.html</a>
                                 </td>
                                 <td
                                     style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #888;">
@@ -893,7 +893,7 @@
                                     ACTIVE</td>
                                 <td
                                     style="padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;">
-                                    <a href="result.html" class="btn btn-secondary"
+                                    <a href="../result.html" class="btn btn-secondary"
                                         style="padding: 8px 15px; font-size: 0.75rem;">Launch</a>
                                 </td>
                             </tr>
@@ -1282,7 +1282,7 @@
                     } else {
                         console.log("🎓 Approved Student: Redirecting to Dashboard");
                         // Strict Redirection for approved students to prevent admin access
-                        window.location.href = "student_dashboard.html";
+                        window.location.href = "../student_dashboard.html";
                     }
                     return;
                 }
