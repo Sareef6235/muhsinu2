@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services | MIFTHAHUL HUDA MADRASA</title>
+    <meta name="description"
+        content="Explore the comprehensive services at MIFTHAHUL HUDA MADRASA including Quality Education, Personal Mentoring, and Success Records.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --glass-bg-accent: rgba(255, 255, 255, 0.08);
+        }
+
+        .services-hero {
+            padding: 180px 0 100px;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 1) 0%, rgba(0, 243, 255, 0.05) 100%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .services-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.1) 0%, transparent 70%);
+            z-index: 1;
+        }
+
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #888;
+            position: relative;
+            z-index: 2;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+        }
+
+        .breadcrumb span {
+            color: #555;
+        }
+
+        .services-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+            letter-spacing: -1px;
+        }
+
+        .services-hero p {
+            font-size: 1.2rem;
+            color: #aaa;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .service-detail-section {
+            padding: 100px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .service-detail-section:last-child {
+            border-bottom: none;
+        }
+
+        .service-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .service-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .service-content h2 i {
+            font-size: 3rem;
+            color: var(--secondary-color);
+        }
+
+        .service-content p {
+            font-size: 1.1rem;
+            color: #bbb;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .detail-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .detail-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: 0.3s;
+        }
+
+        .detail-item:hover {
+            background: var(--glass-bg-accent);
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .detail-item i {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .detail-item span {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .service-visual {
+            position: relative;
+            height: 400px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .service-visual i {
+            font-size: 10rem;
+            opacity: 0.1;
+            color: var(--primary-color);
+            position: absolute;
+        }
+
+        .floating-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            width: 80%;
+            text-align: center;
+            z-index: 2;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .cta-section {
+            padding: 100px 0;
+            text-align: center;
+            background: linear-gradient(0deg, rgba(10, 10, 10, 1) 0%, rgba(188, 19, 254, 0.05) 100%);
+        }
+
+        .cta-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 60px;
+            border-radius: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            backdrop-filter: blur(20px);
+        }
+
+        .cta-card h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-card p {
+            color: #aaa;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 992px) {
+            .service-container {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+
+            .service-visual {
+                order: -1;
+                height: 300px;
+            }
+
+            .services-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .detail-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header id="main-header">
+        <nav class="container">
+            <a href="index.html#hero" class="logo">MHMV 2026.</a>
+            <ul class="nav-links">
+                <li><a href="index.html#hero">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li class="dropdown">
+                    <a href="gallery.html" class="dropdown-toggle">Gallery</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
+                        <li><a href="gallery.html?tab=video">Video Gallery</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Student Zone</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="creative.html">Fee Payment</a></li>
+                        <li><a href="restored_pages/creative.html">Creative Submission</a></li>
+                        <li><a href="creation_receipt.html">Approved Receipts</a></li>
+                        <li><a href="creations.html">Creations</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Result</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="result.html">Exam Result (New)</a></li>
+                        <li><a href="exam_result.html">Exam Result (Old)</a></li>
+                    </ul>
+                </li>
+                <li><a href="student_dashboard.html">Student Dashboard</a></li>
+                <li><a href="booking.html" style="color: #00f3ff;">Booking</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Portal</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="admin/">Portal</a></li>
+                        <li class="admin-only" style="display: none;"><a href="admin/"
+                                style="font-weight: 600; color: var(--primary-color);">Admin
+                                Panel</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-btn" aria-label="Toggle navigation">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="services-hero">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span>/</span>
+                    <span>Services</span>
+                </div>
+                <h1 class="animate-fade-up">Our Services</h1>
+                <p class="animate-fade-up delay-1">What We Offer at MIFTHAHUL HUDA MADRASA</p>
+            </div>
+        </section>
+
+        <div id="services-detail-container">
+            <!-- Service details rendered dynamically via JS -->
+        </div>
+
+        <script type="module">
+            import { SERVICES_DATA } from './services-data.js';
+            const container = document.getElementById('services-detail-container');
+            if (container) {
+                container.innerHTML = SERVICES_DATA.map((service, index) => {
+                    const isEven = index % 2 === 0;
+                    const directionStyle = isEven ? '' : 'style="direction: rtl;"';
+                    const contentStyle = isEven ? '' : 'style="direction: ltr;"';
+
+                    return `
+                        <section id="${service.id}" class="service-detail-section">
+                            <div class="container service-container" ${directionStyle}>
+                                <div class="service-content animate-fade-up" ${contentStyle}>
+                                    <h2><i class="${service.icon}"></i> ${service.title}</h2>
+                                    <p>${service.detailedDesc}</p>
+                                    <div class="detail-list">
+                                        ${service.points.map(point => `
+                                            <div class="detail-item">
+                                                <i class="${point.icon}"></i>
+                                                <span>${point.text}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <div class="service-visual animate-fade-up delay-2">
+                                    <i class="${service.visualIcon}"></i>
+                                    <div class="floating-card">
+                                        <h3 style="color: ${service.accent}; margin-bottom: 15px;">${service.id === 'education' ? 'Structured Learning' : service.id === 'mentoring' ? 'Individual Attention' : 'Proven Excellence'}</h3>
+                                        <p style="font-size: 0.9rem; color: #888;">${service.id === 'education' ? 'Step-by-step guidance through complex Islamic Jurisprudence and Modern Sciences.' : service.id === 'mentoring' ? 'Personalized paths for every learner, ensuring emotional and academic growth.' : 'Year after year, we maintain 100% success rates in major certifications.'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    `;
+                }).join('');
+            }
+        </script>
+
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-card animate-fade-up">
+                    <h2>Ready to Join Us?</h2>
+                    <p>Experience the best in value-based education. Book a consultation or tuition session today.</p>
+                    <a href="index.html#booking" class="btn btn-primary">Enroll Now</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer
+        style="background: #0a0a0a; border-top: 1px solid var(--glass-border); padding: 60px 0 30px; margin-top: 80px;">
+        <div class="container">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <div>
+                    <h3 style="color: var(--primary-color); margin-bottom: 20px; font-size: 1.3rem;">MIFTHAHUL HUDA
+                        MADRASA</h3>
+                    <p style="color: #888; line-height: 1.8;">Empowering students through quality education and Islamic
+                        values at Vengara S S Road.</p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Quick Links</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 12px;"><a href="index.html#about"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">About Us</a></li>
+                        <li style="margin-bottom: 12px;"><a href="services.html"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Services</a></li>
+                        <li style="margin-bottom: 12px;"><a href="index.html#booking"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Book Tuition</a></li>
+                        <li style="margin-bottom: 12px;"><a href="exam_result.html"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Exam Results</a></li>
+                        <li style="margin-bottom: 12px;"><a href="index.html#gallery"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Gallery</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Contact</h4>
+                    <p style="color: #888; margin-bottom: 10px;">📍 Vengara S S Road</p>
+                    <p style="color: #888; margin-bottom: 10px;">📞 <a href="https://wa.me/916235989198"
+                            style="color: #888; text-decoration: none;">+91 6235989198</a></p>
+                    <p style="color: #888;">✉️ Contact via WhatsApp</p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Enroll Now</h4>
+                    <p style="color: #888; margin-bottom: 20px; line-height: 1.6;">Start your learning journey with us
+                        today!</p>
+                    <a href="index.html#booking" class="btn btn-primary" style="display: inline-block;">Book a Tuition
+                        Session</a>
+                </div>
+            </div>
+            <div
+                style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; text-align: center; display: flex; flex-direction: column; gap: 10px;">
+                <p style="color: #666; font-size: 0.9rem;">© 2026 MHMV. All rights reserved.</p>
+                <a href="admin/" style="color: #333; font-size: 0.75rem; text-decoration: none;">Admin Access</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <div class="whatsapp-float-wrapper">
+        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp">
+            <i class="ph-fill ph-whatsapp-logo"></i>
+        </a>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-container">
+            <a href="index.html#hero" class="nav-item">
+                <i class="ph ph-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="gallery.html" class="nav-item">
+                <i class="ph ph-image"></i>
+                <span>Gallery</span>
+            </a>
+
+            <!-- CENTER ACTION BUTTON -->
+            <a href="index.html#booking" class="btn-book-nav" aria-label="Book Tuition">
+                <i class="ph-bold ph-calendar-plus" style="color: #000; font-size: 1.6rem;"></i>
+            </a>
+
+            <a href="creative.html" class="nav-item">
+                <i class="ph ph-student"></i>
+                <span>Student</span>
+            </a>
+            <a href="index.html#contact" class="nav-item">
+                <i class="ph ph-chat-circle"></i>
+                <span>Contact</span>
+            </a>
+        </div>
+    </nav>
+
+    <script src="script.js"></script>
+    <script>
+        // Smooth scroll for hash links
+        window.addEventListener('load', () => {
+            if (window.location.hash) {
+                const target = document.querySelector(window.location.hash);
+                if (target) {
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: target.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    }, 500);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -19,6 +19,7 @@
             <a href="index.html#hero" class="logo">MHMV 2026.</a>
             <ul class="nav-links">
                 <li><a href="index.html#hero">Home</a></li>
+                <li><a href="services.html">Services</a></li>
                 <li class="dropdown">
                     <a href="gallery.html" class="dropdown-toggle">Gallery</a>
                     <ul class="dropdown-menu">
@@ -75,11 +76,7 @@
             <!-- Three.js Animated Background -->
             <canvas id="hero-canvas"
                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
-            <!-- Full-width background image -->
-            <div style="position: absolute; top: 0; left: 0; width: 100; height: 100; z-index: 0;">
-                <img src="assets/refont_calligraphic (4).png" alt="Madrasa Logo"
-                    style="width: 100; height: 100; object-fit: cover; opacity: 0.15;">
-            </div>
+
 
             <!-- Content overlay -->
             <div class="container hero-content" style="position: relative; z-index: 1;">
@@ -91,17 +88,14 @@
                     achievement and success in the future.
                 </p>
                 <div class="cta-group animate-fade-up delay-4">
-                    <a href="#booking" class="btn btn-primary">Book Tuition</a>
+                    <a href="creative.html#creative" class="btn btn-primary">Book Buy</a>
                     <a href="#gallery" class="btn btn-secondary"
                         style="border-color: var(--primary-color); color: var(--primary-color);">View Gallery</a>
                     <a href="#contact" class="btn btn-secondary">Contact Us</a>
                 </div>
             </div>
 
-            <!-- Hero Image Asset -->
-            <div class="hero-image-container animate-fade-up delay-2">
-                <img src="assets/refont_calligraphic (4).png" alt="Hero Asset" class="hero-image-asset">
-            </div>
+
         </section>
 
         <section id="about">
@@ -191,39 +185,31 @@
             </div>
         </section>
 
+        <section id="dashboard" style="padding: 0; margin-top: -100px;"></section>
         <!-- Services Section -->
         <section id="services">
             <div class="container">
                 <h2 class="section-title">Our Services</h2>
-                <div class="services-grid">
-                    <div class="service-card">
-                        <i class="ph ph-books service-icon"></i>
-                        <h3>Quality Education</h3>
-                        <p>Comprehensive Islamic and academic guidance following the latest standards.</p>
-                        <ul class="service-list">
-                            <li>Expert Faculty</li>
-                            <li>Modern Curriculum</li>
-                        </ul>
-                    </div>
-                    <div class="service-card">
-                        <i class="ph ph-users-three service-icon"></i>
-                        <h3>Personal Mentoring</h3>
-                        <p>One-on-one sessions for students needing extra help in specific subjects.</p>
-                        <ul class="service-list">
-                            <li>Custom Plans</li>
-                            <li>Progress Tracking</li>
-                        </ul>
-                    </div>
-                    <div class="service-card">
-                        <i class="ph ph-certificate service-icon"></i>
-                        <h3>Success Records</h3>
-                        <p>Proven track record of students achieving top scores in examinations.</p>
-                        <ul class="service-list">
-                            <li>Result Oriented</li>
-                            <li>Verified Stats</li>
-                        </ul>
-                    </div>
+                <div class="services-grid" id="services-grid-home">
+                    <!-- Cards rendered dynamically via JS -->
                 </div>
+
+                <script type="module">
+                    import { SERVICES_DATA } from './services-data.js';
+                    const grid = document.getElementById('services-grid-home');
+                    if (grid) {
+                        grid.innerHTML = SERVICES_DATA.map(service => `
+                            <a href="services.html#${service.id}" class="service-card animate-fade-up">
+                                <i class="${service.icon} service-icon"></i>
+                                <h3>${service.title}</h3>
+                                <p>${service.shortDesc}</p>
+                                <ul class="service-list">
+                                    ${service.points.slice(0, 2).map(p => `<li>${p.text}</li>`).join('')}
+                                </ul>
+                            </a>
+                        `).join('');
+                    }
+                </script>
             </div>
         </section>
 
@@ -828,6 +814,10 @@
                                 style="color: #888; text-decoration: none; transition: 0.3s;"
                                 onmouseover="this.style.color='var(--primary-color)'"
                                 onmouseout="this.style.color='#888'">About Us</a></li>
+                        <li style="margin-bottom: 12px;"><a href="services.html"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Services</a></li>
                         <li style="margin-bottom: 12px;"><a href="#booking"
                                 style="color: #888; text-decoration: none; transition: 0.3s;"
                                 onmouseover="this.style.color='var(--primary-color)'"
@@ -883,6 +873,10 @@
             <a href="gallery.html" class="nav-item">
                 <i class="ph ph-image"></i>
                 <span>Gallery</span>
+            </a>
+            <a href="services.html" class="nav-item">
+                <i class="ph ph-briefcase"></i>
+                <span>Services</span>
             </a>
 
             <!-- CENTER ACTION BUTTON -->
