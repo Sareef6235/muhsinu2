@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fee Payment Portal - MIFTHAHUL HUDA MADRASA</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Creative Corner - MIFTHAHUL HUDA MADRASA</title>
+    <link rel="stylesheet" href="../styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -16,34 +16,32 @@
 <body>
     <header id="main-header">
         <nav class="container">
-            <a href="index.html#hero" class="logo">MHMV 2026.</a>
+            <a href="../index.html#hero" class="logo">MHMV 2026.</a>
             <ul class="nav-links">
-                <li><a href="index.html#hero">Home</a></li>
+                <li><a href="../index.html#hero">Home</a></li>
                 <li class="dropdown">
-                    <a href="gallery.html" class="dropdown-toggle">Gallery</a>
+                    <a href="../gallery.html" class="dropdown-toggle">Gallery</a>
                     <ul class="dropdown-menu">
-                        <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
-                        <li><a href="gallery.html?tab=video">Video Gallery</a></li>
+                        <li><a href="../gallery.html?tab=photo">Photo Gallery</a></li>
+                        <li><a href="../gallery.html?tab=video">Video Gallery</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" class="active">Student Zone</a>
+                    <a href="#" class="dropdown-toggle" class="active">Creative Corner</a>
                     <ul class="dropdown-menu">
-                        <li><a href="creative.html" class="active">Fee Payment</a></li>
-                        <li><a href="restored_pages/creative.html">Creative Submission</a></li>
-                        <li><a href="creation_receipt.html">Approved Receipts</a></li>
-                        <li><a href="creations.html">Creations</a></li>
+                        <li><a href="creative.html" class="active">Creative Corner</a></li>
+                        <li><a href="../creations.html">Creations</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Result</a>
                     <ul class="dropdown-menu">
-                        <li><a href="result.html">Exam Result (New)</a></li>
-                        <li><a href="exam_result.html">Exam Result (Old)</a></li>
+                        <li><a href="../result.html">Exam Result (New)</a></li>
+                        <li><a href="../exam_result.html">Exam Result (Old)</a></li>
                     </ul>
                 </li>
-                <li><a href="portal.html">Portal</a></li>
-                <li><a href="index.html#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
+                <li><a href="../portal.html">Portal</a></li>
+                <li><a href="../index.html#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
             </ul>
             <button class="mobile-menu-btn" aria-label="Toggle navigation">
                 <span class="bar"></span>
@@ -54,47 +52,38 @@
     </header>
 
     <header class="creative-header">
-        <h1 class="creative-title">💳 Fee Payment Portal</h1>
-        <p>Submit Fee Receipt Proof & Track Payment Status</p>
+        <h1 class="creative-title">🎨 Creative Corner</h1>
+        <p>Student Creations – Admin Approved</p>
     </header>
 
     <!-- ================= STUDENT SUBMIT ================= -->
     <section>
         <div class="card creation-card submission-card animate-fade-up">
-            <h2>📤 Submit Fee Receipt Proof</h2>
+            <h2>📤 Submit Your Work</h2>
 
             <div class="creative-input-group">
                 <input id="name" placeholder="Student Name">
-            </div>
-
-            <!-- CLASS SELECTION -->
-            <div class="creative-input-group">
-                <label style="display:block; margin-bottom: 8px; color: #aaa;">Select Class:</label>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                    <script>
-                        for (let i = 1; i <= 12; i++) {
-                            document.write(`
-                                <label style="font-size: 0.9rem; color: #ccc; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                                    <input type="radio" name="cls" value="${i}" style="accent-color: var(--primary-color);"> Class ${i}
-                                </label>
-                            `);
-                        }
-                    </script>
-                </div>
+                <input id="cls" placeholder="Class">
             </div>
 
             <div class="creative-input-group">
-                <input id="receiptNo" type="number" placeholder="Receipt / Reference Number">
-                <input id="payDate" type="date" placeholder="Payment Date">
+                <select id="type">
+                    <option value="" disabled selected>Select category</option>
+                    <option value="Drawing">Drawing / Visual Art</option>
+                    <option value="Story">Story / Literary Work</option>
+                    <option value="Poem">Poem</option>
+                    <option value="Other">Other Creation</option>
+                </select>
+                <input id="title" placeholder="Title">
             </div>
 
-            <textarea id="content" placeholder="Remarks / Payment Details (optional)" rows="3"></textarea>
+            <textarea id="content" placeholder="Story / Message" rows="5"></textarea>
 
             <div
                 style="margin-top: 15px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
                 <label for="file"
                     style="display: block; color: var(--primary-color); font-size: 0.95rem; margin-bottom: 10px; font-weight: 600;">
-                    <i class="ph ph-image"></i> Upload Receipt Image (Max 200KB)
+                    <i class="ph ph-image"></i> Upload Image (optional) (Max 200KB)
                 </label>
                 <input type="file" id="file" accept="image/*"
                     style="padding: 0; background: transparent; border: none; margin: 0;"
@@ -111,7 +100,7 @@
                 }
             </script>
 
-            <button onclick="submitWork()">Submit Receipt</button>
+            <button onclick="submitWork()">Submit for Review</button>
             <div id="status-msg" class="submission-status"></div>
         </div>
     </section>
@@ -130,26 +119,10 @@
     <!-- ================= ADMIN PANEL ================= -->
     <section id="adminPanel" class="hidden">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-            <h2>🛠 Fee Verification Panel</h2>
-            <div style="display: flex; gap: 10px;">
-                <a href="restored_pages/creative.html#adminLoginSection" class="btn-secondary"
-                    style="padding: 10px 20px; text-decoration: none; font-size: 0.9rem;">Manage Creative
-                    Submissions</a>
-                <button onclick="logout()"
-                    style="width: auto; padding: 10px 20px; margin: 0; background: #ff4444;">Logout</button>
-            </div>
+            <h2>🛠 Admin Approval Panel</h2>
+            <button onclick="logout()"
+                style="width: auto; padding: 10px 20px; margin: 0; background: #ff4444;">Logout</button>
         </div>
-
-        <div style="margin-bottom: 20px;">
-            <select id="admin-class-filter" onchange="renderAdmin(this.value === 'all' ? null : this.value)"
-                style="padding: 10px; border-radius: 8px; background: #222; color: #fff; border: 1px solid #444;">
-                <option value="all">Filter by Class: All</option>
-                <script>
-                    for (let i = 1; i <= 12; i++) document.write(`<option value="${i}">Class ${i}</option>`);
-                </script>
-            </select>
-        </div>
-
         <div class="grid" id="pending"></div>
     </section>
 
@@ -167,19 +140,19 @@
                 <div>
                     <h4 style="color: #fff; margin-bottom: 20px;">Quick Links</h4>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 12px;"><a href="index.html#about"
+                        <li style="margin-bottom: 12px;"><a href="../index.html#about"
                                 style="color: #888; text-decoration: none; transition: 0.3s;"
                                 onmouseover="this.style.color='var(--primary-color)'"
                                 onmouseout="this.style.color='#888'">About Us</a></li>
-                        <li style="margin-bottom: 12px;"><a href="index.html#booking"
+                        <li style="margin-bottom: 12px;"><a href="../index.html#booking"
                                 style="color: #888; text-decoration: none; transition: 0.3s;"
                                 onmouseover="this.style.color='var(--primary-color)'"
                                 onmouseout="this.style.color='#888'">Book Tuition</a></li>
-                        <li style="margin-bottom: 12px;"><a href="exam_result.html"
+                        <li style="margin-bottom: 12px;"><a href="../exam_result.html"
                                 style="color: #888; text-decoration: none; transition: 0.3s;"
                                 onmouseover="this.style.color='var(--primary-color)'"
                                 onmouseout="this.style.color='#888'">Exam Results</a></li>
-                        <li style="margin-bottom: 12px;"><a href="index.html#gallery"
+                        <li style="margin-bottom: 12px;"><a href="../index.html#gallery"
                                 style="color: #888; text-decoration: none; transition: 0.3s;"
                                 onmouseover="this.style.color='var(--primary-color)'"
                                 onmouseout="this.style.color='#888'">Gallery</a></li>
@@ -196,7 +169,8 @@
                     <h4 style="color: #fff; margin-bottom: 20px;">Enroll Now</h4>
                     <p style="color: #888; margin-bottom: 20px; line-height: 1.6;">Start your learning journey with us
                         today!</p>
-                    <a href="index.html#booking" class="btn btn-primary" style="display: inline-block;">Book a Tuition
+                    <a href="../index.html#booking" class="btn btn-primary" style="display: inline-block;">Book a
+                        Tuition
                         Session</a>
                 </div>
             </div>
@@ -208,11 +182,11 @@
 
     <nav class="bottom-nav">
         <div class="bottom-nav-container">
-            <a href="index.html#hero" class="nav-item">
+            <a href="../index.html#hero" class="nav-item">
                 <i class="ph ph-house"></i>
                 <span>Home</span>
             </a>
-            <a href="creations.html" class="nav-item">
+            <a href="../creations.html" class="nav-item">
                 <i class="ph ph-paint-brush"></i>
                 <span>Creations</span>
             </a>
@@ -220,23 +194,23 @@
                 <i class="ph ph-palette"></i>
                 <span>Corner</span>
             </a>
-            <a href="photos.html" class="nav-item">
+            <a href="../photos.html" class="nav-item">
                 <i class="ph ph-image"></i>
                 <span>Gallery</span>
             </a>
-            <a href="index.html#booking" class="btn-book-nav">
+            <a href="../index.html#booking" class="btn-book-nav">
                 <i class="ph ph-calendar-plus"></i>
                 Book Tuition
             </a>
-            <a href="result.html" class="nav-item">
+            <a href="../result.html" class="nav-item">
                 <i class="ph ph-exam"></i>
                 <span>Result</span>
             </a>
-            <a href="portal.html" class="nav-item">
+            <a href="../portal.html" class="nav-item">
                 <i class="ph ph-user-circle"></i>
                 <span>Portal</span>
             </a>
-            <a href="index.html#contact" class="nav-item">
+            <a href="../index.html#contact" class="nav-item">
                 <i class="ph ph-chat-circle"></i>
                 <span>Contact</span>
             </a>
@@ -265,13 +239,13 @@
                 <div>
                     <h4 style="color: #fff; margin-bottom: 25px;">Quick Links</h4>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 12px;"><a href="index.html#hero"
+                        <li style="margin-bottom: 12px;"><a href="../index.html#hero"
                                 style="color: #888; transition: 0.3s;">Home</a></li>
-                        <li style="margin-bottom: 12px;"><a href="result.html"
+                        <li style="margin-bottom: 12px;"><a href="../result.html"
                                 style="color: #888; transition: 0.3s;">Results</a></li>
-                        <li style="margin-bottom: 12px;"><a href="creations.html"
+                        <li style="margin-bottom: 12px;"><a href="../creations.html"
                                 style="color: #888; transition: 0.3s;">Creations</a></li>
-                        <li style="margin-bottom: 12px;"><a href="portal.html"
+                        <li style="margin-bottom: 12px;"><a href="../portal.html"
                                 style="color: #888; transition: 0.3s;">Admin
                                 Access</a></li>
                     </ul>
@@ -284,35 +258,33 @@
             </div>
             <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 30px; text-align: center;">
                 <p style="color: #444; font-size: 0.85rem;">© 2026 MHMV. All rights reserved.</p>
-                <a href="portal.html"
+                <a href="../portal.html"
                     style="color: #222; font-size: 0.7rem; text-decoration: none; margin-top: 10px; display: inline-block;">Platform
                     Administration</a>
             </div>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="../script.js"></script>
     <script>
         // ===== ADMIN CREDENTIALS =====
         const ADMIN_EMAIL = "123v213@gmail.com";
         const ADMIN_PASS = "@#asd123";
 
         // ===== STORAGE =====
-        // Key is 'fee_receipts' to avoid conflict with old creative works, or user can clear local storage
-        let works = JSON.parse(localStorage.getItem("fee_receipts") || "[]");
+        let works = JSON.parse(localStorage.getItem("works") || "[]");
 
         // ===== SUBMIT =====
         function submitWork() {
             const nameEl = document.getElementById("name");
-            const clsEn = document.querySelector('input[name="cls"]:checked');
-            const receiptNoEl = document.getElementById("receiptNo");
-            const payDateEl = document.getElementById("payDate");
+            const clsEl = document.getElementById("cls");
+            const titleEl = document.getElementById("title");
             const contentEl = document.getElementById("content");
             const file = document.getElementById("file").files[0];
             const statusMsg = document.getElementById("status-msg");
 
-            if (!nameEl.value || !clsEn || !receiptNoEl.value || !payDateEl.value || !file) {
-                alert("Please fill in Name, Class, Receipt No, Date and upload an Image.");
+            if (!nameEl.value || !clsEl.value || !titleEl.value) {
+                alert("Please fill in Name, Class, and Title.");
                 return;
             }
 
@@ -321,23 +293,22 @@
             reader.onload = () => {
                 works.push({
                     name: nameEl.value,
-                    cls: clsEn.value,
-                    receiptNo: receiptNoEl.value,
-                    date: payDateEl.value,
+                    cls: clsEl.value,
+                    type: document.getElementById("type").value,
+                    title: titleEl.value,
                     content: contentEl.value,
-                    img: reader.result || "", // Base64 image
+                    img: reader.result || "",
                     approved: false,
-                    submittedAt: new Date().toLocaleString()
+                    date: new Date().toLocaleDateString()
                 });
-                localStorage.setItem("fee_receipts", JSON.stringify(works));
-                statusMsg.innerHTML = "✅ Receipt Submitted! Waiting for verification.";
+                localStorage.setItem("works", JSON.stringify(works));
+                statusMsg.innerHTML = "✅ Submitted! Waiting for teacher approval.";
                 statusMsg.style.color = "var(--primary-color)";
 
                 // Reset form
                 nameEl.value = "";
-                document.querySelectorAll('input[name="cls"]').forEach(r => r.checked = false);
-                receiptNoEl.value = "";
-                payDateEl.value = "";
+                clsEl.value = "";
+                titleEl.value = "";
                 contentEl.value = "";
                 document.getElementById("file").value = "";
 
@@ -347,9 +318,7 @@
             };
 
             if (file) reader.readAsDataURL(file);
-            else {
-                alert("Please upload a receipt image.");
-            }
+            else reader.onload();
         }
 
         // ===== ADMIN LOGIN =====
@@ -359,7 +328,10 @@
 
             if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
                 sessionStorage.setItem("admin", "true");
-                window.location.href = "admin_dashboard.html";
+                document.getElementById("adminPanel").classList.remove("hidden");
+                document.getElementById("adminLoginSection").classList.add("hidden");
+                renderAdmin();
+                window.scrollTo(0, document.getElementById("adminPanel").offsetTop - 100);
             } else {
                 alert("Wrong credentials");
             }
@@ -371,58 +343,79 @@
         }
 
         // ===== ADMIN VIEW =====
-        function renderAdmin(filterClass = null) {
+        function renderAdmin() {
             const pending = document.getElementById("pending");
             pending.innerHTML = "";
             let count = 0;
 
             works.forEach((w, i) => {
-                // Show if NOT approved AND matches filter (if any)
-                // OR show ALL? User said "View submissions". Usually admin wants to see pending. 
-                // Let's show all pending first.
-                if (!w.approved && (!filterClass || w.cls == filterClass)) {
+                if (!w.approved) {
                     count++;
                     pending.innerHTML += `
                     <div class="card creation-card">
-                        <span style="background: var(--primary-color); color: #000; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: 700;">Class ${w.cls}</span>
-                        <h4 style="margin: 15px 0 5px;">Receipt #${w.receiptNo}</h4>
-                        <p style="color: #888; font-size: 0.9rem; margin-bottom: 5px;">${w.name}</p>
-                        <p style="color: #666; font-size: 0.8rem; margin-bottom: 15px;">Date: ${w.date}</p>
-                        ${w.img ? `<img src="${w.img}" onclick="window.open(this.src)" style="cursor:pointer; max-height: 200px; object-fit: contain;">` : ``}
-                        <p style="font-size: 0.95rem; line-height: 1.5; color: #ccc; margin-top: 10px;">Remarks: ${w.content || 'None'}</p>
+                        <span style="background: var(--primary-color); color: #000; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: 700;">${w.type}</span>
+                        <h4 style="margin: 15px 0 5px;">${w.title}</h4>
+                        <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">${w.name} – Class ${w.cls}</p>
+                        ${w.img ? `<img src="${w.img}">` : ``}
+                        <p style="font-size: 0.95rem; line-height: 1.5; color: #ccc;">${w.content}</p>
                         <div style="display: flex; gap: 10px; margin-top: 20px;">
                             <button onclick="approve(${i})" style="flex: 2; margin: 0;">Approve ✅</button>
-                            <button onclick="reject(${i})" style="flex: 1; margin: 0; background: #333; color: #ff4444;">Reject 🗑️</button>
+                            <button onclick="reject(${i})" style="flex: 1; margin: 0; background: #333; color: #ff4444;">Delete 🗑️</button>
                         </div>
                     </div>`;
                 }
             });
 
             if (count === 0) {
-                pending.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #666;'>No pending receipts found.</p>";
+                pending.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #666;'>No pending submissions.</p>";
             }
         }
 
         // ===== APPROVE =====
         function approve(i) {
             works[i].approved = true;
-            localStorage.setItem("fee_receipts", JSON.stringify(works));
-            const clsFilter = document.getElementById('admin-class-filter')?.value || null;
-            renderAdmin(clsFilter === "all" ? null : clsFilter);
-            alert("Receipt Verified & Approved!");
+            localStorage.setItem("works", JSON.stringify(works));
+            renderAdmin();
+            renderGallery();
         }
 
         // ===== REJECT/DELETE =====
         function reject(i) {
-            if (confirm("Are you sure you want to reject/delete this receipt?")) {
+            if (confirm("Are you sure you want to delete this submission?")) {
                 works.splice(i, 1);
-                localStorage.setItem("fee_receipts", JSON.stringify(works));
-                const clsFilter = document.getElementById('admin-class-filter')?.value || null;
-                renderAdmin(clsFilter === "all" ? null : clsFilter);
+                localStorage.setItem("works", JSON.stringify(works));
+                renderAdmin();
             }
         }
 
+        // ===== PUBLIC GALLERY =====
+        function renderGallery() {
+            const gallery = document.getElementById("gallery");
+            gallery.innerHTML = "";
+            const approvedWorks = works.filter(w => w.approved);
+
+            if (approvedWorks.length === 0) {
+                gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #666;'>No approved creations yet. Be the first to submit!</p>";
+                return;
+            }
+
+            approvedWorks.forEach(w => {
+                gallery.innerHTML += `
+                <div class="card creation-card animate-fade-up">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <span style="background: rgba(0, 243, 255, 0.1); color: var(--primary-color); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: 700;">${w.type}</span>
+                        <span style="color: #555; font-size: 0.8rem;">${w.date || ''}</span>
+                    </div>
+                    <h3 style="margin-bottom: 5px; color: #fff;">${w.title}</h3>
+                    <p style="color: var(--primary-color); font-size: 0.9rem; margin-bottom: 20px;">By ${w.name} (Class ${w.cls})</p>
+                    ${w.img ? `<img src="${w.img}">` : ``}
+                    <p style="font-size: 1rem; line-height: 1.6; color: #bbb;">${w.content}</p>
+                </div>`;
+            });
+        }
+
         // ===== INIT =====
+        renderGallery();
         if (sessionStorage.getItem("admin") === "true") {
             document.getElementById("adminPanel").classList.remove("hidden");
             document.getElementById("adminLoginSection").classList.add("hidden");

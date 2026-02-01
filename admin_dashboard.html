@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MHMV 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* Dashboard Specific Styles */
+        :root {
+            --dashboard-sidebar-width: 280px;
+        }
+
+        body {
+            background-color: #050505;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(0, 243, 255, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(188, 19, 254, 0.1) 0px, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--dashboard-sidebar-width);
+            background: rgba(10, 10, 10, 0.95);
+            border-right: 1px solid var(--glass-border);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            color: #888;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(0, 243, 255, 0.08);
+            color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.05);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--dashboard-sidebar-width);
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .date-display {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            opacity: 0.2;
+            color: var(--primary-color);
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .filter-select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 15px;
+            color: #666;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .data-table td {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 20px 15px;
+            color: #ddd;
+            font-size: 0.95rem;
+        }
+
+        .data-table tr td:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        .data-table tr td:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 165, 0, 0.1);
+            color: orange;
+        }
+
+        .status-badge.approved {
+            background: rgba(46, 213, 115, 0.1);
+            color: #2ed573;
+        }
+
+        /* Mobile */
+        .mobile-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ph-fill ph-circles-three-plus"></i>
+            ADMIN PANEL
+        </div>
+        <nav>
+            <div class="nav-item active" onclick="switchPanel('overview', this)">
+                <i class="ph ph-squares-four"></i>
+                Overview
+            </div>
+            <div class="nav-item" onclick="switchPanel('fee', this)">
+                <i class="ph ph-receipt"></i>
+                Fee Verification
+            </div>
+            <div class="nav-item" onclick="switchPanel('creative', this)">
+                <i class="ph ph-paint-brush"></i>
+                Creative Corner
+            </div>
+
+            <div onclick="logout()" class="nav-item" style="margin-top: auto; color: #ff4444;">
+                <i class="ph ph-sign-out"></i>
+                Logout
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header-bar">
+            <div class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('active')">
+                <i class="ph ph-list"></i>
+            </div>
+            <div>
+                <h2 style="font-size: 1.8rem; margin-bottom: 5px;">Dashboard</h2>
+                <div class="date-display" id="date-display">Today</div>
+            </div>
+            <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600; color: #fff;">Admin User</div>
+                    <div style="font-size: 0.8rem; color: #666;">Administrator</div>
+                </div>
+                <div
+                    style="width: 45px; height: 45px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #000;">
+                    A
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. OVERVIEW PANEL -->
+        <div id="overview" class="panel active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="ph ph-receipt stat-icon"></i>
+                    <div class="stat-value" id="total-receipts">0</div>
+                    <div class="stat-label">Total Fee Receipts</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(188, 19, 254, 0.3);">
+                    <i class="ph ph-paint-brush stat-icon" style="color: var(--secondary-color);"></i>
+                    <div class="stat-value" id="total-creations">0</div>
+                    <div class="stat-label">Creative Submissions</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(255, 165, 0, 0.3);">
+                    <i class="ph ph-clock stat-icon" style="color: orange;"></i>
+                    <div class="stat-value" id="pending-approvals">0</div>
+                    <div class="stat-label">Pending Approvals</div>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 20px; font-size: 1.2rem;">Quick Actions Needed</h3>
+            <div id="quick-actions-list" style="display: grid; gap: 15px;">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+
+        <!-- 2. FEE VERIFICATION PANEL -->
+        <div id="fee" class="panel">
+            <div class="panel-header">
+                <h3>Fee Receipt Verification</h3>
+                <select class="filter-select" onchange="renderFeeTable(this.value)">
+                    <option value="all">All Classes</option>
+                    <option value="pending">Pending Only</option>
+                    <script>
+                        for (let i = 1; i <= 12; i++) document.write(`<option value="${i}">Class ${i}</option>`);
+                    </script>
+                </select>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Ref No.</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Proof</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fee-table-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. CREATIVE APPROVAL PANEL -->
+        <div id="creative" class="panel">
+            <div class="panel-header">
+                <h3>Creative Submissions</h3>
+                <div style="display: flex; gap: 15px;">
+                    <button class="btn-primary" onclick="window.open('restored_pages/creative.html', '_blank')"
+                        style="font-size: 0.8rem;">View Public Page</button>
+                    <select class="filter-select" onchange="renderCreativeTable(this.value)">
+                        <option value="all">All Items</option>
+                        <option value="pending">Pending Only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid" id="creative-grid"
+                style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; display: grid;">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Image Review Modal -->
+    <div id="img-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; flex-direction: column;">
+        <img id="modal-img-src" src=""
+            style="max-height: 80vh; max-width: 90%; border-radius: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
+        <button onclick="document.getElementById('img-modal').style.display='none'"
+            style="margin-top: 20px; padding: 10px 30px; background: #333; color: #fff; border: none; border-radius: 50px; cursor: pointer;">Close</button>
+    </div>
+
+    <script>
+        // INIT DATE
+        document.getElementById('date-display').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        // LOAD DATA
+        let feeReceipts = JSON.parse(localStorage.getItem("fee_receipts") || "[]");
+        let creations = JSON.parse(localStorage.getItem("works") || "[]");
+
+        function saveData() {
+            localStorage.setItem("fee_receipts", JSON.stringify(feeReceipts));
+            localStorage.setItem("works", JSON.stringify(creations));
+            updateStats();
+        }
+
+        // NAVIGATION
+        function switchPanel(panelId, el) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+
+            if (el) {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            if (window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+
+            if (panelId === 'fee') renderFeeTable();
+            if (panelId === 'creative') renderCreativeTable();
+        }
+
+        // STATS
+        function updateStats() {
+            document.getElementById('total-receipts').textContent = feeReceipts.length;
+            document.getElementById('total-creations').textContent = creations.length;
+
+            const pReceipts = feeReceipts.filter(r => !r.approved).length;
+            const pCreations = creations.filter(c => !c.approved).length;
+            document.getElementById('pending-approvals').textContent = pReceipts + pCreations;
+
+            // Update Quick Actions
+            const qaList = document.getElementById('quick-actions-list');
+            qaList.innerHTML = '';
+            if (pReceipts > 0) qaList.innerHTML += `<div style="background: rgba(255, 165, 0, 0.1); color: orange; padding: 15px; border-radius: 10px; border: 1px dashed orange;">${pReceipts} New Fee Receipts needing verification. <b onclick="switchPanel('fee')" style="cursor: pointer; text-decoration: underline;">View</b></div>`;
+            if (pCreations > 0) qaList.innerHTML += `<div style="background: rgba(188, 19, 254, 0.1); color: var(--secondary-color); padding: 15px; border-radius: 10px; border: 1px dashed var(--secondary-color);">${pCreations} Creative submissions pending. <b onclick="switchPanel('creative')" style="cursor: pointer; text-decoration: underline;">View</b></div>`;
+            if (pReceipts === 0 && pCreations === 0) qaList.innerHTML = `<div style="color: #666; font-style: italic;">All clear! No pending actions.</div>`;
+        }
+
+        // RENDER FEE TABLE
+        function renderFeeTable(filter = 'all') {
+            const tbody = document.getElementById('fee-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = feeReceipts.filter(item => {
+                if (filter === 'all') return true;
+                if (filter === 'pending') return !item.approved;
+                return item.cls == filter;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #666;">No data found</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((r, idx) => {
+                // Find original index
+                const originalIdx = feeReceipts.indexOf(r);
+
+                tbody.innerHTML += `
+                <tr>
+                    <td>
+                        <div style="font-weight: 600; color: #fff;">${r.name}</div>
+                    </td>
+                    <td>Class ${r.cls}</td>
+                    <td style="font-family: monospace; color: #888;">#${r.receiptNo}</td>
+                    <td>${r.date || 'N/A'}</td>
+                    <td>
+                        <span class="status-badge ${r.approved ? 'approved' : 'pending'}">
+                            ${r.approved ? 'Verified' : 'Pending'}
+                        </span>
+                    </td>
+                    <td>
+                        ${r.img ? `<button onclick="viewImage('${r.img}')" style="background: none; border: 1px solid #444; color: #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer;">View Proof</button>` : '<span style="color: #444;">No Img</span>'}
+                    </td>
+                    <td>
+                        ${!r.approved ?
+                        `<div style="display: flex; gap: 5px;">
+                                <button onclick="approveFee(${originalIdx})" style="background: var(--primary-color); border: none; width: 30px; height: 30px; border-radius: 50%; color: #000; cursor: pointer;" title="Approve"><i class="ph-bold ph-check"></i></button>
+                                <button onclick="rejectFee(${originalIdx})" style="background: #333; border: none; width: 30px; height: 30px; border-radius: 50%; color: #ff4444; cursor: pointer;" title="Reject"><i class="ph-bold ph-trash"></i></button>
+                            </div>` :
+                        `<span style="color: #444;">Approved</span>`
+                    }
+                    </td>
+                </tr>`;
+            });
+        }
+
+        // RENDER CREATIVE GRID
+        function renderCreativeTable(filter = 'all') {
+            const grid = document.getElementById('creative-grid');
+            grid.innerHTML = '';
+
+            const filtered = creations.filter(item => {
+                if (filter === 'all') return true;
+                if (filter === 'pending') return !item.approved;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; color: #666; text-align: center;">No items found.</p>`;
+                return;
+            }
+
+            filtered.forEach((c, idx) => {
+                const originalIdx = creations.indexOf(c);
+
+                grid.innerHTML += `
+                <div style="background: #111; border: 1px solid #333; border-radius: 12px; overflow: hidden;">
+                    ${c.img ? `<div style="height: 150px; overflow: hidden;"><img src="${c.img}" style="width: 100%; height: 100%; object-fit: cover;"></div>` : ''}
+                    <div style="padding: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                             <span style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary-color); font-weight: 700;">${c.type}</span>
+                             <span class="status-badge ${c.approved ? 'approved' : 'pending'}">${c.approved ? 'Live' : 'Pending'}</span>
+                        </div>
+                        <h4 style="margin-bottom: 5px; color: #fff;">${c.title}</h4>
+                        <p style="font-size: 0.8rem; color: #888; margin-bottom: 15px;">By ${c.name} (Class ${c.cls})</p>
+                        
+                        ${!c.approved ?
+                        `<div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button onclick="approveCreative(${originalIdx})" style="flex: 1; padding: 8px; background: var(--primary-color); border: none; border-radius: 5px; font-weight: 600; cursor: pointer;">Approve</button>
+                                <button onclick="rejectCreative(${originalIdx})" style="flex: 1; padding: 8px; background: #333; color: #ff4444; border: none; border-radius: 5px; cursor: pointer;">Reject</button>
+                            </div>` :
+                        '<button onclick="rejectCreative(' + originalIdx + ')" style="width: 100%; padding: 8px; background: #222; color: #ff4444; border: none; border-radius: 5px; cursor: pointer;">Delete / Revoke</button>'
+                    }
+                    </div>
+                </div>`;
+            });
+        }
+
+        // ACTIONS
+        function approveFee(idx) {
+            if (confirm("Verify this receipt?")) {
+                feeReceipts[idx].approved = true;
+                saveData();
+                renderFeeTable();
+            }
+        }
+
+        function rejectFee(idx) {
+            if (confirm("Delete this receipt submission permanently?")) {
+                feeReceipts.splice(idx, 1);
+                saveData();
+                renderFeeTable();
+            }
+        }
+
+        function approveCreative(idx) {
+            creations[idx].approved = true;
+            saveData();
+            renderCreativeTable();
+        }
+
+        function rejectCreative(idx) {
+            if (confirm("Remove this creation?" + (creations[idx].approved ? " It is currently public." : ""))) {
+                creations.splice(idx, 1);
+                saveData();
+                renderCreativeTable();
+            }
+        }
+
+        function viewImage(src) {
+            document.getElementById('modal-img-src').src = src;
+            document.getElementById('img-modal').style.display = 'flex';
+        }
+
+        function logout() {
+            sessionStorage.removeItem("admin");
+            window.location.href = "index.html";
+        }
+
+        // AUTH CHECK
+        if (sessionStorage.getItem("admin") !== "true") {
+            // Simple redirect protection (client-side only as requested)
+            window.location.href = "creative.html#adminLoginSection";
+        }
+
+        // Initial Load
+        updateStats();
+        renderFeeTable('pending'); // Default view
+    </script>
+</body>
+
+</html>
