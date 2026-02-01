@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News CMS | Administrative Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --cms-primary: #00f3ff;
+            --cms-secondary: #bc13fe;
+            --cms-bg: #050508;
+            --cms-glass: rgba(255, 255, 255, 0.03);
+            --cms-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--cms-bg);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cms-header {
+            padding: 20px 40px;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--cms-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .cms-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2px;
+            flex: 1;
+            background: var(--cms-border);
+        }
+
+        @media (max-width: 1100px) {
+            .cms-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Forms Section */
+        .cms-panel {
+            background: var(--cms-bg);
+            padding: 40px;
+            overflow-y: auto;
+            max-height: calc(100vh - 80px);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cms-input,
+        .cms-textarea,
+        .cms-select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--cms-border);
+            padding: 15px;
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .cms-input:focus,
+        .cms-textarea:focus {
+            border-color: var(--cms-primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        }
+
+        /* Rich Text Fake Editor */
+        .editor-toolbar {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--cms-border);
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .tool-btn {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .tool-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .editor-content {
+            min-height: 250px;
+            border-radius: 0 0 12px 12px;
+        }
+
+        /* Image Upload Box */
+        .upload-box {
+            border: 2px dashed var(--cms-border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .upload-box:hover {
+            border-color: var(--cms-primary);
+            background: rgba(0, 243, 255, 0.02);
+        }
+
+        .preview-img-container {
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            max-height: 200px;
+            display: none;
+        }
+
+        /* Controls */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .btn-cms {
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-cms-primary {
+            background: var(--cms-primary);
+            color: #000;
+        }
+
+        .btn-cms-secondary {
+            background: #222;
+            color: #fff;
+            border: 1px solid var(--cms-border);
+        }
+
+        .btn-cms-outline {
+            background: transparent;
+            border: 1px solid var(--cms-border);
+            color: #888;
+        }
+
+        .btn-cms:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* List Section */
+        .news-item {
+            background: var(--cms-glass);
+            border: 1px solid var(--cms-border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 20px;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .news-item:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .news-item-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+            background: #111;
+        }
+
+        .news-item-info {
+            flex: 1;
+        }
+
+        .status-tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-published {
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--cms-primary);
+        }
+
+        .status-draft {
+            background: rgba(255, 170, 0, 0.1);
+            color: #ffa500;
+        }
+
+        .news-item-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: 1px solid var(--cms-border);
+            color: #888;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .action-edit:hover {
+            color: var(--cms-primary);
+            border-color: var(--cms-primary);
+        }
+
+        .action-delete:hover {
+            color: #ff4444;
+            border-color: #ff4444;
+        }
+
+        /* Toast Notifications */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 30px;
+            border-radius: 10px;
+            background: #111;
+            border: 1px solid var(--cms-primary);
+            color: #fff;
+            transform: translateY(100px);
+            transition: 0.5s;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #toast.show {
+            transform: translateY(0);
+        }
+
+        /* JetEngine-style Preview Panel */
+        .preview-sticky {
+            position: sticky;
+            top: 100px;
+        }
+
+        .preview-card {
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--cms-border);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .preview-header {
+            height: 180px;
+            background: #111;
+            position: relative;
+        }
+
+        .preview-body {
+            padding: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="cms-header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="admin/dashboard.html" class="action-btn"><i class="ph ph-arrow-left"></i></a>
+            <div>
+                <h1 style="font-size: 1.2rem; font-weight: 700;">NEWS CMS</h1>
+                <p style="font-size: 0.8rem; color: #666;">JetEngine-style Management System</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 15px;">
+            <a href="news.html" target="_blank" class="btn-cms btn-cms-outline" style="padding: 10px 20px;">
+                <i class="ph ph-eye"></i> View Live
+            </a>
+            <button class="btn-cms btn-cms-primary" style="padding: 10px 20px;" onclick="location.reload()">
+                <i class="ph ph-arrows-clockwise"></i> Refresh
+            </button>
+        </div>
+    </header>
+
+    <div class="cms-layout">
+        <!-- FORM PANEL -->
+        <div class="cms-panel">
+            <h2 style="margin-bottom: 30px; font-size: 1.5rem;" id="form-title">Create New Article</h2>
+
+            <form id="news-form">
+                <input type="hidden" id="post-id">
+
+                <div class="form-group">
+                    <label class="form-label">Article Title</label>
+                    <input type="text" id="post-title" class="cms-input" placeholder="e.g. Admission Open for 2026"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Short Description</label>
+                    <textarea id="post-short" class="cms-textarea" style="height: 80px;" maxlength="150"
+                        placeholder="A brief summary for cards..."></textarea>
+                    <div style="text-align: right; font-size: 0.7rem; color: #666; margin-top: 5px;" id="char-count">
+                        0/150</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Full Content</label>
+                    <div class="editor-toolbar">
+                        <button type="button" class="tool-btn" title="Bold"><i class="ph ph-text-b"></i></button>
+                        <button type="button" class="tool-btn" title="Italic"><i class="ph ph-text-italic"></i></button>
+                        <button type="button" class="tool-btn" title="List"><i class="ph ph-list-bullets"></i></button>
+                        <button type="button" class="tool-btn" title="Link"><i class="ph ph-link"></i></button>
+                    </div>
+                    <textarea id="post-content" class="cms-textarea editor-content"
+                        placeholder="Write your full article using HTML or plain text..."></textarea>
+                </div>
+
+                <div class="cms-layout"
+                    style="background: none; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0;">
+                    <div class="form-group">
+                        <label class="form-label">Publication Date</label>
+                        <input type="date" id="post-date" class="cms-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select id="post-status" class="cms-select">
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Featured Image (Max 100KB)</label>
+                    <div class="upload-box" onclick="document.getElementById('post-image').click()">
+                        <i class="ph ph-cloud-arrow-up" style="font-size: 2rem; color: var(--cms-primary);"></i>
+                        <p style="margin-top: 10px; color: #888;">Click to upload image</p>
+                        <input type="file" id="post-image" hidden accept="image/*">
+                        <div class="preview-img-container" id="preview-img-container">
+                            <img src="" id="form-img-preview" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn-cms btn-cms-primary" id="publish-btn"
+                        onclick="saveData('published')">
+                        <i class="ph ph-paper-plane-tilt"></i> Publish Now
+                    </button>
+                    <button type="button" class="btn-cms btn-cms-secondary" onclick="saveData('draft')">
+                        <i class="ph ph-file-text"></i> Save Draft
+                    </button>
+                    <button type="button" class="btn-cms btn-cms-outline" onclick="resetForm()">
+                        <i class="ph ph-arrow-counter-clockwise"></i> Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- LIST & PREVIEW PANEL -->
+        <div class="cms-panel" style="background: rgba(0,0,0,0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="font-size: 1.5rem;">Article Management</h2>
+                <div style="position: relative;">
+                    <i class="ph ph-magnifying-glass"
+                        style="position: absolute; left: 15px; top: 18px; color: #666;"></i>
+                    <input type="text" class="cms-input" id="search-box" style="padding-left: 45px; height: 50px;"
+                        placeholder="Search news...">
+                </div>
+            </div>
+
+            <div id="posts-list">
+                <!-- Data will be loaded here -->
+            </div>
+
+            <!-- LIVE PREVIEW AREA -->
+            <div style="margin-top: 60px; border-top: 1px solid var(--cms-border); padding-top: 40px;">
+                <h3 style="margin-bottom: 25px; color: #666; font-size: 0.9rem; text-transform: uppercase;">Live Preview
+                    (Card View)</h3>
+                <div class="preview-sticky">
+                    <div class="preview-card" id="live-preview-card">
+                        <div class="preview-header" id="prev-img-bg">
+                            <div style="position: absolute; bottom: 15px; left: 20px; background: var(--cms-primary); color: #000; padding: 4px 12px; border-radius: 5px; font-weight: 700; font-size: 0.7rem;"
+                                id="prev-date">DATE</div>
+                        </div>
+                        <div class="preview-body">
+                            <h4 style="font-size: 1.2rem; margin-bottom: 15px;" id="prev-title">New Article Title</h4>
+                            <p style="color: #888; font-size: 0.9rem; line-height: 1.6;" id="prev-short">Your short
+                                description will appear here as a summary...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast">
+        <i class="ph ph-check-circle" style="color: var(--cms-primary); font-size: 1.5rem;"></i>
+        <span id="toast-msg">Success Message!</span>
+    </div>
+
+    <script type="module">
+        import { NewsService } from './news-service.js';
+
+        const newsService = new NewsService();
+        const form = document.getElementById('news-form');
+        const postsList = document.getElementById('posts-list');
+        const searchBox = document.getElementById('search-box');
+
+        // Initial Load
+        window.addEventListener('load', () => {
+            renderList();
+            resetForm();
+        });
+
+        // --- RENDER LIST ---
+        function renderList() {
+            const news = newsService.getAllNews();
+            const searchTerm = searchBox.value.toLowerCase();
+
+            const filtered = news.filter(n => n.title.toLowerCase().includes(searchTerm));
+
+            if (filtered.length === 0) {
+                postsList.innerHTML = `<div style="text-align: center; color: #444; padding: 50px;">No articles found.</div>`;
+                return;
+            }
+
+            postsList.innerHTML = filtered.map(item => `
+                <div class="news-item">
+                    <img src="${item.image || 'https://via.placeholder.com/150'}" class="news-item-img">
+                    <div class="news-item-info">
+                        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
+                            <span class="status-tag status-${item.status}">${item.status}</span>
+                            <span style="color: #666; font-size: 0.75rem;">${new Date(item.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <h4 style="margin-bottom: 5px;">${item.title}</h4>
+                        <p style="color: #888; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">${item.shortDescription}</p>
+                    </div>
+                    <div class="news-item-actions">
+                        <button class="action-btn action-edit" onclick="editPost('${item.id}')" title="Edit"><i class="ph ph-pencil"></i></button>
+                        <button class="action-btn action-delete" onclick="deletePost('${item.id}')" title="Delete"><i class="ph ph-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        searchBox.addEventListener('input', renderList);
+
+        // --- FORM LOGIC ---
+
+        // Image Handling with Compression
+        const imageInput = document.getElementById('post-image');
+        const imgPreview = document.getElementById('form-img-preview');
+        const imgContainer = document.getElementById('preview-img-container');
+        const prevBg = document.getElementById('prev-img-bg');
+        let currentCompressedBase64 = null;
+
+        imageInput.addEventListener('change', async (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                try {
+                    currentCompressedBase64 = await NewsService.compressImage(file);
+                    imgPreview.src = currentCompressedBase64;
+                    imgContainer.style.display = 'block';
+                    prevBg.style.backgroundImage = `url(${currentCompressedBase64})`;
+                    prevBg.style.backgroundSize = 'cover';
+                } catch (err) {
+                    showToast("Error compressing image", true);
+                }
+            }
+        });
+
+        // Live Preview Sync
+        const titleIn = document.getElementById('post-title');
+        const shortIn = document.getElementById('post-short');
+        const dateIn = document.getElementById('post-date');
+
+        titleIn.addEventListener('input', () => document.getElementById('prev-title').innerText = titleIn.value || "New Article Title");
+        shortIn.addEventListener('input', () => {
+            document.getElementById('prev-short').innerText = shortIn.value || "Your short description will appear here...";
+            document.getElementById('char-count').innerText = `${shortIn.value.length}/150`;
+        });
+        dateIn.addEventListener('change', () => {
+            if (dateIn.value) {
+                const d = new Date(dateIn.value);
+                document.getElementById('prev-date').innerText = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            }
+        });
+
+        // Global functions for editing/deleting
+        window.editPost = (id) => {
+            const item = newsService.getNewsById(id);
+            if (!item) return;
+
+            document.getElementById('form-title').innerText = "Edit Article";
+            document.getElementById('post-id').value = item.id;
+            document.getElementById('post-title').value = item.title;
+            document.getElementById('post-short').value = item.shortDescription;
+            document.getElementById('post-content').value = item.fullContent;
+            document.getElementById('post-date').value = item.date ? item.date.split('T')[0] : '';
+            document.getElementById('post-status').value = item.status || 'published';
+
+            if (item.image) {
+                currentCompressedBase64 = item.image;
+                imgPreview.src = item.image;
+                imgContainer.style.display = 'block';
+                prevBg.style.backgroundImage = `url(${item.image})`;
+                prevBg.style.backgroundSize = 'cover';
+            } else {
+                currentCompressedBase64 = null;
+                imgContainer.style.display = 'none';
+                prevBg.style.backgroundImage = 'none';
+            }
+
+            // Sync Preview
+            document.getElementById('prev-title').innerText = item.title;
+            document.getElementById('prev-short').innerText = item.shortDescription;
+            document.getElementById('publish-btn').innerHTML = '<i class="ph ph-check"></i> Update Article';
+
+            // Scroll to form
+            document.querySelector('.cms-panel').scrollTop = 0;
+        };
+
+        window.deletePost = (id) => {
+            if (confirm("Permanently delete this article? This cannot be undone.")) {
+                newsService.deleteNews(id);
+                renderList();
+                showToast("Article deleted permanently.");
+            }
+        };
+
+        window.saveData = async (statusOverride) => {
+            const id = document.getElementById('post-id').value;
+            const title = titleIn.value;
+            const short = shortIn.value;
+            const content = document.getElementById('post-content').value;
+            const date = dateIn.value;
+            const status = statusOverride || document.getElementById('post-status').value;
+
+            if (!title) { showToast("Please enter a title.", true); return; }
+
+            const data = {
+                id: id || null,
+                title,
+                shortDescription: short,
+                fullContent: content,
+                image: currentCompressedBase64,
+                date: date ? new Date(date).toISOString() : new Date().toISOString(),
+                status: status,
+                createdAt: id ? newsService.getNewsById(id).createdAt : new Date().toISOString()
+            };
+
+            try {
+                await newsService.saveNews(data);
+                showToast(id ? "Changes saved successfully!" : "Article published!");
+                resetForm();
+                renderList();
+            } catch (err) {
+                showToast(err.message, true);
+            }
+        };
+
+        window.resetForm = () => {
+            form.reset();
+            document.getElementById('post-id').value = '';
+            document.getElementById('form-title').innerText = "Create New Article";
+            document.getElementById('publish-btn').innerHTML = '<i class="ph ph-paper-plane-tilt"></i> Publish Now';
+            imgContainer.style.display = 'none';
+            currentCompressedBase64 = null;
+            prevBg.style.backgroundImage = 'none';
+
+            // Reset preview
+            document.getElementById('prev-title').innerText = "New Article Title";
+            document.getElementById('prev-short').innerText = "Your short description will appear here...";
+            document.getElementById('prev-date').innerText = "DATE";
+            document.getElementById('char-count').innerText = "0/150";
+        };
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            const m = document.getElementById('toast-msg');
+            m.innerText = msg;
+            t.style.borderColor = isError ? '#ff4444' : 'var(--cms-primary)';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+
+</html>
