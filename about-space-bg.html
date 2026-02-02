@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Outer Space Background</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+            background: #000000;
+        }
+
+        /* Canvas background layer */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: #000000;
+        }
+
+        /* Dark overlay for enhanced readability */
+        .dark-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+            pointer-events: none;
+        }
+
+        /* Content container */
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            line-height: 1.8;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 400;
+            color: #e0e0e0;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #d0d0d0;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+
+            .content {
+                padding: 60px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Canvas background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Dark overlay for readability -->
+    <div class="dark-overlay"></div>
+
+    <!-- Page content -->
+    <div class="content">
+        <h1>About Us</h1>
+
+        <div class="section">
+            <p>
+                Welcome to our institution, where we believe in nurturing minds and inspiring futures.
+                Our journey began with a simple vision: to create a learning environment that empowers
+                students to reach their full potential and become leaders of tomorrow.
+            </p>
+            <p>
+                Like the vast expanse of space, we believe in infinite possibilities. Every student
+                brings unique talents and perspectives that contribute to our vibrant community.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Our Vision</h2>
+            <p>
+                To be a beacon of excellence in education, fostering innovation, critical thinking,
+                and character development. We envision a future where our students become global
+                citizens who make meaningful contributions to society.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Our Mission</h2>
+            <p>
+                We are committed to providing world-class education that combines academic rigor
+                with holistic development. Our mission is to create an inclusive, supportive
+                environment where every student can thrive intellectually, emotionally, and socially.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Our Values</h2>
+            <p>
+                <strong>Excellence:</strong> We strive for the highest standards in everything we do,
+                continuously improving and innovating our educational approaches.
+            </p>
+            <p>
+                <strong>Integrity:</strong> We uphold honesty, transparency, and ethical conduct in
+                all our interactions and decisions.
+            </p>
+            <p>
+                <strong>Innovation:</strong> We embrace creativity and forward-thinking, preparing
+                our students for an ever-evolving world.
+            </p>
+            <p>
+                <strong>Community:</strong> We foster a sense of belonging, collaboration, and mutual
+                respect among students, faculty, and families.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Our History</h2>
+            <p>
+                Founded over two decades ago, our institution has grown from a small educational
+                initiative to a comprehensive learning center serving hundreds of students. Throughout
+                our journey, we have remained steadfast in our commitment to educational excellence
+                and student success.
+            </p>
+            <p>
+                Today, we continue to evolve, integrating modern teaching methodologies while
+                preserving the timeless values that have guided us from the beginning.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * OUTER SPACE BACKGROUND - CANVAS ANIMATION
+         * 
+         * Design Philosophy:
+         * - Subtle and calm, never distracting
+         * - Deep space aesthetic with soft star field
+         * - Gentle nebula gradients for depth
+         * - Extremely slow motion for professional feel
+         * - Optimized for performance on all devices
+         */
+
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        let width, height, dpr;
+        let stars = [];
+        let nebulaClouds = [];
+        let animationId;
+        let prefersReducedMotion = false;
+
+        // Check for reduced motion preference
+        const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        prefersReducedMotion = motionQuery.matches;
+
+        // Listen for changes to motion preference
+        motionQuery.addEventListener('change', (e) => {
+            prefersReducedMotion = e.matches;
+        });
+
+        /**
+         * Initialize canvas with proper device pixel ratio handling
+         * Ensures crisp rendering on high-DPI displays
+         */
+        function initCanvas() {
+            dpr = window.devicePixelRatio || 1;
+            width = window.innerWidth;
+            height = window.innerHeight;
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+
+            ctx.scale(dpr, dpr);
+        }
+
+        /**
+         * Star class - represents individual stars in the field
+         * Stars have subtle size variation and gentle twinkling
+         */
+        class Star {
+            constructor() {
+                this.reset();
+                // Randomize initial position for first render
+                this.y = Math.random() * height;
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = -10;
+                this.size = Math.random() * 1.5 + 0.3; // Small stars: 0.3 to 1.8px
+                this.opacity = Math.random() * 0.4 + 0.3; // Low contrast: 0.3 to 0.7
+                this.twinkleSpeed = Math.random() * 0.0005 + 0.0002; // Very slow twinkle
+                this.twinklePhase = Math.random() * Math.PI * 2;
+                // Extremely slow drift speed (10-30 seconds to cross screen)
+                this.speed = prefersReducedMotion ? 0 : (Math.random() * 0.05 + 0.02);
+            }
+
+            update(deltaTime) {
+                if (!prefersReducedMotion) {
+                    // Gentle downward drift
+                    this.y += this.speed * deltaTime * 0.06;
+
+                    // Subtle twinkling effect
+                    this.twinklePhase += this.twinkleSpeed * deltaTime;
+                }
+
+                // Reset star when it drifts off screen
+                if (this.y > height + 10) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                // Calculate twinkle opacity
+                const twinkle = Math.sin(this.twinklePhase) * 0.15;
+                const currentOpacity = Math.max(0.1, Math.min(0.8, this.opacity + twinkle));
+
+                ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        /**
+         * Nebula Cloud class - creates soft, subtle gradient clouds
+         * Adds depth and visual interest without overwhelming
+         */
+        class NebulaCloud {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.radius = Math.random() * 200 + 150; // 150-350px radius
+                this.opacity = Math.random() * 0.03 + 0.01; // Very subtle: 0.01 to 0.04
+                // Soft color palette: deep blues and purples
+                this.hue = Math.random() * 60 + 200; // 200-260 (blue to purple range)
+                this.driftX = prefersReducedMotion ? 0 : (Math.random() - 0.5) * 0.01;
+                this.driftY = prefersReducedMotion ? 0 : (Math.random() - 0.5) * 0.01;
+                this.pulseSpeed = Math.random() * 0.0003 + 0.0001;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+            }
+
+            update(deltaTime) {
+                if (!prefersReducedMotion) {
+                    // Extremely slow drift
+                    this.x += this.driftX * deltaTime * 0.06;
+                    this.y += this.driftY * deltaTime * 0.06;
+
+                    // Gentle pulsing
+                    this.pulsePhase += this.pulseSpeed * deltaTime;
+
+                    // Wrap around screen edges
+                    if (this.x < -this.radius) this.x = width + this.radius;
+                    if (this.x > width + this.radius) this.x = -this.radius;
+                    if (this.y < -this.radius) this.y = height + this.radius;
+                    if (this.y > height + this.radius) this.y = -this.radius;
+                }
+            }
+
+            draw() {
+                const pulse = Math.sin(this.pulsePhase) * 0.01;
+                const currentOpacity = this.opacity + pulse;
+
+                // Create radial gradient for soft nebula effect
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.radius
+                );
+
+                gradient.addColorStop(0, `hsla(${this.hue}, 70%, 50%, ${currentOpacity})`);
+                gradient.addColorStop(0.5, `hsla(${this.hue}, 60%, 40%, ${currentOpacity * 0.5})`);
+                gradient.addColorStop(1, `hsla(${this.hue}, 50%, 30%, 0)`);
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(
+                    this.x - this.radius,
+                    this.y - this.radius,
+                    this.radius * 2,
+                    this.radius * 2
+                );
+            }
+        }
+
+        /**
+         * Create initial star field
+         * Star count is optimized for performance on mobile devices
+         */
+        function createStars() {
+            stars = [];
+            // Fewer stars on mobile for better performance
+            const starCount = width < 768 ? 150 : width < 1200 ? 250 : 400;
+
+            for (let i = 0; i < starCount; i++) {
+                stars.push(new Star());
+            }
+        }
+
+        /**
+         * Create nebula clouds
+         * Limited count for performance
+         */
+        function createNebulae() {
+            nebulaClouds = [];
+            // 3-5 nebula clouds depending on screen size
+            const nebulaCount = width < 768 ? 3 : 5;
+
+            for (let i = 0; i < nebulaCount; i++) {
+                nebulaClouds.push(new NebulaCloud());
+            }
+        }
+
+        /**
+         * Animation loop with delta time for smooth, frame-rate independent motion
+         */
+        let lastTime = performance.now();
+
+        function animate(currentTime) {
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+
+            // Clear canvas with deep space background
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw nebula clouds first (background layer)
+            nebulaClouds.forEach(cloud => {
+                cloud.update(deltaTime);
+                cloud.draw();
+            });
+
+            // Draw stars on top
+            stars.forEach(star => {
+                star.update(deltaTime);
+                star.draw();
+            });
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        /**
+         * Handle window resize
+         * Debounced for performance
+         */
+        let resizeTimeout;
+        function handleResize() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                initCanvas();
+                createStars();
+                createNebulae();
+            }, 250);
+        }
+
+        /**
+         * Initialize and start animation
+         */
+        function init() {
+            initCanvas();
+            createStars();
+            createNebulae();
+            animate(performance.now());
+        }
+
+        // Event listeners
+        window.addEventListener('resize', handleResize);
+
+        // Start the animation when page loads
+        init();
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            cancelAnimationFrame(animationId);
+            window.removeEventListener('resize', handleResize);
+        });
+    </script>
+</body>
+
+</html>
