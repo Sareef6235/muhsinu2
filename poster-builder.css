@@ -24,30 +24,32 @@ body {
     overflow-x: hidden;
 }
 
-/* Header */
-.builder-header {
-    background: #fff;
-    border-bottom: 1px solid var(--border-color);
-    padding: 15px 30px;
+/* Toolbar (Below Fixed Nav) */
+.builder-toolbar {
+    background: rgba(15, 15, 15, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 10px 0;
     position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: var(--shadow);
+    top: 70px;
+    /* Below fixed site nav */
+    z-index: 900;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-.header-content {
+.builder-toolbar .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1920px;
-    margin: 0 auto;
 }
 
-.builder-header h1 {
-    font-size: 1.5rem;
+.builder-toolbar h1 {
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--primary-color);
+    margin: 0;
 }
+
 
 .header-actions {
     display: flex;
@@ -103,19 +105,24 @@ body {
 .builder-container {
     display: grid;
     grid-template-columns: 300px 1fr 320px;
-    height: calc(100vh - 70px);
+    height: calc(100vh - 130px);
+    /* Height minus nav and toolbar */
     max-width: 1920px;
     margin: 0 auto;
 }
 
+
 /* Template Sidebar */
 .template-sidebar {
-    background: #fff;
-    border-right: 1px solid var(--border-color);
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(15px);
+    border-right: 1px solid var(--glass-border);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    color: #fff;
 }
+
 
 .sidebar-header {
     padding: 20px;
@@ -181,14 +188,15 @@ body {
 }
 
 .template-card {
-    background: #fff;
-    border: 2px solid var(--border-color);
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
     padding: 15px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s ease;
     position: relative;
 }
+
 
 .template-card:hover {
     border-color: var(--primary-color);
@@ -315,13 +323,15 @@ body {
 }
 
 .preview-header {
-    background: #fff;
+    background: rgba(15, 15, 15, 0.9);
     padding: 15px 20px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--glass-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: #fff;
 }
+
 
 .preview-header h3 {
     font-size: 1.1rem;
@@ -371,12 +381,15 @@ body {
 
 /* Customization Sidebar */
 .customization-sidebar {
-    background: #fff;
-    border-left: 1px solid var(--border-color);
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(15px);
+    border-left: 1px solid var(--glass-border);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    color: #fff;
 }
+
 
 .customization-panels {
     flex: 1;
@@ -476,10 +489,11 @@ body {
 }
 
 .panel-tab.active {
-    background: #fff;
+    background: rgba(0, 243, 255, 0.1);
     color: var(--primary-color);
     border-top: 3px solid var(--primary-color);
 }
+
 
 /* Modal */
 .modal {

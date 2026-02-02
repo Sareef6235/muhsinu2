@@ -5,25 +5,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poster Builder - Create Beautiful Posters & Notices</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="poster-builder.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;700;800&family=Poppins:wght@300;400;600;700;800&display=swap"
         rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
 
 <body>
     <!-- Header -->
-    <header class="builder-header">
-        <div class="header-content">
+    <header id="main-header">
+        <nav class="container">
+            <a href="index.html#hero" class="logo">MHMV 2026.</a>
+            <ul class="nav-links">
+                <li><a href="index.html#hero">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li class="dropdown">
+                    <a href="gallery.html" class="dropdown-toggle">Gallery</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
+                        <li><a href="gallery.html?tab=video">Video Gallery</a></li>
+                    </ul>
+                </li>
+                <li><a href="poster-builder.html" style="font-weight: 600;">poster builder <span
+                            style="font-size: 0.7em; background: var(--primary-color); color: #000; padding: 2px 4px; border-radius: 4px; margin-left: 5px;">NEW</span></a>
+                </li>
+                <li><a href="poster-builder-guide.html">Builder Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Student Zone</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="creative.html">Fee Payment</a></li>
+                        <li><a href="creation_receipt.html">Approved Receipts</a></li>
+                        <li><a href="creations.html">Creations</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Result</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="result.html">Exam Result (New)</a></li>
+                        <li><a href="exam_result.html">Exam Result (Old)</a></li>
+                    </ul>
+                </li>
+                <li><a href="student_dashboard.html">Student Dashboard</a></li>
+                <li><a href="booking.html" style="color: #00f3ff;">Booking</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Portal</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="admin/dashboard.html">Portal</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <button class="mobile-menu-btn" aria-label="Toggle navigation">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Builder Toolbar (New sticky header for actions) -->
+    <div class="builder-toolbar">
+        <div class="header-content container">
             <h1>🎨 Poster Builder</h1>
             <div class="header-actions">
                 <button id="save-design-btn" class="btn btn-secondary">💾 Save</button>
                 <button id="export-menu-btn" class="btn btn-primary">📥 Export</button>
             </div>
         </div>
-    </header>
+    </div>
+
 
     <!-- Main Builder Layout -->
     <div class="builder-container">
@@ -189,8 +242,10 @@
 
     <!-- Scripts -->
     <!-- Scripts -->
+    <script src="site-nav.js"></script>
     <script src="poster-templates.js"></script>
     <script src="poster-builder.js"></script>
 </body>
+
 
 </html>
