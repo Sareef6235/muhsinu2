@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation | MHMV 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            background-color: #050505;
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+
+        .confirmation-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .success-hero {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(46, 213, 115, 0.1);
+            color: #2ed573;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 20px;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+            box-shadow: 0 0 30px rgba(46, 213, 115, 0.2);
+        }
+
+        .summary-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+
+        .booking-id {
+            color: #666;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .subject-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            color: #ccc;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .subject-row:last-child {
+            border-bottom: none;
+        }
+
+        .total-row {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .total-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .payment-section {
+            text-align: center;
+            margin-top: 50px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 24px;
+            border: 1px dashed var(--glass-border);
+        }
+
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            background: #fff;
+            margin: 0 auto 25px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            padding: 10px;
+        }
+
+        .qr-placeholder img {
+            max-width: 100%;
+        }
+
+        .btn-done {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 40px;
+            background: var(--primary-gradient);
+            color: #000;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            margin-top: 30px;
+            transition: 0.3s;
+        }
+
+        .btn-done:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="confirmation-container">
+        <div class="success-hero animate-fade-up">
+            <div class="success-icon">
+                <i class="ph-fill ph-check-circle"></i>
+            </div>
+            <h1 style="font-size: 2.5rem; color: #fff; margin-bottom: 10px;">Booking Confirmed!</h1>
+            <p style="color: #888;">Your educational path is now being processed by our team.</p>
+        </div>
+
+        <div class="summary-card animate-fade-up delay-1" id="summary-content">
+            <div style="text-align: center; color: #666; padding: 40px;">
+                <i class="ph ph-circle-notch ph-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                <p>Retrieving your booking details...</p>
+            </div>
+        </div>
+
+        <div id="payment-status-container">
+            <!-- PENDING STATE -->
+            <div id="state-pending" class="payment-section animate-fade-up delay-2" style="display: none;">
+                <h3>Ready to Complete?</h3>
+                <p style="color: #888; margin-bottom: 30px;">Click below to initiate your secure payment session via
+                    UPI.</p>
+                <button id="btn-initiate-pay" class="btn-done" style="border: none; cursor: pointer;">
+                    <span>Initiate Payment</span>
+                    <i class="ph-bold ph-lightning"></i>
+                </button>
+            </div>
+
+            <!-- INITIATED / PROCESSING STATE -->
+            <div id="state-processing" class="payment-section animate-fade-up delay-2" style="display: none;">
+                <h3>Secure UPI Transfer</h3>
+                <p style="color: #888; margin-bottom: 30px;">Scan the QR or click "Open UPI App". Please share the
+                    screenshot on WhatsApp after payment.</p>
+
+                <div class="qr-placeholder" id="qr-display">
+                    <i class="ph ph-qr-code" style="font-size: 10rem;"></i>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <div style="color: #ccc; font-weight: 600; margin-bottom: 5px;">UPI ID: mhmv2026@sbi</div>
+                    <div style="font-size: 0.85rem; color: #666;">Ref: <span id="payment-ref">---</span></div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+                    <a id="upi-deep-link" href="#" class="btn-done" style="background: #fff; color: #000;">
+                        <span>Open UPI App</span>
+                        <i class="ph-bold ph-device-mobile"></i>
+                    </a>
+                    <button id="btn-confirm-sent" class="btn-done"
+                        style="border: none; cursor: pointer; background: rgba(255,255,255,0.05); color: #fff;">
+                        <span>I have sent the payment</span>
+                        <i class="ph-bold ph-paper-plane-tilt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PAID STATE -->
+            <div id="state-paid" class="payment-section animate-fade-up delay-2" style="display: none;">
+                <div class="success-icon" style="margin-bottom: 20px;">
+                    <i class="ph-fill ph-check-circle"></i>
+                </div>
+                <h3>Payment Verified</h3>
+                <p style="color: #888; margin-bottom: 30px;">Thank you! Your tuition session is now fully secured. You
+                    can view your status in the dashboard.</p>
+                <a href="index.html" class="btn-done">
+                    <span>Back to Home</span>
+                    <i class="ph-bold ph-house"></i>
+                </a>
+            </div>
+
+            <!-- UNAUTHORIZED / ERROR -->
+            <div id="state-error" class="payment-section animate-fade-up delay-2"
+                style="display: none; border-color: #ff4444;">
+                <i class="ph ph-warning-circle" style="font-size: 3rem; color: #ff4444; margin-bottom: 15px;"></i>
+                <h3 id="error-title">Access Denied</h3>
+                <p id="error-msg" style="color: #888; margin-bottom: 30px;">You do not have permission to access this
+                    payment records.</p>
+                <a href="login.html" class="btn-done" style="background: #333; color: #fff;">
+                    <span>Login Again</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./firebase.js";
+        import { doc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const summaryContent = document.getElementById('summary-content');
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('id');
+
+        let currentBooking = null;
+
+        /**
+         * UI State Manager
+         */
+        function setUIState(state) {
+            document.querySelectorAll('#payment-status-container > div').forEach(div => div.style.display = 'none');
+            const target = document.getElementById(`state-${state}`);
+            if (target) target.style.display = 'block';
+        }
+
+        /**
+         * Initialize Payment Logic
+         */
+        async function handleInitiatePayment() {
+            if (!currentBooking || !bookingId) return;
+
+            try {
+                await updateDoc(doc(db, "bookings", bookingId), {
+                    paymentStatus: 'initiated',
+                    updatedAt: new Date()
+                });
+                // Status update will be picked up by onSnapshot
+            } catch (err) {
+                console.error("Initiation error:", err);
+                alert("Could not initiate payment. Please try again.");
+            }
+        }
+
+        /**
+         * Load Summary and Watch for Status Changes
+         */
+        function startBookingWatcher(user) {
+            if (!bookingId) {
+                setUIState('error');
+                document.getElementById('error-msg').textContent = "No booking reference provided.";
+                return;
+            }
+
+            const docRef = doc(db, "bookings", bookingId);
+
+            // Real-time listener
+            onSnapshot(docRef, (docSnap) => {
+                if (!docSnap.exists()) {
+                    setUIState('error');
+                    document.getElementById('error-msg').textContent = "Booking not found.";
+                    return;
+                }
+
+                const data = docSnap.data();
+                currentBooking = data;
+
+                // 1. Security Check: Ownership
+                if (data.studentId !== user.uid) {
+                    setUIState('error');
+                    return;
+                }
+
+                // 2. Render Summary (Existing Logic)
+                renderSummary(data);
+
+                // 3. Handle Payment UI State
+                const status = data.paymentStatus || 'pending';
+                if (status === 'pending') {
+                    setUIState('pending');
+                } else if (status === 'initiated' || status === 'processing') {
+                    setUIState('processing');
+                    setupUPIInstructions(data);
+                } else if (status === 'paid') {
+                    setUIState('paid');
+                    // Hide Summary Hero as it might be redundant
+                    document.querySelector('.success-hero').style.display = 'none';
+                }
+            }, (err) => {
+                console.error("Snapshot error:", err);
+                setUIState('error');
+                document.getElementById('error-msg').textContent = "Session expired or connection lost.";
+            });
+        }
+
+        function renderSummary(data) {
+            let subjectsHtml = data.subjects.map(s => `
+                <div class="subject-row">
+                    <span>${s.name}</span>
+                    <span style="font-weight: 600;">₹${s.price}</span>
+                </div>
+            `).join('');
+
+            summaryContent.innerHTML = `
+                <div class="summary-header">
+                    <div>
+                        <h2 style="color: #fff; margin-bottom: 5px;">${data.firstName} ${data.lastName}</h2>
+                        <p style="color: #888;">Class ${data.class}</p>
+                    </div>
+                    <div class="booking-id">ID: ${bookingId}</div>
+                </div>
+                
+                <div class="summary-body">
+                    <h4 style="color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Selected Curriculum</h4>
+                    ${subjectsHtml}
+                    
+                    <div class="total-row">
+                        <div class="total-label">Total Amount</div>
+                        <div class="total-value">₹${data.total}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setupUPIInstructions(data) {
+            const upiId = "mhmv2026@sbi";
+            const amount = data.total;
+            const note = `MHMV Tuition - ${data.firstName} ${bookingId.substring(0, 6)}`;
+
+            // Generate deep link
+            const deepLink = `upi://pay?pa=${upiId}&pn=MHMV%20Madrasa&am=${amount}&tn=${encodeURIComponent(note)}&cu=INR`;
+            document.getElementById('upi-deep-link').href = deepLink;
+            document.getElementById('payment-ref').textContent = bookingId;
+
+            // Simple QR integration (Optional: Dynamic QR can be done via API, using icon for now)
+            // document.getElementById('qr-display').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(deepLink)}" />`;
+        }
+
+        // --- AUTH BRIDGE ---
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = `login.html?redirect=${encodeURIComponent(window.location.href)}`;
+                return;
+            }
+            startBookingWatcher(user);
+        });
+
+        // Event Listeners
+        document.getElementById('btn-initiate-pay').addEventListener('click', handleInitiatePayment);
+        document.getElementById('btn-confirm-sent').addEventListener('click', async () => {
+            if (confirm("Have you successfully transferred the amount? Our admin will verify this manually.")) {
+                await updateDoc(doc(db, "bookings", bookingId), {
+                    paymentStatus: 'processing'
+                });
+            }
+        });
+    </script>
+    <script type="module" src="auth-nav-guard.js"></script>
+</body>
+
+</html>

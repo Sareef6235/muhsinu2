@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poster Builder - Create Beautiful Posters & Notices</title>
+    <link rel="stylesheet" href="poster-builder.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;700;800&family=Poppins:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="builder-header">
+        <div class="header-content">
+            <h1>🎨 Poster Builder</h1>
+            <div class="header-actions">
+                <button id="save-design-btn" class="btn btn-secondary">💾 Save</button>
+                <button id="export-menu-btn" class="btn btn-primary">📥 Export</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Builder Layout -->
+    <div class="builder-container">
+        <!-- Left Sidebar - Template Selector -->
+        <aside class="template-sidebar">
+            <div class="sidebar-header">
+                <h2>Templates</h2>
+                <input type="search" id="template-search" placeholder="Search templates..." class="search-input">
+            </div>
+
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="all">All</button>
+                <button class="category-tab" data-category="favorites">❤️ Favorites</button>
+                <button class="category-tab" data-category="minimal">Minimal</button>
+                <button class="category-tab" data-category="bold">Bold</button>
+                <button class="category-tab" data-category="gradient">Gradient</button>
+                <button class="category-tab" data-category="professional">Professional</button>
+                <button class="category-tab" data-category="creative">Creative</button>
+                <button class="category-tab" data-category="event">Event</button>
+            </div>
+
+            <div id="template-grid" class="template-grid">
+                <!-- Templates will be loaded here dynamically -->
+            </div>
+        </aside>
+
+        <!-- Center - Live Preview -->
+        <main class="preview-area">
+            <div class="preview-header">
+                <h3>Live Preview</h3>
+                <div class="preview-controls">
+                    <button id="zoom-out" class="icon-btn">🔍-</button>
+                    <span id="zoom-level">100%</span>
+                    <button id="zoom-in" class="icon-btn">🔍+</button>
+                </div>
+            </div>
+            <div id="preview-canvas" class="preview-canvas">
+                <div id="poster-preview" class="poster-preview">
+                    <!-- Selected template will render here -->
+                    <div class="empty-state">
+                        <h2>👈 Select a template to get started</h2>
+                        <p>Choose from 100+ professionally designed templates</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar - Customization Panel -->
+        <aside class="customization-sidebar">
+            <div class="sidebar-header">
+                <h2>Customize</h2>
+            </div>
+
+            <div class="customization-panels">
+                <!-- Content Panel -->
+                <div class="panel active" id="content-panel">
+                    <h3 class="panel-title">📝 Content</h3>
+                    <div class="panel-content">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="toggle-title" checked> Title
+                            </label>
+                            <input type="text" id="edit-title" placeholder="Enter title" class="input-field">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="toggle-subtitle" checked> Subtitle
+                            </label>
+                            <input type="text" id="edit-subtitle" placeholder="Enter subtitle" class="input-field">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="toggle-image" checked> Image
+                            </label>
+                            <input type="file" id="upload-image" accept="image/*" class="file-input">
+                            <input type="url" id="image-url" placeholder="Or paste image URL" class="input-field">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="toggle-date" checked> Date
+                            </label>
+                            <input type="text" id="edit-date" placeholder="Enter date" class="input-field">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="toggle-description" checked> Description
+                            </label>
+                            <textarea id="edit-description" placeholder="Enter description" class="textarea-field"
+                                rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="toggle-button" checked> Button
+                            </label>
+                            <input type="text" id="edit-button" placeholder="Button text" class="input-field">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Style Panel -->
+                <div class="panel" id="style-panel">
+                    <h3 class="panel-title">🎨 Style</h3>
+                    <div class="panel-content">
+                        <div class="form-group">
+                            <label>Background Color</label>
+                            <input type="color" id="bg-color" class="color-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Text Color</label>
+                            <input type="color" id="text-color" class="color-input" value="#000000">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Accent Color</label>
+                            <input type="color" id="accent-color" class="color-input" value="#667eea">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Font Family</label>
+                            <select id="font-family" class="select-field">
+                                <option value="Inter">Inter</option>
+                                <option value="Playfair Display">Playfair Display</option>
+                                <option value="Roboto">Roboto</option>
+                                <option value="Montserrat">Montserrat</option>
+                                <option value="Poppins">Poppins</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-tabs">
+                <button class="panel-tab active" data-panel="content-panel">Content</button>
+                <button class="panel-tab" data-panel="style-panel">Style</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="export-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Export Poster</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <button id="export-png" class="export-btn">📷 Download as PNG</button>
+                <button id="export-pdf" class="export-btn">📄 Download as PDF</button>
+                <button id="export-html" class="export-btn">💻 Copy HTML Code</button>
+                <button id="export-json" class="export-btn">💾 Save as JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Scripts -->
+    <script src="poster-templates.js"></script>
+    <script src="poster-builder.js"></script>
+</body>
+
+</html>
