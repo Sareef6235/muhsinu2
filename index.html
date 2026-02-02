@@ -49,6 +49,7 @@
                         <li><a href="news.html">All News</a></li>
                     </ul>
                 </li>
+                <li><a href="student_dashboard.html">Student Dashboard</a></li>
                 <li><a href="booking.html" style="color: #00f3ff;">Booking</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Portal</a>
@@ -193,8 +194,13 @@
 
         <section id="dashboard" style="padding: 0; margin-top: -100px;"></section>
         <!-- NEWS & UPDATES SECTION -->
-        <section id="news" class="section">
-            <div class="container" style="text-align: center;">
+        <section id="news" class="section" style="position: relative; overflow: hidden;">
+            <!-- Cosmic Accents -->
+            <div class="cosmic-accent accent-1"></div>
+            <div class="cosmic-accent accent-2"></div>
+            <div class="cosmic-accent accent-3"></div>
+
+            <div class="container" style="text-align: center; position: relative; z-index: 2;">
                 <div class="section-badge animate-fade-up">Updates</div>
                 <h2 class="section-title animate-fade-up" style="margin-bottom: 25px;">Latest News & Notices</h2>
 
@@ -676,6 +682,7 @@
         window.firebaseApp = app;
         window.db = db;
         window.rtdb = rtdb;
+        window.NewsService = NewsService;
         window.firestoreUtils = { collection, addDoc, serverTimestamp };
 
         const subjectContainer = document.getElementById('subject-checkboxes');
@@ -841,7 +848,11 @@
 
         window.loadNews = async () => {
             try {
-                const newsService = new NewsService();
+                if (!window.NewsService) {
+                    console.error("NewsService not found on window");
+                    return;
+                }
+                const newsService = new window.NewsService();
                 const newsGrid = document.getElementById('home-news-grid');
                 if (!newsGrid) return;
 

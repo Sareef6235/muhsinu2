@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Madrasa Student Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --bg: #0b0b12;
+            --card: #161622;
+            --accent: #22c55e;
+            --muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui;
+            background: var(--bg);
+            color: #fff;
+        }
+
+        header {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem
+        }
+
+        header p {
+            opacity: .9
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        img,
+        video {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .primary {
+            background: var(--accent);
+            color: #000
+        }
+
+        .danger {
+            background: #ef4444;
+            color: #fff
+        }
+
+        .ghost {
+            background: #2a2a3a;
+            color: #fff
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 10px;
+            border: none;
+            background: #1f1f2d;
+            color: #fff;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: #222233;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: #000
+        }
+
+        .hidden {
+            display: none
+        }
+
+        .small {
+            font-size: .85rem;
+            color: var(--muted)
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Standard Site Header -->
+    <header id="main-header">
+        <nav class="container">
+            <a href="index.html#hero" class="logo">MHMV 2026.</a>
+            <ul class="nav-links">
+                <li><a href="index.html#hero">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li class="dropdown">
+                    <a href="gallery.html" class="dropdown-toggle">Gallery</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
+                        <li><a href="gallery.html?tab=video">Video Gallery</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Student Zone</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="creative.html">Fee Payment</a></li>
+                        <li><a href="restored_pages/creative.html">Creative Submission</a></li>
+                        <li><a href="creation_receipt.html">Approved Receipts</a></li>
+                        <li><a href="creations.html">Creations</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">News</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="index.html#news">Latest Updates</a></li>
+                        <li><a href="news.html">All News</a></li>
+                    </ul>
+                </li>
+                <li><a href="student_dashboard.html" class="active">Student Dashboard</a></li>
+                <li><a href="booking.html" style="color: #00f3ff;">Booking</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Portal</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="admin/dashboard.html">Portal</a></li>
+                        <li class="admin-only" style="display: none;"><a href="admin/dashboard.html"
+                                style="font-weight: 600; color: var(--primary-color);">Admin
+                                Panel</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-btn" aria-label="Toggle navigation">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </nav>
+    </header>
+
+    <main style="padding-top: 100px;">
+        <!-- Dashboard Hero -->
+        <section class="dashboard-hero"
+            style="padding: 60px 0; text-align: center; background: radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.05) 0%, transparent 70%);">
+            <div class="container">
+                <h1 style="font-size: 3rem; font-weight: 700; margin-bottom: 10px;">📚 Student <span
+                        style="color: var(--primary-color);">Dashboard</span></h1>
+                <p style="color: #888; font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px;">Share your creativity,
+                    track your submissions, and stay updated with your classmates' works.</p>
+
+                <div class="dashboard-stats"
+                    style="display: flex; justify-content: center; gap: 40px; margin-bottom: 40px;">
+                    <div class="stat-card">
+                        <div id="stat-total" style="font-size: 2rem; font-weight: 700; color: var(--primary-color);">0
+                        </div>
+                        <div style="font-size: 0.8rem; color: #555; text-transform: uppercase;">Total Works</div>
+                    </div>
+                    <div class="stat-card">
+                        <div id="stat-pending"
+                            style="font-size: 2rem; font-weight: 700; color: var(--secondary-color);">0</div>
+                        <div style="font-size: 0.8rem; color: #555; text-transform: uppercase;">Pending Approval</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="container" style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; align-items: start;">
+            <!-- Upload Side -->
+            <aside class="upload-sidebar" style="position: sticky; top: 100px;">
+                <div class="card"
+                    style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 30px; border-radius: 20px; backdrop-filter: blur(10px);">
+                    <h2
+                        style="font-size: 1.4rem; margin-bottom: 20px; color: var(--primary-color); display: flex; align-items: center; gap: 10px;">
+                        <i class="ph ph-cloud-arrow-up"></i> Submit Your Work
+                    </h2>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label"
+                            style="display: block; color: #888; font-size: 0.8rem; margin-bottom: 8px;">Your
+                            Name</label>
+                        <input type="text" id="sname" class="form-select" style="background-image: none; cursor: text;"
+                            placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label"
+                            style="display: block; color: #888; font-size: 0.8rem; margin-bottom: 8px;">Select
+                            Class</label>
+                        <select id="sclass" class="form-select">
+                            <option value="Class 5">Class 5</option>
+                            <option value="Class 6">Class 6</option>
+                            <option value="Class 7">Class 7</option>
+                            <option value="Class 8">Class 8</option>
+                            <option value="Class 9">Class 9</option>
+                            <option value="Class 10">Class 10</option>
+                            <option value="Class 11">Class 11</option>
+                            <option value="Class 12">Class 12</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label"
+                            style="display: block; color: #888; font-size: 0.8rem; margin-bottom: 8px;">Media
+                            Type</label>
+                        <div style="display: flex; gap: 10px;">
+                            <label
+                                style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.3s; border: 1px solid transparent;">
+                                <input type="radio" name="media-type" value="image" checked style="display: none;">
+                                <i class="ph ph-image"></i> Image
+                            </label>
+                            <label
+                                style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.3s; border: 1px solid transparent;">
+                                <input type="radio" name="media-type" value="video" style="display: none;">
+                                <i class="ph ph-video-camera"></i> Video
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 30px;">
+                        <label class="form-label"
+                            style="display: block; color: #888; font-size: 0.8rem; margin-bottom: 8px;">File
+                            Upload</label>
+                        <div class="upload-area"
+                            style="border: 2px dashed var(--glass-border); border-radius: 15px; padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.3s;"
+                            onclick="document.getElementById('file').click()">
+                            <i class="ph ph-plus-circle" style="font-size: 2.5rem; color: var(--primary-color);"></i>
+                            <p id="file-name" style="margin-top: 10px; color: #666; font-size: 0.9rem;">Click to select
+                                file</p>
+                            <input type="file" id="file" hidden
+                                onchange="document.getElementById('file-name').innerText = this.files[0] ? this.files[0].name : 'Click to select file'">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary"
+                        style="width: 100%; padding: 15px; border-radius: 12px; font-size: 1rem;" onclick="upload()">
+                        <i class="ph ph-paper-plane-tilt"></i> Submit for Approval
+                    </button>
+                    <p id="upload-status"
+                        style="margin-top: 15px; text-align: center; font-size: 0.85rem; display: none;"></p>
+                </div>
+            </aside>
+
+            <!-- Gallery Side -->
+            <section class="gallery-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="font-size: 1.5rem;">Public Gallery</h2>
+                    <div class="tabs" id="classTabs" style="display: flex; gap: 8px;">
+                        <button class="tab-btn active" data-class="All" onclick="filterClass('All')">All</button>
+                        <button class="tab-btn" data-class="Class 5" onclick="filterClass('Class 5')">C5</button>
+                        <button class="tab-btn" data-class="Class 6" onclick="filterClass('Class 6')">C6</button>
+                        <button class="tab-btn" data-class="Class 7" onclick="filterClass('Class 7')">C7</button>
+                        <button class="tab-btn" data-class="Class 8" onclick="filterClass('Class 8')">C8</button>
+                    </div>
+                </div>
+
+                <div id="gallery" class="grid"
+                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;">
+                    <!-- Items via JS -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Admin Portal Toggle (Hidden for students) -->
+        <section id="admin-access-section"
+            style="margin-top: 100px; padding: 40px 0; border-top: 1px solid var(--glass-border); text-align: center;">
+            <div class="container">
+                <button class="btn-secondary"
+                    style="background: transparent; border: 1px solid #222; color: #333; font-size: 0.8rem; padding: 10px 20px;"
+                    onclick="document.getElementById('admin-overlay').style.display='flex'">Admin Login</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Admin Login Overlay -->
+    <div id="admin-overlay"
+        style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: center; justify-content: center;">
+        <div class="card"
+            style="width: 100%; max-width: 400px; padding: 40px; background: #0a0a0a; border: 1px solid var(--glass-border); border-radius: 20px; position: relative;">
+            <button onclick="document.getElementById('admin-overlay').style.display='none'"
+                style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #666; font-size: 1.5rem; cursor: pointer;"><i
+                    class="ph ph-x"></i></button>
+            <h2 style="margin-bottom: 10px; color: var(--primary-color);">Admin Login</h2>
+            <p style="color: #666; margin-bottom: 30px; font-size: 0.9rem;">Verification panel access for teachers only.
+            </p>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="email" id="email" class="form-select" style="background-image: none; cursor: text;"
+                    placeholder="Admin Email">
+            </div>
+            <div class="form-group" style="margin-bottom: 30px;">
+                <input type="password" id="password" class="form-select" style="background-image: none; cursor: text;"
+                    placeholder="Password">
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; height: 50px;" onclick="login()">Access Panel</button>
+            <p id="adminMsg" style="margin-top: 15px; color: #ff4444; font-size: 0.85rem; text-align: center;"></p>
+        </div>
+    </div>
+
+    <!-- Admin Panel Overlay (Active/Visible only if logged in) -->
+    <div id="adminPanel" class="hidden"
+        style="position: fixed; top:0; left:0; width:100%; height:100%; background: #050508; z-index: 2100; overflow-y: auto; display: none;">
+        <div class="container" style="padding: 40px 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                <div>
+                    <h2 style="font-size: 1.8rem; color: var(--primary-color);">👨💼 Verification Panel</h2>
+                    <p style="color: #666;">Approve or reject student submissions</p>
+                </div>
+                <button class="btn btn-danger" style="background: #ff4444; color: #000;" onclick="logout()">Logout
+                    Panel</button>
+            </div>
+
+            <div id="adminList" class="grid"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
+                <!-- Items via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"
+        style="position: fixed; bottom: 30px; right: 30px; padding: 15px 25px; background: #111; border: 1px solid var(--primary-color); border-radius: 12px; color: #fff; transform: translateY(150px); transition: 0.3s; z-index: 3000;">
+        <span id="toast-msg"></span>
+    </div>
+
+    <!-- FireBase Logic -->
+    <script type="module">
+        import { auth, db, storage } from "./firebase.js";
+        import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { collection, addDoc, onSnapshot, query, where, updateDoc, doc, deleteDoc, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        let currentClassFilter = "All";
+
+        // --- AUTH OBSERVER ---
+        onAuthStateChanged(auth, async user => {
+            const adminPanel = document.getElementById("adminPanel");
+            const adminOverlay = document.getElementById("admin-overlay");
+
+            if (user) {
+                const snap = await getDoc(doc(db, "users", user.uid));
+                const data = snap.data();
+                if (data && data.role === "admin") {
+                    adminPanel.style.display = "block";
+                    adminOverlay.style.display = "none";
+                    loadAdminData();
+                } else {
+                    showToast("Access Denied", true);
+                    await signOut(auth);
+                }
+            } else {
+                adminPanel.style.display = "none";
+            }
+        });
+
+        // --- STUDENT UPLOAD ---
+        window.upload = async () => {
+            const fileInput = document.getElementById("file");
+            const sname = document.getElementById("sname");
+            const sclass = document.getElementById("sclass");
+            const type = document.querySelector('input[name="media-type"]:checked').value;
+            const status = document.getElementById("upload-status");
+            const btn = event.target.closest('button');
+
+            if (!sname.value) return showToast("Enter your name", true);
+            const file = fileInput.files[0];
+            if (!file) return showToast("Select a file to upload", true);
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Uploading...';
+            status.style.display = "block";
+            status.innerHTML = "Uploading to server...";
+            status.style.color = "#888";
+
+            try {
+                const refS = ref(storage, `media/${Date.now()}-${file.name}`);
+                await uploadBytes(refS, file);
+                const url = await getDownloadURL(refS);
+
+                await addDoc(collection(db, "media"), {
+                    name: sname.value,
+                    class: sclass.value,
+                    type: type,
+                    url,
+                    approved: false, // Default to false for security!
+                    visible: true,
+                    created: new Date()
+                });
+
+                showToast("Work submitted for approval! 🎉");
+                sname.value = "";
+                fileInput.value = "";
+                document.getElementById('file-name').innerText = "Click to select file";
+            } catch (err) {
+                console.error(err);
+                showToast("Upload failed", true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ph ph-paper-plane-tilt"></i> Submit for Approval';
+                status.style.display = "none";
+            }
+        };
+
+        // --- PUBLIC GALLERY ---
+        window.filterClass = (cls) => {
+            currentClassFilter = cls;
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.class === cls);
+            });
+            loadGallery();
+        };
+
+        function loadGallery() {
+            const gallery = document.getElementById("gallery");
+            let q = query(collection(db, "media"), where("approved", "==", true), orderBy("created", "desc"));
+
+            if (currentClassFilter !== "All") {
+                q = query(collection(db, "media"), where("approved", "==", true), where("class", "==", currentClassFilter), orderBy("created", "desc"));
+            }
+
+            onSnapshot(q, snap => {
+                gallery.innerHTML = "";
+                let count = 0;
+                snap.forEach(d => {
+                    const m = d.data();
+                    count++;
+                    gallery.innerHTML += `
+                        <div class="card gallery-item" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; animation: fadeIn 0.5s ease forwards;">
+                            <div style="aspect-ratio: 1/1; background: #000; display: flex; align-items: center; justify-content: center;">
+                                ${m.type === "image"
+                            ? `<img src="${m.url}" style="width:100%; height:100%; object-fit: cover;">`
+                            : `<video src="${m.url}" controls style="width:100%; max-height:100%;"></video>`}
+                            </div>
+                            <div style="padding: 15px;">
+                                <h4 style="font-size: 1rem; margin-bottom: 5px;">${m.name}</h4>
+                                <span style="font-size: 0.75rem; color: var(--primary-color); background: rgba(0, 243, 255, 0.1); padding: 3px 8px; border-radius: 4px;">${m.class}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById('stat-total').innerText = count;
+                if (count === 0) gallery.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #444; padding: 40px;">No works found for this category.</p>';
+            });
+        }
+
+        // --- ADMIN LOGIN ---
+        window.login = () => {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const msg = document.getElementById("adminMsg");
+
+            signInWithEmailAndPassword(auth, email, password)
+                .catch(e => {
+                    msg.innerText = "Invalid credentials or unauthorized.";
+                    showToast("Login Failed", true);
+                });
+        };
+
+        window.logout = () => signOut(auth);
+
+        // --- ADMIN PANEL LOAD ---
+        function loadAdminData() {
+            const adminList = document.getElementById("adminList");
+            const q = query(collection(db, "media"), orderBy("created", "desc"));
+
+            onSnapshot(q, snap => {
+                adminList.innerHTML = "";
+                let pendingCount = 0;
+                snap.forEach(d => {
+                    const m = d.data();
+                    if (!m.approved) pendingCount++;
+
+                    adminList.innerHTML += `
+                        <div class="card" style="background: #111; border: 1px solid ${m.approved ? '#222' : 'var(--primary-color)'}; border-radius: 15px; overflow: hidden;">
+                            <div style="aspect-ratio: 16/9; background: #000; position: relative;">
+                                ${m.type === "image"
+                            ? `<img src="${m.url}" style="width:100%; height:100%; object-fit: cover;">`
+                            : `<video src="${m.url}" controls style="width:100%; height:100%;"></video>`}
+                                ${!m.approved ? `<span style="position: absolute; top: 10px; right: 10px; background: var(--primary-color); color: #000; padding: 4px 10px; border-radius: 5px; font-size: 0.7rem; font-weight: 800;">PENDING</span>` : ''}
+                            </div>
+                            <div style="padding: 20px;">
+                                <h3 style="font-size: 1.1rem; margin-bottom: 5px;">${m.name}</h3>
+                                <p style="color: #666; font-size: 0.85rem; margin-bottom: 20px;">Submitted: ${new Date(m.created.toDate()).toLocaleDateString()} • ${m.class}</p>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    ${!m.approved
+                            ? `<button class="btn-cms btn-cms-primary" style="padding: 10px; font-size: 0.8rem;" onclick="approve('${d.id}')"><i class="ph ph-check"></i> Approve</button>`
+                            : `<button class="btn-cms" style="padding: 10px; font-size: 0.8rem; background: #222; color: #888;" disabled><i class="ph ph-check-circle"></i> Approved</button>`
+                        }
+                                    <button class="btn-cms btn-cms-danger" style="padding: 10px; font-size: 0.8rem; background: #331111; color: #ff4444;" onclick="removeItem('${d.id}')"><i class="ph ph-trash"></i> Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById('stat-pending').innerText = pendingCount;
+            });
+        }
+
+        window.approve = id => {
+            updateDoc(doc(db, "media", id), { approved: true })
+                .then(() => showToast("Success: Work Approved"));
+        };
+
+        window.removeItem = id => {
+            if (confirm("Permanently delete this submission?")) {
+                deleteDoc(doc(db, "media", id))
+                    .then(() => showToast("Success: Work Deleted"));
+            }
+        };
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.style.borderColor = isError ? '#ff4444' : 'var(--primary-color)';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // --- INIT ---
+        loadGallery();
+
+        // CSS for Toast
+        const style = document.createElement('style');
+        style.innerHTML = `
+            #toast.show { transform: translateY(0); }
+            .animate-spin { animation: spin 1s linear infinite; }
+            @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .tab-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #888; padding: 6px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 0.8rem; }
+            .tab-btn.active { background: var(--primary-color); color: #000; border-color: var(--primary-color); }
+        `;
+        document.head.appendChild(style);
+
+    </script>
+
+</body>
+
+</html>

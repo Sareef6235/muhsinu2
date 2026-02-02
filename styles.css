@@ -2568,49 +2568,66 @@ footer {
     box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
 }
 
+/* Antigravity Floating Animation */
+@keyframes antigravity-float {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+        filter: drop-shadow(0 5px 15px rgba(0, 243, 255, 0.1));
+    }
+
+    50% {
+        transform: translateY(-15px) scale(1.01);
+        filter: drop-shadow(0 25px 35px rgba(0, 243, 255, 0.3));
+    }
+}
+
 /* Glassmorphism News Card */
 .news-card-premium {
-    background: rgba(10, 10, 15, 0.4) !important;
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 20px !important;
     overflow: hidden;
     height: 100%;
     display: flex;
     flex-direction: column;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     text-decoration: none;
     padding: 0 !important;
+    animation: antigravity-float 6s ease-in-out infinite;
 }
 
 .news-card-premium:hover {
-    transform: translateY(-10px) scale(1.02);
+    transform: translateY(-20px) scale(1.05);
     border-color: var(--primary-color) !important;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 243, 255, 0.1);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 243, 255, 0.2);
+    animation-play-state: paused;
 }
 
 .news-card-premium .img-wrapper {
-    height: 200px;
+    height: 220px;
     overflow: hidden;
     position: relative;
-    background: #111;
+    background: #050505;
 }
 
 .news-card-premium img {
     width: 100%;
     height: 100%;
     object-fit: cover !important;
-    transition: transform 0.6s ease;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .news-card-premium:hover img {
-    transform: scale(1.15);
+    transform: scale(1.1);
 }
 
 /* New Highlight Animation */
 .news-highlight {
-    animation: glowPulse 2s infinite alternate;
+    border-color: rgba(0, 243, 255, 0.3) !important;
 }
 
 .news-highlight::before {
@@ -2624,18 +2641,18 @@ footer {
     background-size: 400%;
     z-index: -1;
     border-radius: 22px;
-    opacity: 0.6;
+    opacity: 0.4;
     animation: neonBorder 3s linear infinite;
-    filter: blur(5px);
+    filter: blur(8px);
 }
 
 @keyframes glowPulse {
     0% {
-        box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
     }
 
     100% {
-        box-shadow: 0 0 25px rgba(0, 243, 255, 0.4);
+        box-shadow: 0 0 30px rgba(0, 243, 255, 0.5);
     }
 }
 
@@ -2650,6 +2667,164 @@ footer {
 
     100% {
         background-position: 0% 50%;
+    }
+}
+
+/* Cosmic Accents for News Section */
+.cosmic-accent {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.15;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.accent-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--primary-color);
+    top: -100px;
+    left: -200px;
+    animation: floating-accent 15s infinite alternate ease-in-out;
+}
+
+.accent-2 {
+    width: 500px;
+    height: 500px;
+    background: var(--secondary-color);
+    bottom: -150px;
+    right: -200px;
+    animation: floating-accent 20s infinite alternate-reverse ease-in-out;
+}
+
+.accent-3 {
+    width: 300px;
+    height: 300px;
+    background: #fff;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.05;
+    animation: floating-accent 25s infinite alternate ease-in-out;
+}
+
+@keyframes floating-accent {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+
+    100% {
+        transform: translate(150px, 100px) rotate(45deg) scale(1.2);
+    }
+}
+
+
+/* =========================================
+   Unified Antigravity Booking Styles
+   ========================================= */
+
+.booking-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 80px;
+    align-items: start;
+}
+
+.antigravity-panel {
+    background: rgba(16, 16, 24, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    animation: weightless-float 6s ease-in-out infinite;
+}
+
+.antigravity-panel:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(var(--neon-rgb), 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Secondary Panel specific - slightly delayed float */
+.antigravity-panel.secondary {
+    animation-delay: 3s;
+    background: rgba(16, 16, 24, 0.4);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.panel-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.badge-primary {
+    background: rgba(0, 243, 255, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+}
+
+.badge-secondary {
+    background: rgba(188, 19, 254, 0.1);
+    color: var(--secondary-color);
+    border: 1px solid rgba(188, 19, 254, 0.2);
+}
+
+/* Form Styles Refinement for Panels */
+.antigravity-panel .form-section-title {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.antigravity-panel .form-input {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.antigravity-panel .form-input:focus {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Floating Animation */
+@keyframes weightless-float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+/* Responsive Booking */
+@media (max-width: 992px) {
+    .booking-main-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .antigravity-panel {
+        animation: none;
+        /* Disable float on touch devices for better usability */
+        padding: 30px 20px;
     }
 }
 
@@ -2720,4 +2895,226 @@ footer {
 
 [dir="rtl"] .ph-arrow-right {
     transform: rotate(180deg);
+}
+
+/* =========================================
+   Premium Fee Receipt Redesign
+   ========================================= */
+
+.premium-glass-card {
+    background: rgba(16, 16, 24, 0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 30px;
+    padding: 50px;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.premium-glass-card.animate-fade-up {
+    animation: fadeUp 0.8s ease-out forwards;
+}
+
+.premium-form-header {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.premium-form-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #fff 0%, #ccc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.premium-form-header p {
+    color: #888;
+    font-size: 1rem;
+}
+
+/* Premium Form Groups */
+.premium-form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.premium-label {
+    display: block;
+    color: #aaa;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+.premium-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: 'Outfit', sans-serif;
+}
+
+.premium-input:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(0, 243, 255, 0.1);
+    outline: none;
+}
+
+.premium-input::placeholder {
+    color: #555;
+    font-weight: 400;
+}
+
+/* Class Selection Grid */
+.class-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.class-option {
+    position: relative;
+}
+
+.class-option input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.class-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #bbb;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.class-option input:checked~.class-btn {
+    background: rgba(0, 243, 255, 0.15);
+    border-color: var(--primary-color);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.class-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Premium Upload Box */
+.upload-box-premium {
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.01);
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-box-premium:hover {
+    border-color: var(--primary-color);
+    background: rgba(0, 243, 255, 0.02);
+}
+
+.upload-icon-circle {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+}
+
+.upload-box-premium:hover .upload-icon-circle {
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(0, 243, 255, 0.1);
+}
+
+.upload-text-main {
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.upload-text-sub {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Status Message and Button */
+.submission-status {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    text-align: center;
+    min-height: 24px;
+    font-weight: 500;
+}
+
+.btn-submit-premium {
+    width: 100%;
+    padding: 18px;
+    font-size: 1.1rem;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: 14px;
+    color: #000;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 243, 255, 0.2);
+}
+
+.btn-submit-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(0, 243, 255, 0.3);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .premium-glass-card {
+        padding: 30px 20px;
+    }
+
+    .class-selection-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }

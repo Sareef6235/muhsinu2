@@ -49,6 +49,7 @@
                         <li><a href="news.html">All News</a></li>
                     </ul>
                 </li>
+                <li><a href="student_dashboard.html">Student Dashboard</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Portal</a>
                     <ul class="dropdown-menu">
@@ -76,75 +77,121 @@
 
     <!-- ================= STUDENT SUBMIT ================= -->
     <section id="creative">
-        <div class="card creation-card submission-card animate-fade-up">
-            <h2>📤 Submit Fee Receipt Proof</h2>
+        <div class="premium-glass-card animate-fade-up">
+            <div class="premium-form-header">
+                <h2>📤 Submit Fee Receipt</h2>
+                <p>Upload your payment proof for admin verification</p>
+            </div>
 
-            <div class="creative-input-group">
-                <input id="name" placeholder="Student Name">
+            <div class="premium-form-group">
+                <label class="premium-label">Student Name</label>
+                <input id="name" class="premium-input" placeholder="Enter full name">
             </div>
 
             <!-- CLASS SELECTION -->
-            <!-- CLASS SELECTION -->
-            <div class="creative-input-group">
-                <label style="display:block; margin-bottom:10px; color:#aaa;">Select Class</label>
-                <div class="class-radio-grid">
-                    <div class="class-radio"><input type="radio" name="cls" id="c1" value="1"><label for="c1">Class
-                            1</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c2" value="2"><label for="c2">Class
-                            2</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c3" value="3"><label for="c3">Class
-                            3</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c4" value="4"><label for="c4">Class
-                            4</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c5" value="5"><label for="c5">Class
-                            5</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c6" value="6"><label for="c6">Class
-                            6</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c7" value="7"><label for="c7">Class
-                            7</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c8" value="8"><label for="c8">Class
-                            8</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c9" value="9"><label for="c9">Class
-                            9</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c10" value="10"><label for="c10">Class
-                            10</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c11" value="11"><label for="c11">Class
-                            11</label></div>
-                    <div class="class-radio"><input type="radio" name="cls" id="c12" value="12"><label for="c12">Class
-                            12</label></div>
+            <div class="premium-form-group">
+                <label class="premium-label">Select Class</label>
+                <div class="class-selection-grid">
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c1" value="1">
+                        <span class="class-btn">1</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c2" value="2">
+                        <span class="class-btn">2</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c3" value="3">
+                        <span class="class-btn">3</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c4" value="4">
+                        <span class="class-btn">4</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c5" value="5">
+                        <span class="class-btn">5</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c6" value="6">
+                        <span class="class-btn">6</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c7" value="7">
+                        <span class="class-btn">7</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c8" value="8">
+                        <span class="class-btn">8</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c9" value="9">
+                        <span class="class-btn">9</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c10" value="10">
+                        <span class="class-btn">10</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c11" value="11">
+                        <span class="class-btn">+1</span>
+                    </label>
+                    <label class="class-option">
+                        <input type="radio" name="cls" id="c12" value="12">
+                        <span class="class-btn">+2</span>
+                    </label>
                 </div>
             </div>
 
-            <div class="creative-input-group">
-                <input id="receiptNo" type="number" placeholder="Receipt / Reference Number">
-                <input id="payDate" type="date" placeholder="Payment Date">
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="premium-form-group">
+                    <label class="premium-label">Receipt Number</label>
+                    <input id="receiptNo" class="premium-input" type="number" placeholder="e.g. 12345">
+                </div>
+                <div class="premium-form-group">
+                    <label class="premium-label">Payment Date</label>
+                    <input id="payDate" class="premium-input" type="date">
+                </div>
             </div>
 
-            <div class="creative-input-group">
-                <textarea id="content" placeholder="Remarks / Payment Details (optional)" rows="3"></textarea>
+            <div class="premium-form-group">
+                <label class="premium-label">Remarks (Optional)</label>
+                <textarea id="content" class="premium-input" placeholder="Any additional details..."
+                    rows="3"></textarea>
             </div>
 
-            <div class="file-upload-box">
-                <label for="file"
-                    style="display: block; color: var(--primary-color); font-size: 0.95rem; margin-bottom: 10px; font-weight: 600;">
-                    <i class="ph ph-image"></i> Upload Receipt Image (Max 200KB)
-                </label>
-                <input type="file" id="file" accept="image/*"
-                    style="padding: 0; background: transparent; border: none; margin: 0;"
-                    onchange="validateFileSize(this)">
+            <div class="premium-form-group">
+                <label class="premium-label">Upload Receipt</label>
+                <div class="upload-box-premium" onclick="document.getElementById('file').click()">
+                    <div class="upload-icon-circle">
+                        <i class="ph ph-image"></i>
+                    </div>
+                    <div class="upload-text-main">Click to upload image</div>
+                    <div class="upload-text-sub">Max file size: 200KB</div>
+                    <input type="file" id="file" accept="image/*" style="display: none;"
+                        onchange="validateFileSize(this)">
+                </div>
             </div>
 
             <script>
                 function validateFileSize(input) {
                     const file = input.files[0];
-                    if (file && file.size > 204800) { // 200KB in bytes
-                        alert("File size exceeds 200KB. Please upload a smaller image.");
-                        input.value = ""; // Clear the input
+                    if (file) {
+                        if (file.size > 204800) { // 200KB
+                            alert("File size exceeds 200KB. Please upload a smaller image.");
+                            input.value = "";
+                            document.querySelector('.upload-text-main').textContent = "Click to upload image";
+                        } else {
+                            document.querySelector('.upload-text-main').textContent = file.name;
+                        }
                     }
                 }
             </script>
 
-            <button onclick="submitWork()">Submit Receipt</button>
+            <button onclick="submitWork()" class="btn-submit-premium">
+                <span>Submit Fee Receipt</span>
+                <i class="ph-bold ph-paper-plane-right"></i>
+            </button>
             <div id="status-msg" class="submission-status"></div>
         </div>
     </section>

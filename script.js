@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Tuition Booking Logic (Checkboxes + UPI)
     const tuitionForm = document.getElementById('tuition-form');
-    const totalPriceEl = document.getElementById('total-price');
-    const classRadios = document.querySelectorAll('input[name="class"]');
+    const totalPriceEl = document.getElementById('g-total-price');
+    const classRadios = document.querySelectorAll('#g-class-radios input[name="class"]');
     const sessionsList = document.getElementById('sessions-list');
     const maxSubjects = 8;
 
@@ -80,12 +80,12 @@ document.addEventListener('DOMContentLoaded', () => {
         let subjectTotal = 0;
         let multiplier = 1;
 
-        const checkedCbs = document.querySelectorAll('#subject-checkboxes input[type="checkbox"]:checked');
+        const checkedCbs = document.querySelectorAll('#g-subject-checkboxes input[type="checkbox"]:checked');
         checkedCbs.forEach(cb => {
             subjectTotal += parseInt(cb.dataset.price) || 0;
         });
 
-        const selectedClass = document.querySelector('input[name="class"]:checked');
+        const selectedClass = document.querySelector('#g-class-radios input[name="class"]:checked');
         if (selectedClass) {
             multiplier = parseFloat(selectedClass.dataset.multiplier) || 1;
         }
@@ -100,12 +100,18 @@ document.addEventListener('DOMContentLoaded', () => {
             radio.addEventListener('change', calculateTotal);
         });
 
+        // Also listen to checkboxes for price update
+        const checkboxes = document.querySelectorAll('#g-subject-checkboxes input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', calculateTotal);
+        });
+
         tuitionForm.addEventListener("submit", async (e) => {
-            const checkedSubjects = Array.from(document.querySelectorAll('#subject-checkboxes input[type="checkbox"]:checked'));
-            const selectedClass = document.querySelector('input[name="class"]:checked');
-            const firstName = document.getElementById('fname').value;
-            const lastName = document.getElementById('lname').value;
-            const email = document.getElementById('email').value;
+            const checkedSubjects = Array.from(document.querySelectorAll('#g-subject-checkboxes input[type="checkbox"]:checked'));
+            const selectedClass = document.querySelector('#g-class-radios input[name="class"]:checked');
+            const firstName = document.getElementById('g-fname').value;
+            const lastName = document.getElementById('g-lname').value;
+            const email = document.getElementById('g-email').value;
 
             if (checkedSubjects.length === 0) {
                 e.preventDefault();
@@ -117,9 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const amount = calculateTotal();
 
             // Populate Hidden Google Form Fields
-            document.getElementById('booking-subjects-hidden').value = checkedSubjects.map(cb => cb.value).join(", ");
-            document.getElementById('booking-class-hidden').value = selectedClass.value;
-            document.getElementById('booking-price-hidden').value = "₹" + amount;
+            document.getElementById('g-booking-subjects-hidden').value = checkedSubjects.map(cb => cb.value).join(", ");
+            document.getElementById('g-booking-class-hidden').value = selectedClass.value;
+            document.getElementById('g-booking-price-hidden').value = "₹" + amount;
 
             // 1. Write to Firestore asynchronously
             if (window.db && window.firestoreUtils) {
