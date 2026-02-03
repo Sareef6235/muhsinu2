@@ -1,0 +1,21 @@
+{
+    "name": "Forminator",
+    "version": "1.0.0",
+    "description": "Advanced form builder with validation",
+    "author": "MHMV Team",
+    "main": "forminator.js",
+    "styles": [
+        "forminator.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": true,
+    "hooks": {
+        "init": "Forminator.init"
+    },
+    "capabilities": [
+        "form_builder",
+        "validation",
+        "submissions"
+    ]
+}

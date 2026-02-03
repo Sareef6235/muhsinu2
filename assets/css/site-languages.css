@@ -1,0 +1,125 @@
+/* Global Language Switcher Styles */
+:root {
+    --lang-primary: #00f3ff;
+    --lang-bg: rgba(15, 15, 15, 0.9);
+    --lang-border: rgba(255, 255, 255, 0.1);
+    --lang-text: rgba(255, 255, 255, 0.8);
+    --lang-hover: rgba(255, 255, 255, 0.1);
+}
+
+.site-lang-switcher {
+    display: inline-flex;
+    gap: 5px;
+    padding: 4px;
+    background: var(--lang-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--lang-border);
+    border-radius: 30px;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+/* ============================================
+   SINGLE INSTANCE CONTROL
+   Only ONE switcher appears per page
+   ============================================ */
+
+/* Hide all switchers by default */
+.site-lang-switcher {
+    display: none;
+}
+
+/* Show ONLY in header (top placement) */
+header#main-header .site-lang-switcher:first-of-type {
+    display: inline-flex;
+}
+
+/* Prevent switchers in sections (force hide) */
+section .site-lang-switcher {
+    display: none !important;
+}
+
+/* Alternative: Show ONLY in footer (bottom placement)
+   Uncomment below and comment out header rule above to switch */
+/*
+footer#main-footer .site-lang-switcher:first-of-type {
+    display: inline-flex;
+}
+*/
+
+.site-lang-switcher.in-header {
+    margin-left: 15px;
+}
+
+.site-lang-switcher.in-section {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    opacity: 0.3;
+}
+
+.site-lang-switcher.in-section:hover {
+    opacity: 1;
+}
+
+.lang-btn {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--lang-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.lang-btn:hover {
+    background: var(--lang-hover);
+}
+
+.lang-btn.active {
+    background: var(--lang-primary);
+    color: #000;
+}
+
+/* RTL Adjustments */
+[dir="rtl"] .site-lang-switcher.in-section {
+    right: auto;
+    left: 20px;
+}
+
+[dir="rtl"] .site-lang-switcher.in-header {
+    margin-left: 0;
+    margin-right: 15px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .site-lang-switcher {
+        flex-direction: column;
+        border-radius: 12px;
+        padding: 8px;
+    }
+
+    .site-lang-switcher.in-section {
+        position: static;
+        margin-bottom: 20px;
+        opacity: 1;
+        width: fit-content;
+    }
+
+    .lang-btn {
+        text-align: center;
+        width: 100%;
+    }
+}
+
+/* Smooth Content Transitions */
+.lang-switching {
+    opacity: 0;
+    filter: blur(5px);
+}
+
+body {
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}

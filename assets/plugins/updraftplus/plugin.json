@@ -1,0 +1,21 @@
+{
+    "name": "UpdraftPlus",
+    "version": "1.0.0",
+    "description": "Backup and restore system",
+    "author": "MHMV Team",
+    "main": "updraftplus.js",
+    "styles": [
+        "updraftplus.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": false,
+    "hooks": {
+        "init": "UpdraftPlus.init"
+    },
+    "capabilities": [
+        "backups",
+        "restore",
+        "export_import"
+    ]
+}

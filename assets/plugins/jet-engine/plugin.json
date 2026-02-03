@@ -1,0 +1,29 @@
+{
+    "name": "JetEngine",
+    "version": "1.0.0",
+    "description": "Dynamic content engine with CPT, meta fields, and listings",
+    "author": "MHMV Team",
+    "main": "engine.js",
+    "styles": [
+        "engine.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": true,
+    "hooks": {
+        "init": "JetEngine.init",
+        "activate": "JetEngine.activate",
+        "deactivate": "JetEngine.deactivate"
+    },
+    "settings": {
+        "enableCPT": true,
+        "enableMetaFields": true,
+        "enableListings": true
+    },
+    "capabilities": [
+        "custom_post_types",
+        "meta_fields",
+        "dynamic_listings",
+        "query_builder"
+    ]
+}

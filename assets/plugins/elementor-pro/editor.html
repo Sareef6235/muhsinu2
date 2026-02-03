@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elementor Pro - Visual Editor</title>
+    <link rel="stylesheet" href="../../css/styles.css"> <!-- Global Styles -->
+    <link rel="stylesheet" href="editor.css"> <!-- Editor Specific Styles -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #1e1e1e;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="elementor-ui" class="loading">
+        <!-- LOADING OVERLAY -->
+        <div id="e-loader">
+            <div class="e-loader-spinner"></div>
+            <div class="e-loader-text">Loading Editor...</div>
+        </div>
+
+        <!-- TOP BAR -->
+        <header class="e-top-bar">
+            <div class="e-top-left">
+                <button class="e-menu-toggle" id="e-main-menu-btn"><i class="ph-bold ph-list"></i></button>
+                <div class="e-logo">Elementor</div>
+            </div>
+
+            <div class="e-top-center">
+                <div class="e-responsive-controls">
+                    <button class="active" data-view="desktop" title="Desktop View"><i
+                            class="ph-bold ph-desktop"></i></button>
+                    <button data-view="tablet" title="Tablet View"><i class="ph-bold ph-device-tablet"></i></button>
+                    <button data-view="mobile" title="Mobile View"><i class="ph-bold ph-device-mobile"></i></button>
+                </div>
+            </div>
+
+            <div class="e-top-right">
+                <button class="e-btn-icon" title="History"><i class="ph-bold ph-clock-counter-clockwise"></i></button>
+                <button class="e-btn-icon" title="Navigator"><i class="ph-bold ph-layers"></i></button>
+                <button class="e-btn-publish" id="e-publish-btn">PUBLISH</button>
+            </div>
+        </header>
+
+        <!-- MAIN MENU DROPDOWN -->
+        <div class="e-main-menu-dropdown" id="e-main-menu" style="display: none;">
+            <div class="e-menu-section">
+                <div class="e-menu-title">File</div>
+                <div class="e-menu-item" action="new_page"><i class="ph ph-file-plus"></i> New Page</div>
+                <div class="e-menu-item" action="import_html" id="btn-import-html"><i class="ph ph-file-code"></i>
+                    Import HTML</div>
+                <div class="e-menu-item" action="export_html"><i class="ph ph-export"></i> Export HTML</div>
+            </div>
+            <div class="e-menu-section">
+                <div class="e-menu-title">Settings</div>
+                <div class="e-menu-item" action="site_settings"><i class="ph ph-gear"></i> Site Settings</div>
+                <div class="e-menu-item" action="theme_builder"><i class="ph ph-paint-brush"></i> Theme Builder</div>
+            </div>
+            <div class="e-menu-section">
+                <div class="e-menu-item" action="exit"><i class="ph ph-sign-out"></i> Exit to Dashboard</div>
+            </div>
+        </div>
+
+        <div class="e-workspace">
+            <!-- LEFT SIDEBAR -->
+            <aside class="e-sidebar">
+                <!-- SIDEBAR HEADER (Search/Tabs) -->
+                <div class="e-sidebar-header">
+                    <div class="e-sidebar-tabs">
+                        <button class="active" data-tab="elements"><i class="ph-bold ph-squares-four"></i></button>
+                        <button data-tab="global"><i class="ph-bold ph-globe"></i></button>
+                    </div>
+                </div>
+
+                <!-- SIDEBAR CONTENT -->
+                <div class="e-sidebar-content">
+
+                    <!-- WIDGETS PANEL -->
+                    <div id="panel-elements" class="e-panel active">
+                        <div class="e-search-box">
+                            <i class="ph ph-magnifying-glass"></i>
+                            <input type="text" id="widget-search" placeholder="Search Widget...">
+                        </div>
+                        <div class="e-widgets-list" id="e-widgets-container">
+                            <!-- Widgets injected here -->
+                        </div>
+                    </div>
+
+                    <!-- PROPERTIES PANEL -->
+                    <div id="panel-properties" class="e-panel">
+                        <div class="e-panel-header">
+                            <button class="e-back-to-elements"><i class="ph-bold ph-squares-four"></i></button>
+                            <span id="e-editing-label">Edit Heading</span>
+                        </div>
+                        <div class="e-properties-tabs">
+                            <button class="active" data-prop-tab="content">Content</button>
+                            <button data-prop-tab="style">Style</button>
+                            <button data-prop-tab="advanced">Advanced</button>
+                        </div>
+                        <div class="e-controls-container" id="e-properties-content">
+                            <!-- Controls injected here -->
+                        </div>
+                    </div>
+
+                    <!-- NAVIGATOR PANEL -->
+                    <div id="panel-navigator" class="e-panel">
+                        <div class="e-panel-header">
+                            <span>Navigator</span>
+                            <button class="e-close-navigator">&times;</button>
+                        </div>
+                        <div class="e-navigator-tree" id="e-navigator-content">
+                            <!-- Tree View -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SIDEBAR FOOTER -->
+                <div class="e-sidebar-footer">
+                    <button title="Settings"><i class="ph-bold ph-gear"></i></button>
+                    <button title="Navigator"><i class="ph-bold ph-layers"></i></button>
+                    <button title="History"><i class="ph-bold ph-clock-counter-clockwise"></i></button>
+                    <button title="Responsive Mode"><i class="ph-bold ph-monitor"></i></button>
+                    <button title="Preview"><i class="ph-bold ph-eye"></i></button>
+                </div>
+            </aside>
+
+            <!-- CANVAS AREA -->
+            <main class="e-canvas-frame">
+                <div id="e-canvas-wrapper" class="device-desktop">
+                    <div id="e-canvas" class="e-drop-zone">
+                        <!-- User Content Goes Here -->
+                        <div class="e-empty-canvas-state">
+                            <div class="e-add-section-box">
+                                <button class="e-add-new-section"><i class="ph-bold ph-plus"></i></button>
+                                <button class="e-add-template"><i class="ph-bold ph-folder"></i></button>
+                                <div class="e-drag-text">Drag widgets here</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- HTML IMPORT MODAL -->
+        <div id="modal-import-html" class="e-modal">
+            <div class="e-modal-content">
+                <div class="e-modal-header">
+                    <h3>Import HTML</h3>
+                    <button class="e-modal-close">&times;</button>
+                </div>
+                <div class="e-modal-body">
+                    <div class="e-import-tabs">
+                        <button class="active" data-tab="file">Upload File</button>
+                        <button data-tab="code">Paste Code</button>
+                    </div>
+
+                    <div class="e-import-tab-content active" id="import-file">
+                        <div class="e-file-drop-area" id="html-drop-zone">
+                            <i class="ph ph-upload-simple"></i>
+                            <p>Drag & Drop .html file here</p>
+                            <p>or</p>
+                            <label for="html-file-input" class="e-btn-secondary">Choose File</label>
+                            <input type="file" id="html-file-input" accept=".html,.htm" hidden>
+                        </div>
+                    </div>
+
+                    <div class="e-import-tab-content" id="import-code" style="display: none;">
+                        <textarea id="html-code-input" placeholder="Paste your HTML code here..."></textarea>
+                    </div>
+                </div>
+                <div class="e-modal-footer">
+                    <button class="e-btn-secondary e-modal-close">Cancel</button>
+                    <button class="e-btn-primary" id="btn-process-import">Import</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Initialization via Plugin System -->
+    <script type="module">
+        import PluginLoader from '../../system/plugin-loader.js';
+
+        // Ensure core is loaded then init editor
+        const init = async () => {
+            // Mock ensuring Elementor plugin is loaded
+            if (window.PluginManager) {
+                // We assume PluginLoader is already instantiated globally or we instantiate it
+            }
+
+            // Loading elementor logic dynamically if not present
+            if (!window.ElementorPro) {
+                await import('./editor.js');
+            }
+
+            if (window.ElementorPro && window.ElementorPro.initEditor) {
+                window.ElementorPro.initEditor();
+            } else {
+                console.error("Failed to load Elementor Pro Editor");
+            }
+        };
+
+        // If PluginManager is ready, go. Else wait.
+        if (document.readyState === 'complete') {
+            init();
+        } else {
+            window.addEventListener('load', init);
+        }
+    </script>
+</body>
+
+</html>

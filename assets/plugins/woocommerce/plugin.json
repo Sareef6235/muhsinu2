@@ -1,0 +1,29 @@
+{
+    "name": "WooCommerce",
+    "version": "1.0.0",
+    "description": "E-commerce platform for services and payments",
+    "author": "MHMV Team",
+    "main": "woocommerce.js",
+    "styles": [
+        "woocommerce.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": true,
+    "hooks": {
+        "init": "WooCommerce.init"
+    },
+    "settings": {
+        "currency": "INR",
+        "paymentGateways": [
+            "upi",
+            "razorpay"
+        ]
+    },
+    "capabilities": [
+        "cart",
+        "checkout",
+        "payments",
+        "orders"
+    ]
+}

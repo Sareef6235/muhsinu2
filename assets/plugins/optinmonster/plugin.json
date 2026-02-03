@@ -1,0 +1,21 @@
+{
+    "name": "OptinMonster",
+    "version": "1.0.0",
+    "description": "Popup and lead capture system",
+    "author": "MHMV Team",
+    "main": "optinmonster.js",
+    "styles": [
+        "optinmonster.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": false,
+    "hooks": {
+        "init": "OptinMonster.init"
+    },
+    "capabilities": [
+        "popups",
+        "lead_capture",
+        "triggers"
+    ]
+}

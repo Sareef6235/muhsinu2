@@ -1,0 +1,26 @@
+{
+    "name": "Elementor Pro",
+    "version": "1.0.0",
+    "description": "Visual page builder with drag-and-drop interface",
+    "author": "MHMV Team",
+    "main": "editor.js",
+    "styles": [
+        "editor.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": false,
+    "hooks": {
+        "init": "ElementorPro.init"
+    },
+    "settings": {
+        "enableWidgets": true,
+        "enableTemplates": true
+    },
+    "capabilities": [
+        "visual_builder",
+        "widgets",
+        "templates",
+        "responsive_editing"
+    ]
+}

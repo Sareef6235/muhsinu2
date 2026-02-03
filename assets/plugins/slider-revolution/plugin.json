@@ -1,0 +1,21 @@
+{
+    "name": "Slider Revolution",
+    "version": "1.0.0",
+    "description": "Advanced slider with animations",
+    "author": "MHMV Team",
+    "main": "slider.js",
+    "styles": [
+        "slider.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": false,
+    "hooks": {
+        "init": "SliderRevolution.init"
+    },
+    "capabilities": [
+        "sliders",
+        "animations",
+        "responsive"
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "name": "Booking System",
+    "version": "1.0.0",
+    "description": "Booking and schedule management",
+    "author": "MHMV Team",
+    "main": "booking.js",
+    "styles": [
+        "booking.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": true,
+    "hooks": {
+        "init": "BookingSystem.init"
+    },
+    "capabilities": [
+        "calendar",
+        "bookings",
+        "schedules"
+    ]
+}

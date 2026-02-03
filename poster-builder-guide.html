@@ -5,9 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poster Builder Guide - Create Beautiful Posters & Notices</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/phosphor-icons/1.4.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/modern-nav.css">
+    <link rel="stylesheet" href="assets/css/site-footer.css">
+    <script src="assets/js/utils/performance.js" defer></script>
+    <script src="assets/js/site-languages.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         :root {
             --guide-accent: #667eea;
@@ -171,86 +175,55 @@
 <body>
     <!-- Header -->
     <header id="main-header">
-        <nav class="container">
-            <a href="index.html#hero" class="logo">MHMV 2026.</a>
-            <ul class="nav-links">
-                <li><a href="index.html#hero">Home</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li class="dropdown">
-                    <a href="gallery.html" class="dropdown-toggle">Gallery</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
-                        <li><a href="gallery.html?tab=video">Video Gallery</a></li>
-                    </ul>
-                </li>
-                <li><a href="poster-builder.html" style="font-weight: 600;">poster builder <span
-                            style="font-size: 0.7em; background: var(--primary-color); color: #000; padding: 2px 4px; border-radius: 4px; margin-left: 5px;">NEW</span></a>
-                </li>
-                <li><a href="poster-builder-guide.html">Builder Guide</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">Student Zone</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="creative.html">Fee Payment</a></li>
-                        <li><a href="creation_receipt.html">Approved Receipts</a></li>
-                        <li><a href="creations.html">Creations</a></li>
-                    </ul>
-                </li>
-                <li><a href="student_dashboard.html">Student Dashboard</a></li>
-                <li><a href="booking.html" style="color: #00f3ff;">Booking</a></li>
-            </ul>
-            <button class="mobile-menu-btn" aria-label="Toggle navigation">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-        </nav>
+        <!-- Navigation injected via site-nav.js -->
     </header>
 
     <main class="guide-container">
         <section class="guide-hero animate-fade-up">
             <h1>Poster Builder Guide</h1>
             <p>Master the art of creating professional posters, notices, and announcements with our intuitive tool.</p>
-            <a href="poster-builder.html" class="btn btn-primary" style="display: inline-block;">Launch Builder</a>
+            <a href="pages/poster-builder/index.html" class="btn btn-primary" style="display: inline-block;">Launch
+                Builder</a>
         </section>
 
         <section class="step-grid">
             <div class="step-card animate-fade-up delay-1">
                 <span class="step-number">01</span>
-                <i class="ph ph-palette step-icon"></i>
-                <h2>Choose Template</h2>
-                <p>Browse through 100+ professionally designed templates. Use search and category filters to find the
-                    perfect starting point.</p>
+                <i class="ph ph-squares-four step-icon"></i>
+                <h2>Elements Library</h2>
+                <p>Access a massive library of 100+ premium assets including Shapes, Icons, Stickers, and multilingual
+                    Typography (English, Arabic, Malayalam).</p>
             </div>
 
             <div class="step-card animate-fade-up delay-2">
                 <span class="step-number">02</span>
-                <i class="ph ph-text-aa step-icon"></i>
-                <h2>Customize Content</h2>
-                <p>Edit titles, descriptions, and dates. Toggle visibility of sections and upload your own images or
-                    brand logos.</p>
+                <i class="ph ph-magnet step-icon"></i>
+                <h2>Smart Snap & Align</h2>
+                <p>Enjoy precision design with our 10px snap-to-grid system. Blue smart guides automatically appear to
+                    help you align elements perfectly.</p>
             </div>
 
             <div class="step-card animate-fade-up delay-3">
                 <span class="step-number">03</span>
-                <i class="ph ph-hand-grabbing step-icon"></i>
-                <h2>Drag & Arrange</h2>
-                <p>Rearrange layout elements by dragging them in the live preview. Create unique structures that fit
-                    your specific needs.</p>
+                <i class="ph ph-magic-wand step-icon"></i>
+                <h2>Magic AI Design</h2>
+                <p>One click to auto-arrange, color-coordinate, and animate your entire canvas. A perfect starting point
+                    for any poster.</p>
             </div>
 
             <div class="step-card animate-fade-up delay-1">
                 <span class="step-number">04</span>
-                <i class="ph ph-paint-brush-broad step-icon"></i>
-                <h2>Style Your Way</h2>
-                <p>Change background colors, text colors, and fonts. Apply accent colors that match your event's theme.
-                </p>
+                <i class="ph ph-arrows-out-cardinal step-icon"></i>
+                <h2>Interactive Controls</h2>
+                <p>Resize with corner handles and rotate with precision (hold Shift for 45° snaps). Double-click text to
+                    quick-edit instantly.</p>
             </div>
 
             <div class="step-card animate-fade-up delay-2">
                 <span class="step-number">05</span>
-                <i class="ph ph-eye step-icon"></i>
-                <h2>Live Preview</h2>
-                <p>Watch your design come to life in real-time. Zoom in/out to check fine details before you finalize.
+                <i class="ph ph-star step-icon"></i>
+                <h2>Favorites & History</h2>
+                <p>Star your favorite elements for quick access and easily find recently used items in the library tabs.
                 </p>
             </div>
 
@@ -258,8 +231,8 @@
                 <span class="step-number">06</span>
                 <i class="ph ph-download-simple step-icon"></i>
                 <h2>Export & Share</h2>
-                <p>Download your masterpiece as PNG or PDF. You can also copy HTML code to embed it directly or save as
-                    JSON for later.</p>
+                <p>Download your masterpiece as high-quality PNG or PDF. Share directly to WhatsApp with a single click.
+                </p>
             </div>
         </section>
 
@@ -285,13 +258,15 @@
             <h2>Ready to start designing?</h2>
             <p>No account required. Everything stays on your device.</p>
             <div class="cta-group" style="margin-top: 30px;">
-                <a href="poster-builder.html" class="btn btn-primary">Open Poster Builder</a>
-                <a href="index.html" class="btn btn-secondary">Back to Home</a>
+                <a href="pages/poster-builder/" class="btn btn-primary">Open Poster Builder</a>
+                <a href="./" class="btn btn-secondary">Back to Home</a>
             </div>
         </section>
     </main>
 
-    <script src="site-nav.js"></script>
+    <script src="assets/js/site-nav.js" defer></script>
+    <script src="assets/js/site-footer.js" defer></script>
+    <script src="assets/js/script.js" defer></script>
 </body>
 
 </html>

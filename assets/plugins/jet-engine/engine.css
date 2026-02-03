@@ -1,0 +1,53 @@
+/* JetEngine Plugin Styles */
+
+.jet-item {
+    background: rgba(17, 17, 17, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.jet-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+}
+
+.jet-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.jet-item h3 {
+    margin: 0 0 10px 0;
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+.jet-item p {
+    color: #aaa;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.jet-list-item {
+    background: rgba(17, 17, 17, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.jet-list-item h4 {
+    margin: 0 0 5px 0;
+    color: #fff;
+}
+
+.jet-list-item p {
+    margin: 0;
+    color: #888;
+    font-size: 0.85rem;
+}

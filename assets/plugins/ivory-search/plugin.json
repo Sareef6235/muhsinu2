@@ -1,0 +1,21 @@
+{
+    "name": "Ivory Search",
+    "version": "1.0.0",
+    "description": "Advanced site search with autocomplete",
+    "author": "MHMV Team",
+    "main": "search.js",
+    "styles": [
+        "search.css"
+    ],
+    "dependencies": [],
+    "admin": false,
+    "autoload": true,
+    "hooks": {
+        "init": "IvorySearch.init"
+    },
+    "capabilities": [
+        "search",
+        "autocomplete",
+        "filters"
+    ]
+}

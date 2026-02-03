@@ -1,0 +1,19 @@
+{
+    "name": "Jetpack",
+    "version": "1.0.0",
+    "description": "Performance and optimization tools",
+    "author": "MHMV Team",
+    "main": "jetpack.js",
+    "styles": [],
+    "dependencies": [],
+    "admin": true,
+    "autoload": true,
+    "hooks": {
+        "init": "Jetpack.init"
+    },
+    "capabilities": [
+        "lazy_loading",
+        "image_optimization",
+        "cdn"
+    ]
+}

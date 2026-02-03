@@ -1,0 +1,21 @@
+{
+    "name": "Advanced Custom Fields",
+    "version": "1.0.0",
+    "description": "Custom fields engine with field types and conditional logic",
+    "author": "MHMV Team",
+    "main": "acf.js",
+    "styles": [
+        "acf.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": true,
+    "hooks": {
+        "init": "ACF.init"
+    },
+    "capabilities": [
+        "custom_fields",
+        "field_groups",
+        "conditional_logic"
+    ]
+}

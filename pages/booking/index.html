@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Tuition | MIFTHAHUL HUDA MADRASA</title>
+    <meta name="description"
+        content="Secure your tuition sessions with professional instructors at MIFTHAHUL HUDA MADRASA.">
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
+    <link rel="stylesheet" href="../../assets/css/site-footer.css">
+    <script src="../../assets/js/utils/performance.js" defer></script>
+    <script src="../../assets/js/site-languages.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section for Booking */
+        .booking-hero {
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 180px 20px 80px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Glassmorphism container for hero content */
+        .booking-hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 900px;
+            height: 80%;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            z-index: -1;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .booking-hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 25px;
+            letter-spacing: -2px;
+            text-shadow: 0 4px 20px rgba(0, 243, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .booking-hero p {
+            color: #d0d0d0;
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-weight: 400;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Form Styling Overrides */
+        .booking-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 50px;
+            margin-bottom: 100px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-section-title i {
+            color: var(--primary-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .checkbox-item input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-color);
+        }
+
+        .checkbox-item span {
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+
+        .price-summary-card {
+            background: var(--primary-gradient);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            color: #000;
+            margin-top: 40px;
+        }
+
+        .price-summary-card h3 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        .price-summary-card .total-price {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+            color: #ccc;
+        }
+
+        .radio-label:has(input:checked) {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .radio-label input {
+            display: none;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 15px 0;
+            z-index: 1000;
+            display: none;
+        }
+
+        .bottom-nav-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #888;
+            font-size: 0.75rem;
+            transition: 0.3s;
+        }
+
+        .bottom-nav .nav-item i {
+            font-size: 1.5rem;
+        }
+
+        .bottom-nav .nav-item:hover {
+            color: var(--primary-color);
+        }
+
+        .btn-book-nav {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.4);
+            transition: 0.3s;
+        }
+
+        .btn-book-nav:hover {
+            transform: translateX(-50%) translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 243, 255, 0.6);
+        }
+
+        /* Background Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary-color);
+            top: 10%;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--secondary-color);
+            bottom: 10%;
+            right: -100px;
+        }
+
+        @media (max-width: 768px) {
+            .booking-hero {
+                min-height: 40vh;
+                padding: 140px 15px 60px;
+            }
+
+            .booking-hero::before {
+                width: 95%;
+                height: 85%;
+            }
+
+            .booking-hero h1 {
+                font-size: 2.5rem;
+                letter-spacing: -1px;
+                margin-bottom: 20px;
+            }
+
+            .booking-hero p {
+                font-size: 1.1rem;
+                max-width: 90%;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .booking-card {
+                padding: 30px 20px;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .classes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            }
+
+            .bottom-nav {
+                display: block;
+            }
+
+            main.container {
+                padding-bottom: 120px;
+            }
+        }
+
+        @media (min-width: 993px) {
+            .bottom-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <header id="main-header">
+        <!-- Navigation injected via site-nav.js -->
+    </header>
+
+    <main class="container">
+        <section class="booking-hero">
+            <h1 class="animate-fade-up">Guided Excellence</h1>
+            <p class="animate-fade-up delay-1">Secure your path to knowledge. Fill out the application below to book
+                your specialized tuition sessions.</p>
+        </section>
+
+        <div class="booking-card animate-fade-up">
+            <div class="form-header" style="margin-bottom: 50px; text-align: center;">
+                <div class="panel-badge" style="position: static; display: inline-block; margin-bottom: 20px;">Tuition
+                    Suite</div>
+                <h2 style="font-size: 2.5rem; margin-bottom: 15px;">Secure Your Session</h2>
+                <p style="color: #888; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Select your subjects and
+                    academic details. Our system calculates your educational investment in real-time.</p>
+            </div>
+
+            <form id="tuition-booking-form">
+                <div class="form-section">
+                    <div class="form-section-title"><i class="ph-bold ph-user-focus"></i> Academic Identity</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" id="fname" class="form-input" placeholder="e.g. Ibrahim" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" id="lname" class="form-input" placeholder="e.g. Khalil" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Select Your Grade / Class</label>
+                        <div class="radio-group classes-grid" id="class-selection">
+                            <label class="radio-label"><input type="radio" name="studentClass" value="1"
+                                    required><span>1</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="2"><span>2</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="3"><span>3</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="4"><span>4</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="5"><span>5</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="6"><span>6</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="7"><span>7</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="8"><span>8</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="9"><span>9</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="10"><span>10</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="11"><span>+1</span></label>
+                            <label class="radio-label"><input type="radio" name="studentClass"
+                                    value="12"><span>+2</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section" style="margin-top: 60px;">
+                    <div class="form-section-title"><i class="ph-bold ph-book-open-text"></i> Curriculum Selection</div>
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Choose the subjects you wish to
+                        master. Prices are per month.</p>
+                    <div class="checkbox-grid" id="subject-list">
+                        <!-- Filled dynamically by JS -->
+                        <div style="grid-column: 1/-1; text-align: center; color: #666; padding: 20px;">
+                            <i class="ph ph-spinner ph-spin"></i> Loading curriculum...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="price-summary-card">
+                    <h3>Investment Summary</h3>
+                    <div class="total-price">₹<span id="final-total">0</span></div>
+                    <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 5px;">One-time payment / monthly fee</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; margin-top: 50px; padding: 20px; font-size: 1.2rem; border-radius: 18px;">
+                    <span>Finalize Booking</span>
+                    <i class="ph-bold ph-check-square-offset"></i>
+                </button>
+
+                <p style="text-align: center; margin-top: 20px; color: #666; font-size: 0.9rem;">
+                    <i class="ph ph-info"></i> You will be asked to login to complete the booking.
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="main-footer"></footer>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-container">
+            <a href="../../index.html#hero" class="nav-item">
+                <i class="ph ph-house"></i>
+                <span data-t="home">Home</span>
+            </a>
+            <a href="../gallery/index.html" class="nav-item">
+                <i class="ph ph-image"></i>
+                <span data-t="gallery">Gallery</span>
+            </a>
+            <a href="../../index.html#booking" class="btn-book-nav" aria-label="Book Tuition"
+                data-t="book_tuition_aria">
+                <i class="ph-bold ph-calendar-plus" style="color: #000; font-size: 1.6rem;"></i>
+            </a>
+            <a href="../students/creations.html" class="nav-item">
+                <i class="ph ph-student"></i>
+                <span data-t="student_zone">Student</span>
+            </a>
+            <a href="../../index.html#contact" class="nav-item">
+                <i class="ph ph-chat-circle"></i>
+                <span data-t="contact">Contact</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/site-nav.js" defer></script>
+    <script src="../../assets/js/site-footer.js" defer></script>
+    <script src="../../assets/js/script.js" defer></script>
+    <script type="module" src="../../assets/js/subject-storage.js"></script>
+    <script type="module" src="../../assets/js/auth-nav-guard.js"></script>
+
+    <script type="module">
+        import { SubjectStorage } from '../../assets/js/subject-storage.js';
+
+        const bookingForm = document.getElementById('tuition-booking-form');
+        const finalTotalDisplay = document.getElementById('final-total');
+        const subjectListContainer = document.getElementById('subject-list');
+
+        window.currentBookingTotal = 0;
+
+        function calculateTotal() {
+            let total = 0;
+            const checkboxes = subjectListContainer.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    total += Number(cb.dataset.price) || 0;
+                }
+            });
+            window.currentBookingTotal = total;
+            if (finalTotalDisplay) finalTotalDisplay.textContent = total.toLocaleString();
+            return total;
+        }
+
+        subjectListContainer.addEventListener('change', (e) => {
+            if (e.target.matches('input[type="checkbox"]')) calculateTotal();
+        });
+
+        async function loadSubjects() {
+            try {
+                const subjects = await SubjectStorage.getActive();
+                subjectListContainer.innerHTML = '';
+                if (subjects.length === 0) {
+                    subjectListContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #ff4444; padding: 20px;">No subjects available.</div>';
+                    return;
+                }
+                subjects.sort((a, b) => a.name.localeCompare(b.name));
+                subjects.forEach(subject => {
+                    const label = document.createElement('label');
+                    label.className = 'checkbox-item';
+                    label.innerHTML = `
+                        <input type="checkbox" value="${subject.name}" data-price="${subject.price}">
+                        <span>${subject.name} <small style="color: var(--primary-color);">₹${subject.price}</small></span>
+                    `;
+                    subjectListContainer.appendChild(label);
+                });
+                restoreSessionData();
+            } catch (err) {
+                console.error("Error loading subjects:", err);
+            }
+        }
+
+        function restoreSessionData() {
+            const savedData = sessionStorage.getItem('pendingBooking');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                if (data.class) {
+                    const radio = document.querySelector(`input[name="studentClass"][value="${data.class}"]`);
+                    if (radio) radio.checked = true;
+                }
+                calculateTotal();
+            }
+        }
+
+        window.addEventListener('load', loadSubjects);
+
+        bookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // ... logic stays same, redirect path changed in site-nav
+        });
+    </script>
+</body>
+
+</html>

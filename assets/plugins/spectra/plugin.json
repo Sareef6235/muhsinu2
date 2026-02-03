@@ -1,0 +1,21 @@
+{
+    "name": "Spectra",
+    "version": "1.0.0",
+    "description": "Premium UI blocks and components",
+    "author": "MHMV Team",
+    "main": "spectra.js",
+    "styles": [
+        "spectra.css"
+    ],
+    "dependencies": [],
+    "admin": false,
+    "autoload": true,
+    "hooks": {
+        "init": "Spectra.init"
+    },
+    "capabilities": [
+        "blocks",
+        "components",
+        "animations"
+    ]
+}

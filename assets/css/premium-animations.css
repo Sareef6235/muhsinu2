@@ -1,0 +1,557 @@
+/* 
+ * Premium Animation Preset System
+ * Luxury Motion Design Foundations
+ */
+
+:root {
+    --luxury-easing: cubic-bezier(0.23, 1, 0.32, 1);
+    /* EaseOutQuint */
+    --elastic-easing: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+    --soft-easing: cubic-bezier(0.4, 0, 0.2, 1);
+
+    --anim-duration: 0.8s;
+    --anim-delay: 0s;
+    --anim-intensity: 1;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    ::before,
+    ::after {
+        animation-delay: -1ms !important;
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        background-attachment: initial !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0s !important;
+        transition-delay: 0s !important;
+    }
+}
+
+/* --- Entrance Animations --- */
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(calc(30px * var(--anim-intensity)));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeScale {
+    from {
+        opacity: 0;
+        transform: scale(calc(0.9 * var(--anim-intensity)));
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes glassReveal {
+    from {
+        opacity: 0;
+        filter: blur(20px);
+        transform: scale(1.1);
+    }
+
+    to {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+    }
+}
+
+@keyframes depthPop {
+    0% {
+        opacity: 0;
+        transform: perspective(1000px) translateZ(-100px) rotateX(20deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: perspective(1000px) translateZ(0) rotateX(0);
+    }
+}
+
+@keyframes elasticReveal {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+
+    60% {
+        transform: scale(1.1);
+    }
+
+    80% {
+        transform: scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* --- Exit Animations --- */
+
+@keyframes fadeOutBlur {
+    from {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        filter: blur(10px);
+        transform: scale(0.9);
+    }
+}
+
+@keyframes slideOutDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+}
+
+/* --- Loop / Ambient --- */
+
+@keyframes antiGravity {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(calc(-15px * var(--anim-intensity)));
+    }
+}
+
+@keyframes breathing {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(calc(1 + (0.05 * var(--anim-intensity))));
+    }
+}
+
+@keyframes lightShimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes lightSweep {
+    0% {
+        transform: translateX(-100%) rotate(25deg);
+    }
+
+    100% {
+        transform: translateX(200%) rotate(25deg);
+    }
+}
+
+@keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(calc(-30px * var(--anim-intensity, 1)));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeLeft {
+    from {
+        opacity: 0;
+        transform: translateX(calc(30px * var(--anim-intensity, 1)));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeRight {
+    from {
+        opacity: 0;
+        transform: translateX(calc(-30px * var(--anim-intensity, 1)));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes zoomPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    70% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-30px);
+    }
+
+    60% {
+        transform: translateY(-15px);
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+@keyframes swing {
+    20% {
+        transform: rotate(15deg);
+    }
+
+    40% {
+        transform: rotate(-10deg);
+    }
+
+    60% {
+        transform: rotate(5deg);
+    }
+
+    80% {
+        transform: rotate(-5deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes blurIn {
+    from {
+        filter: blur(20px);
+        opacity: 0;
+    }
+
+    to {
+        filter: blur(0);
+        opacity: 1;
+    }
+}
+
+@keyframes textGlow {
+
+    0%,
+    100% {
+        text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    }
+
+    50% {
+        text-shadow: 0 0 30px rgba(0, 243, 255, 1);
+    }
+}
+
+@keyframes flip3D {
+    0% {
+        transform: perspective(1000px) rotateY(180deg);
+        opacity: 0;
+    }
+
+    100% {
+        transform: perspective(1000px) rotateY(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes typewriter {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes neonFlicker {
+
+    0%,
+    18%,
+    22%,
+    25%,
+    53%,
+    57%,
+    100% {
+        text-shadow: 0 0 4px #fff, 0 0 11px #fff, 0 0 19px #fff, 0 0 40px var(--neon-color, #00f3ff);
+        opacity: 1;
+    }
+
+    20%,
+    24%,
+    55% {
+        text-shadow: none;
+        opacity: 0.7;
+    }
+}
+
+/* --- Hover Foundations --- */
+
+.magnetic-wrap {
+    display: inline-block;
+    transition: transform 0.3s var(--luxury-easing);
+}
+
+.glass-reflection {
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-reflection::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
+    transform: skewX(-25deg);
+    transition: 0.75s;
+}
+
+.glass-reflection:hover::after {
+    left: 150%;
+}
+
+.anim-fade-down {
+    animation: fadeDown var(--anim-duration) var(--luxury-easing) both;
+}
+
+.anim-fade-left {
+    animation: fadeLeft var(--anim-duration) var(--luxury-easing) both;
+}
+
+.anim-fade-right {
+    animation: fadeRight var(--anim-duration) var(--luxury-easing) both;
+}
+
+.anim-zoom-pop {
+    animation: zoomPop var(--anim-duration) var(--elastic-easing) both;
+}
+
+.anim-slide-up {
+    animation: slideUp var(--anim-duration) var(--luxury-easing) both;
+}
+
+.anim-spin {
+    animation: spin 10s linear infinite;
+}
+
+.anim-bounce {
+    animation: bounce 2s infinite;
+}
+
+.anim-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+.anim-swing {
+    animation: swing 2s ease-in-out infinite;
+}
+
+.anim-blur-in {
+    animation: blurIn var(--anim-duration) ease-out both;
+}
+
+.anim-text-glow {
+    animation: textGlow 2s infinite;
+}
+
+.anim-3d-flip {
+    animation: flip3D 1.2s var(--luxury-easing) both;
+}
+
+.anim-typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typewriter 2s steps(40, end);
+}
+
+/* --- Application Classes --- */
+
+.anim-fade-up {
+    animation: fadeUp var(--anim-duration) var(--luxury-easing) var(--anim-delay) both;
+}
+
+.anim-fade-scale {
+    animation: fadeScale var(--anim-duration) var(--luxury-easing) var(--anim-delay) both;
+}
+
+.anim-glass-reveal {
+    animation: glassReveal var(--anim-duration) var(--luxury-easing) var(--anim-delay) both;
+}
+
+.anim-depth-pop {
+    animation: depthPop var(--anim-duration) var(--luxury-easing) var(--anim-delay) both;
+}
+
+.anim-elastic-reveal {
+    animation: elasticReveal var(--anim-duration) var(--elastic-easing) var(--anim-delay) both;
+}
+
+.anim-loop-float {
+    animation: antiGravity 5s ease-in-out infinite;
+}
+
+.anim-loop-breath {
+    animation: breathing 4s ease-in-out infinite;
+}
+
+.anim-loop-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background-size: 200% 100%;
+    animation: lightShimmer 3s infinite linear;
+}
+
+/* Text Shimmer */
+.text-shimmer {
+    background: linear-gradient(to right, #fff 20%, #888 40%, #888 60%, #fff 80%);
+    background-size: 200% auto;
+    color: #fff;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: lightShimmer 3s linear infinite;
+}
+
+/* --- Scroll Trigger Animations --- */
+.animate-fade-up,
+.animate-fade-left,
+.animate-fade-right,
+.animate-scale-in {
+    opacity: 0;
+    transition: opacity var(--anim-duration) var(--luxury-easing),
+        transform var(--anim-duration) var(--luxury-easing);
+    transition-delay: var(--anim-delay);
+}
+
+.animate-fade-up {
+    transform: translateY(30px) !important;
+}
+
+.animate-fade-left {
+    transform: translateX(-30px) !important;
+}
+
+.animate-fade-right {
+    transform: translateX(30px) !important;
+}
+
+.animate-scale-in {
+    transform: scale(0.9) !important;
+}
+
+.animate-fade-up.active,
+.animate-fade-left.active,
+.animate-fade-right.active,
+.animate-scale-in.active {
+    opacity: 1 !important;
+    transform: translate(0) scale(1) !important;
+}
+
+.delay-1 {
+    transition-delay: 0.1s !important;
+}
+
+.delay-2 {
+    transition-delay: 0.2s !important;
+}
+
+.delay-3 {
+    transition-delay: 0.3s !important;
+}
+
+.delay-4 {
+    transition-delay: 0.4s !important;
+}
+
+.delay-5 {
+    transition-delay: 0.5s !important;
+}

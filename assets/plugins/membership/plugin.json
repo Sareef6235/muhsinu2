@@ -1,0 +1,29 @@
+{
+    "name": "Membership",
+    "version": "1.0.0",
+    "description": "User roles and membership management",
+    "author": "MHMV Team",
+    "main": "membership.js",
+    "styles": [
+        "membership.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": true,
+    "hooks": {
+        "init": "Membership.init"
+    },
+    "settings": {
+        "roles": [
+            "student",
+            "teacher",
+            "admin"
+        ],
+        "enableSubscriptions": true
+    },
+    "capabilities": [
+        "roles",
+        "access_control",
+        "subscriptions"
+    ]
+}

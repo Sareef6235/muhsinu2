@@ -1,0 +1,30 @@
+{
+    "name": "WPML",
+    "version": "1.0.0",
+    "description": "Multi-language support (Arabic, Malayalam, English)",
+    "author": "MHMV Team",
+    "main": "wpml.js",
+    "styles": [
+        "wpml.css"
+    ],
+    "dependencies": [],
+    "admin": true,
+    "autoload": true,
+    "hooks": {
+        "init": "WPML.init"
+    },
+    "settings": {
+        "languages": [
+            "en",
+            "ar",
+            "ml"
+        ],
+        "defaultLanguage": "en",
+        "enableRTL": true
+    },
+    "capabilities": [
+        "translations",
+        "language_switcher",
+        "rtl_support"
+    ]
+}

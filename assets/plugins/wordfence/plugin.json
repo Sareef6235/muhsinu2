@@ -1,0 +1,19 @@
+{
+    "name": "Wordfence",
+    "version": "1.0.0",
+    "description": "Security and firewall protection",
+    "author": "MHMV Team",
+    "main": "wordfence.js",
+    "styles": [],
+    "dependencies": [],
+    "admin": true,
+    "autoload": true,
+    "hooks": {
+        "init": "Wordfence.init"
+    },
+    "capabilities": [
+        "firewall",
+        "login_protection",
+        "security_logs"
+    ]
+}

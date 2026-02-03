@@ -1,0 +1,21 @@
+{
+    "name": "CookieYes",
+    "version": "1.0.0",
+    "description": "Cookie consent and GDPR compliance",
+    "author": "MHMV Team",
+    "main": "cookieyes.js",
+    "styles": [
+        "cookieyes.css"
+    ],
+    "dependencies": [],
+    "admin": false,
+    "autoload": true,
+    "hooks": {
+        "init": "CookieYes.init"
+    },
+    "capabilities": [
+        "consent_banner",
+        "cookie_management",
+        "gdpr"
+    ]
+}

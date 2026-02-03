@@ -6,7 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MIFTHAHUL HUDA MADRASA</title>
     <meta name="description" content="Portfolio of MIFTHAHUL HUDA MADRASA. Exploring technology and sharing knowledge.">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/modern-nav.css">
+    <link rel="stylesheet" href="assets/css/site-footer.css">
+    <link rel="stylesheet" href="assets/css/site-languages.css">
+
+    <!-- Critical Scripts (Optimized) -->
+    <script src="assets/js/utils/performance.js" defer></script>
+    <script src="assets/js/site-languages.js" defer></script>
+    <script src="assets/js/subject-storage.js" defer></script>
+    <script type="module" src="assets/js/services-cms.js" defer></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -15,65 +25,7 @@
 
 <body>
     <header id="main-header">
-        <nav class="container">
-            <a href="index.html#hero" class="logo">MHMV 2026.</a>
-            <ul class="nav-links">
-                <li><a href="index.html#hero">Home</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li class="dropdown">
-                    <a href="gallery.html" class="dropdown-toggle">Gallery</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="gallery.html?tab=photo">Photo Gallery</a></li>
-                        <li><a href="gallery.html?tab=video">Video Gallery</a></li>
-                    </ul>
-                </li>
-                <li><a href="poster-builder.html" style="font-weight: 600;">poster builder <span
-                            style="font-size: 0.7em; background: var(--primary-color); color: #000; padding: 2px 4px; border-radius: 4px; margin-left: 5px;">NEW</span></a>
-                </li>
-                <li><a href="poster-builder-guide.html">Builder Guide</a></li>
-
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">Student Zone</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="creative.html">Fee Payment</a></li>
-                        <li><a href="creation_receipt.html">Approved Receipts</a></li>
-                        <li><a href="creations.html">Creations</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">Result</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="result.html">Exam Result (New)</a></li>
-                        <li><a href="exam_result.html">Exam Result (Old)</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">News</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="index.html#news">Latest Updates</a></li>
-                        <li><a href="news.html">All News</a></li>
-                    </ul>
-                </li>
-                <li><a href="student_dashboard.html">Student Dashboard</a></li>
-                <li><a href="booking.html" style="color: #00f3ff;">Booking</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">Portal</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="admin/dashboard.html">Portal</a></li>
-
-                        <li class="admin-only" style="display: none;"><a href="admin/dashboard.html"
-                                style="font-weight: 600; color: var(--primary-color);">Admin
-                                Panel</a></li>
-                    </ul>
-                </li>
-                <li><a href="#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
-            </ul>
-            <button class="mobile-menu-btn" aria-label="Toggle navigation">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-        </nav>
+        <!-- Navigation injected via site-nav.js -->
     </header>
 
     <main>
@@ -92,18 +44,20 @@
 
             <!-- Content overlay -->
             <div class="container hero-content" style="position: relative; z-index: 1;">
-                <h2 class="animate-fade-up">Welcome to</h2>
-                <h1 class="animate-fade-up delay-1">MIFTHAHUL HUDA MADRASA</h1>
-                <h3 class="animate-fade-up delay-2">Vengara S S Road</h3>
-                <p class="animate-fade-up delay-3">
+                <h2 class="animate-fade-up" data-t="welcome_to">Welcome to</h2>
+                <h1 class="animate-fade-up delay-1" data-t="mhmv_title">MIFTHAHUL HUDA MADRASA</h1>
+                <h3 class="animate-fade-up delay-2" data-t="address_vengara">Vengara S S Road</h3>
+                <p class="animate-fade-up delay-3" data-t="hero_cta_text">
                     A simple reminder that consistent effort and dedication in learning today pave the way for
                     achievement and success in the future.
                 </p>
                 <div class="cta-group animate-fade-up delay-4">
-                    <a href="creation_receipt.html" class="btn btn-primary">Receipt</a>
-                    <a href="gallery.html?tab=photo" class="btn btn-secondary"
-                        style="border-color: var(--primary-color); color: var(--primary-color);">View Gallery</a>
-                    <a href="#contact" class="btn btn-secondary">Contact Us</a>
+                    <a href="pages/students/creation_receipt.html" class="btn btn-primary"
+                        data-t="btn_receipt">Receipt</a>
+                    <a href="pages/gallery/index.html?tab=photo" class="btn btn-secondary"
+                        style="border-color: var(--primary-color); color: var(--primary-color);"
+                        data-t="btn_gallery">View Gallery</a>
+                    <a href="#contact" class="btn btn-secondary" data-t="btn_contact">Contact Us</a>
                 </div>
             </div>
 
@@ -113,8 +67,8 @@
             <div class="container">
                 <div class="about-grid overhaul-content">
                     <div class="about-text">
-                        <h2 class="section-title">Student Results</h2>
-                        <p>
+                        <h2 class="section-title" data-t="results_title">Student Results</h2>
+                        <p data-t="results_desc">
                             Verify student performance directly from our official examination database.
                             Enter your Register Number below to view immediate results and standigs.
                         </p>
@@ -137,15 +91,15 @@
                         <div id="home-result-container"
                             style="display: none; background: rgba(0, 243, 255, 0.03); border: 1px solid rgba(0, 243, 255, 0.2); padding: 25px; border-radius: 15px; margin-top: 20px; animation: fadeIn 0.5s ease;">
                             <div id="home-result-area"></div>
-                            <a href="result.html" class="btn-link"
+                            <a href="pages/results/" class="btn-link"
                                 style="display: inline-block; margin-top: 15px; color: var(--primary-color);">View Full
                                 Transcript →</a>
                         </div>
                     </div>
 
                     <div class="about-text">
-                        <h2 class="section-title">Educational Programs</h2>
-                        <p>
+                        <h2 class="section-title" data-t="programs_title">Educational Programs</h2>
+                        <p data-t="programs_desc">
                             Our Madrasa offers a range of structured educational programs designed to develop both
                             religious and
                             academic knowledge. These include Qur’an memorization classes, Tajweed and Arabic language
@@ -221,7 +175,7 @@
                     <p style="color: #666; text-align: center; width: 100%;">Loading news...</p>
                 </div>
 
-                <a href="news.html" class="btn-primary animate-fade-up" style="margin-top: 40px; display: none;"
+                <a href="pages/news/" class="btn-primary animate-fade-up" style="margin-top: 40px; display: none;"
                     id="view-all-news-btn">View All Updates</a>
             </div>
         </section>
@@ -235,20 +189,31 @@
                 </div>
 
                 <script type="module">
-                    import { services } from './services-data.js';
-                    const grid = document.getElementById('services-grid-home');
-                    if (grid) {
-                        grid.innerHTML = services.map(service => `
-                            <a href="services.html#${service.id}" class="service-card animate-fade-up">
-                                <i class="${service.icon} service-icon"></i>
-                                <h3>${service.title}</h3>
-                                <p>${service.shortDescription}</p>
-                                <ul class="service-list">
-                                    ${service.bulletPoints.slice(0, 2).map(text => `<li>${text}</li>`).join('')}
-                                </ul>
-                            </a>
-                        `).join('');
+                    import { ServicesCMS } from './assets/js/services-cms.js';
+                    async function loadHomeServices() {
+                        const grid = document.getElementById('services-grid-home');
+                        if (!grid) return;
+                        try {
+                            const allServices = await ServicesCMS.getAll();
+                            const currentLang = document.documentElement.lang || 'en';
+                            grid.innerHTML = allServices.filter(s => s.visible).map(service => {
+                                const content = service.content[currentLang] || service.content.en;
+                                return `
+                                    <a href="pages/services/index.html#${service.id}" class="service-card animate-fade-up">
+                                        <i class="${service.icon} service-icon"></i>
+                                        <h3>${content.title}</h3>
+                                        <p>${content.shortDesc}</p>
+                                        <ul class="service-list">
+                                            ${content.features.slice(0, 2).map(text => `<li>${text}</li>`).join('')}
+                                        </ul>
+                                    </a>
+                                `;
+                            }).join('');
+                        } catch (err) {
+                            console.error("Error loading home services:", err);
+                        }
                     }
+                    loadHomeServices();
                 </script>
             </div>
         </section>
@@ -350,9 +315,9 @@
                 <div id="video-list" class="video-grid">
                     <!-- Dynamic Videos will load here -->
                     <div class="video-item">
-                        <video controls poster="assets/refont_calligraphic (4).png"
+                        <video controls poster="assets/images/refont_calligraphic (4).png"
                             style="width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
-                            <source src="assets/gallary/videos/WhatsApp Video 2025-11-20 at 11.51.28 AM.mp4"
+                            <source src="assets/gallery/videos/WhatsApp Video 2025-11-20 at 11.51.28 AM.mp4"
                                 type="video/mp4">
                         </video>
                     </div>
@@ -367,7 +332,7 @@
                 <div id="creations-grid" class="creations-grid">
                     <div class="creation-card drawing">
                         <div class="drawing-frame" style="height: 250px; overflow: hidden; border-radius: 12px;">
-                            <img src="assets/refont_calligraphic (4).png" alt="Student Drawing"
+                            <img src="assets/images/refont_calligraphic (4).png" alt="Student Drawing"
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <div class="creation-info" style="padding: 20px;">
@@ -381,7 +346,7 @@
                             <h3>The Path of Knowledge</h3>
                             <p style="font-style: italic; color: #888; margin-top: 10px;">"A short story about the
                                 journey of a young student seeking wisdom..."</p>
-                            <a href="creations.html" class="btn-link"
+                            <a href="pages/students/creations.html" class="btn-link"
                                 style="color: var(--secondary-color); font-weight: 600; display: inline-block; margin-top: 15px;">Read
                                 Full Story →</a>
                         </div>
@@ -542,75 +507,96 @@
 
     </main>
 
-    <script src="site-nav.js"></script>
-    <script src="script.js"></script>
 
 
     <!-- Three.js Background Animation -->
+    <!-- Three.js Background Animation -->
     <script>
-        const canvas = document.getElementById('hero-canvas');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        // Defer 3D animation until browser is idle
+        const initThreeJS = () => {
+            const canvas = document.getElementById('hero-canvas');
+            if (!canvas) return;
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        camera.position.z = 5;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
 
-        // Create particles
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 1500;
-        const posArray = new Float32Array(particlesCount * 3);
-
-        for (let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 10;
-        }
-
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-
-        // Create material with cyan color
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.015,
-            color: 0x00f3ff,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending
-        });
-
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-
-        // Animation
-        let mouseX = 0;
-        let mouseY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Rotate particles
-            particlesMesh.rotation.y += 0.0005;
-            particlesMesh.rotation.x += 0.0003;
-
-            // Mouse interaction
-            particlesMesh.rotation.y += mouseX * 0.0002;
-            particlesMesh.rotation.x += mouseY * 0.0002;
-
-            renderer.render(scene, camera);
-        }
-
-        animate();
-
-        // Handle resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            camera.position.z = 5;
+
+            // Create particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            // Create material with cyan color
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.015,
+                color: 0x00f3ff,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            // Animation
+            let mouseX = 0;
+            let mouseY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            let isVisible = true;
+            const heroObserver = new IntersectionObserver((entries) => {
+                isVisible = entries[0].isIntersecting;
+            });
+            heroObserver.observe(heroSection);
+
+            function animate() {
+                if (isVisible) {
+                    requestAnimationFrame(animate);
+
+                    // Rotate particles
+                    particlesMesh.rotation.y += 0.0005;
+                    particlesMesh.rotation.x += 0.0003;
+
+                    // Mouse interaction
+                    particlesMesh.rotation.y += mouseX * 0.0002;
+                    particlesMesh.rotation.x += mouseY * 0.0002;
+
+                    renderer.render(scene, camera);
+                } else {
+                    requestAnimationFrame(animate);
+                }
+            }
+
+            animate();
+
+            // Handle resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        if (window.Perf) {
+            window.Perf.runIdle(initThreeJS, 1000);
+        } else {
+            // Fallback if Perf is not loaded (shouldn't happen if head script works)
+            setTimeout(initThreeJS, 1000);
+        }
     </script>
 
     </nav>
@@ -641,7 +627,7 @@
                     <p style="margin-bottom: 15px; color: #bbb; font-size: 0.9rem;">Scan to Pay via UPI</p>
                     <div class="modal-qr-container"
                         style="background: white; padding: 15px; border-radius: 15px; display: inline-block;">
-                        <img src="assets/upi-qr.jpeg" alt="UPI QR Code" class="modal-qr-img"
+                        <img src="assets/images/upi-qr.jpeg" alt="UPI QR Code" class="modal-qr-img"
                             style="max-width: 180px; width: 100%; display: block; height: auto; border-radius: 8px;">
                     </div>
                     <div style="margin-top: 15px;">
@@ -662,39 +648,16 @@
         </div>
     </div>
 
-    <!-- Firebase SDK v10 (Modular) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { NewsService } from './news-service.js';
+        import { NewsService } from './assets/js/news-service.js';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDY3La232JPHrnwPL_VfwQKJ07JLIEHAZE",
-            authDomain: "my-pc-895cd.firebaseapp.com",
-            databaseURL: "https://my-pc-895cd-default-rtdb.firebaseio.com",
-            projectId: "my-pc-895cd",
-            storageBucket: "my-pc-895cd.firebasestorage.app",
-            messagingSenderId: "970176385787",
-            appId: "1:970176385787:web:d21a6d1ef8079934fb565e",
-            measurementId: "G-NKFHNQ88XG"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const rtdb = getDatabase(app);
-
-        // Expose to window for external access
-        window.firebaseApp = app;
-        window.db = db;
-        window.rtdb = rtdb;
+        // 0. Initialize Systems
         window.NewsService = NewsService;
-        window.firestoreUtils = { collection, addDoc, serverTimestamp };
 
         const subjectContainer = document.getElementById('subject-checkboxes');
         const totalPriceEl = document.getElementById('total-price');
 
-        // 1. Dynamic Subject Loader
+        // 1. Local Subject Loader (Replacing Firebase)
         function updateTotalPrice() {
             let total = 0;
             document.querySelectorAll('#subject-checkboxes input:checked').forEach(cb => {
@@ -705,39 +668,94 @@
             if (hiddenPrice) hiddenPrice.value = total;
         }
 
-        onSnapshot(query(collection(db, "subjects"), where("active", "==", true), orderBy("name")), snap => {
+        async function initSubjects() {
             if (!subjectContainer) return;
-            subjectContainer.innerHTML = "";
-            snap.forEach(doc => {
-                const s = doc.data();
-                const label = document.createElement('label');
-                if (s.rtl) label.dir = 'rtl';
-                label.innerHTML = `
-                    <input type="checkbox" name="subject[]" value="${s.name} (₹${s.price})" data-price="${s.price}">
-                    ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
-                `;
-                const input = label.querySelector('input');
-                input.addEventListener('change', () => {
-                    updateTotalPrice();
 
+            // Wait for SubjectStorage to be ready (it's loaded as a module now)
+            try {
+                const activeSubjects = await SubjectStorage.getActive();
+                subjectContainer.innerHTML = "";
 
-                    // --- EXISTING SERVICES LOGIC ---
-                    const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
-                        .map(c => c.value).join(', ');
-                    const hiddenSub = document.getElementById('booking-subjects-hidden');
-                    if (hiddenSub) hiddenSub.value = selected;
+                if (activeSubjects.length === 0) {
+                    subjectContainer.innerHTML = "<p style='color: #666; font-size: 0.9rem;'>No subjects available.</p>";
+                    return;
+                }
+
+                activeSubjects.forEach(s => {
+                    const label = document.createElement('label');
+                    if (s.rtl) label.dir = 'rtl';
+                    label.innerHTML = `
+                        <input type="checkbox" name="subject[]" value="${s.name} (₹${s.price})" data-price="${s.price}">
+                        ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
+                    `;
+                    const input = label.querySelector('input');
+                    input.addEventListener('change', () => {
+                        updateTotalPrice();
+                        const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
+                            .map(c => c.value).join(', ');
+                        const hiddenSub = document.getElementById('booking-subjects-hidden');
+                        if (hiddenSub) hiddenSub.value = selected;
+                    });
+                    subjectContainer.appendChild(label);
                 });
-                subjectContainer.appendChild(label);
-            });
+            } catch (err) {
+                console.error("Error loading subjects:", err);
+            }
+        }
+
+        async function initHomeNews() {
+            const newsGrid = document.getElementById('home-news-grid');
+            if (!newsGrid) return;
+            try {
+                const newsItems = await new NewsService().getPublishedNews();
+                const currentLang = document.documentElement.lang || 'en';
+                const limitedNews = newsItems.slice(0, 3);
+
+                if (limitedNews.length === 0) {
+                    newsGrid.innerHTML = '<p style="color: #666; text-align: center; width: 100%;">No recent updates.</p>';
+                    return;
+                }
+
+                newsGrid.innerHTML = limitedNews.map(item => {
+                    const title = (item.title && item.title[currentLang]) || (item.title && item.title.en) || "Untitled";
+                    const short = (item.shortDescription && item.shortDescription[currentLang]) || (item.shortDescription && item.shortDescription.en) || "";
+                    return `
+                        <article class="news-card-premium animate-fade-up" onclick="window.location.href='pages/news/index.html?id=${item.id}'">
+                            <div class="img-wrapper" style="height: 200px; overflow: hidden; border-radius: 12px;">
+                                ${item.image ? `<img src="${item.image}" alt="${title}" style="width: 100%; height: 100%; object-fit: cover;">` : `<div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #111; color: #222;"><i class="ph ph-newspaper" style="font-size: 3rem;"></i></div>`}
+                            </div>
+                            <div style="padding: 20px;">
+                                <h3 style="margin-bottom: 10px; font-size: 1.2rem;">${title}</h3>
+                                <p style="color: #888; font-size: 0.9rem; line-height: 1.5;">${short}</p>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+                document.getElementById('view-all-news-btn').style.display = 'inline-block';
+            } catch (err) {
+                console.error("Error loading home news:", err);
+            }
+        }
+
+        // Run on load - optimized via idle callbacks
+        window.addEventListener('load', () => {
+            if (window.Perf) {
+                window.Perf.runIdle(() => {
+                    initSubjects();
+                    initHomeNews();
+                });
+            } else {
+                initSubjects();
+                initHomeNews();
+            }
         });
 
-        // 2. Real-time Listeners (RTDB)
-        onValue(ref(rtdb, "notice"), (snapshot) => {
-            if (snapshot.val() === true) {
-                const target = document.getElementById("gallerySection");
-                if (target) {
-                    target.scrollIntoView({ behavior: "smooth" });
-                    setTimeout(() => set(ref(rtdb, "notice"), false), 5000);
+        // 2. Local Notice System (Listen for storage events if needed, or static for now)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'mhm_site_notice') {
+                const notice = JSON.parse(e.newValue);
+                if (notice && notice.active) {
+                    // Handle local notice
                 }
             }
         });
@@ -747,45 +765,32 @@
         const videoList = document.getElementById('video-list');
         const downloadIcon = `<svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
 
-        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallary")
-            .then(res => res.json())
-            .then(files => {
-                if (Array.isArray(files) && galleryList) {
-                    // Dynamic loading logic if needed
-                }
-            }).catch(err => console.error("Image sync failed:", err));
+        const initMediaSync = () => {
+            fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallery")
+                .then(res => res.json())
+                .then(files => {
+                    if (Array.isArray(files) && galleryList) {
+                        // Dynamic loading logic if needed
+                    }
+                }).catch(err => console.error("Image sync failed:", err));
 
-        // 4. PDF Sync
-        const pdfList = document.getElementById('pdf-list');
-        function addPdfToSessions(name, url) {
-            const item = document.createElement("div");
-            item.className = "session-card pdf-card animate-fade-up";
-            item.innerHTML = `
-                <div class="pdf-info">
-                    <i class="ph ph-file-pdf" style="font-size: 2rem; color: #ff4d4d;"></i>
-                    <div>
-                        <h4>${name.replace(/\.pdf$/i, '')}</h4>
-                        <p>Official Document / Certificate</p>
-                    </div>
-                </div>
-                <a href="${url}" target="_blank" class="btn-pdf">View Document</a>
-            `;
-            if (pdfList) pdfList.appendChild(item);
-        }
+            fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/pdfs")
+                .then(res => res.json())
+                .then(files => {
+                    if (Array.isArray(files)) {
+                        const hasPdfs = files.some(f => f.name.match(/\.(pdf)$/i));
+                        if (hasPdfs && pdfList) pdfList.innerHTML = '';
+                        files.forEach(file => {
+                            if (file.type === "file" && file.name.match(/\.(pdf)$/i)) {
+                                addPdfToSessions(file.name, file.download_url);
+                            }
+                        });
+                    }
+                }).catch(err => console.error("PDF sync failed:", err));
+        };
 
-        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/pdfs")
-            .then(res => res.json())
-            .then(files => {
-                if (Array.isArray(files)) {
-                    const hasPdfs = files.some(f => f.name.match(/\.(pdf)$/i));
-                    if (hasPdfs && pdfList) pdfList.innerHTML = '';
-                    files.forEach(file => {
-                        if (file.type === "file" && file.name.match(/\.(pdf)$/i)) {
-                            addPdfToSessions(file.name, file.download_url);
-                        }
-                    });
-                }
-            }).catch(err => console.error("PDF sync failed:", err));
+        if (window.Perf) window.Perf.runIdle(initMediaSync, 2000);
+        else initMediaSync();
 
         // 5. Exam Result Logic
         const RESULT_SHEET_ID = "1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU";
@@ -862,14 +867,17 @@
                 const newsGrid = document.getElementById('home-news-grid');
                 if (!newsGrid) return;
 
+                const currentNewsLang = document.documentElement.lang || 'en';
                 const latestNews = newsService.getPublishedNews().slice(0, 3);
                 const lastId = localStorage.getItem('mhm_last_news_id');
+
+                const t = (window.LanguageSystem && window.LanguageSystem.dictionary[currentNewsLang]) || { news_no_updates: "No updates at the moment.", read_more: "Read Full Article" };
 
                 if (latestNews.length === 0) {
                     newsGrid.innerHTML = `
                         <div class="animate-fade-up" style="grid-column: 1/-1; text-align: center; padding: 60px; background: rgba(255,255,255,0.02); border-radius: 30px; border: 1px solid var(--glass-border);">
                             <i class="ph ph-newspaper-clipping" style="font-size: 4rem; color: #222; margin-bottom: 20px;"></i>
-                            <p style="color: #666; font-size: 1.1rem;">No updates at the moment.</p>
+                            <p style="color: #666; font-size: 1.1rem;" data-t="news_no_updates">${t.news_no_updates}</p>
                         </div>
                     `;
                     return;
@@ -878,7 +886,7 @@
                 newsGrid.innerHTML = latestNews.map((item, index) => {
                     const title = item.title[currentNewsLang] || item.title.en || item.title.ml || "Untitled";
                     const shortDesc = item.shortDescription[currentNewsLang] || item.shortDescription.en || item.shortDescription.ml || "";
-                    const date = new Date(item.date).toLocaleDateString(currentNewsLang === 'ml' ? 'ml-IN' : 'en-US', {
+                    const date = new Date(item.date).toLocaleDateString(currentNewsLang === 'ml' ? 'ml-IN' : (currentNewsLang === 'ar' ? 'ar-SA' : 'en-US'), {
                         month: 'short', day: 'numeric', year: 'numeric'
                     });
 
@@ -886,9 +894,9 @@
                     const isRtl = currentNewsLang === 'ar';
 
                     return `
-                    <article class="news-card-premium animate-fade-up ${isNew ? 'news-highlight' : ''}" 
-                             style="animation-delay: ${index * 0.1}s; direction: ${isRtl ? 'rtl' : 'ltr'};" 
-                             onclick="window.location.href='news.html?id=${item.id}'">
+                     <article class="news-card-premium animate-fade-up ${isNew ? 'news-highlight' : ''}" 
+                              style="animation-delay: ${index * 0.1}s; direction: ${isRtl ? 'rtl' : 'ltr'};" 
+                              onclick="window.location.href='pages/news/index.html?id=${item.id}'">
                         <div class="img-wrapper">
                             ${item.image ? `<img src="${item.image}" alt="${title}" loading="lazy">` : `<div style="height:100%; display:flex; align-items:center; justify-content:center; background:#111; color:#222;"><i class="ph ph-newspaper" style="font-size:4rem;"></i></div>`}
                             <div style="position: absolute; top: 15px; left: 15px; background: var(--primary-color); color: #000; padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 0.7rem; box-shadow: 0 4px 15px rgba(0,243,255,0.3);">
@@ -901,7 +909,7 @@
                                 ${shortDesc}
                             </p>
                             <div style="margin-top: auto; color: var(--primary-color); font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                                ${currentNewsLang === 'en' ? 'Read Full Article' : (currentNewsLang === 'ml' ? 'കൂടുതൽ വായിക്കുക' : 'قراءة المزيد')} 
+                                <span data-t="read_more">${t.read_more}</span>
                                 <i class="ph-bold ph-arrow-right"></i>
                             </div>
                         </div>
@@ -944,108 +952,18 @@
     </script>
 
 
-    <footer
-        style="background: #0a0a0a; border-top: 1px solid var(--glass-border); padding: 60px 0 30px; margin-top: 80px;">
-        <div class="container">
-            <div
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
-                <div>
-                    <h3 style="color: var(--primary-color); margin-bottom: 20px; font-size: 1.3rem;">MIFTHAHUL HUDA
-                        MADRASA</h3>
-                    <p style="color: #888; line-height: 1.8;">Empowering students through quality education and Islamic
-                        values at Vengara S S Road.</p>
-                </div>
-                <div>
-                    <h4 style="color: #fff; margin-bottom: 20px;">Quick Links</h4>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 12px;"><a href="#about"
-                                style="color: #888; text-decoration: none; transition: 0.3s;"
-                                onmouseover="this.style.color='var(--primary-color)'"
-                                onmouseout="this.style.color='#888'">About Us</a></li>
-                        <li style="margin-bottom: 12px;"><a href="services.html"
-                                style="color: #888; text-decoration: none; transition: 0.3s;"
-                                onmouseover="this.style.color='var(--primary-color)'"
-                                onmouseout="this.style.color='#888'">Services</a></li>
-                        <li style="margin-bottom: 12px;"><a href="#booking"
-                                style="color: #888; text-decoration: none; transition: 0.3s;"
-                                onmouseover="this.style.color='var(--primary-color)'"
-                                onmouseout="this.style.color='#888'">Book Tuition</a></li>
-                        <li style="margin-bottom: 12px;"><a href="exam_result.html"
-                                style="color: #888; text-decoration: none; transition: 0.3s;"
-                                onmouseover="this.style.color='var(--primary-color)'"
-                                onmouseout="this.style.color='#888'">Exam Results</a></li>
-                        <li style="margin-bottom: 12px;"><a href="#gallery"
-                                style="color: #888; text-decoration: none; transition: 0.3s;"
-                                onmouseover="this.style.color='var(--primary-color)'"
-                                onmouseout="this.style.color='#888'">Gallery</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 style="color: #fff; margin-bottom: 20px;">Contact</h4>
-                    <p style="color: #888; margin-bottom: 10px;">📍 Vengara S S Road</p>
-                    <p style="color: #888; margin-bottom: 10px;">📞 <a href="https://wa.me/916235989198"
-                            style="color: #888; text-decoration: none;">+91 6235989198</a></p>
-                    <p style="color: #888;">✉️ Contact via WhatsApp</p>
-                </div>
-                <div>
-                    <h4 style="color: #fff; margin-bottom: 20px;">Enroll Now</h4>
-                    <p style="color: #888; margin-bottom: 20px; line-height: 1.6;">Start your learning journey with us
-                        today!</p>
-                    <a href="#booking" class="btn btn-primary" style="display: inline-block;">Book a Tuition Session</a>
-                </div>
-            </div>
-            <div
-                style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; text-align: center; display: flex; flex-direction: column; gap: 10px;">
-                <p style="color: #666; font-size: 0.9rem;">© 2026 MHMV. All rights reserved.</p>
-                <a href="admin/dashboard.html" style="color: #333; font-size: 0.75rem; text-decoration: none;">Admin
-                    Access</a>
-            </div>
-        </div>
-    </footer>
+    <footer id="main-footer"></footer>
     <!-- WhatsApp Floating Button -->
     <div class="whatsapp-float-wrapper">
-        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp">
+        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp"
+            data-t="whatsapp_aria">
             <i class="ph-fill ph-whatsapp-logo"></i>
         </a>
     </div>
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <div class="bottom-nav-container">
-            <a href="index.html#hero" class="nav-item active">
-                <i class="ph ph-house"></i>
-                <span>Home</span>
-            </a>
-            <a href="gallery.html" class="nav-item">
-                <i class="ph ph-image"></i>
-                <span>Gallery</span>
-            </a>
-            <a href="services.html" class="nav-item">
-                <i class="ph ph-briefcase"></i>
-                <span>Services</span>
-            </a>
-
-            <!-- CENTER ACTION BUTTON -->
-            <a href="index.html#booking" class="btn-book-nav" aria-label="Book Tuition">
-                <i class="ph-bold ph-calendar-plus" style="color: #000; font-size: 1.6rem;"></i>
-            </a>
-
-            <a href="#news" class="nav-item" style="position: relative;">
-                <i class="ph ph-newspaper"></i>
-                <span>News</span>
-                <span id="news-badge-mobile" class="news-badge" style="display: none; top: -5px; right: 5px;">0</span>
-            </a>
-
-            <a href="creative.html" class="nav-item">
-                <i class="ph ph-student"></i>
-                <span>Student</span>
-            </a>
-            <a href="index.html#contact" class="nav-item">
-                <i class="ph ph-chat-circle"></i>
-                <span>Contact</span>
-            </a>
-        </div>
-    </nav>
-    <script type="module" src="auth-nav-guard.js"></script>
+    <script src="assets/js/site-nav.js" defer></script>
+    <script src="assets/js/site-footer.js" defer></script>
+    <script src="assets/js/script.js" defer></script>
+    <script type="module" src="assets/js/auth-nav-guard.js" defer></script>
 </body>
 
 </html>

@@ -1,0 +1,131 @@
+/* =========================================
+   PREMIUM MOBILE BOTTOM NAVIGATION
+========================================= */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(10, 10, 10, 0.85);
+    /* Dark Glass */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    padding-bottom: env(safe-area-inset-bottom);
+    display: none;
+    /* Hidden by default on desktop */
+}
+
+/* Container */
+.bottom-nav-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 70px;
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Nav Items */
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    text-decoration: none;
+    font-size: 0.7rem;
+    gap: 4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 60px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nav-item i {
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+    margin-bottom: 2px;
+}
+
+/* Active State */
+.nav-item.active {
+    color: var(--primary-color);
+}
+
+.nav-item.active i {
+    transform: translateY(-3px);
+    text-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
+}
+
+.nav-item:active {
+    transform: scale(0.9);
+}
+
+/* =========================================
+   CENTER ACTION BUTTON (BOOK)
+========================================= */
+.btn-book-nav {
+    position: relative;
+    top: -25px;
+    /* Elevated */
+    width: 65px;
+    height: 65px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-size: 1.8rem;
+    box-shadow: 0 10px 25px rgba(0, 243, 255, 0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 4px solid rgba(10, 10, 10, 0.95);
+    /* Simulate cutout */
+    text-decoration: none;
+    z-index: 10;
+}
+
+.btn-book-nav i {
+    color: #000;
+}
+
+/* Pulse Animation */
+.btn-book-nav::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: inherit;
+    z-index: -1;
+    opacity: 0.6;
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+.btn-book-nav:active {
+    transform: scale(0.9) translateY(2px);
+}
+
+/* =========================================
+   MEDIA QUERY: MOBILE ONLY
+========================================= */
+@media (max-width: 768px) {
+    .bottom-nav {
+        display: block;
+    }
+}
