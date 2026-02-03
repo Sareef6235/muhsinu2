@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Results | Student Portal</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --light: #f8fafc;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #64748b;
+        }
+
+        .search-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            ring: 2px solid var(--primary);
+        }
+
+        .btn-search {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-search:hover {
+            background: #1d4ed8;
+        }
+
+        /* Result Card */
+        #result-display {
+            margin-top: 3rem;
+            display: none;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid var(--primary);
+        }
+
+        .res-header {
+            padding: 2rem;
+            background: #f1f5f9;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .res-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .res-status {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .status-passed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .res-body {
+            padding: 2rem;
+        }
+
+        .res-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px dotted #e2e8f0;
+        }
+
+        .res-label {
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .res-val {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .not-found {
+            text-align: center;
+            color: var(--danger);
+            background: #fef2f2;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav style="background: white; padding: 1rem; border-bottom: 1px solid #e2e8f0;">
+        <div class="container"
+            style="padding:0; display:flex; justify-content:space-between; align-items:center; max-width: 1200px;">
+            <a href="../../index.html"
+                style="font-weight:bold; font-size:1.5rem; text-decoration:none; color:var(--dark);">Portfolio</a>
+            <div>
+                <a href="../../index.html" style="margin-left:1rem; text-decoration:none; color:var(--dark);">Home</a>
+                <a href="services.html" style="margin-left:1rem; text-decoration:none; color:var(--dark);">Services</a>
+                <a href="results.html" style="margin-left:1rem; text-decoration:none; color:var(--primary);">Results</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Exam Results</h1>
+            <p>Enter your registration details below to view your result status.</p>
+        </div>
+
+        <div class="search-box">
+            <form id="search-form">
+                <div class="input-group">
+                    <label>Registration Number</label>
+                    <input type="text" id="reg-no" placeholder="e.g. REG2026001" required>
+                </div>
+                <!-- Optional: DOB field could be added here for extra security -->
+                <button type="submit" class="btn-search">Check Result</button>
+            </form>
+            <div id="error-msg" class="not-found" style="display:none;"></div>
+        </div>
+
+        <div id="result-display">
+            <!-- Dynamic Result Card -->
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from '../../assets/js/system/store.js';
+
+        async function init() {
+            await db.init();
+        }
+
+        document.getElementById('search-form').onsubmit = (e) => {
+            e.preventDefault();
+            const regNo = document.getElementById('reg-no').value.trim();
+            if (!regNo) return;
+
+            searchResult(regNo);
+        };
+
+        function searchResult(regNo) {
+            const results = db.get('results');
+            // Case insensitive search
+            const result = results.find(r => r.regno.toLowerCase() === regNo.toLowerCase());
+
+            const display = document.getElementById('result-display');
+            const error = document.getElementById('error-msg');
+
+            if (result) {
+                error.style.display = 'none';
+                display.style.display = 'block';
+
+                const isPassed = result.status.toLowerCase() === 'passed';
+                const statusClass = isPassed ? 'status-passed' : 'status-failed';
+
+                // Parse Details if JSON
+                let detailsHtml = '';
+                try {
+                    // Try to see if details is JSON object, if so render nice table
+                    // If simple string, render as paragraph
+                    // For now, assume text or simple pre-formatted
+                    // If we want fancy table, we can parse it.
+                    // Let's just output text for now.
+                    detailsHtml = `<div style="background:#f8fafc; padding:1rem; border-radius:0.5rem; margin-top:1rem;">${result.details || 'No additional details.'}</div>`;
+                } catch (e) { }
+
+                display.innerHTML = `
+                    <div class="result-card">
+                        <div class="res-header">
+                            <h2>${result.name}</h2>
+                            <div class="res-status ${statusClass}">${result.status}</div>
+                        </div>
+                        <div class="res-body">
+                            <div class="res-row">
+                                <span class="res-label">Registration No</span>
+                                <span class="res-val">${result.regno}</span>
+                            </div>
+                            <div class="res-row">
+                                <span class="res-label">Exam Section</span>
+                                <span class="res-val">${result.section}</span>
+                            </div>
+                            <div class="res-row">
+                                <span class="res-label">Date Declared</span>
+                                <span class="res-val">${new Date().toLocaleDateString()}</span> 
+                                <!-- In real app, date should be in DB -->
+                            </div>
+                            
+                            <h4 style="margin-top:2rem; margin-bottom:0.5rem;">Remarks / Marks</h4>
+                            ${detailsHtml}
+                            
+                            <div style="margin-top:2rem; text-align:center;">
+                                <button onclick="window.print()" style="background:none; border:1px solid #cbd5e1; padding:0.5rem 1rem; border-radius:0.25rem; cursor:pointer;">🖨 Print Result</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                display.style.display = 'none';
+                error.textContent = `No result found for Register Number "${regNo}". Please check and try again.`;
+                error.style.display = 'block';
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

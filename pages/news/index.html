@@ -4,193 +4,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News & Updates | MIFTHAHUL HUDA MADRASA</title>
+    <title>News & Events | MHMV</title>
     <link rel="stylesheet" href="../../assets/css/styles.css">
-    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
-    <link rel="stylesheet" href="../../assets/css/site-footer.css">
-    <script src="../../assets/js/utils/performance.js" defer></script>
-    <script src="../../assets/js/site-languages.js" defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/animations.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-        .news-hero {
-            padding-top: 150px;
-            padding-bottom: 60px;
-            text-align: center;
-            background: linear-gradient(180deg, rgba(5, 5, 8, 0.8) 0%, transparent 100%);
-        }
-
-        .news-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px 80px;
-        }
-
-        .news-featured-img {
-            width: 100%;
-            height: auto;
-            border-radius: 20px;
-            margin-bottom: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--glass-border);
-        }
-
-        .news-content {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #ddd;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: #888;
-            text-decoration: none;
-            margin-bottom: 40px;
-            transition: color 0.3s;
-        }
-
-        .back-btn:hover {
-            color: var(--primary-color);
-        }
-
-        .grid {
-            display: grid;
-            gap: 30px;
-        }
-
-        @media (min-width: 768px) {
-            .grid {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            }
-        }
-    </style>
+    <script type="module" src="../../assets/js/components/header.js"></script>
+    <script type="module" src="../../assets/js/news-service.js"></script>
 </head>
 
 <body>
-    <header id="main-header">
-        <!-- Navigation injected via site-nav.js -->
-    </header>
+    <site-header></site-header>
 
-    <main id="main-content">
-        <div class="not-found" style="margin-top: 150px; text-align: center;">
-            <i class="ph ph-spinner" style="font-size: 3rem; animation: spin 1s linear infinite;"></i>
-            <p>Loading news content...</p>
+    <main class="page-container" style="padding-top: 100px;">
+        <div class="container">
+            <h1 class="section-title">Latest Updates</h1>
+
+            <div id="news-wrapper">
+                <div class="loading-spinner"></div>
+            </div>
         </div>
     </main>
 
-
-    <footer id="main-footer"></footer>
-
-    <!-- Bottom Navigation (matches index.html style but relative links) -->
-    <nav class="bottom-nav">
-        <div class="bottom-nav-container">
-            <a href="../../index.html" class="nav-item">
-                <i class="ph ph-house"></i>
-                <span data-t="home">Home</span>
-            </a>
-        </div>
-    </nav>
-
-    <script src="../../assets/js/site-nav.js" defer></script>
-    <script src="../../assets/js/site-footer.js" defer></script>
-    <script src="../../assets/js/script.js" defer></script>
-    <script type="module" src="../../assets/js/auth-nav-guard.js"></script>
     <script type="module">
         import { NewsService } from '../../assets/js/news-service.js';
 
-        const newsService = new NewsService();
-        const mainContent = document.getElementById('main-content');
-        let currentLang = 'en';
+        async function init() {
+            const container = document.getElementById('news-wrapper');
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
 
-        const params = new URLSearchParams(window.location.search);
-        const newsId = params.get('id');
+            if (id) {
+                // Detail view
+                const all = await new NewsService().getAllNews(); // or getById
+                const item = all.find(n => n.id === id);
 
-        window.switchNewsLang = (lang) => {
-            currentLang = lang;
-            render();
-        };
+                if (item) {
+                    const lang = document.documentElement.lang || 'en';
+                    const title = item.title[lang] || item.title.en;
+                    container.innerHTML = `
+                         <a href="index.html" class="btn-text"><i class="ph ph-arrow-left"></i> Back to News</a>
+                         <article class="news-detail animate-fade-up" style="max-width: 800px; margin: 20px auto;">
+                            ${item.image ? `<img src="${item.image}" style="width:100%; border-radius:15px; margin-bottom:20px;">` : ''}
+                            <div class="meta" style="color:#666; margin-bottom:10px;">${new Date(item.date).toLocaleDateString()}</div>
+                            <h1>${title}</h1>
+                            <div class="content" style="font-size:1.1rem; line-height:1.8; margin-top:20px;">
+                                ${item.shortDesc} <!-- Expand if full content exists -->
+                            </div>
+                         </article>
+                    `;
+                }
+            } else {
+                // List view
+                const news = await new NewsService().getPublishedNews();
+                if (news.length === 0) {
+                    container.innerHTML = "No updates yet.";
+                    return;
+                }
 
-        async function render() {
-            if (!newsId) await renderArchive();
-            else {
-                const article = await newsService.getNewsById(newsId);
-                article ? renderArticle(article) : render404();
+                container.innerHTML = `<div class="news-grid">
+                    ${news.map(n => {
+                    const title = n.title.en || n.title; // simple fallback
+                    return `
+                            <div class="news-card-premium animate-fade-up" onclick="window.location.href='?id=${n.id}'">
+                                <div class="img-wrapper">
+                                     ${n.image ? `<img src="${n.image}">` : `<div style="height:100%; background:#222;"></div>`}
+                                </div>
+                                <div style="padding:20px;">
+                                    <div style="font-size:0.8rem; color:var(--primary-color); margin-bottom:5px;">${new Date(n.date).toLocaleDateString()}</div>
+                                    <h3>${title}</h3>
+                                    <p>${n.shortDesc.substring(0, 100)}...</p>
+                                </div>
+                            </div>
+                        `;
+                }).join('')}
+                </div>`;
             }
         }
-
-        async function renderArchive() {
-            const news = await newsService.getPublishedNews();
-            document.title = "Updates & Notices | MHMV";
-            mainContent.innerHTML = `
-                <div class="news-hero">
-                    <div class="container">
-                        <div class="section-badge">Newsroom</div>
-                        <h1 style="font-size: 3.5rem; margin-top: 10px; font-weight: 800; letter-spacing: -2px;">Latest Updates</h1>
-                        <div class="lang-toggle-wrapper" style="margin-top: 30px;">
-                            <button class="lang-btn ${currentLang === 'en' ? 'active' : ''}" onclick="window.switchNewsLang('en')">English</button>
-                            <button class="lang-btn ${currentLang === 'ml' ? 'active' : ''}" onclick="window.switchNewsLang('ml')">Malayalam</button>
-                            <button class="lang-btn ${currentLang === 'ar' ? 'active' : ''}" onclick="window.switchNewsLang('ar')">Arabic</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="container" style="padding-bottom: 100px;">
-                    <div class="grid">
-                        ${news.length === 0 ? '<p style="text-align: center; color: #666; width: 100%;">No news available.</p>' :
-                    news.map((item, idx) => {
-                        const title = (item.title && item.title[currentLang]) || (item.title && item.title.en) || "Untitled";
-                        const short = (item.shortDescription && item.shortDescription[currentLang]) || (item.shortDescription && item.shortDescription.en) || "";
-                        const dateVal = item.date || item.createdAt?.toDate?.()?.toISOString() || new Date().toISOString();
-                        const date = new Date(dateVal).toLocaleDateString(currentLang === 'ml' ? 'ml-IN' : 'en-US');
-                        return `
-                            <article class="news-card-premium animate-fade-up" style="animation-delay: ${idx * 0.1}s; direction: ${currentLang === 'ar' ? 'rtl' : 'ltr'}" onclick="window.location.href='index.html?id=${item.id}'">
-                                <div class="img-wrapper">
-                                    ${item.image ? `<img src="${item.image}" alt="${title}">` : `<div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #111; color: #222;"><i class="ph ph-newspaper" style="font-size: 4rem;"></i></div>`}
-                                </div>
-                                <div style="padding: 30px;">
-                                    <span style="color: var(--primary-color); font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;">${date}</span>
-                                    <h3 style="margin: 15px 0; font-size: 1.4rem;">${title}</h3>
-                                    <p style="color: #888; font-size: 0.95rem; line-height: 1.6;">${short}</p>
-                                </div>
-                            </article>
-                        `;
-                    }).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderArticle(item) {
-            const title = (item.title && item.title[currentLang]) || (item.title && item.title.en) || "Untitled";
-            const content = (item.fullContent && item.fullContent[currentLang]) || (item.fullContent && item.fullContent.en) || "Content not available.";
-            const dateVal = item.date || item.createdAt?.toDate?.()?.toISOString() || new Date().toISOString();
-            const date = new Date(dateVal).toLocaleDateString(currentLang === 'ml' ? 'ml-IN' : 'en-US');
-            const isRtl = currentLang === 'ar';
-
-            mainContent.innerHTML = `
-                <div class="container" style="margin-top: 150px; display: flex; justify-content: space-between; align-items: center;">
-                    <a href="./" class="back-btn"><i class="ph ph-arrow-left"></i> All Updates</a>
-                </div>
-                <article style="direction: ${isRtl ? 'rtl' : 'ltr'}">
-                    <div class="news-hero" style="padding-top: 40px; text-align: ${isRtl ? 'right' : 'left'}">
-                        <div class="container">
-                            <h1 style="font-size: 3.5rem; margin-bottom: 25px; font-weight: 800;">${title}</h1>
-                        </div>
-                    </div>
-                    <div class="news-container">
-                        ${item.image ? `<img src="${item.image}" class="news-featured-img">` : ''}
-                        <div class="news-content">${content}</div>
-                    </div>
-                </article>
-            `;
-        }
-
-        function render404() {
-            mainContent.innerHTML = `<div class="container" style="margin-top: 150px; text-align: center;"><h2>Article Not Found</h2><a href="index.html">Back to News</a></div>`;
-        }
-
-        window.onload = render;
+        init();
     </script>
 </body>
 

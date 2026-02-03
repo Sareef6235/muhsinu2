@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MHMV | Exam Results</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script type="module" src="assets/js/core/storage.js"></script>
+    <script type="module" src="assets/js/modules/results.js"></script>
+</head>
+
+<body>
+
+    <section class="results-page">
+        <div class="results-container">
+            <div class="result-card-search animate-pop-in">
+                <div class="icon-header">
+                    <i class="ph ph-student"></i>
+                </div>
+                <h1>Exam Results</h1>
+                <p>Enter your details to view your mark sheet.</p>
+
+                <form id="result-search-form">
+                    <div class="form-group">
+                        <label>Select Examination</label>
+                        <select id="exam-select" required>
+                            <option value="">Loading exams...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Register Number</label>
+                        <input type="text" id="reg-no" placeholder="e.g. 1001" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Check Result</button>
+                </form>
+
+                <div id="error-msg" class="error-box" style="display:none;"></div>
+            </div>
+
+            <div id="result-display" class="result-detail-card" style="display:none;">
+                <button id="back-to-search" class="btn-text"><i class="ph ph-arrow-left"></i> Back</button>
+                <div class="student-profile">
+                    <div class="avatar"><i class="ph ph-user"></i></div>
+                    <div>
+                        <h2 id="res-name">Student Name</h2>
+                        <p>Reg No: <span id="res-reg">---</span></p>
+                    </div>
+                    <div class="status-badge" id="res-status">Pass</div>
+                </div>
+                <div class="score-box">
+                    <h3>Score</h3>
+                    <div class="score-value" id="res-score">0%</div>
+                </div>
+                <!-- Future: Detailed marks table -->
+            </div>
+        </div>
+    </section>
+
+    <style>
+        body {
+            background: #f0f2f5;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .results-page {
+            width: 100%;
+            padding: 20px;
+        }
+
+        .results-container {
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .result-card-search,
+        .result-detail-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .icon-header {
+            width: 60px;
+            height: 60px;
+            background: #e3f2fd;
+            color: #2196f3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin: 0 auto 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2196f3;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: #2196f3;
+            color: white;
+            padding: 14px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .error-box {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Result Detail */
+        .student-profile {
+            display: flex;
+            align-items: center;
+            text-align: left;
+            gap: 15px;
+            margin: 30px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background: #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .score-box {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2196f3;
+        }
+
+        .btn-text {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+    </style>
+
+    <script type="module">
+        import { ResultManager } from './assets/js/modules/results.js';
+
+        // Load Exams
+        async function loadExams() {
+            const exams = await ResultManager.getAllExams();
+            const select = document.getElementById('exam-select');
+
+            if (exams.length === 0) {
+                select.innerHTML = '<option value="">No active exams</option>';
+                return;
+            }
+
+            select.innerHTML = '<option value="">Select Exam</option>' +
+                exams.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+        }
+
+        // Handle Search
+        document.getElementById('result-search-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const examId = document.getElementById('exam-select').value;
+            const regNo = document.getElementById('reg-no').value;
+            const errorBox = document.getElementById('error-msg');
+
+            errorBox.style.display = 'none';
+
+            if (!examId) {
+                errorBox.innerText = 'Please select an exam.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            const result = await ResultManager.searchResult(examId, regNo);
+
+            if (result) {
+                showResult(result);
+            } else {
+                errorBox.innerHTML = 'Result not found. Check Register Number.';
+                errorBox.style.display = 'block';
+            }
+        };
+
+        function showResult(data) {
+            document.querySelector('.result-card-search').style.display = 'none';
+            document.getElementById('result-display').style.display = 'block';
+
+            document.getElementById('res-name').innerText = data.name;
+            document.getElementById('res-reg').innerText = data.regNo;
+            document.getElementById('res-score').innerText = data.score;
+            document.getElementById('res-status').innerText = data.status;
+
+            const badge = document.getElementById('res-status');
+            if (data.status === 'Pass') {
+                badge.style.background = '#e8f5e9';
+                badge.style.color = '#2e7d32';
+            } else {
+                badge.style.background = '#ffebee';
+                badge.style.color = '#c62828';
+            }
+        }
+
+        document.getElementById('back-to-search').onclick = () => {
+            document.querySelector('.result-card-search').style.display = 'block';
+            document.getElementById('result-display').style.display = 'none';
+        };
+
+        loadExams();
+    </script>
+</body>
+
+</html>

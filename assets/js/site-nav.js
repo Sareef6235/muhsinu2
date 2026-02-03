@@ -2,7 +2,8 @@
  * Modern Navigation Controller v2.0
  * Features: Auto-path resolution, Auth-awareness, Multi-language, Glassmorphism UI
  */
-const NavigationSystem = {
+export const NavigationSystem = {
+    // ... (rest of the object)
     // 1. Menu Config - SINGLE SOURCE OF TRUTH
     getConfig() {
         const BP = this.getBasePath();
@@ -33,7 +34,7 @@ const NavigationSystem = {
             { label: 'Gallery', href: '#', type: 'dropdown', children: galleryItems, tKey: 'gallery' },
             { label: 'Student Zone', href: '#', type: 'dropdown', children: studentItems, tKey: 'student_zone' },
             { label: 'Pro Tools', href: '#', type: 'dropdown', children: proItems, tKey: 'pro_tools' },
-            { label: 'Tuition', href: BP + 'pages/booking/', tKey: 'booking', class: 'btn-nav' }
+            // { label: 'Tuition', href: BP + 'pages/booking/', tKey: 'booking', class: 'btn-nav' } // Optional
         ];
     },
 
@@ -46,8 +47,6 @@ const NavigationSystem = {
         const rootIndex = parts.indexOf('muhsin2');
         if (rootIndex !== -1) {
             const depth = parts.length - 1 - rootIndex;
-            // If we are at root or root index.html, depth might be 0 or 1
-            // But if we are in a folder like pages/about/, parts.length - 1 - rootIndex is the depth
             if (depth <= 0) return '';
             return '../'.repeat(depth);
         }
@@ -55,7 +54,6 @@ const NavigationSystem = {
         // Fallback for relative counting based on 'pages' folder
         if (path.includes('/pages/')) {
             const afterPages = path.split('/pages/')[1];
-            // If it's pages/about/ or pages/about/index.html
             if (afterPages.includes('/')) return '../../';
             return '../';
         }
@@ -63,12 +61,17 @@ const NavigationSystem = {
     },
 
     // 3. UI Generator
-    render() {
-        const header = document.getElementById('main-header');
+    render(targetElement) {
+        // Allow passing a target element directly (e.g. shadow root or specific container)
+        const header = targetElement || document.getElementById('main-header');
         if (!header) return;
 
         const config = this.getConfig();
         const BP = this.getBasePath();
+
+        // Check if we need to wrap it in #main-header structure or if we are injecting INSIDE it
+        // The CSS expects #main-header to contain .nav-container
+        // If 'header' IS #main-header, we inject .nav-container inside.
 
         header.innerHTML = `
             <div class="nav-container">
@@ -103,9 +106,9 @@ const NavigationSystem = {
             </div>
         `;
 
-        this.bindEvents();
-        this.highlightActive();
-        this.syncAdminVisibility();
+        this.bindEvents(header); // Pass header to scope events if needed
+        this.highlightActive(header);
+        this.syncAdminVisibility(header);
     },
 
     createNavItem(item) {
@@ -156,10 +159,10 @@ const NavigationSystem = {
     },
 
     // 4. Interactions
-    bindEvents() {
-        const toggle = document.querySelector('.menu-toggle');
-        const close = document.querySelector('.close-menu');
-        const overlay = document.querySelector('.mobile-overlay');
+    bindEvents(scope = document) {
+        const toggle = scope.querySelector('.menu-toggle');
+        const close = scope.querySelector('.close-menu');
+        const overlay = scope.querySelector('.mobile-overlay');
 
         if (toggle && overlay) {
             toggle.onclick = () => overlay.classList.add('active');
@@ -168,24 +171,26 @@ const NavigationSystem = {
         }
 
         // Accordions
-        document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+        scope.querySelectorAll('.accordion-trigger').forEach(trigger => {
             trigger.onclick = () => {
                 const parent = trigger.parentElement;
                 parent.classList.toggle('open');
             };
         });
 
-        // Header Scroll Effect
+        // Header Scroll Effect - Global window event
         window.onscroll = () => {
             const header = document.getElementById('main-header');
-            if (window.scrollY > 50) header.classList.add('scrolled');
-            else header.classList.remove('scrolled');
+            if (header) {
+                if (window.scrollY > 50) header.classList.add('scrolled');
+                else header.classList.remove('scrolled');
+            }
         };
     },
 
-    highlightActive() {
+    highlightActive(scope = document) {
         const path = window.location.pathname;
-        const links = document.querySelectorAll('.nav-link, .dropdown-link, .mobile-link');
+        const links = scope.querySelectorAll('.nav-link, .dropdown-link, .mobile-link');
         links.forEach(link => {
             const href = link.getAttribute('href');
             if (href && href !== '#' && path.includes(href.replace('../', ''))) {
@@ -197,11 +202,11 @@ const NavigationSystem = {
         });
     },
 
-    syncAdminVisibility() {
+    syncAdminVisibility(scope = document) {
         // Listen for Auth Guard's window.userData
         const updateVisibility = () => {
             const isAdmin = window.userData && window.userData.role === 'admin';
-            document.querySelectorAll('.admin-only-link').forEach(link => {
+            scope.querySelectorAll('.admin-only-link').forEach(link => {
                 link.style.display = isAdmin ? 'flex' : 'none';
             });
         };
@@ -214,5 +219,3 @@ const NavigationSystem = {
         this.render();
     }
 };
-
-document.addEventListener('DOMContentLoaded', () => NavigationSystem.init());

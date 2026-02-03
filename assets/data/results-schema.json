@@ -1,0 +1,23 @@
+{
+    "active_exams": [
+        {
+            "id": "mid_2024",
+            "name": "Mid Term Examination 2024",
+            "date": "2024-06-15"
+        },
+        {
+            "id": "ent_2025",
+            "name": "Entrance Exam 2025",
+            "date": "2025-01-10"
+        }
+    ],
+    "results_schema": {
+        "reg": "string",
+        "name": "string",
+        "dob": "date",
+        "marks": "object",
+        "total": "number",
+        "rank": "number",
+        "status": "string"
+    }
+}

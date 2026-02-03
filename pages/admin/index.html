@@ -4,105 +4,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login | MIFTHAHUL HUDA</title>
+    <title>MHMV | Admin Login</title>
     <link rel="stylesheet" href="../../assets/css/styles.css">
-    <script src="../../assets/js/utils/performance.js" defer></script>
-    <script src="../../assets/js/site-languages.js" defer></script>
-    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
-    <link rel="stylesheet" href="../../assets/css/site-footer.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Config Local Auth -->
+    <script type="module" src="../../assets/js/core/auth.js"></script>
+    <script type="module" src="../../assets/js/admin-auth.js"></script>
+</head>
+
+<body class="admin-login-body">
+
+    <div class="login-container animate-fade-in-up">
+        <div class="login-header">
+            <div class="logo">MHMV</div>
+            <h2>Admin Portal</h2>
+            <p>Secure Access Area</p>
+        </div>
+
+        <form id="admin-login-form" class="login-form">
+            <div class="form-group">
+                <label><i class="ph ph-envelope"></i> Email Address</label>
+                <input type="email" id="admin-email" placeholder="admin@mhmv.org" required>
+            </div>
+            <div class="form-group">
+                <label><i class="ph ph-lock"></i> Password</label>
+                <input type="password" id="admin-password" placeholder="••••••••" required>
+            </div>
+            <div id="login-error" class="error-msg"
+                style="display:none; color:red; margin-bottom:15px; font-size:0.9rem;"></div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+                <i class="ph ph-sign-in"></i> Access Dashboard
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <a href="../../index.html" class="back-link"><i class="ph ph-arrow-left"></i> Back to Website</a>
+        </div>
+    </div>
+
     <style>
-        body {
-            background-color: #050505;
+        .admin-login-body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow: hidden;
-            font-family: 'Outfit', sans-serif;
         }
 
-        .login-card {
-            background: rgba(15, 15, 15, 0.8);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 50px 40px;
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
             text-align: center;
-            max-width: 450px;
-            width: 100%;
         }
 
-        .login-input {
-            width: 100%;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: #fff;
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .login-header h2 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .login-header p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            text-align: left;
             margin-bottom: 20px;
         }
 
-        .btn-login {
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        .form-group input {
             width: 100%;
-            padding: 16px;
-            background: #00f3ff;
-            border: none;
-            border-radius: 12px;
-            color: #000;
-            font-weight: 700;
-            cursor: pointer;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-lg {
+            padding: 14px;
+            font-size: 1.1rem;
+        }
+
+        .login-footer {
+            margin-top: 30px;
+        }
+
+        .back-link {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--primary-color);
         }
     </style>
-</head>
 
-<body>
-    <header id="main-header"></header>
-    <div class="login-card animate-fade-up">
-        <h1 style="color: #fff; margin-bottom: 30px;">Admin Access</h1>
-        <form id="loginForm">
-            <input type="email" id="email" class="login-input" placeholder="Email" required>
-            <input type="password" id="password" class="login-input" placeholder="Password" required>
-            <button type="submit" class="btn-login">Sign In</button>
-        </form>
-    </div>
-
-    <script type="module">
-        import { auth } from "../../assets/js/firebase.js";
-        import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-        const loginForm = document.getElementById('loginForm');
-
-        // Redirect if already logged in
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                window.location.href = 'dashboard.html';
-            }
-        });
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const btn = e.target.querySelector('button');
-
-            btn.disabled = true;
-            btn.innerText = 'Verifying...';
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = 'dashboard.html';
-            } catch (error) {
-                console.error("Login failed:", error);
-                alert("Invalid credentials. Please try again.");
-                btn.disabled = false;
-                btn.innerText = 'Sign In';
-            }
-        });
-    </script>
-    <script src="../../assets/js/site-nav.js" defer></script>
-    <script src="../../assets/js/site-footer.js" defer></script>
 </body>
 
 </html>

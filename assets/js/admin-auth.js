@@ -1,63 +1,68 @@
-import { auth } from "./firebase.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+/**
+ * Admin Authentication Guard (Local Version)
+ * Protects admin pages using local session logic.
+ */
 
-class AdminAuth {
+import { Auth } from './core/auth.js';
+
+export class AdminAuth {
     constructor() {
         this.init();
     }
 
     init() {
-        // Listen for auth state changes
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                document.body.classList.remove('admin-logged-in');
-                this.hideAdminElements();
-                if (this.isProtectedPage()) {
-                    this.redirectToLogin();
-                }
-            } else {
-                document.body.classList.add('admin-logged-in');
-                this.showAdminElements();
-            }
-        });
+        // 1. Check if we are on a protected page
+        if (this.isProtectedPage()) {
+            // Strict check: Redirects if not logged in
+            Auth.check(true);
+        }
+
+        // 2. Handle Login Form (if on login page)
+        this.bindLogin();
+
+        // 3. Handle Logout (if on dashboard)
+        this.bindLogout();
     }
 
     isProtectedPage() {
         const path = window.location.pathname;
-        // Consider any page under /admin/ (except the login page itself) as protected
-        return path.includes('/admin/') && !path.endsWith('/admin/index.html');
+        return path.includes('/admin/') &&
+            !path.endsWith('/admin/') &&
+            !path.endsWith('/admin/index.html');
     }
 
-    redirectToLogin() {
-        const BP = (window.Perf && window.Perf.getBasePath) ? window.Perf.getBasePath() : '../../';
-        window.location.href = BP + 'pages/admin/index.html';
-    }
+    bindLogin() {
+        const loginForm = document.getElementById('admin-login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('admin-email').value;
+                const password = document.getElementById('admin-password').value;
+                const errorMsg = document.getElementById('login-error');
 
-    async logout() {
-        try {
-            await signOut(auth);
-            this.redirectToLogin();
-        } catch (error) {
-            console.error("Logout failed:", error);
+                if (Auth.login(email, password)) {
+                    // Success
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // Fail
+                    if (errorMsg) errorMsg.textContent = 'Invalid credentials. Try admin@mhmv.org / admin123';
+                    if (errorMsg) errorMsg.style.display = 'block';
+                }
+            });
         }
     }
 
-    showAdminElements() {
-        document.querySelectorAll('.admin-only').forEach(el => {
-            el.style.display = 'block';
-        });
-    }
-
-    hideAdminElements() {
-        document.querySelectorAll('.admin-only').forEach(el => {
-            el.style.display = 'none';
-        });
+    bindLogout() {
+        const logoutBtn = document.getElementById('admin-logout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to logout?')) {
+                    Auth.logout();
+                }
+            });
+        }
     }
 }
 
-// Create instance
-const adminAuth = new AdminAuth();
-
-// Export as both global and module
-window.AdminAuth = adminAuth;
-export default adminAuth;
+// Auto-init
+window.AdminAuth = new AdminAuth();

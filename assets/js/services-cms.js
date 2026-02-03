@@ -1,108 +1,82 @@
-import { db } from "./firebase.js";
-import {
-    collection,
-    getDocs,
-    doc,
-    setDoc,
-    deleteDoc,
-    query,
-    where,
-    addDoc,
-    serverTimestamp,
-    orderBy
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { services as defaultServices } from './services-data.js';
+/**
+ * Services CMS (Local Version)
+ * Manages service data using the local Storage engine.
+ */
+
+import { Storage } from './core/storage.js';
+
+const COLLECTION = 'services';
 
 export const ServicesCMS = {
-    COLLECTION: 'services',
 
     /**
-     * Get all services from Firestore
+     * Get all services
      */
     async getAll() {
-        try {
-            const snapshot = await getDocs(collection(db, this.COLLECTION));
-            let list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            if (list.length === 0) {
-                // Migration: If Firestore is empty, push default data
-                console.log("Firestore empty, migrating default services...");
-                const initialData = this.migrateStaticToCMS(defaultServices);
-                for (const item of initialData) {
-                    const id = item.id;
-                    const data = { ...item };
-                    delete data.id;
-                    await setDoc(doc(db, this.COLLECTION, id), data);
-                }
-                return initialData;
+        // Migration check: If empty, load default data
+        const list = Storage.getAll(COLLECTION);
+        if (list.length === 0) {
+            console.log("Local CMS empty, loading defaults...");
+            try {
+                const res = await fetch('../assets/data/services.json');
+                const defaults = await res.json();
+                defaults.forEach(item => Storage.save(COLLECTION, item));
+                return defaults;
+            } catch (e) {
+                console.error("Failed to load default services:", e);
+                return [];
             }
-            return list;
-        } catch (e) {
-            console.error("Error fetching services:", e);
-            return [];
         }
+        return list;
     },
 
-    migrateStaticToCMS(staticList) {
-        return staticList.map(s => {
-            if (s.content && s.content.en && s.content.en.title) return s;
-            return {
-                id: s.id,
-                visible: true,
-                templateId: 'corporate',
-                icon: s.icon,
-                image: null,
-                video: null,
-                content: {
-                    en: {
-                        title: s.title || '',
-                        shortDesc: s.shortDescription || '',
-                        fullDesc: s.fullDescription || '',
-                        features: s.bulletPoints || []
-                    },
-                    ar: { title: '', shortDesc: '', fullDesc: '', features: [] },
-                    ml: { title: '', shortDesc: '', fullDesc: '', features: [] }
-                },
-                createdAt: new Date().toISOString()
-            };
-        });
-    },
-
+    /**
+     * Get single service by ID
+     */
     async getById(id) {
-        const list = await this.getAll();
-        return list.find(s => s.id === id);
+        return Storage.getById(COLLECTION, id);
     },
 
+    /**
+     * Add new service
+     */
     async add(service) {
-        const id = service.id;
-        delete service.id;
-        service.updatedAt = serverTimestamp();
-        await setDoc(doc(db, this.COLLECTION, id), service);
+        if (!service.id) service.id = 'srv_' + Date.now();
+        Storage.save(COLLECTION, service);
+        return service;
     },
 
-    async update(id, updatedData) {
-        delete updatedData.id;
-        updatedData.updatedAt = serverTimestamp();
-        await setDoc(doc(db, this.COLLECTION, id), updatedData, { merge: true });
+    /**
+     * Update existing service
+     */
+    async update(id, data) {
+        const existing = Storage.getById(COLLECTION, id);
+        if (existing) {
+            const updated = { ...existing, ...data };
+            Storage.save(COLLECTION, updated);
+            return updated;
+        }
+        return null;
     },
 
+    /**
+     * Delete service
+     */
     async delete(id) {
-        await deleteDoc(doc(db, this.COLLECTION, id));
+        Storage.delete(COLLECTION, id);
     },
 
-    async reorder(id, newIndex) {
-        // reordering in Firestore usually needs an 'order' field.
-        // For now, we'll just skip it or update an 'order' field if we add it.
-        // CMS logic in services.html depends on this. 
-        // I'll add an 'orderIndex' field to the data.
-        const list = await this.getAll();
-        // Skip for now as it needs a systematic order update for the whole collection
+    /**
+     * Save (Upsert wrapper for convenience)
+     */
+    async save(data) {
+        if (!data.id) data.id = 'srv_' + Date.now();
+        Storage.save(COLLECTION, data);
     },
 
-    exportData() {
-        // ... keeps logic for client-side download
-    },
-
+    /**
+     * Get Template Options (Static)
+     */
     getTemplates() {
         return [
             { id: 'corporate', name: 'Corporate Standard', icon: 'ph-buildings' },
@@ -119,3 +93,5 @@ export const ServicesCMS = {
     }
 };
 
+// Global Exposure for Admin Panel usage
+window.ServicesCMS = ServicesCMS;

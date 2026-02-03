@@ -1,0 +1,22 @@
+[
+    {
+        "id": "srv_creative",
+        "title": "Creative Design",
+        "icon": "ph-paint-brush",
+        "desc": "Professional graphic design services for your brand identity.",
+        "content": {
+            "full": "<h2>Creative Design Solutions</h2><p>We provide top-tier design services including logo design, branding, and marketing materials.</p>"
+        },
+        "image": "../../assets/images/services/creative.jpg"
+    },
+    {
+        "id": "srv_web",
+        "title": "Web Development",
+        "icon": "ph-code",
+        "desc": "Modern responsive websites built with the latest technologies.",
+        "content": {
+            "full": "<h2>Web Development</h2><p>From landing pages to complex web applications, we build it all.</p>"
+        },
+        "image": "../../assets/images/services/web.jpg"
+    }
+]

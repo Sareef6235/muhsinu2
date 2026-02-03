@@ -1,114 +1,64 @@
-import { db } from "./firebase.js";
-import {
-    collection,
-    getDocs,
-    doc,
-    setDoc,
-    deleteDoc,
-    query,
-    where,
-    addDoc,
-    serverTimestamp,
-    onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
 /**
- * Subject Storage Utility (Firebase Version)
- * Manages subject data in Firestore
+ * Subject Storage Utility (Local Version)
+ * Manages subject data using the local Storage engine.
  */
-const COLLECTION_NAME = 'subjects';
+
+import { Storage } from './core/storage.js';
+
+const COLLECTION = 'subjects';
 
 export const SubjectStorage = {
     /**
-     * Get all subjects from Firestore
+     * Get all subjects
      */
     async getAll() {
-        try {
-            const querySnapshot = await getDocs(collection(db, COLLECTION_NAME));
-            return querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-        } catch (error) {
-            console.error('Error fetching subjects:', error);
-            return [];
-        }
+        return Storage.getAll(COLLECTION);
     },
 
     /**
      * Get only active subjects
      */
     async getActive() {
-        try {
-            const q = query(collection(db, COLLECTION_NAME), where("active", "==", true));
-            const querySnapshot = await getDocs(q);
-            return querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-        } catch (error) {
-            console.error('Error fetching active subjects:', error);
-            return [];
-        }
-    },
-
-    /**
-     * Subscribe to live updates
-     */
-    subscribe(callback) {
-        return onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
-            const subjects = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            callback(subjects);
-        });
+        const list = Storage.getAll(COLLECTION);
+        return list.filter(s => s.active !== false);
     },
 
     /**
      * Save or update a subject
      */
     async save(subject) {
+        if (!subject.id) subject.id = 'sub_' + Date.now();
+
         const data = {
+            id: subject.id,
             name: subject.name,
             price: Number(subject.price),
             active: subject.active !== false,
-            rtl: !!subject.rtl,
-            updatedAt: serverTimestamp()
+            rtl: !!subject.rtl
         };
 
-        if (subject.id) {
-            await setDoc(doc(db, COLLECTION_NAME, subject.id), data, { merge: true });
-            return { id: subject.id, ...data };
-        } else {
-            data.createdAt = serverTimestamp();
-            const docRef = await addDoc(collection(db, COLLECTION_NAME), data);
-            return { id: docRef.id, ...data };
-        }
+        Storage.save(COLLECTION, data);
+        return data;
     },
 
     /**
      * Delete a subject
      */
     async delete(id) {
-        await deleteDoc(doc(db, COLLECTION_NAME, id));
+        Storage.delete(COLLECTION, id);
     },
 
     /**
      * Toggle status
      */
     async toggle(id) {
-        // First get current state
-        const subjects = await this.getAll();
-        const subject = subjects.find(s => s.id === id);
+        const subject = Storage.getById(COLLECTION, id);
         if (subject) {
-            await setDoc(doc(db, COLLECTION_NAME, id), {
-                active: !subject.active,
-                updatedAt: serverTimestamp()
-            }, { merge: true });
+            subject.active = !subject.active;
+            Storage.save(COLLECTION, subject);
         }
     }
 };
 
-// Export to window for non-module compatibility if needed
+// Global Exposure
 window.SubjectStorage = SubjectStorage;

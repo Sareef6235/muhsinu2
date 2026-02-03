@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Manager</title>
+    <!-- Use main site styles + admin overrides -->
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        /* Login Screen */
+        #login-screen {
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-box input {
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            border: none;
+            width: 200px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .login-box button {
+            padding: 0.8rem 2rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        /* Dashboard */
+        #dashboard {
+            display: none;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            height: 100vh;
+        }
+
+        .sidebar {
+            background: #1e293b;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .nav-item {
+            padding: 0.8rem;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--primary);
+            opacity: 1;
+        }
+
+        .content {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Auth Guard -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color:white; margin-top:0;">Admin Access</h2>
+            <input type="password" id="pin-input" placeholder="Enter PIN" maxlength="4">
+            <button onclick="tryLogin()">Unlock</button>
+            <p id="msg" style="color: #ef4444; margin-bottom:0; height: 1.5rem;"></p>
+        </div>
+    </div>
+
+    <!-- Admin App -->
+    <div id="dashboard" class="hidden">
+        <aside class="sidebar">
+            <h2>CMS Manager</h2>
+            <nav>
+                <div class="nav-item active" onclick="loadView('overview')">📊 Overview</div>
+                <div class="nav-item" onclick="loadView('services')">🛠 Services</div>
+                <div class="nav-item" onclick="loadView('results')">🎓 Exam Results</div>
+                <div class="nav-item" onclick="loadView('pages')">📑 Pages</div>
+                <div class="nav-item" onclick="loadView('media')">🖼 Media</div>
+                <div class="nav-item" onclick="loadView('settings')">⚙️ Settings</div>
+            </nav>
+            <div style="margin-top: auto;">
+                <div class="nav-item" onclick="doLogout()">🚪 Logout</div>
+            </div>
+        </aside>
+
+        <main class="content">
+            <div class="header">
+                <h1 id="page-title">Overview</h1>
+                <div class="actions" id="page-actions">
+                    <!-- Dynamic Buttons -->
+                </div>
+            </div>
+
+            <div id="view-container">
+                <!-- Content injected here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modules -->
+    <script type="module">
+        import { Auth } from '../assets/js/system/auth.js';
+        import { db } from '../assets/js/system/store.js';
+        import { Utils } from '../assets/js/system/utils.js';
+
+        // -- Global Scope Exposure for HTML onclicks --
+        window.tryLogin = async () => {
+            const pin = document.getElementById('pin-input').value;
+            if (await Auth.login(pin)) {
+                initDashboard();
+            } else {
+                document.getElementById('msg').textContent = 'Invalid PIN';
+                document.getElementById('pin-input').value = '';
+            }
+        };
+
+        window.doLogout = () => Auth.logout();
+
+        window.loadView = (viewName) => {
+            // Update Sidebar
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // weak query, assume text content match or order for now, improve later
+            // For now just highlight based on click logic if we had element ref, 
+            // but here we rebuild the view.
+
+            document.getElementById('page-title').textContent = viewName.charAt(0).toUpperCase() + viewName.slice(1);
+
+            const container = document.getElementById('view-container');
+            container.innerHTML = `<p>Loading ${viewName}...</p>`;
+
+            // Dynamic View Loader
+            renderView(viewName, container);
+        };
+
+        // -- Init --
+        async function initDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            await db.init();
+            loadView('overview');
+        }
+
+        // Check session on load
+        if (Auth.isAuthenticated()) {
+            initDashboard();
+        }
+
+        // -- View Renderer --
+        async function renderView(view, container) {
+            container.innerHTML = ''; // Clear
+
+            switch (view) {
+                case 'overview':
+                    container.innerHTML = `
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div style="background:white; padding:1.5rem; border-radius:0.5rem; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                                <h3>Services</h3>
+                                <p style="font-size:2rem; font-weight:bold;">${db.get('services').length}</p>
+                            </div>
+                            <div style="background:white; padding:1.5rem; border-radius:0.5rem; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                                <h3>Exam Results</h3>
+                                <p style="font-size:2rem; font-weight:bold;">${db.get('results').length}</p>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 2rem; background: #fff3cd; padding: 1rem; border-radius: 0.5rem; border: 1px solid #ffeeba; color: #856404;">
+                            <strong>📢 IMPORTANT:</strong> Since there is no backend server, any changes you make here are saved to your 
+                            <strong>Browser's Local Storage</strong>. <br>
+                            To publish changes to the live site, you must <strong>Export Data</strong> and commit the file to GitHub.
+                            <br><br>
+                            <button class="btn" onclick="downloadData()">⬇ Download Data JSON</button>
+                        </div>
+                    `;
+                    break;
+
+                case 'services':
+                    try {
+                        const module = await import('./modules/services-view.js');
+                        module.ServicesView.render(container);
+                    } catch (e) {
+                        console.error(e);
+                        container.innerHTML = `<p style="color:red">Error loading module: ${e.message}</p>`;
+                    }
+                    break;
+
+                case 'results':
+                    try {
+                        const module = await import('./modules/results-view.js');
+                        module.ResultsView.render(container);
+                    } catch (e) {
+                        console.error(e);
+                        container.innerHTML = `<p style="color:red">Error loading module: ${e.message}</p>`;
+                    }
+                    break;
+
+                case 'pages':
+                    try {
+                        const module = await import('./modules/pages-view.js');
+                        module.PagesView.render(container);
+                    } catch (e) {
+                        container.innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
+                    }
+                    break;
+
+                case 'media':
+                    try {
+                        const module = await import('./modules/media-view.js');
+                        module.MediaView.render(container);
+                    } catch (e) {
+                        container.innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
+                    }
+                    break;
+
+                case 'settings':
+                    // Settings is basically Pages view for now, or we can reuse
+                    try {
+                        const module = await import('./modules/pages-view.js');
+                        module.PagesView.render(container);
+                    } catch (e) { console.error(e); }
+                    break;
+
+                default:
+            }
+
+            // -- Helper: Download Data --
+            window.downloadData = () => {
+                const data = db.exportAll();
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cms-backup-${Date.now()}.json`;
+                a.click();
+            };
+
+    </script>
+</body>
+
+</html>
