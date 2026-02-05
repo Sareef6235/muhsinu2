@@ -135,14 +135,29 @@ const SchoolManager = (() => {
     // Toggle add modal
     const toggleAddForm = () => {
         const modal = document.getElementById("school-add-modal");
-        if (!modal) return;
-        modal.style.display = modal.style.display === "none" ? "flex" : "none";
+        if (!modal) {
+            console.warn("SchoolManager: Modal '#school-add-modal' missing.");
+            return;
+        }
+
+        // Defensive toggle logic
+        const isHidden = !modal.style.display || modal.style.display === "none";
+        modal.style.display = isHidden ? "flex" : "none";
 
         if (modal.style.display === "flex") {
-            document.getElementById("school-name-input").value = "";
-            document.getElementById("school-code-input").value = "";
-            document.getElementById("school-address-input").value = "";
-            document.getElementById("school-name-input").focus();
+            try {
+                const nameInput = document.getElementById("school-name-input");
+                if (nameInput) {
+                    nameInput.value = "";
+                    nameInput.focus();
+                }
+                const codeInput = document.getElementById("school-code-input");
+                if (codeInput) codeInput.value = "";
+                const addrInput = document.getElementById("school-address-input");
+                if (addrInput) addrInput.value = "";
+            } catch (e) {
+                console.warn("SchoolManager: Error resetting form inputs", e);
+            }
         }
     };
 
@@ -229,6 +244,22 @@ const SchoolManager = (() => {
 
         render();
         updateDashboardContext();
+
+        // 🟢 UX Listeners for Modal Behavior
+        const modal = document.getElementById("school-add-modal");
+        if (modal) {
+            // Close on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) toggleAddForm();
+            });
+
+            // Close on Escape key
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display === 'flex') {
+                    toggleAddForm();
+                }
+            });
+        }
     };
 
     return {

@@ -391,10 +391,44 @@
             cursor: not-allowed;
             transform: none !important;
         }
+
+        /* Modal Overlay & Card System */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 
 <body>
+    <script>
+        // 🛡️ Defensive Shim: Prevent errors if SchoolManager is clicked before module loads
+        window.SchoolManager = window.SchoolManager || {
+            toggleAddForm: () => console.warn("SchoolManager: Module loading..."),
+            switchSchool: () => console.warn("SchoolManager: Module loading..."),
+            saveSchool: () => console.warn("SchoolManager: Module loading..."),
+            deleteSchool: () => console.warn("SchoolManager: Module loading..."),
+            renderManagementGrid: () => { }
+        };
+    </script>
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
