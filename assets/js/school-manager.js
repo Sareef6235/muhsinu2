@@ -206,6 +206,7 @@ const SchoolManager = (() => {
         deleteSchool,
         getAll: loadSchools,
         getActiveId: getActiveSchoolId,
+        getActiveSchool: getActiveSchoolId,
         renderManagementGrid: render
     };
 })();
