@@ -282,37 +282,6 @@ const ResultsManagement = (() => {
         return results;
     };
 
-    const transformToResultObject = (row, examId) => {
-        // Extract subject columns (any column not in standard fields)
-        const standardFields = ['Roll No', 'Name', 'DOB', 'Class', 'Total', 'Grade', 'Status', 'Rank'];
-        const subjects = {};
-
-        Object.keys(row).forEach(key => {
-            if (!standardFields.includes(key) && row[key] && !isNaN(row[key])) {
-                subjects[key] = parseInt(row[key], 10);
-            }
-        });
-
-        // Calculate total if not provided
-        let total = parseInt(row['Total'], 10) || 0;
-        if (total === 0 && Object.keys(subjects).length > 0) {
-            total = Object.values(subjects).reduce((sum, mark) => sum + mark, 0);
-        }
-
-        return {
-            rollNo: row['Roll No'] || '',
-            name: row['Name'] || '',
-            dob: row['DOB'] || '',
-            class: row['Class'] || '',
-            exam: '', // Will be filled from exam metadata
-            examId: examId,
-            subjects: subjects,
-            totalMarks: total,
-            grade: row['Grade'] || calculateGrade(total),
-            status: row['Status'] || (total >= 180 ? 'Pass' : 'Fail'), // Example threshold
-            rank: parseInt(row['Rank'], 10) || null
-        };
-    };
 
     const calculateGrade = (total) => {
         if (total >= 450) return 'A+';
@@ -324,101 +293,6 @@ const ResultsManagement = (() => {
         return 'F';
     };
 
-    /**
-     * SYNC LOGIC: Handle Sync click
-     */
-    const handleSyncClick = async () => {
-        const examId = examSelect?.value;
-        const sheetId = sheetIdInput?.value?.trim();
-        const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : 'default';
-
-        if (!schoolId) {
-            showStatus('<span style="color:#ff4444;">❌ No active school selected.</span>', 'error');
-            return;
-        }
-
-        if (!examId) {
-            showStatus('<span style="color:#ff4444;">❌ Please select an exam session first.</span>', 'error');
-            return;
-        }
-
-        // Disable button during sync
-        syncButton.disabled = true;
-        const originalBtnHtml = syncButton.innerHTML;
-        syncButton.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Syncing...';
-
-        try {
-            // Step 1: Validating
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Validating...', 'loading');
-            await sleep(500);
-
-            if (!sheetId) {
-                throw new Error('Google Sheet ID is required for syncing results.');
-            }
-
-            // Step 2: Preparing preview
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Preparing preview...', 'loading');
-            await sleep(500);
-
-            // Step 3: Fetching from Google Sheets
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching from Google Sheets...', 'loading');
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
-
-            const response = await fetch(csvUrl);
-            if (!response.ok) {
-                throw new Error('Failed to connect to Google Sheets. Please verify the Sheet ID and ensure the sheet is "Public" (Anyone with link can view).');
-            }
-
-            const csvText = await response.text();
-
-            // Step 4: Parsing data
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Parsing data...', 'loading');
-            await sleep(500);
-
-            const rawData = parseCSV(csvText);
-            if (!rawData || rawData.length === 0) {
-                throw new Error('No data found in the spreadsheet. Please verify the sheet content.');
-            }
-
-            // Get exam metadata for display name
-            const exams = window.ExamManager ? ExamManager.getAll() : [];
-            const examMeta = exams.find(e => e.id === examId);
-            const examName = examMeta ? examMeta.name : 'Unknown Exam';
-
-            const results = rawData.map(row => {
-                const result = transformToResultObject(row, examId);
-                result.exam = examName;
-                return result;
-            });
-
-            // Step 5: Ready to sync
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Ready to sync...', 'loading');
-            await sleep(500);
-
-            // Save to storage (as preview - published is false by default)
-            saveExamResults(schoolId, examId, results, sheetId, false);
-
-            // Step 6: Success
-            showStatus(
-                `<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> ✓ Preview generated! ${results.length} results loaded. Click "Publish" to make them visible to students.`,
-                'success'
-            );
-
-            renderTable();
-            updatePublishToggle();
-
-        } catch (error) {
-            console.error('Sync Error:', error);
-            showStatus(
-                `<span style="color:#ff4444;">❌ Error: ${error.message}</span>`,
-                'error'
-            );
-        } finally {
-            syncButton.disabled = false;
-            syncButton.innerHTML = originalBtnHtml;
-            updateButtonState();
-        }
-    };
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -563,19 +437,24 @@ const ResultsManagement = (() => {
     };
 
     /**
-     * SYNC LOGIC: Handle Sync click
+     * SYNC LOGIC: Robust Handle Sync click
      */
     const handleSyncClick = async () => {
         const examId = examSelect?.value;
         const sheetId = sheetIdInput?.value?.trim();
         const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : 'default';
 
-        if (!schoolId || !examId || !sheetId) {
-            alert("Please select an exam and provide a Sheet ID.");
+        // 1. Initial Validation
+        if (!examId) {
+            showStatus('<span style="color:#ffcc00;">⚠️ Please select an exam session first.</span>', 'warning');
+            return;
+        }
+        if (!sheetId) {
+            showStatus('<span style="color:#ffcc00;">⚠️ Please provide a valid Google Sheet ID.</span>', 'warning');
             return;
         }
 
-        // Get Mapping configuration
+        // 2. Mapping Configuration Validation
         const mapping = {
             roll: document.getElementById('map-roll')?.value,
             name: document.getElementById('map-name')?.value,
@@ -585,59 +464,75 @@ const ResultsManagement = (() => {
         };
 
         if (!mapping.roll || !mapping.name) {
-            alert("Roll No and Name columns must be mapped.");
+            showStatus('<span style="color:#ff4444;">❌ Error: Roll No and Name columns must be mapped.</span>', 'error');
+            const mappingUI = document.getElementById('column-mapping-ui');
+            if (mappingUI) mappingUI.style.display = 'block';
             return;
         }
 
+        // UI State: Loading
         syncButton.disabled = true;
         const originalBtnHtml = syncButton.innerHTML;
-        syncButton.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Syncing...';
+        syncButton.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Processing...';
 
         try {
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching data...', 'loading');
+            // Step 1: Network Check & Fetch
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching data from Google Sheets...', 'loading');
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0&cache_bust=${Date.now()}`;
 
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
             const response = await fetch(csvUrl);
-            if (!response.ok) throw new Error('Failed to connect to Google Sheets.');
+            if (!response.ok) {
+                throw new Error('Could not reach Google Sheets. Ensure the sheet is Public (Anyone with link can view).');
+            }
 
             const csvText = await response.text();
+
+            // Step 2: Parse CSV
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Parsing spreadsheet content...', 'loading');
             const rawData = parseCSV(csvText);
+            if (!rawData || rawData.length === 0) {
+                throw new Error('Spreadsheet appears to be empty or misformatted.');
+            }
 
-            if (!rawData.length) throw new Error('No data found in sheet.');
-
-            // Get exam metadata
+            // Step 3: Transformation with Validation
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Preparing preview table...', 'loading');
             const examMeta = (window.ExamManager ? ExamManager.getAll() : []).find(e => e.id === examId);
-            const examName = examMeta ? `${examMeta.name} (${examMeta.examTypeName})` : 'Result';
+            const examName = examMeta ? `${examMeta.name} (${examMeta.examTypeName || ''})` : 'Result';
 
-            // Process Data
             const results = rawData.map(row => {
                 const subjects = {};
                 let totalMarks = 0;
 
+                // Process subject marks
                 mapping.subjects.forEach(sub => {
                     const val = parseFloat(row[sub]) || 0;
                     subjects[sub] = val;
                     totalMarks += val;
                 });
 
+                // Get status (Pass/Fail)
                 const resStatus = row[mapping.status] || (totalMarks > 0 ? 'Pass' : 'Absent');
 
                 return {
-                    schoolId,
-                    examId,
-                    exam: examName,
                     rollNo: row[mapping.roll] || '',
                     name: row[mapping.name] || '',
                     dob: mapping.dob ? row[mapping.dob] : '',
+                    examId: examId,
+                    exam: examName,
                     subjects: subjects,
                     totalMarks: totalMarks,
                     grade: calculateGrade(totalMarks),
                     status: resStatus,
-                    rank: null // Rank calculated later during render
+                    rank: null // Rank will be calculated on render
                 };
             }).filter(r => r.rollNo && r.name);
 
-            // Save
+            if (results.length === 0) {
+                throw new Error('No valid results found after processing. Check your column mappings.');
+            }
+
+            // Step 4: Storage & UI Update
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Saving locally...', 'loading');
             saveExamResults(examId, results, sheetId, false);
 
             showStatus(
@@ -646,23 +541,13 @@ const ResultsManagement = (() => {
             );
 
         } catch (error) {
-            console.error('Sync Error:', error);
-            showStatus(`<span style="color:#ff4444;">❌ Error: ${error.message}</span>`, 'error');
+            console.error('📊 ResultsManagement Sync Error:', error);
+            showStatus(`<span style="color:#ff4444;">❌ Sync Failed: ${error.message}</span>`, 'error');
         } finally {
             syncButton.disabled = false;
             syncButton.innerHTML = originalBtnHtml;
             updateButtonState();
         }
-    };
-
-    const calculateGrade = (total) => {
-        // Simple default grading logic
-        if (total >= 450) return 'A+';
-        if (total >= 400) return 'A';
-        if (total >= 350) return 'B+';
-        if (total >= 300) return 'B';
-        if (total >= 200) return 'C';
-        return 'D';
     };
 
     return {
