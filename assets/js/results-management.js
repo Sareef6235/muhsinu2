@@ -323,38 +323,52 @@ const ResultsManagement = (() => {
         const sheetId = sheetIdInput?.value?.trim();
         const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : 'default';
 
-        if (!examId || !sheetId) {
-            showStatus('<span style="color:#ff4444;">❌ Please select an exam and enter Sheet ID.</span>', 'error');
+        if (!schoolId) {
+            showStatus('<span style="color:#ff4444;">❌ No active school selected.</span>', 'error');
+            return;
+        }
+
+        if (!examId) {
+            showStatus('<span style="color:#ff4444;">❌ Please select an exam session first.</span>', 'error');
             return;
         }
 
         // Disable button during sync
         syncButton.disabled = true;
+        const originalBtnHtml = syncButton.innerHTML;
         syncButton.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Syncing...';
 
         try {
             // Step 1: Validating
             showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Validating...', 'loading');
-            await sleep(300);
+            await sleep(500);
 
-            // Step 2: Fetching from Google Sheets
+            if (!sheetId) {
+                throw new Error('Google Sheet ID is required for syncing results.');
+            }
+
+            // Step 2: Preparing preview
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Preparing preview...', 'loading');
+            await sleep(500);
+
+            // Step 3: Fetching from Google Sheets
             showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching from Google Sheets...', 'loading');
             const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
 
             const response = await fetch(csvUrl);
             if (!response.ok) {
-                throw new Error('Failed to fetch Google Sheet. Check Sheet ID and permissions.');
+                throw new Error('Failed to connect to Google Sheets. Please verify the Sheet ID and ensure the sheet is "Public" (Anyone with link can view).');
             }
 
             const csvText = await response.text();
 
-            // Step 3: Parsing data
+            // Step 4: Parsing data
             showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Parsing data...', 'loading');
-            await sleep(300);
+            await sleep(500);
 
             const rawData = parseCSV(csvText);
-            if (rawData.length === 0) {
-                throw new Error('No data found in sheet or invalid format.');
+            if (!rawData || rawData.length === 0) {
+                throw new Error('No data found in the spreadsheet. Please verify the sheet content.');
             }
 
             // Get exam metadata for display name
@@ -368,15 +382,16 @@ const ResultsManagement = (() => {
                 return result;
             });
 
-            // Step 4: Saving results
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Saving results...', 'loading');
-            await sleep(300);
+            // Step 5: Ready to sync
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Ready to sync...', 'loading');
+            await sleep(500);
 
-            saveExamResults(schoolId, examId, results, sheetId, false); // Default to unpublished
+            // Save to storage (as preview - published is false by default)
+            saveExamResults(schoolId, examId, results, sheetId, false);
 
-            // Step 5: Success
+            // Step 6: Success
             showStatus(
-                `<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> ✓ Sync complete! ${results.length} results synced.`,
+                `<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> ✓ Preview generated! ${results.length} results loaded. Click "Publish" to make them visible to students.`,
                 'success'
             );
 
@@ -391,7 +406,7 @@ const ResultsManagement = (() => {
             );
         } finally {
             syncButton.disabled = false;
-            syncButton.innerHTML = '<i class="ph-bold ph-download"></i> Preview & Sync';
+            syncButton.innerHTML = originalBtnHtml;
             updateButtonState();
         }
     };

@@ -186,12 +186,16 @@ const ExamManager = (function () {
             const inputs = form.querySelectorAll('input');
             inputs.forEach(i => i.value = '');
 
-            // Populate dropdowns fresh
+            const selects = form.querySelectorAll('select');
+            selects.forEach(s => s.selectedIndex = 0);
+
+            // Populate dropdowns fresh BEFORE showing
             if (typeof window.populateExamFormDropdowns === 'function') {
                 window.populateExamFormDropdowns();
             }
 
             form.style.display = 'block';
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
             form.style.display = 'none';
         }

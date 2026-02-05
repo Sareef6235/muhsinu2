@@ -1506,30 +1506,45 @@
             const yearSelect = document.getElementById('exam-academic-year');
             const typeSelect = document.getElementById('exam-type-select');
 
+            console.log('🛠️ Dashboard: Refreshing exam form dropdowns...');
+
             // 1. Populate Years
             if (yearSelect) {
-                yearSelect.innerHTML = '<option value="">-- Select Year --</option>'; // Safe clear
+                yearSelect.innerHTML = '<option value="">-- Select Year --</option>';
                 if (window.AcademicYearManager && typeof AcademicYearManager.getActive === 'function') {
                     const activeYears = AcademicYearManager.getActive();
-                    if (activeYears.length > 0) {
+                    if (activeYears && activeYears.length > 0) {
                         yearSelect.innerHTML += activeYears.map(y => `<option value="${y.id}">${y.name}</option>`).join('');
+                    } else {
+                        console.warn('🛠️ Dashboard: No active academic years found.');
                     }
                 }
             }
 
             // 2. Populate Types
             if (typeSelect) {
-                typeSelect.innerHTML = '<option value="">-- Select Type --</option>'; // Safe clear
+                typeSelect.innerHTML = '<option value="">-- Select Type --</option>';
                 if (window.ExamTypeManager && typeof ExamTypeManager.getActive === 'function') {
                     const activeTypes = ExamTypeManager.getActive();
-                    if (activeTypes.length > 0) {
+                    if (activeTypes && activeTypes.length > 0) {
                         typeSelect.innerHTML += activeTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+                    } else {
+                        console.warn('🛠️ Dashboard: No active exam types found.');
                     }
                 }
             }
-
-            console.log('🛠️ Dashboard: Exam form dropdowns refreshed.');
         }
+
+        // Global Listeners for Reactive UI
+        window.addEventListener('schoolChanged', () => {
+            console.log('🛠️ Dashboard: School changed, syncing all managers...');
+            if (typeof populateExamFormDropdowns === 'function') populateExamFormDropdowns();
+            if (window.ExamManager && ExamManager.refresh) ExamManager.refresh();
+            if (window.ResultsManagement && ResultsManagement.refresh) ResultsManagement.refresh();
+        });
+
+        window.addEventListener('yearChanged', populateExamFormDropdowns);
+        window.addEventListener('examTypeChanged', populateExamFormDropdowns);
     </script>
 
     <script>
