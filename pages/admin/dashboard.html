@@ -1481,6 +1481,39 @@
         // Managers now handle their own dropdown population via internal event listeners
         // We only need to ensure stats are updated when data changes globally
         window.addEventListener('examsUpdated', updateStats);
+
+        /**
+         * Populates all dropdowns in the Exam Add/Edit form
+         * Defensive implementation to ensure clean state and active data only.
+         */
+        function populateExamFormDropdowns() {
+            const yearSelect = document.getElementById('exam-academic-year');
+            const typeSelect = document.getElementById('exam-type-select');
+
+            // 1. Populate Years
+            if (yearSelect) {
+                yearSelect.innerHTML = '<option value="">-- Select Year --</option>'; // Safe clear
+                if (window.AcademicYearManager && typeof AcademicYearManager.getActive === 'function') {
+                    const activeYears = AcademicYearManager.getActive();
+                    if (activeYears.length > 0) {
+                        yearSelect.innerHTML += activeYears.map(y => `<option value="${y.id}">${y.name}</option>`).join('');
+                    }
+                }
+            }
+
+            // 2. Populate Types
+            if (typeSelect) {
+                typeSelect.innerHTML = '<option value="">-- Select Type --</option>'; // Safe clear
+                if (window.ExamTypeManager && typeof ExamTypeManager.getActive === 'function') {
+                    const activeTypes = ExamTypeManager.getActive();
+                    if (activeTypes.length > 0) {
+                        typeSelect.innerHTML += activeTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+                    }
+                }
+            }
+
+            console.log('🛠️ Dashboard: Exam form dropdowns refreshed.');
+        }
     </script>
 
     <script>

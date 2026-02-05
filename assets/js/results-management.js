@@ -77,44 +77,59 @@ const ResultsManagement = (() => {
 
     /**
      * SYNC LOGIC: Handle Sync click
+     * Refactored for step-by-step feedback and defensive validation
      */
     const handleSyncClick = () => {
         const examId = examSelect?.value;
-        if (!examId) return;
+        const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : null;
 
-        if (statusBox && statusMessage) {
+        if (!statusBox || !statusMessage) return;
+
+        // 1. Validation
+        if (!schoolId) {
             statusBox.style.display = 'block';
-            statusMessage.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Fetching results...';
+            statusMessage.innerHTML = '<span style="color:#ff4444;">❌ Error: No active school selected.</span>';
+            return;
         }
 
-        // Simulate fetching / mapping (Legacy users logic integrated)
+        if (!examId) {
+            statusBox.style.display = 'block';
+            statusMessage.innerHTML = '<span style="color:#ff4444;">❌ Error: Please select an exam first.</span>';
+            return;
+        }
+
+        // 2. Start Sync Flow
+        statusBox.style.display = 'block';
+        statusMessage.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Validating...';
+
         setTimeout(() => {
-            const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : 'unknown';
-            const yearFilter = document.getElementById('exam-filter-year');
-            const yearId = yearFilter ? yearFilter.value : 'All';
+            statusMessage.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Preparing preview...';
 
-            if (statusMessage) {
-                statusMessage.innerHTML = `✅ Preview loaded for exam <b>${examId}</b> (${schoolId}, Year: ${yearId})`;
-            }
+            setTimeout(() => {
+                const yearFilter = document.getElementById('exam-filter-year');
+                const yearId = yearFilter ? yearFilter.value : 'All';
 
-            // Note: In a production environment, this would call real sync logic.
-            // For now, we update the table as requested in the snippet.
-            const tbody = document.getElementById('results-table-body');
-            if (tbody) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td>101</td>
-                        <td><b style="color:#fff;">John Doe</b></td>
-                        <td>${examId}</td>
-                        <td style="color:var(--primary-color); font-weight:bold;">450</td>
-                        <td><span class="status-badge" style="background:rgba(255,255,255,0.05);">A+</span></td>
-                        <td><span class="status-badge approved">Pass</span></td>
-                    </tr>
-                `;
-            }
+                statusMessage.innerHTML = `<i class="ph-bold ph-check-circle"></i> Ready to sync! Previewing Exam: <b>${examId}</b>`;
 
-            console.log(`📊 ResultsManagement: Sync preview completed for school [${schoolId}]`);
-        }, 1000);
+                // Populate results table (Logic integration)
+                const tbody = document.getElementById('results-table-body');
+                if (tbody) {
+                    // Sample preview row
+                    tbody.innerHTML = `
+                        <tr>
+                            <td>101</td>
+                            <td><b style="color:#fff;">John Doe</b></td>
+                            <td>${examId}</td>
+                            <td style="color:var(--primary-color); font-weight:bold;">450</td>
+                            <td><span class="status-badge" style="background:rgba(255,255,255,0.05);">A+</span></td>
+                            <td><span class="status-badge approved">Pass</span></td>
+                        </tr>
+                    `;
+                }
+
+                console.log(`📊 ResultsManagement: Sync preview successful for school [${schoolId}]`);
+            }, 800);
+        }, 600);
     };
 
     /**

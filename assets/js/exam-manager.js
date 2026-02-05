@@ -158,26 +158,61 @@ const ExamManager = (function () {
 
         // Trigger results refresh if current exam selection might be affected
         window.dispatchEvent(new CustomEvent('examSelectionRefreshed'));
+        console.log('📝 ExamManager: Dropdowns refreshed.');
     }
 
     function saveExam() {
         const yearSelect = document.getElementById('exam-academic-year');
         const typeSelect = document.getElementById('exam-type-select');
         const nameInput = document.getElementById('exam-name-input');
+        const sheetInput = document.getElementById('exam-sheet-id');
 
-        if (create(yearSelect.value, typeSelect.value, nameInput.value)) {
+        if (create(yearSelect.value, typeSelect.value, nameInput.value, sheetInput?.value)) {
             nameInput.value = '';
-            // Form toggle logic usually handled in dashboard.html or here
-            if (typeof toggleExamAddForm === 'function') toggleExamAddForm();
+            if (sheetInput) sheetInput.value = '';
+            toggleAddForm(); // Close on success
         }
     }
 
-    // Compatibility helper for dashboard logic
+    // Defensive toggle: resets inputs and ensures fresh state
     function toggleAddForm() {
         const form = document.getElementById('exam-add-form');
         if (!form) return;
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+
+        const isOpening = (form.style.display === 'none' || getComputedStyle(form).display === 'none');
+
+        if (isOpening) {
+            // Reset fields
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(i => i.value = '');
+
+            // Populate dropdowns fresh
+            if (typeof window.populateExamFormDropdowns === 'function') {
+                window.populateExamFormDropdowns();
+            }
+
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
     }
+
+    // New: Listen for dependency updates
+    window.addEventListener('yearChanged', () => {
+        console.log('📝 ExamManager: Academic Year changed, refreshing form context...');
+        if (typeof window.populateExamFormDropdowns === 'function') {
+            window.populateExamFormDropdowns();
+        }
+        refreshDropdowns();
+    });
+
+    window.addEventListener('examTypeChanged', () => {
+        console.log('📝 ExamManager: Exam Type changed, refreshing form context...');
+        if (typeof window.populateExamFormDropdowns === 'function') {
+            window.populateExamFormDropdowns();
+        }
+        refreshDropdowns();
+    });
 
     return {
         init,
