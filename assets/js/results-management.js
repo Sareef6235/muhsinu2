@@ -297,6 +297,32 @@ const ResultsManagement = (() => {
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     /**
+     * AUTO-MAPPING HELPERS
+     */
+    const normalizeHeader = (h) => h ? h.toLowerCase().replace(/[^a-z0-9]/g, '').trim() : '';
+
+    const patterns = {
+        roll: ['roll', 'rollno', 'rollnumber', 'register', 'regno', 'registerno', 'registernumber', 'admissionno', 'admissionnumber', 'studentid', 'idno'],
+        name: ['name', 'studentname', 'candidatename', 'fullname'],
+        dob: ['dob', 'dateofbirth', 'birthdate'],
+        status: ['status', 'result', 'passfail', 'resultstatus']
+    };
+
+    const findBestMatch = (header, type) => {
+        const normalized = normalizeHeader(header);
+        if (!normalized) return false;
+
+        // Exact normalized match
+        if (patterns[type].includes(normalized)) return true;
+
+        // Partial match for specific types
+        if (type === 'roll' && (normalized.includes('roll') || normalized.includes('register') || normalized.includes('regno'))) return true;
+        if (type === 'name' && (normalized.includes('student') && normalized.includes('name'))) return true;
+
+        return false;
+    };
+
+    /**
      * UI Rendering
      */
     const renderTable = () => {
@@ -361,19 +387,19 @@ const ResultsManagement = (() => {
      * Fetch Column Headers (Feature Requirement)
      */
     /**
-     * Fetch Column Headers & Reveal Mapping UI
+     * Fetch Column Headers & Reveal Mapping UI with Smart Auto-Detection
      */
     const fetchHeaders = async () => {
         const sheetId = sheetIdInput?.value?.trim();
         const examId = examSelect?.value;
 
         if (!sheetId || !examId) {
-            alert("Please select an exam and provide a Sheet ID first.");
+            showStatus('<span style="color:#ffcc00;">⚠️ Select an exam and provide a Sheet ID first.</span>', 'warning');
             return;
         }
 
         try {
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching headers...', 'loading');
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching headers & analyzing sheet content...', 'loading');
 
             const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
             const response = await fetch(csvUrl);
@@ -383,55 +409,84 @@ const ResultsManagement = (() => {
             }
 
             const csvText = await response.text();
-            const firstLine = csvText.split('\n')[0];
-            const headers = firstLine.split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+            const lines = csvText.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
 
             if (headers.length < 2) throw new Error("Could not parse headers from sheet.");
 
-            // Populate Mapping Selects
-            const selects = document.querySelectorAll('.map-select');
-            selects.forEach(sel => {
-                sel.innerHTML = '<option value="">-- Ignore --</option>' +
+            // Analyze first data row to help identify subjects
+            const firstDataRow = lines[1] ? lines[1].split(',').map(v => v.trim().replace(/^"|"$/g, '')) : [];
+
+            // 1. Populate Mapping Dropdowns & Run Auto-Detection
+            const mappingRefs = {
+                'map-roll': 'roll',
+                'map-name': 'name',
+                'map-dob': 'dob',
+                'map-status': 'status'
+            };
+
+            const autoMappedHeaders = new Set();
+
+            Object.keys(mappingRefs).forEach(selectId => {
+                const sel = document.getElementById(selectId);
+                if (!sel) return;
+
+                const type = mappingRefs[selectId];
+                sel.innerHTML = '<option value="">-- Select Column --</option>' +
                     headers.map(h => `<option value="${h}">${h}</option>`).join('');
 
-                // Smart Auto-Mapping
-                const id = sel.id;
-                const match = headers.find(h => {
-                    const lower = h.toLowerCase();
-                    if (id === 'map-roll') return lower.includes('roll') || lower.includes('reg') || lower.includes('id');
-                    if (id === 'map-name') return lower.includes('name') || lower.includes('student');
-                    if (id === 'map-dob') return lower.includes('dob') || lower.includes('birth');
-                    if (id === 'map-status') return lower.includes('status') || lower.includes('result');
-                    return false;
-                });
-                if (match) sel.value = match;
+                // Smart Detection
+                const match = headers.find(h => findBestMatch(h, type));
+                if (match) {
+                    sel.value = match;
+                    autoMappedHeaders.add(match);
+                }
             });
 
-            // Populate Subject Checkboxes
+            // 2. Identify and Group Subject Columns
             const subjectContainer = document.getElementById('map-subjects-container');
             if (subjectContainer) {
-                const standard = ['roll', 'name', 'dob', 'class', 'status', 'total', 'grade', 'rank', 'remark', 'id'];
-                subjectContainer.innerHTML = headers.map(h => {
-                    const isLikelySubject = !standard.some(s => h.toLowerCase().includes(s));
-                    return `
-                        <label style="display:flex; align-items:center; gap:5px; font-size:0.75rem; background:rgba(255,255,255,0.05); padding:5px; border-radius:4px; cursor:pointer;">
-                            <input type="checkbox" class="map-subject-checkbox" value="${h}" ${isLikelySubject ? 'checked' : ''}>
-                            <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${h}">${h}</span>
-                        </label>
-                    `;
-                }).join('');
+                const standardKeywords = ['roll', 'name', 'dob', 'class', 'status', 'total', 'grade', 'rank', 'remark', 'id', 'result', 'year', 'exam'];
+
+                const subjectFields = headers.filter((h, idx) => {
+                    // Skip if already auto-mapped to a standard field
+                    if (autoMappedHeaders.has(h)) return false;
+
+                    const normalized = normalizeHeader(h);
+
+                    // Skip if it looks like a standard field keyword
+                    if (standardKeywords.some(key => normalized.includes(key))) return false;
+
+                    // Heuristic: If it has data in first row that is numeric or not empty, and not standard field
+                    const dataVal = firstDataRow[idx];
+                    const isNumeric = dataVal && !isNaN(dataVal.replace('%', ''));
+
+                    return isNumeric || (dataVal && dataVal.length > 0 && dataVal.length < 15);
+                });
+
+                subjectContainer.innerHTML = subjectFields.map(h => `
+                    <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:6px; cursor:pointer; transition:all 0.2s;" class="subject-map-label">
+                        <input type="checkbox" class="map-subject-checkbox" value="${h}" checked>
+                        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${h}">${h}</span>
+                    </label>
+                `).join('');
+
+                if (subjectFields.length === 0) {
+                    subjectContainer.innerHTML = '<p style="font-size:0.8rem; color:#888; width:100%;">No subject columns identified. You can manually select them if needed.</p>';
+                }
             }
 
-            // Reveal UI
+            // 3. Reveal Mapping UI
             const mappingUI = document.getElementById('column-mapping-ui');
             if (mappingUI) {
                 mappingUI.style.display = 'block';
+                mappingUI.style.animation = 'fadeInUp 0.4s ease-out';
                 mappingUI.scrollIntoView({ behavior: 'smooth' });
             }
 
-            showStatus('<i class="ph-bold ph-check-circle"></i> Headers loaded! Please verify the column mappings below.', 'success');
+            showStatus('<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> ✓ Smart mapping complete! Please verify the selections below.', 'success');
         } catch (error) {
-            console.error('Fetch Headers Error:', error);
+            console.error('📊 ResultsManagement FetchHeaders Error:', error);
             showStatus(`<span style="color:#ff4444;">❌ Error: ${error.message}</span>`, 'error');
         }
     };
