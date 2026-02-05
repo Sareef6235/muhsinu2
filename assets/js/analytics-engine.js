@@ -1,159 +1,182 @@
 /**
  * Analytics Engine
- * Calculates advanced metrics for teacher and subject performance.
+ * Handles all statistical calculations for the dashboard.
+ * School-Aware & Event-Driven.
  */
 const AnalyticsEngine = (function () {
     'use strict';
 
-    function calculate(examId) {
-        // Ensure ResultsManagement is available
-        if (!window.ResultsManagement) {
-            console.error("ResultsManagement module not found.");
-            return null;
-        }
+    function getExamList() {
+        return window.ExamManager ? window.ExamManager.getActive() : [];
+    }
 
-        const allResults = window.ResultsManagement.getAllResults();
-        // Filter by exam
-        const validResults = allResults.filter(r => r.examId === examId);
+    function getAllResults() {
+        // Results are stored in 'exam_results_cache' (global array, filtering needed)
+        // ResultsManagement handles filtering, but we can access raw data
+        return window.ResultsManagement ? window.ResultsManagement.getAllResults() : [];
+    }
 
-        if (validResults.length === 0) return null;
+    // Filter results by specific exam
+    function getResultsForExam(examId) {
+        return getAllResults().filter(r => r.examId === examId);
+    }
 
-        // 1. Aggregation Map: Subject -> { totalMarks, count, passCount, topScore, scores[] }
-        const map = {};
+    // CALCULATE: Overview Stats (Pass %, Top Score, Average)
+    function calculateExamStats(examId) {
+        const results = getResultsForExam(examId);
+        if (results.length === 0) return null;
 
-        validResults.forEach(r => {
-            if (!r.subjects) return;
-            Object.entries(r.subjects).forEach(([subName, mark]) => {
-                const score = parseFloat(mark);
-                if (isNaN(score)) return; // Skip non-numeric grades if analyzing marks
+        const totalStudents = results.length;
+        const passed = results.filter(r => r.status === 'Pass').length;
+        const failed = totalStudents - passed;
+        const passPercentage = ((passed / totalStudents) * 100).toFixed(1);
 
-                if (!map[subName]) {
-                    map[subName] = {
-                        sum: 0, count: 0, pass: 0,
-                        top: -1,
-                        scores: [],
-                        grades: { 'A+': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0 }
-                    };
+        // Find Topper
+        const topper = results.reduce((prev, current) => (prev.totalMarks > current.totalMarks) ? prev : current);
+
+        // Subject Averages
+        const subjectStats = {};
+        results.forEach(student => {
+            if (!student.subjects) return;
+            Object.entries(student.subjects).forEach(([subject, marks]) => {
+                if (!subjectStats[subject]) subjectStats[subject] = { total: 0, count: 0 };
+                const val = parseFloat(marks);
+                if (!isNaN(val)) {
+                    subjectStats[subject].total += val;
+                    subjectStats[subject].count++;
                 }
-
-                // Stats
-                map[subName].sum += score;
-                map[subName].count++;
-                map[subName].scores.push(score);
-                if (score >= 30) map[subName].pass++; // Assuming 30 is pass
-                if (score > map[subName].top) map[subName].top = score;
-
-                // Grade Est. (Simple logic, can be customized)
-                let g = 'F';
-                if (score >= 90) g = 'A+';
-                else if (score >= 80) g = 'A';
-                else if (score >= 60) g = 'B';
-                else if (score >= 40) g = 'C';
-                else if (score >= 30) g = 'D';
-                else g = 'E'; // or F
-
-                // Increment grade bucket
-                if (map[subName].grades[g] !== undefined) map[subName].grades[g]++;
             });
         });
 
-        // 2. Finalize Metrics
-        const metrics = Object.entries(map).map(([subject, data]) => {
-            return {
-                subject,
-                avg: (data.sum / data.count).toFixed(1),
-                passPct: ((data.pass / data.count) * 100).toFixed(1),
-                top: data.top,
-                count: data.count,
-                grades: data.grades
-            };
-        });
+        const subjectAverages = Object.entries(subjectStats).map(([sub, data]) => ({
+            subject: sub,
+            average: (data.total / data.count).toFixed(1)
+        })).sort((a, b) => b.average - a.average);
 
-        return metrics;
+        return {
+            totalStudents,
+            passed,
+            failed,
+            passPercentage,
+            topper,
+            subjectAverages
+        };
     }
 
-    function render(examId) {
-        const tbody = document.getElementById('analytics-table-body');
-        const avgDisplay = document.getElementById('analytics-avg');
-        const topSubDisplay = document.getElementById('analytics-top-sub');
-        const lowSubDisplay = document.getElementById('analytics-low-sub');
+    // UI: Render Main Analytics View
+    function renderDashboard() {
+        const container = document.getElementById('analytics-view');
+        if (!container) return;
 
-        if (!tbody) return;
+        const exams = getExamList();
+        const selectedExamId = document.getElementById('analytics-exam-select')?.value;
+        const targetExam = selectedExamId ? exams.find(e => e.id === selectedExamId) : exams[0];
 
-        if (!examId) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#666">Select an exam to view analysis.</td></tr>';
-            return;
-        }
-
-        const data = calculate(examId);
-
-        if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#666">No result data found for this exam. Sync results first.</td></tr>';
-            return;
-        }
-
-        // Global Stats
-        const globalAvg = (data.reduce((acc, cur) => acc + parseFloat(cur.passPct), 0) / data.length).toFixed(1);
-
-        // Sort by Pass %
-        data.sort((a, b) => parseFloat(b.passPct) - parseFloat(a.passPct));
-
-        // Update Cards
-        if (avgDisplay) avgDisplay.textContent = `${globalAvg}%`;
-        if (topSubDisplay) topSubDisplay.textContent = data[0].subject;
-        if (lowSubDisplay) lowSubDisplay.textContent = data[data.length - 1].subject;
-
-        // Render Table
-        tbody.innerHTML = data.map(row => {
-            // Try to find teacher if mapped
-            // Placeholder logic for teacher mapping
-            const teacher = "N/A";
-
-            return `
-            <tr>
-                <td>
-                    <div style="font-weight:bold; color:white;">${row.subject}</div>
-                    <div style="font-size:0.8rem; color:#888;">${teacher}</div>
-                </td>
-                <td>${row.avg}</td>
-                <td>
-                    <span class="status-badge ${parseFloat(row.passPct) > 80 ? 'approved' : parseFloat(row.passPct) < 50 ? 'pending' : ''}">
-                        ${row.passPct}%
-                    </span>
-                </td>
-                <td>${row.top}</td>
-                <td>
-                    <div style="display:flex; gap:4px; font-size:0.7rem;">
-                        <span style="color:#00e5ff">A+: ${row.grades['A+']}</span>
-                        <span style="color:#2ed573">A: ${row.grades['A']}</span>
-                        <span style="color:#ff4757">F: ${row.grades['E'] + row.grades['F']}</span>
-                    </div>
-                </td>
-            </tr>
+        // 1. SELECTOR
+        let html = `
+            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                <h3>Performance Analytics</h3>
+                <select id="analytics-exam-select" class="form-input" style="width:250px;" onchange="AnalyticsEngine.renderDashboard()">
+                    ${exams.map(e => `<option value="${e.id}" ${targetExam && targetExam.id === e.id ? 'selected' : ''}>${e.displayName}</option>`).join('')}
+                </select>
+            </div>
         `;
-        }).join('');
-    }
 
-    // Sync Dropdown
-    function syncDropdown() {
-        const select = document.getElementById('analytics-exam-select');
-        if (!select) return;
-
-        // Ensure ResultsManagement is available
-        if (!window.ResultsManagement) return;
-
-        const exams = window.ResultsManagement.getExamList();
-        if (exams.length === 0) {
-            select.innerHTML = '<option value="">No Exams Found</option>';
+        if (!targetExam) {
+            container.innerHTML = html + `<div style="text-align:center; padding:50px; color:#666;">No active exams found for analysis.</div>`;
             return;
         }
 
-        const cur = select.value;
-        select.innerHTML = '<option value="">-- Select Exam --</option>' +
-            exams.map(e => `<option value="${e.id}" ${cur === e.id ? 'selected' : ''}>${e.displayName}</option>`).join('');
+        const stats = calculateExamStats(targetExam.id);
+
+        if (!stats) {
+            container.innerHTML = html + `<div style="text-align:center; padding:50px; color:#666;">No result data uploaded for <b>${targetExam.displayName}</b> yet.</div>`;
+            return;
+        }
+
+        // 2. KEY METRICS CARDS
+        html += `
+            <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:30px;">
+                <div class="glass-card" style="padding:20px; text-align:center; border-left: 4px solid var(--primary-color);">
+                    <div style="font-size:2rem; font-weight:bold;">${stats.passPercentage}%</div>
+                    <div style="color:#888; font-size:0.9rem;">Pass Rate</div>
+                </div>
+                <div class="glass-card" style="padding:20px; text-align:center; border-left: 4px solid #2ed573;">
+                    <div style="font-size:2rem; font-weight:bold;">${stats.totalStudents}</div>
+                    <div style="color:#888; font-size:0.9rem;">Total Students</div>
+                </div>
+                <div class="glass-card" style="padding:20px; text-align:center; border-left: 4px solid #ffa502;">
+                    <div style="font-size:2rem; font-weight:bold;">${stats.topper.totalMarks}</div>
+                    <div style="color:#888; font-size:0.9rem;">Highest Score</div>
+                </div>
+                 <div class="glass-card" style="padding:20px; text-align:center; border-left: 4px solid #ff4757;">
+                    <div style="font-size:2rem; font-weight:bold;">${stats.failed}</div>
+                    <div style="color:#888; font-size:0.9rem;">Needs Improvement</div>
+                </div>
+            </div>
+        `;
+
+        // 3. TOPPER & SUBJECTS GRID
+        html += `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px; margin-bottom:30px;" class="analytics-split">
+                
+                <!-- TOP PERFORMER -->
+                <div class="glass-card" style="padding:25px; position:relative; overflow:hidden;">
+                     <div style="position:absolute; top:-10px; right:-10px; width:80px; height:80px; background:linear-gradient(135deg, transparent 50%, var(--primary-color) 50%); opacity:0.1;"></div>
+                    <h4 style="margin-bottom:20px; color:var(--primary-color);"><i class="ph-bold ph-trophy"></i> Top Performer</h4>
+                    
+                    <div style="display:flex; align-items:center; gap:20px;">
+                        <div style="width:60px; height:60px; background:var(--primary-color); color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:bold;">
+                            ${stats.topper.name.charAt(0)}
+                        </div>
+                        <div>
+                            <div style="font-size:1.2rem; font-weight:bold;">${stats.topper.name}</div>
+                            <div style="color:#888;">Roll No: ${stats.topper.rollNo}</div>
+                            <div style="margin-top:5px; font-size:0.9rem;">Scored <b>${stats.topper.totalMarks}</b> with Grade <b>${stats.topper.grade}</b></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBJECT AVERAGES -->
+                <div class="glass-card" style="padding:25px;">
+                    <h4 style="margin-bottom:20px; color:var(--primary-color);"><i class="ph-bold ph-chart-bar"></i> Subject Averages</h4>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        ${stats.subjectAverages.map(sub => `
+                            <div style="display:flex; align-items:center; justify-content:space-between;">
+                                <span style="color:#ccc;">${sub.subject}</span>
+                                <div style="flex:1; margin:0 15px; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                                    <div style="width:${Math.min(100, (sub.average / 50) * 100)}%; height:100%; background:var(--primary-color);"></div> 
+                                    <!-- Assuming 50 is max roughly, scalable? -->
+                                </div>
+                                <span style="font-weight:bold;">${sub.average}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        // Save selection memory
+        if (selectedExamId) localStorage.setItem('analytics_last_exam', selectedExamId);
     }
 
-    return { calculate, render, syncDropdown };
+    function init() {
+        renderDashboard();
+    }
+
+    // Alias for compatibility
+    function syncDropdown() {
+        renderDashboard();
+    }
+
+    return {
+        init,
+        renderDashboard,
+        syncDropdown
+    };
 })();
 
+// Expose
 window.AnalyticsEngine = AnalyticsEngine;

@@ -1,151 +1,223 @@
-/**
- * school-manager.js
- * Multi-School Logic & Data Management
- */
-import StorageManager from './storage-manager.js';
+const SchoolManager = (() => {
+    const storageKey = "schools";
+    const activeKey = "activeSchoolId";
 
-export const SchoolManager = {
-    KEYS: {
-        SCHOOLS: 'school_list',
-        ACTIVE: StorageManager.ACTIVE_SCHOOL_KEY
-    },
+    // Helper: generate unique ID
+    const generateId = () => 'sch_' + Date.now().toString() + Math.floor(Math.random() * 1000);
 
-    init() {
-        console.log('🏢 School Engine Initializing...');
-        this.renderSwitcher();
-    },
-
-    getAll() {
-        return StorageManager.getGlobal(this.KEYS.SCHOOLS, []);
-    },
-
-    save(schoolData) {
-        const schools = this.getAll();
-        const id = schoolData.id || `sch_${Date.now()}`;
-
-        const newSchool = {
-            id,
-            name: schoolData.name || 'Unnamed Institution',
-            code: schoolData.code || 'SCH',
-            logo: schoolData.logo || '', // Base64 or URL
-            address: schoolData.address || '',
-            active: schoolData.active !== undefined ? schoolData.active : true,
-            updatedAt: new Date().toISOString()
-        };
-
-        const idx = schools.findIndex(s => s.id === id);
-        if (idx !== -1) schools[idx] = { ...schools[idx], ...newSchool };
-        else schools.push(newSchool);
-
-        StorageManager.setGlobal(this.KEYS.SCHOOLS, schools);
-        this.renderSwitcher();
-        return newSchool;
-    },
-
-    delete(id) {
-        if (this.getActive()?.id === id) {
-            alert("Cannot delete the currently active school. Please switch to another school first.");
-            return;
-        }
-
-        if (confirm("Are you sure? This will hide the school profile from the switcher.\n(Note: Results data is preserved safely in storage)")) {
-            const schools = this.getAll().filter(s => s.id !== id);
-            StorageManager.setGlobal(this.KEYS.SCHOOLS, schools);
-            this.renderSwitcher();
-        }
-    },
-
-    getActive() {
-        return StorageManager.getGlobal(this.KEYS.ACTIVE, null);
-    },
-
-    switchSchool(id) {
-        const school = this.getAll().find(s => s.id === id);
-        // id === 'default' will result in school = undefined, which is correct for Legacy fallback
-        StorageManager.setGlobal(this.KEYS.ACTIVE, school || null);
-        location.reload();
-    },
-
-    renderSwitcher() {
-        const selector = document.getElementById('active-school-selector');
-        if (!selector) return;
-
-        const schools = this.getAll();
-        const active = this.getActive();
-
-        let html = `<option value="default" ${!active ? 'selected' : ''}>Legacy System (Default)</option>`;
-        schools.forEach(s => {
-            html += `<option value="${s.id}" ${active?.id === s.id ? 'selected' : ''}>${s.name}</option>`;
-        });
-        selector.innerHTML = html;
-
-        // Also update the Management Grid if we are on the schools panel
-        this.renderManagementGrid();
-    },
-
-    // --- ADMIN UI METHODS ---
-
-    toggleAddForm() {
-        const modal = document.getElementById('school-add-modal');
-        if (!modal) return;
-
-        if (modal.style.display === 'none') {
-            modal.style.display = 'flex'; // Modal overlay needs flex to center
-            document.getElementById('school-name-input').focus();
-        } else {
-            modal.style.display = 'none';
-        }
-    },
-
-    saveSchool(btn) {
-        const name = document.getElementById('school-name-input').value.trim();
-        const code = document.getElementById('school-code-input').value.trim();
-        const address = document.getElementById('school-address-input').value.trim();
-
-        if (!name) return alert("School Name is required");
-
-        if (window.uiLock) window.uiLock(btn, true);
-
+    // Load schools from localStorage
+    const loadSchools = () => {
         try {
-            this.save({ name, code, address });
-            this.toggleAddForm();
-            alert("School Profile Created Successfully!");
+            let schools = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            return schools;
         } catch (e) {
-            console.error(e);
-            alert("Error saving school.");
-        } finally {
-            if (window.uiLock) window.uiLock(btn, false);
+            console.error("SchoolManager: Error loading schools", e);
+            return [];
         }
-    },
+    };
 
-    renderManagementGrid() {
-        const grid = document.getElementById('schools-grid');
+    // Save schools to localStorage
+    const saveSchools = (schools) => {
+        localStorage.setItem(storageKey, JSON.stringify(schools));
+    };
+
+    // Get active school ID
+    const getActiveSchoolId = () => localStorage.getItem(activeKey);
+
+    // Set active school ID
+    const setActiveSchoolId = (id) => {
+        localStorage.setItem(activeKey, id);
+
+        // Dispatch event on window for global compatibility with other managers
+        window.dispatchEvent(new CustomEvent("schoolChanged", { detail: { id } }));
+
+        // Backward compatibility
+        window.dispatchEvent(new CustomEvent("school-changed", { detail: { schoolId: id } }));
+
+        updateDashboardContext();
+    };
+
+    /**
+     * Dashboard Integration: Update UI elements that depend on school context
+     */
+    const updateDashboardContext = () => {
+        const schools = loadSchools();
+        const activeId = getActiveSchoolId();
+        const active = schools.find(s => s.id === activeId);
+
+        if (!active) return;
+
+        // Update dashboard title or top bar school name if elements exist
+        const displayEl = document.getElementById('active-school-display');
+        if (displayEl) displayEl.textContent = active.name;
+
+        // Populate any school selection dropdowns in the UI
+        const selectors = document.querySelectorAll('.school-selector');
+        selectors.forEach(select => {
+            select.innerHTML = schools.map(s => `<option value="${s.id}" ${s.id === activeId ? 'selected' : ''}>${s.name}</option>`).join('');
+        });
+    };
+
+    // Render schools grid
+    const render = () => {
+        const grid = document.getElementById("schools-grid");
+        const schools = loadSchools();
+
         if (!grid) return;
 
-        const schools = this.getAll();
-        const active = this.getActive();
-
         if (schools.length === 0) {
-            grid.innerHTML = '<div style="text-align: center; width: 100%; padding: 40px; color: #666;">No schools found. Add one to get started.</div>';
+            grid.innerHTML = `<div style="text-align:center; width:100%; padding:40px; color:#666;">No schools found.</div>`;
             return;
         }
 
-        grid.innerHTML = schools.map(s => `
-            <div class="glass-card" style="padding: 20px; border: 1px solid ${active?.id === s.id ? 'var(--primary-color)' : 'rgba(255,255,255,0.1)'}; position: relative;">
-                ${active?.id === s.id ? '<div style="position:absolute; top:10px; right:10px; background:var(--primary-color); color:#000; font-size:0.7rem; padding:2px 8px; border-radius:4px; font-weight:bold;">ACTIVE</div>' : ''}
-                
-                <h3 style="color: #fff; margin-bottom: 5px;">${s.name}</h3>
-                <div style="font-size: 0.9rem; color: var(--primary-color); margin-bottom: 15px;">${s.code}</div>
-                <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;"><i class="ph-bold ph-map-pin"></i> ${s.address || 'No Address'}</p>
-                
-                <div style="display: flex; gap: 10px;">
-                    ${active?.id !== s.id ? `<button class="btn btn-sm btn-secondary" onclick="SchoolManager.switchSchool('${s.id}')">Switch To</button>` : '<button class="btn btn-sm" disabled style="opacity:0.5; border:1px solid #555; color:#aaa;">In Use</button>'}
-                    <button class="btn btn-sm btn-danger" onclick="SchoolManager.delete('${s.id}')"><i class="ph-bold ph-trash"></i></button>
-                </div>
-            </div>
-        `).join('');
-    }
-};
+        const activeId = getActiveSchoolId() || schools[0].id;
+        if (!getActiveSchoolId()) {
+            setActiveSchoolId(activeId);
+        }
 
-window.SchoolManager = SchoolManager;
-export default SchoolManager;
+        grid.innerHTML = schools
+            .map(school => {
+                const isActive = school.id === activeId;
+                const activeBadge = isActive ? `<span class="status-badge approved">Active</span>` : "";
+                const canDelete = schools.length > 1 && !isActive;
+
+                return `
+                <div class="school-card glass-card" style="padding:15px; border:1px solid ${isActive ? 'var(--primary-color)' : '#333'}; position:relative; display:flex; flex-direction:column; gap:5px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <strong>${school.name}</strong>
+                        ${activeBadge}
+                    </div>
+                    <span style="font-size:0.85rem; color:#888; font-family:monospace;">${school.code}</span>
+                    <span style="font-size:0.9rem; color:#666;">${school.address || 'No address set'}</span>
+                    <div style="margin-top:10px; display:flex; gap:5px;">
+                        ${!isActive ? `<button class="btn btn-mini btn-secondary" onclick="SchoolManager.switchSchool('${school.id}')">Switch</button>` : ""}
+                        ${canDelete ? `<button class="btn btn-mini btn-danger" onclick="SchoolManager.deleteSchool('${school.id}')">Delete</button>` : ""}
+                    </div>
+                </div>
+                `;
+            })
+            .join("");
+    };
+
+    // Toggle add modal
+    const toggleAddForm = () => {
+        const modal = document.getElementById("school-add-modal");
+        if (!modal) return;
+        modal.style.display = modal.style.display === "none" ? "flex" : "none";
+
+        if (modal.style.display === "flex") {
+            document.getElementById("school-name-input").value = "";
+            document.getElementById("school-code-input").value = "";
+            document.getElementById("school-address-input").value = "";
+            document.getElementById("school-name-input").focus();
+        }
+    };
+
+    // Save new school
+    const saveSchool = (btn) => {
+        const name = document.getElementById("school-name-input").value.trim();
+        const code = document.getElementById("school-code-input").value.trim().toUpperCase();
+        const address = document.getElementById("school-address-input").value.trim();
+
+        if (!name || !code) {
+            alert("School Name and Code are required.");
+            return;
+        }
+
+        let schools = loadSchools();
+        if (schools.find(s => s.code.toLowerCase() === code.toLowerCase())) {
+            alert("A school with this code already exists.");
+            return;
+        }
+
+        const newSchool = {
+            id: generateId(),
+            name,
+            code,
+            address,
+            active: false,
+            createdAt: new Date().toISOString()
+        };
+
+        schools.push(newSchool);
+        saveSchools(schools);
+        toggleAddForm();
+        render();
+    };
+
+    // Switch active school
+    const switchSchool = (id) => {
+        const schools = loadSchools();
+        if (!schools.find(s => s.id === id)) return;
+        setActiveSchoolId(id);
+        render();
+    };
+
+    // Delete school
+    const deleteSchool = (id) => {
+        let schools = loadSchools();
+        if (schools.length <= 1) {
+            alert("Cannot delete the only school.");
+            return;
+        }
+        const activeId = getActiveSchoolId();
+        if (id === activeId) {
+            alert("Cannot delete the active school. Switch first.");
+            return;
+        }
+        if (!confirm("Are you sure you want to delete this school?")) return;
+
+        schools = schools.filter(s => s.id !== id);
+        saveSchools(schools);
+        render();
+    };
+
+    // Initialize
+    const init = () => {
+        let schools = loadSchools();
+        if (!schools || schools.length === 0) {
+            // Create default school if none
+            const defaultSchool = {
+                id: 'default',
+                name: "Default School",
+                code: "DEFAULT",
+                address: "",
+                active: true,
+                createdAt: new Date().toISOString()
+            };
+            schools = [defaultSchool];
+            saveSchools(schools);
+        }
+
+        const activeId = getActiveSchoolId() || schools[0].id;
+        if (!getActiveSchoolId()) {
+            localStorage.setItem(activeKey, activeId);
+        }
+
+        render();
+        updateDashboardContext();
+    };
+
+    return {
+        init,
+        toggleAddForm,
+        saveSchool,
+        switchSchool,
+        deleteSchool,
+        getAll: loadSchools,
+        getActiveId: getActiveSchoolId,
+        renderManagementGrid: render
+    };
+})();
+
+// Initialize on page load
+if (typeof window !== 'undefined') {
+    window.SchoolManager = SchoolManager;
+    document.addEventListener("DOMContentLoaded", () => {
+        SchoolManager.init();
+    });
+}
+
+if (typeof module !== 'undefined') {
+    module.exports = SchoolManager;
+}

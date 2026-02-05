@@ -1,319 +1,135 @@
-// ====================================================================
-// EXAM MANAGER MODULE
-// ====================================================================
-// Manages specific exams (Half Yearly - Class 10, Annual - Science, etc.)
-// Links: Academic Year + Exam Type + Exam Name
-// Safe for production - backward compatible with old results
-// ====================================================================
-
+/**
+ * ExamManager.js - Production Ready
+ * Manages exams with structure {id, name, typeId, yearId, sheetId} per school.
+ */
 const ExamManager = (function () {
     'use strict';
 
     const STORAGE_KEY = 'exams';
-    let editingId = null;
 
-    // Get all exams
+    function init() {
+        console.log('📝 ExamManager: Initializing...');
+        renderTable();
+        refreshDropdowns();
+
+        // Listen for all dependency updates
+        window.addEventListener('schoolChanged', () => {
+            console.log('📝 ExamManager: School changed, refreshing...');
+            renderTable();
+            refreshDropdowns();
+        });
+
+        window.addEventListener('yearChanged', () => {
+            console.log('📝 ExamManager: Years changed, refreshing dropdowns...');
+            refreshDropdowns();
+        });
+
+        window.addEventListener('examTypeChanged', () => {
+            console.log('📝 ExamManager: Types changed, refreshing dropdowns...');
+            refreshDropdowns();
+        });
+
+        // Backward compatibility
+        window.addEventListener('school-changed', () => {
+            renderTable();
+            refreshDropdowns();
+        });
+    }
+
     function getAll() {
         return StorageManager.get(STORAGE_KEY, []);
     }
 
-    // Get exams by academic year
-    function getByYear(academicYear) {
-        return getAll().filter(e => e.academicYear === academicYear);
-    }
-
-    // Get exams by academic year and type
-    function getByYearAndType(academicYear, examType) {
-        return getAll().filter(e =>
-            e.academicYear === academicYear && e.examType === examType
-        );
-    }
-
-    // Get only active exams
-    function getActive() {
-        return getAll().filter(e => e.active);
-    }
-
-    // Get exam by ID
-    function getById(id) {
-        return getAll().find(e => e.id === id);
-    }
-
-    // Save to localStorage
-    function save(exams) {
+    function saveAll(exams) {
         StorageManager.set(STORAGE_KEY, exams);
-        window.dispatchEvent(new CustomEvent('exams-updated'));
+        window.dispatchEvent(new CustomEvent('examsUpdated', { detail: exams }));
+        refreshDropdowns();
     }
 
-    // Create new exam
-    function create(academicYear, examType, examName, sheetId = '') {
+    function create(academicYearId, examTypeId, name, sheetId = '') {
         const exams = getAll();
+        const normalized = name.trim();
 
-        // Validation
-        if (!academicYear || !examType || !examName) {
-            alert('Please fill all required fields');
+        if (!academicYearId || !examTypeId || !normalized) {
+            alert("Please fill all required fields (Year, Type, and Name).");
             return false;
         }
 
-        const normalized = examName.trim();
-        if (!normalized) {
-            alert('Exam name cannot be empty');
-            return false;
-        }
-
-        // Check duplicate
-        const duplicate = exams.find(e =>
-            e.academicYear === academicYear &&
-            e.examType === examType &&
-            e.examName.toLowerCase() === normalized.toLowerCase()
+        // Check duplicates for this year and type
+        const dup = exams.find(e =>
+            e.yearId === academicYearId &&
+            e.typeId === examTypeId &&
+            e.name.toLowerCase() === normalized.toLowerCase()
         );
-        if (duplicate) {
-            alert(`Exam "${normalized}" already exists for this type and year`);
+        if (dup) {
+            alert(`Exam "${normalized}" already exists for this year and type.`);
             return false;
-        }
-
-        // Get exam type name for display
-        let typeName = examType;
-        if (window.ExamTypeManager) {
-            const types = window.ExamTypeManager.getAll();
-            const typeObj = types.find(t => {
-                const id = t.name.toLowerCase().replace(/[^a-z0-9]+/g, '_');
-                return id === examType;
-            });
-            if (typeObj) typeName = typeObj.name;
-        }
-
-        // Get year label for display
-        let yearLabel = academicYear;
-        if (window.AcademicYearManager) {
-            const years = window.AcademicYearManager.getAll();
-            const yearObj = years.find(y => y.id === academicYear);
-            if (yearObj) yearLabel = yearObj.label;
         }
 
         const newExam = {
-            id: 'exam_' + Date.now(),
-            academicYear,
-            examType,
-            examName: normalized,
-            displayName: `${typeName} - ${normalized} (${yearLabel})`,
+            id: 'ex_' + Date.now(),
+            name: normalized,
+            typeId: examTypeId,
+            yearId: academicYearId,
             sheetId: sheetId.trim(),
             active: true,
-            createdAt: new Date().toISOString(),
-            lastSync: null
+            createdAt: new Date().toISOString()
         };
 
         exams.push(newExam);
-        save(exams);
-        return newExam;
-    }
-
-    // Update exam
-    function update(id, updates) {
-        const exams = getAll();
-        const index = exams.findIndex(e => e.id === id);
-
-        if (index === -1) {
-            alert('Exam not found');
-            return false;
-        }
-
-        // If updating name, check duplicates
-        if (updates.examName) {
-            const normalized = updates.examName.trim();
-            if (!normalized) {
-                alert('Exam name cannot be empty');
-                return false;
-            }
-
-            const exam = exams[index];
-            const duplicate = exams.find((e, i) =>
-                i !== index &&
-                e.academicYear === exam.academicYear &&
-                e.examType === exam.examType &&
-                e.examName.toLowerCase() === normalized.toLowerCase()
-            );
-            if (duplicate) {
-                alert(`Exam "${normalized}" already exists`);
-                return false;
-            }
-
-            updates.examName = normalized;
-        }
-
-        exams[index] = { ...exams[index], ...updates };
-        save(exams);
+        saveAll(exams);
+        renderTable();
         return true;
     }
 
-    // Toggle active status
+    function deleteExam(id) {
+        if (!confirm("Delete this exam profile? Results associated with this exam will remain in cache but will not be linked.")) return;
+        const exams = getAll();
+        const updated = exams.filter(e => e.id !== id);
+        saveAll(updated);
+        renderTable();
+    }
+
     function toggleActive(id) {
         const exams = getAll();
         const exam = exams.find(e => e.id === id);
-
         if (exam) {
             exam.active = !exam.active;
-            save(exams);
-            return true;
-        }
-        return false;
-    }
-
-    // Delete exam
-    function deleteExam(id) {
-        if (!confirm('Delete this exam?\n\nNote: Results will remain in storage but won\'t be linked to this exam.')) {
-            return false;
-        }
-
-        const exams = getAll().filter(e => e.id !== id);
-        save(exams);
-        return true;
-    }
-
-    // UI Functions
-    function toggleAddForm() {
-        const form = document.getElementById('exam-add-form');
-        const nameInput = document.getElementById('exam-name-input');
-
-        if (form.style.display === 'none') {
-            form.style.display = 'block';
-            nameInput.value = '';
-            document.getElementById('exam-sheet-id').value = '';
-            nameInput.focus();
-            editingId = null;
-        } else {
-            form.style.display = 'none';
-            editingId = null;
-        }
-    }
-
-    function saveExam(btn) {
-        const yearSelect = document.getElementById('exam-academic-year');
-        const typeSelect = document.getElementById('exam-type-select');
-        const nameInput = document.getElementById('exam-name-input');
-        const sheetInput = document.getElementById('exam-sheet-id');
-
-        const academicYear = yearSelect.value;
-        const examType = typeSelect.value;
-        const examName = nameInput.value.trim();
-        const sheetId = sheetInput.value.trim();
-
-        if (!academicYear || !examType || !examName) {
-            alert('Please fill all required fields');
-            return;
-        }
-
-        if (window.uiLock) window.uiLock(btn, true);
-
-        try {
-            let success;
-            if (editingId) {
-                success = update(editingId, { examName, sheetId });
-            } else {
-                success = create(academicYear, examType, examName, sheetId);
-            }
-
-            if (success) {
-                toggleAddForm();
-                renderTable();
-                updateExamSelector();
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            if (window.uiLock) window.uiLock(btn, false);
-        }
-    }
-
-    function startEdit(id) {
-        const exams = getAll();
-        const exam = exams.find(e => e.id === id);
-
-        if (exam) {
-            editingId = id;
-            const form = document.getElementById('exam-add-form');
-
-            document.getElementById('exam-academic-year').value = exam.academicYear;
-            document.getElementById('exam-type-select').value = exam.examType;
-            document.getElementById('exam-name-input').value = exam.examName;
-            document.getElementById('exam-sheet-id').value = exam.sheetId || '';
-
-            form.style.display = 'block';
-            document.getElementById('exam-name-input').focus();
-        }
-    }
-
-    function handleDelete(id) {
-        if (deleteExam(id)) {
+            saveAll(exams);
             renderTable();
-            updateExamSelector();
         }
     }
 
-    function handleToggleActive(id) {
-        if (toggleActive(id)) {
-            renderTable();
-            updateExamSelector();
-        }
-    }
-
+    /**
+     * UI Rendering
+     */
     function renderTable() {
         const tbody = document.getElementById('exams-table-body');
+        if (!tbody) return;
+
         const exams = getAll();
+        const years = window.AcademicYearManager ? window.AcademicYearManager.getAll() : [];
+        const types = window.ExamTypeManager ? window.ExamTypeManager.getAll() : [];
 
-        // Get filter values
-        const filterYear = document.getElementById('exam-filter-year')?.value || '';
-        const filterType = document.getElementById('exam-filter-type')?.value || '';
-
-        // Filter exams
-        let filtered = exams;
-        if (filterYear) filtered = filtered.filter(e => e.academicYear === filterYear);
-        if (filterType) filtered = filtered.filter(e => e.examType === filterType);
-
-        if (filtered.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" style="text-align: center; color: #666; padding: 30px;">
-                        No exams found. Click "Add Exam" to create one.
-                    </td>
-                </tr>
-            `;
+        if (exams.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#666;">No exams found.</td></tr>';
             return;
         }
 
-        tbody.innerHTML = filtered.map(exam => {
-            const statusBadge = exam.active
-                ? '<span class="status-badge approved">Active</span>'
-                : '<span class="status-badge pending">Inactive</span>';
-
-            const syncBadge = exam.lastSync
-                ? `<span style="font-size: 0.75rem; color: #2ed573;">✓ Synced</span>`
-                : `<span style="font-size: 0.75rem; color: #888;">Not synced</span>`;
+        tbody.innerHTML = exams.map(e => {
+            const year = years.find(y => y.id === e.yearId)?.name || 'Unknown';
+            const type = types.find(t => t.id === e.typeId)?.name || 'Unknown';
 
             return `
                 <tr>
-                    <td><b>${exam.examName}</b><br>${syncBadge}</td>
-                    <td style="font-size: 0.85rem; color: #888;">${exam.examType.replace(/_/g, ' ')}</td>
-                    <td style="font-size: 0.85rem; color: #888;">${exam.academicYear.replace(/_/g, '-')}</td>
-                    <td>${statusBadge}</td>
-                    <td style="text-align: right;">
-                        <div style="display: inline-flex; gap: 8px;">
-                            <button class="nav-item" style="padding: 6px 12px; border: none; font-size: 0.85rem;"
-                                onclick="ExamManager.startEdit('${exam.id}')"
-                                title="Edit">
-                                <i class="ph-bold ph-pencil-simple"></i>
-                            </button>
-                            <button class="nav-item ${exam.active ? '' : 'active'}" 
-                                style="padding: 6px 12px; border: none; font-size: 0.85rem;"
-                                onclick="ExamManager.handleToggleActive('${exam.id}')"
-                                title="${exam.active ? 'Deactivate' : 'Activate'}">
-                                <i class="ph-bold ph-${exam.active ? 'eye-slash' : 'eye'}"></i>
-                            </button>
-                            <button class="nav-item" style="padding: 6px 12px; border: none; font-size: 0.85rem; color: #ff4444;"
-                                onclick="ExamManager.handleDelete('${exam.id}')"
-                                title="Delete">
-                                <i class="ph-bold ph-trash"></i>
-                            </button>
+                    <td><b style="color:#fff;">${e.name}</b></td>
+                    <td>${type}</td>
+                    <td>${year}</td>
+                    <td><span class="status-badge ${e.active ? 'approved' : 'pending'}">${e.active ? 'Active' : 'Disabled'}</span></td>
+                    <td style="text-align:right;">
+                        <div style="display:flex; gap:5px; justify-content:flex-end;">
+                            <button class="btn btn-mini btn-secondary" onclick="ExamManager.toggleActive('${e.id}')"><i class="ph-bold ph-eye${e.active ? '-slash' : ''}"></i></button>
+                            <button class="btn btn-mini btn-danger" onclick="ExamManager.deleteExam('${e.id}')"><i class="ph-bold ph-trash"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -321,51 +137,60 @@ const ExamManager = (function () {
         }).join('');
     }
 
-    function updateExamSelector() {
-        const select = document.getElementById('results-exam-select');
-        if (!select) return;
+    function refreshDropdowns() {
+        // Auto-update `#results-exam-select`
+        const examSelect = document.getElementById('results-exam-select');
+        if (!examSelect) return;
 
-        const currentYear = window.AcademicYearManager ? window.AcademicYearManager.getCurrent() : null;
-        const yearId = currentYear ? currentYear.id : '';
+        const activeExams = getAll().filter(e => e.active);
 
-        const exams = getActive().filter(e => e.academicYear === yearId);
+        // Contextual labeling
+        const years = window.AcademicYearManager ? window.AcademicYearManager.getAll() : [];
+        const types = window.ExamTypeManager ? window.ExamTypeManager.getAll() : [];
 
-        select.innerHTML = '<option value="">-- Select Exam --</option>' +
-            exams.map(e => `<option value="${e.id}">${e.displayName}</option>`).join('');
+        examSelect.innerHTML = `<option value="">-- Select Exam --</option>` +
+            activeExams.map(e => {
+                const yearName = years.find(y => y.id === e.yearId)?.name || '';
+                const typeName = types.find(t => t.id === e.typeId)?.name || '';
+                const label = `${e.name} (${typeName} - ${yearName})`;
+                return `<option value="${e.id}">${label}</option>`;
+            }).join('');
+
+        // Trigger results refresh if current exam selection might be affected
+        window.dispatchEvent(new CustomEvent('examSelectionRefreshed'));
     }
 
-    function init() {
-        renderTable();
-        updateExamSelector();
+    function saveExam() {
+        const yearSelect = document.getElementById('exam-academic-year');
+        const typeSelect = document.getElementById('exam-type-select');
+        const nameInput = document.getElementById('exam-name-input');
 
-        // Listen for exam type updates to refresh labels/selectors
-        window.addEventListener('exam-types-updated', () => {
-            renderTable();
-            updateExamSelector();
-        });
+        if (create(yearSelect.value, typeSelect.value, nameInput.value)) {
+            nameInput.value = '';
+            // Form toggle logic usually handled in dashboard.html or here
+            if (typeof toggleExamAddForm === 'function') toggleExamAddForm();
+        }
     }
 
-    // Public API
+    // Compatibility helper for dashboard logic
+    function toggleAddForm() {
+        const form = document.getElementById('exam-add-form');
+        if (!form) return;
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
     return {
         init,
         getAll,
-        getByYear,
-        getByYearAndType,
-        getActive,
-        getById,
+        getActive: () => getAll().filter(e => e.active),
         create,
-        update,
-        toggleActive,
         deleteExam,
+        toggleActive,
         toggleAddForm,
         saveExam,
-        startEdit,
-        handleDelete,
-        handleToggleActive,
-        renderTable,
-        updateExamSelector
+        refresh: () => { renderTable(); refreshDropdowns(); }
     };
 })();
 
-// Expose globally
 window.ExamManager = ExamManager;
+document.addEventListener('DOMContentLoaded', () => ExamManager.init());

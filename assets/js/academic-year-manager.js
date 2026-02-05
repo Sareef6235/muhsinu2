@@ -1,353 +1,168 @@
-// ====================================================================
-// ACADEMIC YEAR MANAGER MODULE
-// ====================================================================
-// Manages academic years (2024-25, 2025-26, etc.)
-// Safe for production - includes validation and backward compatibility
-// ====================================================================
-
+/**
+ * AcademicYearManager.js - Production Ready
+ * Manages academic years (2024-25, etc.) with multi-school isolation.
+ */
 const AcademicYearManager = (function () {
     'use strict';
 
     const STORAGE_KEY = 'academic_years';
-    let editingId = null;
 
-    // Get all academic years
+    /**
+     * Data Model: { id, name, active, current, schoolId, createdAt }
+     */
+
+    function init() {
+        console.log('📅 AcademicYearManager: Initializing...');
+        renderTable();
+        refreshDropdowns();
+
+        // Listen for School Changes
+        window.addEventListener('schoolChanged', () => {
+            console.log('📅 AcademicYearManager: School changed, refreshing...');
+            renderTable();
+            refreshDropdowns();
+        });
+
+        // Backward compatibility listener
+        window.addEventListener('school-changed', () => {
+            renderTable();
+            refreshDropdowns();
+        });
+    }
+
     function getAll() {
+        // StorageManager.get automatically handles the school-prefixed keys now
         return StorageManager.get(STORAGE_KEY, []);
     }
 
-    // Get only active years
-    function getActive() {
-        return getAll().filter(y => y.active);
+    function saveAll(years) {
+        StorageManager.set(STORAGE_KEY, years);
+        // Dispatch Custom Event
+        window.dispatchEvent(new CustomEvent('yearChanged', { detail: years }));
+        refreshDropdowns();
     }
 
-    // Get current academic year
-    function getCurrent() {
-        const years = getAll();
-        const current = years.find(y => y.current);
-        return current || years[0] || null;
-    }
-
-    // Save to localStorage
-    function save(exams) {
-        StorageManager.set(STORAGE_KEY, exams);
-        window.dispatchEvent(new CustomEvent('exams-updated'));
-    }
-
-    // Create new academic year
     function create(name) {
         const years = getAll();
-
-        // Normalize name
         const normalized = name.trim();
-        if (!normalized) {
-            alert('Academic year name cannot be empty');
-            return false;
-        }
 
-        // Check duplicate name
+        if (!normalized) return alert("Academic year name is required.");
+
+        // Prevent duplicate names in current school context
         if (years.find(y => y.name.toLowerCase() === normalized.toLowerCase())) {
-            alert(`Academic year "${normalized}" already exists`);
+            alert(`Year "${normalized}" already exists for this school.`);
             return false;
         }
 
         const newYear = {
-            id: Date.now().toString(), // User requirement: timestamp ID
-            name: normalized,          // User requirement: 'name' property
+            id: 'yr_' + Date.now(),
+            name: normalized,
             active: true,
-            current: years.length === 0,
+            current: years.length === 0, // Auto-set first as current
             createdAt: new Date().toISOString()
         };
 
         years.push(newYear);
-        save(years);
+        saveAll(years);
+        renderTable();
         return true;
     }
 
-    // Update academic year
-    function update(id, updates) {
-        const years = getAll();
-        const index = years.findIndex(y => y.id === id);
-
-        if (index === -1) {
-            alert('Academic year not found');
-            return false;
-        }
-
-        // If updating name, check duplicates
-        if (updates.name) {
-            const dup = years.find(y => y.id !== id && y.name.toLowerCase() === updates.name.toLowerCase());
-            if (dup) {
-                alert('Academic Year name already exists');
-                return false;
-            }
-        }
-
-        years[index] = { ...years[index], ...updates };
-        save(years);
-        return true;
-    }
-
-    // Set current academic year
-    function setCurrent(id) {
-        const years = getAll();
-        years.forEach(y => y.current = (y.id === id));
-        save(years);
-        updateCurrentYearDisplay();
-        return true;
-    }
-
-    // Toggle active status
     function toggleActive(id) {
         const years = getAll();
         const year = years.find(y => y.id === id);
-
         if (year) {
             year.active = !year.active;
-            save(years);
-            return true;
+            saveAll(years);
+            renderTable();
         }
-        return false;
     }
 
-    // Delete academic year
     function deleteYear(id) {
-        if (!confirm('Delete this academic year?\n\nNote: Associated exams will remain but won\'t be linked.')) {
-            return false;
-        }
-
-        const years = getAll().filter(y => y.id !== id);
-        save(years);
-        return true;
-    }
-
-    // UI Functions
-    function toggleAddForm() {
-        const form = document.getElementById('academic-year-add-form');
-        const input = document.getElementById('academic-year-input');
-
-        if (form.style.display === 'none') {
-            form.style.display = 'block';
-            input.value = '';
-            input.focus();
-            editingId = null;
-        } else {
-            form.style.display = 'none';
-            editingId = null;
-        }
-    }
-
-    function saveAcademicYear() {
-        const btn = event?.target || document.querySelector('button[onclick="AcademicYearManager.saveAcademicYear()"]');
-        const input = document.getElementById('academic-year-input');
-        const name = input.value.trim();
-
-        if (!name) {
-            alert('Please enter an academic year (e.g., 2026-27)');
-            return;
-        }
-
-        if (window.uiLock) window.uiLock(btn, true);
-
-        try {
-            let success;
-            if (editingId) {
-                success = update(editingId, { name });
-            } else {
-                success = create(name);
-            }
-
-            if (success) {
-                toggleAddForm();
-                renderTable();
-                updateCurrentYearSelector();
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            if (window.uiLock) window.uiLock(btn, false);
-        }
-    }
-
-    function startEdit(id) {
         const years = getAll();
         const year = years.find(y => y.id === id);
 
-        if (year) {
-            editingId = id;
-            const form = document.getElementById('academic-year-add-form');
-            const input = document.getElementById('academic-year-input');
-
-            form.style.display = 'block';
-            input.value = year.name;
-            input.focus();
-        }
-    }
-
-    function handleDelete(id) {
-        if (deleteYear(id)) {
-            renderTable();
-            updateCurrentYearSelector();
-        }
-    }
-
-    function handleToggleActive(id) {
-        if (toggleActive(id)) {
-            renderTable();
-            updateCurrentYearSelector();
-        }
-    }
-
-    function handleSetCurrent(id) {
-        if (handleSetCurrent.processing) return; // Prevent double clicks
-        handleSetCurrent.processing = true;
-
-        if (setCurrent(id)) {
-            renderTable();
+        if (!year) return;
+        if (year.current) {
+            alert("Cannot delete the current active year. Set another year as 'current' first.");
+            return;
         }
 
-        setTimeout(() => handleSetCurrent.processing = false, 500);
+        if (!confirm(`Delete academic year "${year.name}"?`)) return;
+
+        const updated = years.filter(y => y.id !== id);
+        saveAll(updated);
+        renderTable();
     }
 
+    function setCurrent(id) {
+        const years = getAll();
+        years.forEach(y => y.current = (y.id === id));
+        saveAll(years);
+        renderTable();
+    }
+
+    /**
+     * UI Rendering
+     */
     function renderTable() {
         const tbody = document.getElementById('academic-years-table-body');
-        if (!tbody) return; // Safety check
+        if (!tbody) return;
 
         const years = getAll();
-
         if (years.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="4" style="text-align: center; color: #666; padding: 30px;">
-                        No academic years created. Click "Add Year" to create one.
-                    </td>
-                </tr>
-            `;
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#666;">No years found.</td></tr>';
             return;
         }
 
-        // Sort: Current first, then by name (descending roughly matches years usually)
-        years.sort((a, b) => {
-            if (a.current) return -1;
-            if (b.current) return 1;
-            return b.name.localeCompare(a.name); // Newest years first generally
-        });
-
-        tbody.innerHTML = years.map(year => {
-            const statusBadge = year.active
-                ? '<span class="status-badge approved">Active</span>'
-                : '<span class="status-badge pending">Inactive</span>';
-
-            const currentBadge = year.current
-                ? '<span class="status-badge" style="background: rgba(188, 19, 254, 0.2); color: #bc13fe;">Current</span>'
-                : '';
-
-            const date = new Date(year.createdAt);
-            const dateStr = !isNaN(date) ? date.toLocaleDateString() : 'N/A';
-
-            return `
-                <tr>
-                    <td><b>${year.name}</b> ${currentBadge}</td>
-                    <td>${statusBadge}</td>
-                    <td style="color: #888; font-size: 0.85rem;">${dateStr}</td>
-                    <td style="text-align: right;">
-                        <div style="display: inline-flex; gap: 8px;">
-                            ${!year.current ? `
-                                <button class="btn btn-mini btn-subtle"
-                                    onclick="AcademicYearManager.handleSetCurrent('${year.id}')"
-                                    title="Set as Current">
-                                    <i class="ph-bold ph-check-circle"></i>
-                                </button>
-                            ` : ''}
-                            <button class="btn btn-mini btn-secondary"
-                                onclick="AcademicYearManager.startEdit('${year.id}')"
-                                title="Edit">
-                                <i class="ph-bold ph-pencil-simple"></i>
-                            </button>
-                            <button class="btn btn-mini ${year.active ? 'btn-secondary' : 'btn-primary'}" 
-                                onclick="AcademicYearManager.handleToggleActive('${year.id}')"
-                                title="${year.active ? 'Deactivate' : 'Activate'}">
-                                <i class="ph-bold ph-${year.active ? 'eye-slash' : 'eye'}"></i>
-                            </button>
-                            <button class="btn btn-mini btn-danger"
-                                onclick="AcademicYearManager.handleDelete('${year.id}')"
-                                title="Delete">
-                                <i class="ph-bold ph-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }).join('');
+        tbody.innerHTML = years.map(y => `
+            <tr>
+                <td><b style="color:#fff;">${y.name}</b> ${y.current ? '<span class="status-badge approved" style="font-size:0.6rem; padding:1px 5px;">CURRENT</span>' : ''}</td>
+                <td><span class="status-badge ${y.active ? 'approved' : 'pending'}">${y.active ? 'Active' : 'Disabled'}</span></td>
+                <td style="text-align:right;">
+                    <div style="display:flex; gap:5px; justify-content:flex-end;">
+                        ${!y.current ? `<button class="btn btn-mini btn-subtle" onclick="AcademicYearManager.setCurrent('${y.id}')" title="Set as Current"><i class="ph-bold ph-check"></i></button>` : ''}
+                        <button class="btn btn-mini btn-secondary" onclick="AcademicYearManager.toggleActive('${y.id}')"><i class="ph-bold ph-eye${y.active ? '-slash' : ''}"></i></button>
+                        <button class="btn btn-mini btn-danger" onclick="AcademicYearManager.deleteYear('${y.id}')"><i class="ph-bold ph-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
     }
 
-    function updateCurrentYearSelector() {
-        const select = document.getElementById('current-academic-year-select');
-        if (!select) return;
+    function refreshDropdowns() {
+        // Auto-update all requested selectors
+        const yearSelect = document.getElementById('exam-academic-year');
+        const filterSelect = document.getElementById('exam-filter-year');
 
-        const years = getActive();
-        const current = getCurrent();
+        const activeYears = getAll().filter(y => y.active);
+        const optionsHtml = activeYears.map(y => `<option value="${y.id}" ${y.current ? 'selected' : ''}>${y.name}</option>`).join('');
 
-        select.innerHTML = years.map(y =>
-            `<option value="${y.id}" ${y.id === current?.id ? 'selected' : ''}>${y.name}</option>`
-        ).join('');
+        if (yearSelect) yearSelect.innerHTML = `<option value="">-- Select Year --</option>` + optionsHtml;
+        if (filterSelect) filterSelect.innerHTML = `<option value="">All Years</option>` + optionsHtml;
     }
 
-    function updateCurrentYearDisplay() {
-        const current = getCurrent();
-        const displays = document.querySelectorAll('.current-academic-year-display');
-        displays.forEach(el => {
-            el.textContent = current ? current.name : 'Not Set';
-        });
-    }
-
-    function init() {
-        if (typeof StorageManager === 'undefined') {
-            console.error('AcademicYearManager: StorageManager not found. Logic will fail.');
-            return;
+    function saveAcademicYear() {
+        const input = document.getElementById('academic-year-input');
+        if (create(input.value)) {
+            input.value = '';
         }
-
-        const years = getAll();
-
-        // Create default current year if none exist (only if legacy/empty)
-        if (years.length === 0) {
-            const now = new Date();
-            const month = now.getMonth();
-            const year = now.getFullYear();
-            const startYear = month >= 3 ? year : year - 1;
-            const endYear = startYear + 1;
-            const defaultName = `${startYear}-${endYear.toString().slice(2)}`;
-
-            // We use create() here to ensure proper ID generation
-            create(defaultName);
-        }
-
-        renderTable();
-        updateCurrentYearSelector();
-        updateCurrentYearDisplay();
     }
 
-    // Public API
     return {
         init,
         getAll,
-        getActive,
-        getCurrent,
+        getActive: () => getAll().filter(y => y.active),
+        getCurrent: () => getAll().find(y => y.current),
         create,
-        update,
-        setCurrent,
-        toggleActive,
         deleteYear,
-        toggleAddForm,
+        toggleActive,
+        setCurrent,
         saveAcademicYear,
-        startEdit,
-        handleDelete,
-        handleToggleActive,
-        handleSetCurrent,
-        renderTable,
-        updateCurrentYearSelector
+        refresh: () => { renderTable(); refreshDropdowns(); }
     };
 })();
 
-// Expose globally
+// Expose to window
 window.AcademicYearManager = AcademicYearManager;
+document.addEventListener('DOMContentLoaded', () => AcademicYearManager.init());

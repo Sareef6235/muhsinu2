@@ -6,7 +6,7 @@
 const StorageManager = {
     LEGACY_PREFIX: 'mhm_v2_',
     SCHOOL_DATA_PREFIX: 'school_',
-    ACTIVE_SCHOOL_KEY: 'active_school_config',
+    ACTIVE_SCHOOL_KEY: 'activeSchoolId', // Updated to match user requirements
 
     /**
      * Determine the correct prefix for the current context.
@@ -14,12 +14,20 @@ const StorageManager = {
      */
     getPrefix() {
         try {
-            const activeSchoolRaw = localStorage.getItem(this.LEGACY_PREFIX + this.ACTIVE_SCHOOL_KEY);
-            if (activeSchoolRaw) {
-                const school = JSON.parse(activeSchoolRaw);
-                if (school && school.id && school.id !== 'default') {
-                    return `${this.SCHOOL_DATA_PREFIX}${school.id}_`;
+            // Check for new key first
+            let activeId = localStorage.getItem(this.ACTIVE_SCHOOL_KEY);
+
+            // Backward compatibility: check for old key if new one is missing
+            if (!activeId) {
+                const oldConfig = localStorage.getItem(this.LEGACY_PREFIX + 'active_school_config');
+                if (oldConfig) {
+                    const parsed = JSON.parse(oldConfig);
+                    activeId = parsed?.id;
                 }
+            }
+
+            if (activeId && activeId !== 'default') {
+                return `${this.SCHOOL_DATA_PREFIX}${activeId}_`;
             }
         } catch (e) {
             console.error("StorageManager: Error parsing school context", e);
