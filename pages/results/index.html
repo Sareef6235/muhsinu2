@@ -652,9 +652,11 @@
         function refreshDropdown() {
             const visibleExams = ResultsCMS.getVisibleExamList();
             if (visibleExams.length === 0) {
-                select.innerHTML = '<option value="">No Active Exams Available</option>';
+                select.innerHTML = '<option value="">No Published Exams Available</option>';
+                select.disabled = true;
                 return;
             }
+            select.disabled = false;
             const currentVal = select.value;
             select.innerHTML = '<option value="">-- Select Exam Session --</option>' +
                 visibleExams.map(e => `<option value="${e.id}" ${e.id === currentVal ? 'selected' : ''}>${e.displayName}</option>`).join('');
@@ -667,16 +669,34 @@
             const btn = document.getElementById('submitBtn');
             const originalText = btn.innerHTML;
 
-            btn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Authenticating...';
-            btn.disabled = true;
-
+            // Validation
             const examId = select.value;
-            const roll = document.getElementById('rollInput').value;
-            const dob = document.getElementById('dobInput')?.value; // Check if DOB input exists
+            const roll = document.getElementById('rollInput').value.trim();
+            const dob = document.getElementById('dobInput')?.value;
+
+            if (!examId) {
+                renderError('Please select an exam session first.');
+                return;
+            }
+
+            if (!roll) {
+                renderError('Please enter your roll number.');
+                return;
+            }
+
+            // Check if exam is published
+            if (!ResultsCMS.isExamPublished(examId)) {
+                renderError('This exam is not yet published. Please check back later.');
+                return;
+            }
+
+            btn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Searching...';
+            btn.disabled = true;
 
             await new Promise(r => setTimeout(r, 600));
 
-            const result = ResultsCMS.search(resultsData, roll, examId, dob);
+            // Search with enhanced validation
+            const result = ResultsCMS.search(null, roll, examId, dob);
 
             btn.innerHTML = originalText;
             btn.disabled = false;
@@ -686,7 +706,12 @@
                 window.currentResult = result;
                 renderResult(result);
             } else {
-                renderError('Invalid Roll Number or Date of Birth for the selected exam.');
+                // Better error messages
+                if (dob) {
+                    renderError('Invalid Roll Number or Date of Birth. Please verify your credentials.');
+                } else {
+                    renderError('Roll Number not found for this exam. Please check and try again.');
+                }
             }
         }
 
