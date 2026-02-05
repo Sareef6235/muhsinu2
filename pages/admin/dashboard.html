@@ -5,434 +5,197 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | MIFTHAHUL HUDA</title>
-
-    <!-- Base Styles -->
+    <!-- Assets are in ../../assets -->
     <link rel="stylesheet" href="../../assets/css/styles.css">
-    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
     <link rel="stylesheet" href="../../assets/css/site-footer.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
+    <link rel="stylesheet" href="../../assets/css/site-languages.css">
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- Core Utilities -->
-    <script src="../../assets/js/utils/performance.js" defer></script>
-    <script src="../../assets/js/site-languages.js" defer></script>
-
-    <!-- CORE SYSTEM (WordPress-style Plugin Architecture) -->
-    <script type="module" src="../../assets/system/plugin-loader.js"></script>
-    <script type="module" src="../../assets/system/core.js"></script>
-    <script type="module" src="../../assets/system/plugins/jet-services.js"></script>
-    <script type="module" src="../../assets/system/plugins/visual-builder.js"></script>
-
-    <!-- Data Management -->
-    <script src="../../assets/js/subject-storage.js" defer></script>
-    <script type="module" src="../../assets/js/media-optimizer.js"></script>
-    <script type="module" src="../../assets/js/service-renderer.js"></script>
-
     <style>
+        :root {
+            --primary-color: #00f3ff;
+            --secondary-color: #bc13fe;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 280px;
+        }
+
         body {
-            margin: 0;
-            padding: 0;
             background: #050505;
             color: #fff;
             font-family: 'Outfit', sans-serif;
+            margin: 0;
             overflow-x: hidden;
         }
 
-        /* Loading Screen */
-        .admin-loading {
+        /* Sidebar Overlay */
+        .sidebar-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #050505;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #0a0a0a;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: 0.3s ease;
+        }
+
+        .sidebar-logo {
+            padding: 40px 30px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
             display: flex;
             align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 20px;
-            z-index: 9999;
+            gap: 12px;
+            letter-spacing: 1px;
         }
 
-        .admin-loading .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(0, 243, 255, 0.1);
-            border-top-color: #00f3ff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        nav {
+            flex: 1;
+            padding: 0 20px;
+            overflow-y: auto;
         }
 
-        .admin-loading p {
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 20px;
             color: #888;
-            font-size: 0.9rem;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: 0.3s;
+            cursor: pointer;
+            font-weight: 500;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .nav-item i {
+            font-size: 1.2rem;
         }
 
-        /* Mobile Responsive Utilities */
-        @media (max-width: 992px) {
-            .admin-sidebar {
-                position: fixed;
-                left: -280px;
-                height: 100vh;
-                z-index: 200;
-            }
-
-            .admin-sidebar.visible {
-                left: 0;
-            }
-
-            .sidebar-close {
-                display: block !important;
-            }
-
-            .sidebar-toggle {
-                display: block !important;
-            }
-
-            .admin-header {
-                padding: 0 20px !important;
-            }
-
-            .admin-content {
-                padding: 20px !important;
-            }
+        /* School Switcher */
+        .school-switcher-container {
+            padding: 20px;
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 20px;
         }
 
-        .md-only {
+        .school-select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .school-select option {
+            background: #000;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* Sidebar Footer (Safe Mode) */
+        .sidebar>div:last-of-type {
+            margin-top: auto;
+        }
+
+        /* Main Content area */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .mobile-toggle {
             display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
 
-        @media (max-width: 992px) {
-            .md-only {
-                display: block;
-            }
-        }
-
-        /* Form Styles */
-        .admin-form {
+        /* Stats Grid */
+        .stats-grid {
             display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 25px;
+            margin-bottom: 40px;
         }
 
-        .form-section {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            border-radius: 25px;
+            text-align: left;
+            transition: 0.3s;
         }
 
-        .form-section h4 {
-            margin: 0 0 20px 0;
-            color: #00f3ff;
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+        /* Panels */
+        .panel {
+            display: none;
+            animation: fadeIn 0.4s easeOut;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group label {
-            font-size: 0.85rem;
-            color: #888;
-            font-weight: 600;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 12px 15px;
-            border-radius: 10px;
-            color: #fff;
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #00f3ff;
-            background: rgba(0, 243, 255, 0.05);
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            font-family: inherit;
-            transition: 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: #00f3ff;
-            color: #000;
-        }
-
-        .btn-primary:hover {
-            background: #00d4e6;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .btn-view-site {
-            background: rgba(0, 243, 255, 0.1);
-            color: #00f3ff;
-            padding: 10px 20px;
-            border-radius: 10px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .btn-view-site:hover {
-            background: rgba(0, 243, 255, 0.2);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .badge.success {
-            background: rgba(0, 255, 136, 0.1);
-            color: #00ff88;
-        }
-
-        .badge.danger {
-            background: rgba(255, 77, 77, 0.1);
-            color: #ff4d4d;
-        }
-
-        /* Table Styles */
-        .table-container {
-            overflow-x: auto;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .table-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* Loading & Empty States */
-        .loading,
-        .empty-state,
-        .error-state {
-            padding: 60px 20px;
-            text-align: center;
-            color: #666;
-        }
-
-        .empty-state {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 15px;
-            border: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-
-        /* Dashboard Recent Grid */
-        .dashboard-recent-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .action-buttons button {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: inherit;
-        }
-
-        .action-buttons button:hover {
-            background: rgba(0, 243, 255, 0.1);
-            border-color: #00f3ff;
-            color: #00f3ff;
-        }
-
-        .status-list {
-            list-style: none;
-            padding: 0;
-            margin: 15px 0 0 0;
-        }
-
-        .status-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        .status-list li:last-child {
-            border-bottom: none;
-        }
-
-        /* Services Admin Grid */
-        .services-admin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 25px;
-        }
-
-        .service-admin-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 15px;
-            transition: 0.3s;
-        }
-
-        .service-admin-card:hover {
-            border-color: rgba(0, 243, 255, 0.3);
-            background: rgba(0, 243, 255, 0.02);
-        }
-
-        .service-admin-card .card-icon {
-            font-size: 2rem;
-            color: #00f3ff;
-            margin-bottom: 15px;
-        }
-
-        .service-admin-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 1.1rem;
-        }
-
-        .service-admin-card p {
-            color: #888;
-            font-size: 0.85rem;
-            margin: 0 0 15px 0;
-        }
-
-        .service-admin-card .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .service-admin-card .actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* Menu Item Row */
-        .menu-item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .menu-label {
-            font-weight: 600;
-        }
-
-        /* Header Breadcrumb */
-        .header-breadcrumb {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        #breadcrumb-current {
-            color: #fff;
-            font-weight: 700;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .admin-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #888;
-        }
-
-        .admin-profile i {
-            font-size: 1.5rem;
-        }
-
-        /* Animations */
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease;
+        .panel.active {
+            display: block;
         }
 
         @keyframes fadeIn {
@@ -446,48 +209,2180 @@
                 transform: translateY(0);
             }
         }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 18px 25px;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .data-table th {
+            color: #666;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* Badges */
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 165, 0, 0.1);
+            color: orange;
+        }
+
+        .status-badge.approved,
+        .status-badge.paid {
+            background: rgba(46, 213, 115, 0.1);
+            color: #2ed573;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                left: -100%;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+        }
+
+        /* --- BUTTON SYSTEM --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            line-height: 1;
+        }
+
+        /* SIZES */
+        .btn-sm {
+            /* Inline/Utility */
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            height: 32px;
+        }
+
+        .btn-md {
+            /* Default Actions */
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            height: 42px;
+        }
+
+        .btn-mini {
+            /* Icon Only */
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        /* VARIANTS */
+        .btn-primary {
+            background: var(--primary-color);
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0, 243, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 243, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-subtle {
+            background: transparent;
+            color: #888;
+        }
+
+        .btn-subtle:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-danger {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 68, 68, 0.2);
+        }
+
+        /* STATES */
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
     </style>
 </head>
 
 <body>
-    <!-- Loading Screen -->
-    <div class="admin-loading" id="admin-loading">
-        <div class="spinner"></div>
-        <p>Loading Admin Panel...</p>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ph-bold ph-shield-check"></i>
+            ADMIN
+        </div>
+
+        <div class="school-switcher-container">
+            <select id="active-school-selector" class="school-select" onchange="SchoolManager.switchSchool(this.value)">
+                <option value="default">Loading Schools...</option>
+            </select>
+        </div>
+
+        <nav>
+            <div class="nav-item active" onclick="switchPanel('overview', this)">
+                <i class="ph ph-squares-four"></i> Dashboard
+            </div>
+            <div class="nav-item" onclick="switchPanel('fee', this)">
+                <i class="ph ph-receipt"></i> Fee Receipts
+            </div>
+            <div class="nav-item" onclick="switchPanel('creative', this)">
+                <i class="ph ph-paint-brush"></i> Creative
+            </div>
+            <div class="nav-item" onclick="switchPanel('bookings', this)">
+                <i class="ph ph-calendar-check"></i> Bookings
+            </div>
+            <div class="nav-item" onclick="switchPanel('news', this)">
+                <i class="ph ph-newspaper"></i> News Ticker
+            </div>
+            <div class="nav-item" onclick="switchPanel('subjects', this)">
+                <i class="ph ph-books"></i> Subjects
+            </div>
+            <div class="nav-item" onclick="switchPanel('results', this)">
+                <i class="ph ph-exam"></i> Results
+            </div>
+            <div class="nav-item" onclick="switchPanel('analytics', this)">
+                <i class="ph ph-chart-line-up"></i> Analytics
+            </div>
+            <div class="nav-item" onclick="switchPanel('schools', this)">
+                <i class="ph ph-buildings"></i> School Profiles
+            </div>
+        </nav>
+
+        <div style="padding: 20px;">
+            <div class="nav-item" onclick="logout()" style="color: #ff3d3d; background: rgba(255, 61, 61, 0.1);">
+                <i class="ph ph-sign-out"></i> Logout
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header-bar">
+            <div class="mobile-toggle" onclick="toggleSidebar()">
+                <i class="ph ph-list"></i>
+            </div>
+            <div>
+                <h2 style="font-size: 1.8rem; margin-bottom: 5px;" id="panel-title">Dashboard</h2>
+                <div class="date-display" id="date-display">Tuesday, February 3, 2026</div>
+            </div>
+            <div style="text-align: right; display: flex; align-items: center; gap: 20px;">
+                <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; color: #fff;">Admin User</div>
+                        <div style="font-size: 0.8rem; color: #666;">Administrator</div>
+                    </div>
+                    <div
+                        style="width: 45px; height: 45px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #000;">
+                        A
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. OVERVIEW PANEL -->
+        <div id="overview" class="panel active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="ph ph-receipt stat-icon"></i>
+                    <div class="stat-value" id="total-receipts">0</div>
+                    <div class="stat-label">Total Fee Receipts</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(188, 19, 254, 0.3);">
+                    <i class="ph ph-paint-brush stat-icon" style="color: var(--secondary-color);"></i>
+                    <div class="stat-value" id="total-creations">0</div>
+                    <div class="stat-label">Creative Submissions</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(46, 213, 115, 0.3);">
+                    <i class="ph ph-calendar-check stat-icon" style="color: #2ed573;"></i>
+                    <div class="stat-value" id="total-bookings">0</div>
+                    <div class="stat-label">Tuition Bookings</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(0, 243, 255, 0.3);">
+                    <i class="ph ph-book-open stat-icon" style="color: var(--primary-color);"></i>
+                    <div class="stat-value" id="total-subjects-stat">0</div>
+                    <div class="stat-label">Active Subjects</div>
+                </div>
+            </div>
+            <h3 style="margin-bottom: 20px; font-size: 1.2rem;">Quick Actions Needed</h3>
+            <div id="quick-actions-list" style="display: grid; gap: 15px;">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+
+        <!-- 2. FEE VERIFICATION PANEL -->
+        <div id="fee" class="panel">
+            <div class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Fee Receipt Verification</h3>
+                <select class="form-input" style="width: 200px;" onchange="renderFeeTable(this.value)">
+                    <option value="all">All Classes</option>
+                    <option value="pending">Pending Only</option>
+                    <script>
+                        for (let i = 1; i <= 12; i++) document.write(`<option value="${i}">Class ${i}</option>`);
+                    </script>
+                </select>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Ref No.</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Proof</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fee-table-body">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #666;">No data found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. CREATIVE APPROVAL PANEL -->
+        <div id="creative" class="panel">
+            <div class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Creative Submissions</h3>
+                <div style="display: flex; gap: 15px;">
+                    <select class="form-input" style="width: 200px;" onchange="renderCreativeTable(this.value)">
+                        <option value="all">All Items</option>
+                        <option value="pending">Pending Only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid" id="creative-grid"
+                style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; display: grid;">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+
+        <!-- 4. TUITION BOOKINGS PANEL -->
+        <div id="bookings" class="panel">
+            <div class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Tuition Bookings</h3>
+                <select class="form-input" style="width: 200px;" id="booking-class-filter"
+                    onchange="renderBookingsTable()">
+                    <option value="all">All Classes</option>
+                </select>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Subjects</th>
+                            <th>Amount</th>
+                            <th>Payment</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookings-table-body">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #666; padding: 40px;">Loading bookings...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. SUBJECT MANAGEMENT PANEL -->
+        <div id="subjects" class="panel">
+            <div class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Tuition Subject Management</h3>
+                <button class="btn btn-sm btn-primary" onclick="showSubjectEditor()">
+                    <i class="ph-bold ph-plus"></i> Add New Subject
+                </button>
+            </div>
+
+            <div id="subject-editor-view"
+                style="display: none; background: rgba(255,255,255,0.02); padding: 30px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 30px;">
+                <h4 id="subject-editor-title" style="margin-bottom: 20px; color: var(--primary-color);">Add New Subject
+                </h4>
+                <input type="hidden" id="subject-id">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">Subject Name</label>
+                        <input type="text" id="subject-name" class="form-input" placeholder="e.g. ARABIC">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Monthly Price (₹)</label>
+                        <input type="number" id="subject-price" class="form-input" placeholder="e.g. 500">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-sm btn-primary" onclick="saveSubject()">Save Subject</button>
+                    <button class="btn btn-sm btn-secondary" onclick="hideSubjectEditor()">Cancel</button>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Subject Name</th>
+                            <th>Monthly Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjects-table-body">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #666; padding: 40px;">Loading subjects...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 6. NEWS MANAGEMENT PANEL -->
+        <div id="news" class="panel">
+            <div class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>News & Notice Board</h3>
+                <button class="btn btn-sm btn-primary" onclick="showNewsEditor()">
+                    <i class="ph-bold ph-plus"></i> Add New
+                </button>
+            </div>
+            <div id="news-list-view">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="news-table-body"></tbody>
+                </table>
+            </div>
+            <!-- Hidden Exam Creator (Legacy/Toggleable) -->
+            <div id="exam-add-form-legacy" class="modal-overlay" style="display: none;">
+                <div class="glass-card" style="max-width: 500px; width: 90%; padding: 30px; position:relative;">
+                    <button onclick="ExamManager.toggleAddForm()"
+                        style="position: absolute; top: 15px; right: 15px; background:none; border:none; color:#fff; cursor:pointer;"><i
+                            class="ph-bold ph-x"></i></button>
+                    <h3 style="margin-bottom: 20px;">Create New Exam</h3>
+
+                    <div class="form-group">
+                        <label class="form-label">Academic Year</label>
+                        <select id="exam-academic-year" class="form-input">
+                            <!-- JS populated -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Exam Type</label>
+                        <select id="exam-type-select" class="form-input">
+                            <!-- JS populated -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Exam Name (Display)</label>
+                        <input type="text" id="exam-name-input" class="form-input" placeholder="e.g. Annual Exam 2026">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Default Sheet ID (Optional)</label>
+                        <input type="text" id="exam-sheet-id" class="form-input"
+                            placeholder="Can be set during sync...">
+                    </div>
+
+                    <button class="btn-premium primary" style="width: 100%; justify-content: center; margin-top: 20px;"
+                        onclick="ExamManager.saveExam(this)">
+                        Create Exam Profile
+                    </button>
+                </div>
+            </div>
+            <div id="news-editor-view" style="display: none;">
+                <h4 style="margin-bottom: 20px; color: var(--primary-color);">Editor</h4>
+                <input type="hidden" id="news-id">
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <input type="text" id="news-title" class="form-input" placeholder="Enter news title...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Short Description</label>
+                    <input type="text" id="news-short" class="form-input" placeholder="Brief summary...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Full Content (HTML Supported)</label>
+                    <textarea id="news-content" class="form-input" style="height: 200px;"
+                        placeholder="Write full article..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Featured Image</label>
+                    <input type="file" id="news-image" accept="image/*" class="form-input">
+                    <div id="news-img-preview" style="margin-top: 10px; max-width: 200px;"></div>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <button class="btn btn-sm btn-primary" onclick="saveNewsItem()">Publish / Update</button>
+                    <button class="btn btn-sm btn-secondary" onclick="hideNewsEditor()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 7. RESULTS MANAGEMENT PANEL (PREMIUM LAYOUT) -->
+        <div id="results" class="panel">
+            <style>
+                .premium-step {
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 16px;
+                    padding: 24px;
+                    margin-bottom: 24px;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .premium-step.active {
+                    background: rgba(255, 255, 255, 0.05);
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 20px rgba(0, 229, 255, 0.05);
+                }
+
+                .step-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                }
+
+                .step-title {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: #fff;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+
+                .step-number {
+                    background: var(--primary-color);
+                    color: #000;
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 800;
+                    font-size: 0.9rem;
+                }
+
+                .manager-toggle {
+                    font-size: 0.8rem;
+                    color: #888;
+                    cursor: pointer;
+                    text-decoration: underline;
+                    background: none;
+                    border: none;
+                    padding: 0;
+                }
+
+                .manager-toggle:hover {
+                    color: var(--primary-color);
+                }
+
+                .manager-section {
+                    display: none;
+                    margin-top: 20px;
+                    padding-top: 20px;
+                    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+                    animation: slideDown 0.3s ease;
+                }
+
+                @keyframes slideDown {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            </style>
+
+            <div class="panel-header"
+                style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h3 style="margin: 0;">Exam Results & Configuration</h3>
+                    <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">Follow the steps to configure and sync
+                        results from Google Sheets.</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-sm btn-subtle" onclick="switchPanel('dashboard')"
+                        title="Back to Main Dashboard">
+                        <i class="ph-bold ph-layout"></i> Dashboard
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="resetDashboardUI()" title="Reset UI (Safe Mode)">
+                        <i class="ph-bold ph-arrows-counter-clockwise"></i> Reset View
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div
+                    style="background: rgba(0, 243, 255, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(0, 243, 255, 0.2);">
+                    <div style="font-size: 0.8rem; color: #666; text-transform: uppercase;">Total Results</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--primary-color);"
+                        id="results-total-count">-</div>
+                </div>
+                <div
+                    style="background: rgba(46, 213, 115, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(46, 213, 115, 0.2);">
+                    <div style="font-size: 0.8rem; color: #666; text-transform: uppercase;">Last Sync</div>
+                    <div style="font-size: 1rem; font-weight: 600; color: #2ed573;" id="results-last-sync">-</div>
+                </div>
+                <div
+                    style="background: rgba(188, 19, 254, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(188, 19, 254, 0.2);">
+                    <div style="font-size: 0.8rem; color: #666; text-transform: uppercase;">Active Exams</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--secondary-color);"
+                        id="results-exams-count">-</div>
+                </div>
+            </div>
+
+            <!-- STEP 1: CONFIGURATION (Years & Types) -->
+            <div class="premium-step">
+                <div class="step-header">
+                    <div class="step-title">
+                        <span class="step-number">1</span>
+                        Global Configuration
+                    </div>
+                    <button class="manager-toggle"
+                        onclick="document.querySelectorAll('.config-manager').forEach(e => e.style.display = e.style.display==='none'?'block':'none')">
+                        <i class="ph-bold ph-gear"></i> Manage Years & Types
+                    </button>
+                </div>
+                <div style="color: #888; font-size: 0.9rem;">
+                    Ensure your <b>Academic Years</b> and <b>Exam Types</b> (Annual, Half Yearly, etc.) are set up
+                    first.
+                </div>
+
+                <!-- Hidden Manager Section -->
+                <div class="manager-section config-manager">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+
+                        <!-- YEARS MANAGER -->
+                        <div>
+                            <h5 style="color: var(--primary-color); margin-bottom: 10px;">Academic Years</h5>
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <input type="text" id="academic-year-input" class="form-input"
+                                    placeholder="e.g. 2026-27">
+                                <button class="btn btn-sm btn-primary"
+                                    onclick="AcademicYearManager.saveAcademicYear()">Add</button>
+                                <button class="btn btn-sm btn-subtle" onclick="AcademicYearManager.toggleAddForm()"><i
+                                        class="ph-bold ph-x"></i></button>
+                            </div>
+
+                            <!-- Essential Table ID for Manager scripts -->
+                            <div style="max-height: 200px; overflow-y: auto;">
+                                <table class="data-table" style="font-size: 0.8rem;">
+                                    <tbody id="academic-years-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- EXAM TYPES MANAGER -->
+                        <div>
+                            <h5 style="color: var(--secondary-color); margin-bottom: 10px;">Exam Types</h5>
+                            <!-- Hidden Add Form for Logic Compatibility -->
+                            <div id="exam-type-add-form" style="display:none; margin-bottom:10px;">
+                                <input type="text" id="exam-type-name-input" class="form-input" placeholder="Name">
+                                <button onclick="ExamTypeManager.saveExamType()">Save</button>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <button class="btn btn-sm btn-subtle" onclick="ExamTypeManager.toggleAddForm()">
+                                    <i class="ph-bold ph-plus"></i> Add Type
+                                </button>
+                            </div>
+
+                            <div style="max-height: 200px; overflow-y: auto;">
+                                <table class="data-table" style="font-size: 0.8rem;">
+                                    <tbody id="exam-types-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: EXAM PROFILE -->
+            <div class="premium-step">
+                <div class="step-header">
+                    <div class="step-title">
+                        <span class="step-number">2</span>
+                        Exam Profile
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-mini btn-subtle"
+                            onclick="document.querySelector('.premium-step:nth-child(4)').scrollIntoView({behavior:'smooth'})"
+                            title="Go to Step 1">
+                            <i class="ph-bold ph-caret-up"></i>
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="ExamManager.toggleAddForm()">
+                            <i class="ph-bold ph-plus"></i> Create New Exam
+                        </button>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 20px; align-items: flex-end;">
+                    <div style="flex: 1;">
+                        <label class="form-label" style="margin-bottom: 8px;">Filter Active Exams</label>
+                        <select id="exam-filter-year" class="form-input" onchange="ExamManager.renderTable()">
+                            <option value="">All Years</option>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <button class="manager-toggle"
+                        onclick="document.getElementById('exam-list-manager').style.display = document.getElementById('exam-list-manager').style.display==='none'?'block':'none'">
+                        View All Exams List
+                    </button>
+                </div>
+
+                <!-- ADD EXAM FORM (Required ID structure) -->
+                <div id="exam-add-form"
+                    style="display: none; margin-top: 20px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; border: 1px solid #444;">
+                    <h4 style="margin-bottom: 15px;">Create / Edit Exam</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label class="form-label">Academic Year</label>
+                            <select id="exam-academic-year" class="form-input"></select>
+                        </div>
+                        <div>
+                            <label class="form-label">Exam Type</label>
+                            <select id="exam-type-select" class="form-input"></select>
+                        </div>
+                        <div>
+                            <label class="form-label">Exam Name (e.g. Class 10)</label>
+                            <input type="text" id="exam-name-input" class="form-input">
+                        </div>
+                        <div>
+                            <label class="form-label">Sheet ID (Optional)</label>
+                            <input type="text" id="exam-sheet-id" class="form-input">
+                        </div>
+                    </div>
+                    <div
+                        style="margin-top: 15px; text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-sm btn-secondary" onclick="ExamManager.toggleAddForm()">Cancel</button>
+                        <button class="btn btn-sm btn-primary" onclick="ExamManager.saveExam(this)">Save Exam
+                            Profile</button>
+                    </div>
+                </div>
+
+                <!-- EXAM LIST (Table) -->
+                <div id="exam-list-manager" class="manager-section">
+                    <table class="data-table" style="font-size: 0.9rem;">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Year</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exams-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- STEP 3: SYNC & RESULTS -->
+            <div class="premium-step active">
+                <div class="step-header">
+                    <div class="step-title">
+                        <span class="step-number">3</span>
+                        Sync & Publish Results
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">1. Target Exam</label>
+                            <select id="results-exam-select" class="form-input" style="padding: 12px; font-size: 1rem;">
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">2. Source Data (Google Sheet ID)</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="results-sheet-id" class="form-input"
+                                    placeholder="Paste Sheet ID here..." style="flex: 1; padding: 12px;">
+                                <button class="btn btn-sm btn-secondary" onclick="ResultsManagement.fetchHeaders()">
+                                    Fetch Headers
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- COLUMN MAPPING UI (Hidden) -->
+                        <div id="column-mapping-ui"
+                            style="display: none; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border: 1px dashed #555; margin-bottom: 20px;">
+                            <h5 style="color: #ccc; margin-bottom: 15px;">Smart Column Mapping</h5>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div><label class="form-label">Roll No*</label><select id="map-roll"
+                                        class="form-input map-select"></select></div>
+                                <div><label class="form-label">Name*</label><select id="map-name"
+                                        class="form-input map-select"></select></div>
+                                <div><label class="form-label">DOB (Login)</label><select id="map-dob"
+                                        class="form-input map-select"></select></div>
+                                <div><label class="form-label">Status</label><select id="map-status"
+                                        class="form-input map-select"></select></div>
+                            </div>
+                            <label class="form-label">Subject Marks Columns</label>
+                            <div id="map-subjects-container"
+                                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; max-height: 150px; overflow-y: auto;">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end;">
+                        <button id="btn-sync-results" class="btn btn-md btn-primary"
+                            style="width: 100%; box-shadow: 0 4px 20px rgba(0, 229, 255, 0.2);"
+                            onclick="ResultsManagement.handleSyncClick()">
+                            <i class="ph-bold ph-arrows-clockwise"></i> PREVIEW & SYNC
+                        </button>
+                        <div id="results-sync-status"
+                            style="display: none; margin-top: 15px; font-size: 0.85rem; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div id="results-sync-message">...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREVIEW / RESULTS TABLE -->
+            <div style="margin-top: 30px;">
+                <h4 style="margin-bottom: 15px; color: #fff;">Synced Data Preview</h4>
+                <div style="overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Exam</th>
+                                <th>Total</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body">
+                            <tr>
+                                <td colspan="6" style="text-align:center; padding: 30px; color: #666;">Ready to sync.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. ANALYTICS PANEL -->
+        <div id="analytics" class="panel">
+            <div class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Performance Analytics</h3>
+                <div class="date-display" style="font-size: 0.9rem; color: #888;">Live Insights</div>
+            </div>
+
+            <div
+                style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px; text-align: center; border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px;">
+                <div
+                    style="width: 60px; height: 60px; background: rgba(0, 243, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="ph-bold ph-chart-bar" style="font-size: 24px; color: var(--primary-color);"></i>
+                </div>
+                <h3 style="margin-bottom: 10px;">Analytics Module Ready</h3>
+                <p style="color: #888; max-width: 400px; line-height: 1.6;">
+                    Configuration successful. Once students begin taking exams and results are synced, detailed
+                    performance
+                    insights will appear here.
+                </p>
+                <button class="btn btn-md btn-primary" onclick="switchPanel('results')" style="margin-top: 20px;">
+                    <i class="ph-bold ph-gear"></i> Configure Exams
+                </button>
+            </div>
+        </div>
+
+        <!-- 9. SCHOOL PROFILES PANEL -->
+        <div id="schools" class="panel">
+            <div class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>School Profiles</h3>
+                <button class="btn btn-sm btn-primary" onclick="SchoolManager.toggleAddForm()">
+                    <i class="ph-bold ph-plus"></i> Add New School
+                </button>
+            </div>
+
+            <div class="school-list-grid" id="schools-grid">
+                <!-- JS populated -->
+                <div style="text-align: center; width: 100%; padding: 40px; color: #666;">
+                    Loading schools...
+                </div>
+            </div>
+
+            <!-- Add School Modal -->
+            <div id="school-add-modal" class="modal-overlay" style="display: none;">
+                <div class="glass-card" style="max-width: 500px; width: 90%; padding: 30px; position:relative;">
+                    <button onclick="SchoolManager.toggleAddForm()"
+                        style="position: absolute; top: 15px; right: 15px; background:none; border:none; color:#fff; cursor:pointer;">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                    <h3 style="margin-bottom: 20px;">Add School Profile</h3>
+
+                    <div class="form-group">
+                        <label class="form-label">School Name</label>
+                        <input type="text" id="school-name-input" class="form-input" placeholder="e.g. Metric Campus">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">School Code</label>
+                        <input type="text" id="school-code-input" class="form-input" placeholder="e.g. MHMV-M">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address / Location</label>
+                        <input type="text" id="school-address-input" class="form-input" placeholder="City, State">
+                    </div>
+
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px;"
+                        onclick="SchoolManager.saveSchool(this)">
+                        Save Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Student Profile Modal -->
+    <div id="student-profile-modal" class="modal-overlay" style="display: none;">
+        <div class="glass-card"
+            style="max-width: 800px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; padding: 0;">
+
+            <!-- Header -->
+            <div
+                style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div style="width: 50px; height: 50px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; color: #000;"
+                        id="sp-avatar">
+                        ST
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.2rem;" id="sp-name">Student Name</h3>
+                        <div style="font-size: 0.85rem; color: #888;" id="sp-details">Class 10 | Roll: 1234</div>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('student-profile-modal').style.display='none'"
+                    class="btn btn-mini btn-subtle"><i class="ph-bold ph-x"></i></button>
+            </div>
+
+            <!-- Content -->
+            <div style="overflow-y: auto; padding: 25px; flex: 1;" id="sp-content">
+                <!-- Dynamic Content -->
+                <div class="profile-stat-grid">
+                    Loading...
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div
+                style="padding: 15px 25px; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="btn btn-secondary" onclick="window.print()"><i class="ph-bold ph-printer"></i> Print
+                    Report</button>
+                <button class="btn btn-primary"
+                    onclick="document.getElementById('student-profile-modal').style.display='none'">Close</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Admin Panel will be injected here by admin-logic.js -->
+    <!-- Image Review Modal -->
+    <div id="img-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; flex-direction: column;">
+        <img id="modal-img-src" src=""
+            style="max-height: 80vh; max-width: 90%; border-radius: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
+        <button onclick="document.getElementById('img-modal').style.display='none'"
+            style="margin-top: 20px; padding: 10px 30px; background: #333; color: #fff; border: none; border-radius: 50px; cursor: pointer;">Close</button>
+    </div>
 
-    <!-- Navigation Scripts (Hidden in Admin Mode) -->
-    <script src="../../assets/js/site-nav.js" defer></script>
-    <script src="../../assets/js/site-footer.js" defer></script>
-    <script src="../../assets/js/script.js" defer></script>
+    <!-- Scripts -->
+    <script type="module">
+        import StorageManager from '../../assets/js/storage-manager.js';
+        import LocalAuth from '../../assets/js/local-auth.js';
+        import { MediaOptimizer } from '../../assets/js/media-optimizer.js';
+        import ServicesEngine from '../../assets/js/services-engine.js';
+        import ResultManager from '../../assets/js/result-system.js';
 
-    <!-- Admin Central Controller -->
-    <script type="module" src="../../assets/js/admin-logic.js"></script>
+        // Set globals for legacy onclick support
+        window.StorageManager = StorageManager;
+        window.LocalAuth = LocalAuth;
+        window.MediaOptimizer = MediaOptimizer;
+        window.ServicesEngine = ServicesEngine;
+        window.ResultManager = ResultManager;
 
-    <!-- Auth & Identity -->
-    <script type="module" src="../../assets/js/admin-auth.js"></script>
+        // Init systems
+        LocalAuth.init();
+        ServicesEngine.init();
+        ResultManager.init();
+
+        // Check Auth
+        if (!LocalAuth.isAuthenticated()) {
+            window.location.href = 'index.html';
+        }
+
+        // Expose global functions
+        window.logout = () => LocalAuth.logout();
+    </script>
 
     <script>
-        // Hide loading screen once admin panel is ready
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const loading = document.getElementById('admin-loading');
-                if (loading) {
-                    loading.style.opacity = '0';
-                    setTimeout(() => loading.remove(), 300);
+        // INIT DATE
+        document.getElementById('date-display').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        // LOAD DATA
+        let feeReceipts = JSON.parse(localStorage.getItem("fee_receipts") || "[]");
+        let creations = JSON.parse(localStorage.getItem("works") || "[]");
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function saveData() {
+            localStorage.setItem("fee_receipts", JSON.stringify(feeReceipts));
+            localStorage.setItem("works", JSON.stringify(creations));
+            updateStats();
+        }
+
+        async function updateStats() {
+            // Count from LocalStorage
+            document.getElementById('total-receipts').textContent = feeReceipts.length;
+            document.getElementById('total-creations').textContent = creations.length;
+
+            // Optional Firebase integration for bookings/subjects if available
+            try {
+                // If using the SubjectStorage utility
+                if (window.SubjectStorage) {
+                    document.getElementById('total-subjects-stat').textContent = SubjectStorage.getActiveCount();
                 }
-            }, 500);
+
+                const bookings = JSON.parse(localStorage.getItem('tuition_bookings') || '[]');
+                document.getElementById('total-bookings').textContent = bookings.length;
+            } catch (e) { console.warn("Stats update error:", e); }
+
+            // Update Quick Actions
+            const pReceipts = feeReceipts.filter(r => !r.approved).length;
+            const pCreations = creations.filter(c => !c.approved).length;
+
+            const qaList = document.getElementById('quick-actions-list');
+            qaList.innerHTML = '';
+
+            if (pReceipts > 0) qaList.innerHTML += `<div style="background: rgba(255, 165, 0, 0.1); color: orange; padding: 15px; border-radius: 10px; border: 1px dashed orange;">${pReceipts} New Fee Receipts needing verification. <b onclick="switchPanel('fee')" style="cursor: pointer; text-decoration: underline;">View</b></div>`;
+            if (pCreations > 0) qaList.innerHTML += `<div style="background: rgba(188, 19, 254, 0.1); color: var(--secondary-color); padding: 15px; border-radius: 10px; border: 1px dashed var(--secondary-color);">${pCreations} Creative submissions pending. <b onclick="switchPanel('creative')" style="cursor: pointer; text-decoration: underline;">View</b></div>`;
+
+            if (pReceipts === 0 && pCreations === 0) qaList.innerHTML = '<div style="color: #666; font-style: italic;">All clear! No pending actions.</div>';
+        }
+
+        // Legacy switchPanel removed - consolidated with the one defined below at module end
+        // kept render calls for reference if needed elsewhere
+
+
+
+
+
+        // --- SUBJECTS MODULE ---
+        function renderSubjectsTable() {
+            const tbody = document.getElementById('subjects-table-body');
+            const subjects = SubjectStorage.getAll();
+            tbody.innerHTML = '';
+            if (subjects.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666; padding: 40px;">No subjects found.</td></tr>';
+                return;
+            }
+            subjects.forEach(s => {
+                const active = s.active !== false;
+                tbody.innerHTML += `
+                    <tr style="${!active ? 'opacity: 0.5' : ''}">
+                        <td style="font-weight: 600;">${s.name}</td>
+                        <td style="color: var(--primary-color);">₹${s.price}</td>
+                        <td><span class="status-badge ${active ? 'approved' : 'pending'}">${active ? 'Active' : 'Hidden'}</span></td>
+                        <td>
+                            <button onclick="toggleSubjectStatus('${s.id}')" class="btn btn-mini btn-subtle" title="Toggle Status"><i class="ph ph-eye${active ? '-slash' : ''}"></i></button>
+                            <button onclick="editSubject('${s.id}', '${s.name}', ${s.price})" class="btn btn-mini btn-secondary" title="Edit"><i class="ph ph-pencil"></i></button>
+                            <button onclick="deleteSubject('${s.id}')" class="btn btn-mini btn-danger" title="Delete"><i class="ph ph-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            updateStats();
+        }
+
+        function showSubjectEditor() { document.getElementById('subject-editor-view').style.display = 'block'; }
+        function hideSubjectEditor() { document.getElementById('subject-editor-view').style.display = 'none'; }
+
+        function saveSubject() {
+            const id = document.getElementById('subject-id').value;
+            const name = document.getElementById('subject-name').value.trim().toUpperCase();
+            const price = parseInt(document.getElementById('subject-price').value);
+            if (!name || isNaN(price)) return alert("Invalid entry");
+            SubjectStorage.save({ id: id || undefined, name, price, active: true });
+            hideSubjectEditor();
+            renderSubjectsTable();
+        }
+
+        function toggleSubjectStatus(id) { SubjectStorage.toggle(id); renderSubjectsTable(); }
+        function deleteSubject(id) { if (confirm("Delete?")) { SubjectStorage.delete(id); renderSubjectsTable(); } }
+
+        // --- BOOKINGS MODULE ---
+        function renderBookingsTable() {
+            const tbody = document.getElementById('bookings-table-body');
+            let bookings = JSON.parse(localStorage.getItem('tuition_bookings') || '[]');
+            tbody.innerHTML = '';
+            if (bookings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #666; padding: 40px;">No bookings yet.</td></tr>';
+                return;
+            }
+            bookings.forEach(b => {
+                const studentName = `${b.firstName} ${b.lastName}`;
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${studentName}</b></td>
+                        <td>Class ${b.class}</td>
+                        <td>${b.subjects.map(s => s.name).join(', ')}</td>
+                        <td>₹${b.total}</td>
+                        <td><span class="status-badge ${b.status || 'pending'}">${b.status || 'pending'}</span></td>
+                        <td>${new Date(b.createdAt).toLocaleDateString()}</td>
+                        <td><button onclick="deleteBooking('${b.id}')" class="btn btn-mini btn-danger" title="Delete"><i class="ph ph-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- NEWS MODULE (Integration stub) ---
+        async function renderNewsTable() {
+            // This will be replaced by your news-service logic
+            const tbody = document.getElementById('news-table-body');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">News CMS functionality is linked to news_admin.html</td></tr>';
+        }
+
+        // --- FEE & CREATIVE ---
+        function renderFeeTable(filter = 'all') {
+            const tbody = document.getElementById('fee-table-body');
+            tbody.innerHTML = '';
+            const filtered = feeReceipts.filter(r => (filter === 'all' || (filter === 'pending' && !r.approved) || r.cls == filter));
+            if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Empty</td></tr>'; return; }
+            filtered.forEach((r, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${r.name}</b></td>
+                        <td>Class ${r.cls}</td>
+                        <td>#${r.receiptNo}</td>
+                        <td>${r.date || 'N/A'}</td>
+                        <td><span class="status-badge ${r.approved ? 'approved' : 'pending'}">${r.approved ? 'Verified' : 'Pending'}</span></td>
+                        <td><button onclick="viewImage('${r.img}')" class="btn btn-sm btn-secondary">View</button></td>
+                        <td>${!r.approved ? `<button onclick="approveFee(${idx})" class="btn btn-mini btn-primary" title="Approve"><i class="ph ph-check"></i></button>` : '---'}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderCreativeTable() {
+            const grid = document.getElementById('creative-grid');
+            grid.innerHTML = creations.map((c, idx) => `
+                <div style="background: #111; border: 1px solid #333; border-radius: 12px; overflow: hidden; padding: 15px;">
+                    <h4 style="color:#fff;">${c.title}</h4>
+                    <p style="color:#666; font-size:0.8rem;">By ${c.name} (Class ${c.cls})</p>
+                    <button class="btn btn-sm ${c.approved ? 'btn-secondary' : 'btn-primary'}" onclick="approveCreative(${idx})" style="width:100%; margin-top:10px;">
+                        ${c.approved ? 'Live' : 'Approve'}
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="rejectCreative(${idx})" style="width:100%; margin-top:5px;">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function approveFee(idx) { feeReceipts[idx].approved = true; saveData(); renderFeeTable(); }
+        function approveCreative(idx) { creations[idx].approved = true; saveData(); renderCreativeTable(); }
+        function rejectCreative(idx) { if (confirm("Remove?")) { creations.splice(idx, 1); saveData(); renderCreativeTable(); } }
+        function viewImage(src) { document.getElementById('modal-img-src').src = src; document.getElementById('img-modal').style.display = 'flex'; }
+
+        function logout() {
+            if (window.AdminAuth) window.AdminAuth.logout();
+            else { sessionStorage.clear(); window.location.href = 'index.html'; }
+        }
+
+        // --- EXAM TYPE MANAGEMENT MODULE ---
+        const ExamTypeManager = (function () {
+            'use strict';
+
+            const STORAGE_KEY = 'exam_types';
+            let editingId = null;
+
+            // Initialize with default exam types if none exist
+            function initDefaults() {
+                const existing = getAll();
+                if (existing.length === 0) {
+                    const defaults = [
+                        { name: 'Half Yearly', active: true },
+                        { name: 'Quarterly', active: true },
+                        { name: 'Annual', active: true },
+                        { name: 'Onam Exam', active: true },
+                        { name: 'Monthly Test', active: true },
+                        { name: 'Model Exam', active: true }
+                    ];
+                    defaults.forEach(type => create(type.name, type.active));
+                }
+            }
+
+            // Get all exam types (school-aware)
+            function getAll() {
+                return StorageManager.get(STORAGE_KEY, []);
+            }
+
+            // Get only active exam types
+            function getActive() {
+                return getAll().filter(type => type.active);
+            }
+
+            // Save exam types to localStorage (school-aware)
+            function save(types) {
+                StorageManager.set(STORAGE_KEY, types);
+                // Trigger update event for dropdowns
+                window.dispatchEvent(new CustomEvent('exam-types-updated'));
+            }
+
+            // Create new exam type
+            function create(name, active = true) {
+                const types = getAll();
+
+                // Normalize name
+                const normalized = name.trim();
+                if (!normalized) {
+                    alert('Exam type name cannot be empty');
+                    return false;
+                }
+
+                // Check for duplicates (case-insensitive)
+                const duplicate = types.find(t =>
+                    t.name.toLowerCase() === normalized.toLowerCase()
+                );
+                if (duplicate) {
+                    alert(`Exam type "${normalized}" already exists`);
+                    return false;
+                }
+
+                const newType = {
+                    id: Date.now().toString(),
+                    name: normalized,
+                    active: active,
+                    createdAt: new Date().toISOString()
+                };
+
+                types.push(newType);
+                save(types);
+                return true;
+            }
+
+            // Update exam type
+            function update(id, updates) {
+                const types = getAll();
+                const index = types.findIndex(t => t.id === id);
+
+                if (index === -1) {
+                    alert('Exam type not found');
+                    return false;
+                }
+
+                // If updating name, check for duplicates
+                if (updates.name) {
+                    const normalized = updates.name.trim();
+                    if (!normalized) {
+                        alert('Exam type name cannot be empty');
+                        return false;
+                    }
+
+                    const duplicate = types.find((t, i) =>
+                        i !== index && t.name.toLowerCase() === normalized.toLowerCase()
+                    );
+                    if (duplicate) {
+                        alert(`Exam type "${normalized}" already exists`);
+                        return false;
+                    }
+
+                    updates.name = normalized;
+                }
+
+                types[index] = { ...types[index], ...updates };
+                save(types);
+                return true;
+            }
+
+            // Delete exam type
+            function deleteType(id) {
+                if (!confirm('Are you sure you want to delete this exam type?\n\nNote: This won\'t affect existing results.')) {
+                    return false;
+                }
+
+                const types = getAll();
+                const filtered = types.filter(t => t.id !== id);
+                save(filtered);
+                return true;
+            }
+
+            // Toggle active status
+            function toggleActive(id) {
+                const types = getAll();
+                const type = types.find(t => t.id === id);
+
+                if (type) {
+                    type.active = !type.active;
+                    save(types);
+                    return true;
+                }
+                return false;
+            }
+
+            // UI Functions
+            function toggleAddForm() {
+                const form = document.getElementById('exam-type-add-form');
+                const input = document.getElementById('exam-type-name-input');
+
+                if (form.style.display === 'none') {
+                    form.style.display = 'block';
+                    input.value = '';
+                    input.focus();
+                    editingId = null;
+                } else {
+                    form.style.display = 'none';
+                    editingId = null;
+                }
+            }
+
+            function saveExamType() {
+                const input = document.getElementById('exam-type-name-input');
+                const name = input.value.trim();
+
+                if (!name) {
+                    alert('Please enter an exam type name');
+                    return;
+                }
+
+                let success;
+                if (editingId) {
+                    success = update(editingId, { name });
+                } else {
+                    success = create(name);
+                }
+
+                if (success) {
+                    toggleAddForm();
+                    renderTable();
+                    updateExamTypeDropdown();
+                }
+            }
+
+            function startEdit(id) {
+                const types = getAll();
+                const type = types.find(t => t.id === id);
+
+                if (type) {
+                    editingId = id;
+                    const form = document.getElementById('exam-type-add-form');
+                    const input = document.getElementById('exam-type-name-input');
+
+                    form.style.display = 'block';
+                    input.value = type.name;
+                    input.focus();
+                }
+            }
+
+            function handleDelete(id) {
+                if (deleteType(id)) {
+                    renderTable();
+                    updateExamTypeDropdown();
+                }
+            }
+
+            function handleToggleActive(id) {
+                if (toggleActive(id)) {
+                    renderTable();
+                    updateExamTypeDropdown();
+                }
+            }
+
+            function renderTable() {
+                const tbody = document.getElementById('exam-types-table-body');
+                const types = getAll();
+
+                if (types.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #666; padding: 30px;">
+                                No exam types created yet. Click "Add Type" to create one.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = types.map(type => {
+                    const statusBadge = type.active
+                        ? '<span class="status-badge approved">Active</span>'
+                        : '<span class="status-badge pending">Inactive</span>';
+
+                    const date = new Date(type.createdAt);
+                    const dateStr = date.toLocaleDateString();
+
+                    return `
+                        <tr>
+                            <td><b>${type.name}</b></td>
+                            <td>${statusBadge}</td>
+                            <td style="color: #888; font-size: 0.85rem;">${dateStr}</td>
+                            <td style="text-align: right;">
+                                <div style="display: inline-flex; gap: 8px;">
+                                    <button class="btn btn-mini btn-secondary"
+                                        onclick="ExamTypeManager.startEdit('${type.id}')"
+                                        title="Edit">
+                                        <i class="ph-bold ph-pencil-simple"></i>
+                                    </button>
+                                    <button class="btn btn-mini ${type.active ? 'btn-secondary' : 'btn-primary'}" 
+                                        onclick="ExamTypeManager.handleToggleActive('${type.id}')"
+                                        title="${type.active ? 'Deactivate' : 'Activate'}">
+                                        <i class="ph-bold ph-${type.active ? 'eye-slash' : 'eye'}"></i>
+                                    </button>
+                                    <button class="btn btn-mini btn-danger"
+                                        onclick="ExamTypeManager.handleDelete('${type.id}')"
+                                        title="Delete">
+                                        <i class="ph-bold ph-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            function updateExamTypeDropdown() {
+                const select = document.getElementById('results-exam-type');
+                if (!select) return;
+
+                const activeTypes = getActive();
+                const currentValue = select.value;
+
+                select.innerHTML = '<option value="">-- Select Exam Type --</option>' +
+                    activeTypes.map(type => {
+                        const id = type.name.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+                        return `<option value="${id}" ${id === currentValue ? 'selected' : ''}>${type.name}</option>`;
+                    }).join('');
+            }
+
+            function init() {
+                initDefaults();
+                renderTable();
+                updateExamTypeDropdown();
+            }
+
+            // Public API
+            return {
+                init,
+                getAll,
+                getActive,
+                create,
+                update,
+                deleteType,
+                toggleActive,
+                toggleAddForm,
+                saveExamType,
+                startEdit,
+                handleDelete,
+                handleToggleActive,
+                renderTable,
+                updateExamTypeDropdown
+            };
+        })();
+
+        // Expose globally
+        window.ExamTypeManager = ExamTypeManager;
+
+        // --- RESULTS MANAGEMENT MODULE ---
+        const ResultsManagement = (function () {
+            'use strict';
+
+            // Private state
+            let isSyncing = false;
+
+            // Storage keys
+            const KEYS = {
+                SHEET_ID: 'results_sheet_id',
+                LAST_SYNC: 'results_last_sync',
+                RESULTS_CACHE: 'exam_results_cache',
+                EXAMS_LIST: 'exam_results_exams',
+                RESULTS_BY_EXAM: 'exam_results_by_exam',
+                COLUMN_MAPPING: 'results_column_mapping'
+            };
+
+            // DOM Elements (cached)
+            const elements = {
+                syncStatus: null,
+                syncMessage: null,
+                totalCount: null,
+                lastSync: null,
+                examsCount: null,
+                tableBody: null,
+                sheetIdInput: null,
+                examSelect: null,
+                syncButton: null,
+                // Mapping UI Elements
+                mappingUI: null,
+                mapRoll: null,
+                mapName: null,
+                mapDob: null,
+                mapStatus: null,
+                mapSubjectsContainer: null
+            };
+
+            // Initialize DOM element references
+            function cacheElements() {
+                elements.syncStatus = document.getElementById('results-sync-status');
+                elements.syncMessage = document.getElementById('results-sync-message');
+                elements.totalCount = document.getElementById('results-total-count');
+                elements.lastSync = document.getElementById('results-last-sync');
+                elements.examsCount = document.getElementById('results-exams-count');
+                elements.tableBody = document.getElementById('results-table-body');
+                elements.sheetIdInput = document.getElementById('results-sheet-id');
+                elements.examSelect = document.getElementById('results-exam-select');
+                elements.syncButton = document.getElementById('btn-sync-results');
+
+                // Mapping UI
+                elements.mappingUI = document.getElementById('column-mapping-ui');
+                elements.mapRoll = document.getElementById('map-roll');
+                elements.mapName = document.getElementById('map-name');
+                elements.mapDob = document.getElementById('map-dob');
+                elements.mapStatus = document.getElementById('map-status');
+                elements.mapSubjectsContainer = document.getElementById('map-subjects-container');
+            }
+
+            // --- UI HANDLERS ---
+
+            /**
+             * Fetch Headers for Mapping
+             */
+            async function fetchHeaders() {
+                cacheElements();
+                const sheetId = elements.sheetIdInput.value.trim();
+
+                if (!sheetId) {
+                    alert('Please enter a Google Sheet ID first');
+                    return;
+                }
+
+                showSyncStatus(true, 'Fetching headers...', 'info');
+
+                try {
+                    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&range=A1:Z1`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Failed to access Google Sheet');
+
+                    const text = await response.text();
+                    const start = text.indexOf('{');
+                    const end = text.lastIndexOf('}');
+                    const json = JSON.parse(text.substring(start, end + 1));
+
+                    const cols = json.table.cols;
+                    const headers = json.table.rows[0].c.map((cell, index) => ({
+                        index: index,
+                        label: cell ? cell.v : `Column ${index + 1}`
+                    })).filter(h => h.label); // Remove empty
+
+                    renderMappingForm(headers);
+                    showSyncStatus(false);
+                    elements.mappingUI.style.display = 'block';
+
+                } catch (error) {
+                    console.error(error);
+                    showSyncStatus(true, 'Error fetching headers: ' + error.message, 'error');
+                }
+            }
+
+            function renderMappingForm(headers) {
+                const options = headers.map(h => `<option value="${h.index}">${h.label}</option>`).join('');
+                const defaultOption = '<option value="">-- Select Column --</option>';
+
+                // Helper to populate select
+                const populate = (el, autoMatch) => {
+                    el.innerHTML = defaultOption + options;
+                    // Auto-select if matches
+                    const match = headers.find(h => h.label.toLowerCase().includes(autoMatch));
+                    if (match) el.value = match.index;
+                };
+
+                populate(elements.mapRoll, 'roll');
+                populate(elements.mapName, 'name');
+                populate(elements.mapDob, 'birth');
+                populate(elements.mapStatus, 'status');
+
+                // Render Subjects Checkbox Grid
+                elements.mapSubjectsContainer.innerHTML = headers.map(h => `
+                    <label style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem; cursor: pointer; background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 4px;">
+                        <input type="checkbox" class="subject-col-check" value="${h.index}" data-label="${h.label}">
+                        ${h.label}
+                    </label>
+                `).join('');
+            }
+
+            /**
+             * Public handler for the Sync Button
+             * Manages UI state and triggers the logic
+             */
+            function handleSyncClick() {
+                if (isSyncing) return;
+
+                // 1. Validate State
+                cacheElements();
+                const examId = elements.examSelect?.value;
+                const sheetId = elements.sheetIdInput?.value.trim();
+
+                if (!examId) {
+                    alert('Please select an Exam from the dropdown first.');
+                    elements.examSelect?.focus();
+                    return;
+                }
+
+                if (!sheetId) {
+                    alert('Please enter a valid Google Sheet ID.');
+                    elements.sheetIdInput?.focus();
+                    return;
+                }
+
+                // NEW: Validate Mapping
+                if (elements.mappingUI.style.display !== 'none') {
+                    if (!elements.mapRoll.value || !elements.mapName.value) {
+                        alert('Please complete the Column Mapping for Roll Number and Name.');
+                        return;
+                    }
+                }
+
+                // 2. Confirm Action
+                if (!confirm(`Are you sure you want to sync results for this exam?\n\nThis will overwrite any existing results for this specific exam.`)) {
+                    return;
+                }
+
+                // 3. UI: Loading State
+                setButtonState('loading');
+                showSyncStatus(true, 'Initialize connection...', 'info');
+                isSyncing = true;
+
+                // New Mapping Config Object
+                const mappingConfig = {
+                    rollIndex: parseInt(elements.mapRoll.value),
+                    nameIndex: parseInt(elements.mapName.value),
+                    dobIndex: elements.mapDob.value ? parseInt(elements.mapDob.value) : null,
+                    statusIndex: elements.mapStatus.value ? parseInt(elements.mapStatus.value) : null,
+                    subjectIndices: Array.from(document.querySelectorAll('.subject-col-check:checked')).map(cb => ({
+                        index: parseInt(cb.value),
+                        name: cb.dataset.label
+                    }))
+                };
+
+                // 4. Trigger Logic (with small delay for UI update)
+                setTimeout(() => {
+                    syncResultsFromGoogleSheet(examId, sheetId, mappingConfig)
+                        .then((result) => {
+                            if (result.success) {
+                                showSyncStatus(true, `Success! ${result.count} records synced.`, 'success');
+                                alert(`Successfully synced ${result.count} student results!`);
+                                renderTable();
+                                updateStats();
+                            } else {
+                                showSyncStatus(true, `Failed: ${result.message}`, 'error');
+                                alert(`Sync Failed:\n${result.message}`);
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            showSyncStatus(true, `Critical Error: ${err.message}`, 'error');
+                        })
+                        .finally(() => {
+                            isSyncing = false;
+                            setButtonState('idle');
+                        });
+                }, 100);
+            }
+
+            function setButtonState(state) {
+                if (!elements.syncButton) return;
+
+                if (state === 'loading') {
+                    elements.syncButton.disabled = true;
+                    elements.syncButton.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Syncing...';
+                    elements.syncButton.style.opacity = '0.7';
+                } else {
+                    elements.syncButton.disabled = false;
+                    elements.syncButton.innerHTML = '<i class="ph-bold ph-list-check"></i> Preview & Sync';
+                    elements.syncButton.style.opacity = '1';
+                }
+            }
+
+
+            // --- CORE LOGIC ---
+
+            /**
+             * Core Logic: Fetch -> Parse -> Save
+             * @param {string} examId 
+             * @param {string} sheetId 
+             * @param {object} [mapping] - Optional object containing column mapping configuration.
+             * @returns {Promise<{success:boolean, count?:number, message?:string}>}
+             */
+            async function syncResultsFromGoogleSheet(examId, sheetId, mapping = null) {
+                try {
+                    // Get Exam Details to store alongside results
+                    const allExams = window.ExamManager ? window.ExamManager.getAll() : [];
+                    const examObj = allExams.find(e => e.id === examId);
+
+                    if (!examObj) throw new Error("Selected Exam ID not found in Exam Manager.");
+
+                    const examDisplayName = `${examObj.name} (${examObj.year})`;
+
+                    // 1. Fetch JSON via GVIZ
+                    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+                    const response = await fetch(url);
+
+                    if (!response.ok) throw new Error(`Google Sheets HTTP Error: ${response.status}`);
+
+                    const text = await response.text();
+
+                    // Simple parse of "/*O_o*/\ngoogle.visualization.Query.setResponse(...);"
+                    const start = text.indexOf('{');
+                    const end = text.lastIndexOf('}');
+                    if (start === -1 || end === -1) throw new Error("Invalid response format from Google Sheets.");
+
+                    const json = JSON.parse(text.substring(start, end + 1));
+
+                    if (!json.table || !json.table.rows || json.table.rows.length === 0) {
+                        return { success: false, message: "Sheet is empty or has no data rows." };
+                    }
+
+                    const rows = json.table.rows;
+                    const cols = json.table.cols;
+
+                    // 2. Parse Rows
+                    const rawResults = [];
+                    const errors = [];
+
+                    rows.forEach((row, index) => {
+                        const c = row.c;
+                        if (!c) return; // Skip empty rows
+
+                        try {
+                            // Extract Data using Mapping or Fallback defaults
+                            let rollNo, name, dob, status, totalMarks = 0;
+                            let subjects = {};
+
+                            if (mapping) {
+                                // ADVANCED MODE: Use Configured Mapping
+                                rollNo = c[mapping.rollIndex]?.v;
+                                name = c[mapping.nameIndex]?.v;
+                                dob = mapping.dobIndex !== null ? c[mapping.dobIndex]?.v : null;
+                                status = mapping.statusIndex !== null ? c[mapping.statusIndex]?.v : 'Pending';
+
+                                // Map Selected Subjects
+                                if (mapping.subjectIndices && mapping.subjectIndices.length > 0) {
+                                    mapping.subjectIndices.forEach(sub => {
+                                        const marks = c[sub.index]?.v;
+                                        if (marks !== null && marks !== undefined) {
+                                            subjects[sub.name] = marks;
+                                            // Handle numeric marks for total calculation
+                                            const numeric = parseFloat(marks);
+                                            if (!isNaN(numeric)) totalMarks += numeric;
+                                        }
+                                    });
+                                } else {
+                                    // Fallback if no subjects selected in mapping: Look for explicit Total column if possible ? 
+                                    // For now, if mapped subjects is empty, total is 0 unless manually set? 
+                                    // Let's assume user MUST map subjects or we fail to calculate total automatically.
+                                }
+
+                                // Normalize Status
+                                if (!status) status = 'Pass'; // Default if column empty
+
+                            } else {
+                                // LEGACY MODE: Default assumptions (Roll=0, Name=1)
+                                if (c.length < 2) return;
+                                rollNo = c[0]?.v;
+                                name = c[1]?.v;
+                                // Fallback logic for subjects... (copied from previous version)
+                                if (c.length >= 5) {
+                                    status = c[c.length - 1]?.v || 'Pass';
+                                    totalMarks = c[c.length - 3]?.v || 0;
+                                    for (let i = 2; i < c.length - 3; i++) {
+                                        const subName = cols[i]?.label || `Subject ${i - 1}`;
+                                        const marks = c[i]?.v;
+                                        if (subName && marks !== null) subjects[subName] = marks;
+                                    }
+                                } else {
+                                    totalMarks = c[2]?.v || 0;
+                                }
+                            }
+
+                            if (!rollNo) return; // Skip invalid rows
+
+                            // Format DOB for Login (YYYY-MM-DD if possible)
+                            let formattedDob = null;
+                            if (dob) {
+                                // Google Sheets Date value is like "Date(2010,0,1)" string or a number
+                                if (typeof dob === 'string' && dob.startsWith('Date')) {
+                                    const dateParts = dob.match(/\d+/g);
+                                    if (dateParts && dateParts.length >= 3) {
+                                        // JS Month is 0-indexed, but output we want 1-indexed for comparison or padded
+                                        const d = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]), parseInt(dateParts[2]));
+                                        formattedDob = d.toISOString().split('T')[0];
+                                    }
+                                } else if (typeof dob === 'string') {
+                                    formattedDob = dob; // Assume already text
+                                }
+                            }
+
+                            rawResults.push({
+                                rollNo: String(rollNo).trim(),
+                                name: name || 'Unknown',
+                                dob: formattedDob,
+                                examId: examId,
+                                exam: examDisplayName,
+                                examType: examObj.type,
+                                subjects: subjects,
+                                totalMarks: Number(totalMarks) || 0,
+                                grade: '-', // Logic to assign grade based on marks or just '-'
+                                status: status
+                            });
+
+                        } catch (e) {
+                            errors.push(`Row ${index + 1}: ${e.message}`);
+                        }
+                    });
+
+                    if (rawResults.length === 0) {
+                        return { success: false, message: "No valid result rows could be parsed." };
+                    }
+
+                    // 3. Post-Processing: Sort & Rank
+                    // Sort Details: Score DESC, then Name ASC
+                    rawResults.sort((a, b) => {
+                        if (b.totalMarks !== a.totalMarks) return b.totalMarks - a.totalMarks;
+                        return a.name.localeCompare(b.name);
+                    });
+
+                    // Assign Ranks (Handling ties)
+                    let currentRank = 1;
+                    for (let i = 0; i < rawResults.length; i++) {
+                        if (i > 0 && rawResults[i].totalMarks < rawResults[i - 1].totalMarks) {
+                            currentRank = i + 1;
+                        }
+                        rawResults[i].rank = currentRank;
+                    }
+
+                    // 4. Save to Storage
+                    saveToStorage(examId, examObj, rawResults);
+
+                    return { success: true, count: rawResults.length };
+
+                } catch (err) {
+                    return { success: false, message: err.message };
+                }
+            }
+
+            /**
+             * Save parsed results to localStorage safely
+             */
+            function saveToStorage(examId, examObj, newResults) {
+                // 1. Get Existing
+                const allResults = JSON.parse(localStorage.getItem(KEYS.RESULTS_CACHE) || '[]');
+                const examsList = JSON.parse(localStorage.getItem(KEYS.EXAMS_LIST) || '[]');
+
+                // 2. Clean old results for THIS exam only
+                const cleanResults = allResults.filter(r => r.examId !== examId);
+
+                // 3. Merge
+                const updatedResults = [...cleanResults, ...newResults];
+
+                // 4. Update Exam Meta
+                const examEntry = {
+                    id: examId,
+                    name: examObj.name,
+                    year: examObj.year,
+                    type: examObj.type,
+                    displayName: `${examObj.name} (${examObj.year})`,
+                    count: newResults.length,
+                    lastSync: new Date().toISOString()
+                };
+
+                const idx = examsList.findIndex(e => e.id === examId);
+                if (idx >= 0) examsList[idx] = examEntry;
+                else examsList.push(examEntry);
+
+                // 5. Write to Disk
+                localStorage.setItem(KEYS.RESULTS_CACHE, JSON.stringify(updatedResults));
+                localStorage.setItem(KEYS.EXAMS_LIST, JSON.stringify(examsList));
+                localStorage.setItem(KEYS.LAST_SYNC, new Date().toISOString());
+
+                // 6. Notify System
+                window.dispatchEvent(new CustomEvent('exam-results-updated', {
+                    detail: { examId, count: newResults.length }
+                }));
+            }
+
+
+            // --- HELPERS ---
+
+            function saveConfig() {
+                const sheetId = elements.sheetIdInput.value.trim();
+                if (sheetId) {
+                    localStorage.setItem(KEYS.SHEET_ID, sheetId);
+                    alert("Framework Configuration Saved.");
+                }
+            }
+
+            function loadConfig() {
+                if (elements.sheetIdInput) {
+                    elements.sheetIdInput.value = localStorage.getItem(KEYS.SHEET_ID) || '';
+                }
+            }
+
+            function renderTable() {
+                if (!elements.tableBody) return;
+                const results = JSON.parse(localStorage.getItem(KEYS.RESULTS_CACHE) || '[]');
+
+                // Filter by selected exam if any
+                const examId = elements.examSelect?.value;
+                const displayResults = examId
+                    ? results.filter(r => r.examId === examId)
+                    : results;
+
+                if (displayResults.length === 0) {
+                    elements.tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#666;">No results loaded. Select an exam and sync.</td></tr>';
+                    return;
+                }
+
+                // Show top 20
+                elements.tableBody.innerHTML = displayResults.slice(0, 20).map(r => `
+                    <tr>
+                        <td><b>${r.rollNo}</b></td>
+                        <td>${r.name}</td>
+                        <td>${r.exam}</td>
+                        <td style="color:var(--primary-color)"><b>${r.totalMarks}</b></td>
+                        <td>${r.grade}</td>
+                        <td><span class="status-badge ${r.status === 'Pass' ? 'approved' : 'pending'}">${r.status}</span></td>
+                        <td style="text-align:right;">
+                            <button class="btn btn-mini btn-secondary" onclick="ResultsManagement.openStudentProfile('${r.rollNo}')" title="View Profile">
+                                <i class="ph-bold ph-user"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('') + (displayResults.length > 20 ? `<tr><td colspan="7" style="text-align:center; color:#888;">...and ${displayResults.length - 20} more</td></tr>` : '');
+            }
+
+            function updateStats() {
+                const results = JSON.parse(localStorage.getItem(KEYS.RESULTS_CACHE) || '[]');
+                const lastSync = localStorage.getItem(KEYS.LAST_SYNC);
+
+                if (elements.totalCount) elements.totalCount.textContent = results.length;
+                if (elements.lastSync) elements.lastSync.textContent = lastSync ? new Date(lastSync).toLocaleDateString() : 'Never';
+            }
+
+            function showSyncStatus(show, msg, type) {
+                if (!elements.syncStatus) return;
+                elements.syncStatus.style.display = show ? 'flex' : 'none';
+                elements.syncMessage.textContent = msg;
+                elements.syncStatus.style.borderColor = type === 'error' ? 'red' : (type === 'success' ? '#00f3ff' : '#444');
+                elements.syncStatus.style.color = type === 'error' ? 'red' : '#fff';
+            }
+
+            function getAllResults() {
+                return JSON.parse(localStorage.getItem(KEYS.RESULTS_CACHE) || '[]');
+            }
+
+            function getExamList() {
+                return window.ExamManager ? window.ExamManager.getAll() : [];
+            }
+
+            function init() {
+                cacheElements();
+                loadConfig();
+
+                // Listen for Exam Selection Change to update table view
+                if (elements.examSelect) {
+                    const populateExams = () => {
+                        const exams = getExamList();
+                        const current = elements.examSelect.value;
+                        elements.examSelect.innerHTML = '<option value="">-- Select Exam --</option>' +
+                            exams.map(e => `<option value="${e.id}">${e.name} (${e.year})</option>`).join('');
+                        if (current) elements.examSelect.value = current;
+                    };
+
+                    populateExams();
+                    // Refetch if exams change
+                    window.addEventListener('exam-manager-updated', populateExams);
+                    elements.examSelect.addEventListener('change', renderTable);
+                }
+
+                renderTable();
+                updateStats();
+            }
+
+            function openStudentProfile(rollNo) {
+                const results = getAllResults();
+                const studentResults = results.filter(r => String(r.rollNo) === String(rollNo));
+
+                if (studentResults.length === 0) return alert("Student data not found.");
+
+                const mainData = studentResults[0];
+
+                document.getElementById('sp-name').textContent = mainData.name;
+                document.getElementById('sp-details').textContent = `Roll No: ${mainData.rollNo} | DOB: ${mainData.dob || 'N/A'}`; // Added DOB fallback
+                document.getElementById('sp-avatar').textContent = mainData.name.charAt(0).toUpperCase();
+
+                const content = document.getElementById('sp-content');
+                content.innerHTML = `
+                    <h4 style="color:var(--primary-color); margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Exam History</h4>
+                    ${studentResults.map(res => `
+                        <div style="background:rgba(255,255,255,0.05); border-radius:10px; padding:15px; margin-bottom:15px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                <h4 style="margin:0;">${res.exam}</h4>
+                                <span class="status-badge ${res.status === 'Pass' ? 'approved' : 'pending'}">${res.status}</span>
+                            </div>
+                            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:10px;">
+                                ${Object.entries(res.subjects).map(([sub, score]) => `
+                                    <div style="background:rgba(0,0,0,0.2); padding:8px; border-radius:6px; text-align:center;">
+                                        <div style="font-size:0.8rem; color:#888;">${sub}</div>
+                                        <div style="font-weight:bold;">${score}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div style="margin-top:10px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:10px; display:flex; justify-content:space-between;">
+                                <span>Total: <b>${res.totalMarks}</b></span>
+                                <span>Rank: <b>#${res.rank || '-'}</b></span>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+
+                document.getElementById('student-profile-modal').style.display = 'flex';
+            }
+
+            return {
+                init,
+                handleSyncClick,
+                syncResultsFromGoogleSheet,
+                saveConfig,
+                updateStats,
+                getAllResults, // Expose for Analytics
+                getExamList,   // Expose for Analytics
+                openStudentProfile
+            };
+
+        })();
+
+        // Initialize when panel is shown
+        window.ResultsManagement = ResultsManagement;
+
+        function switchPanel(panelId, el) {
+            const targetPanel = document.getElementById(panelId);
+            if (!targetPanel) {
+                console.error(`Panel with ID "${panelId}" not found.`);
+                return;
+            }
+
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            targetPanel.classList.add('active');
+
+            // Update title
+            const titleMap = {
+                'overview': 'Dashboard',
+                'dashboard': 'Dashboard', // ID Mapping fallback
+                'fee': 'Fee Verification',
+                'creative': 'Creative Submissions',
+                'bookings': 'Tuition Bookings',
+                'subjects': 'Tuition Subjects',
+                'news': 'News CMS',
+                'results': 'Results Management',
+                'analytics': 'Performance Analytics'
+            };
+            const titleEl = document.getElementById('panel-title');
+            if (titleEl) titleEl.textContent = titleMap[panelId] || 'Admin Dashboard';
+
+            if (el) {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                el.classList.add('active');
+            }
+            if (window.innerWidth <= 992 && typeof toggleSidebar === 'function') toggleSidebar();
+
+            // Refresh panel data safely
+            try {
+                if (panelId === 'fee' && typeof renderFeeTable === 'function') renderFeeTable();
+                if (panelId === 'creative' && typeof renderCreativeTable === 'function') renderCreativeTable();
+                if (panelId === 'news' && typeof renderNewsTable === 'function') renderNewsTable();
+                if (panelId === 'bookings' && typeof renderBookingsTable === 'function') renderBookingsTable();
+                if (panelId === 'subjects' && typeof renderSubjectsTable === 'function') renderSubjectsTable();
+                if (panelId === 'schools' && typeof SchoolManager !== 'undefined') SchoolManager.renderManagementGrid();
+
+                if (panelId === 'results') {
+                    try { if (window.AcademicYearManager && typeof AcademicYearManager.init === 'function') AcademicYearManager.init(); } catch (e) { console.error("AYM Init Fail", e); }
+                    try { if (window.ExamTypeManager && typeof ExamTypeManager.init === 'function') ExamTypeManager.init(); } catch (e) { console.error("ETM Init Fail", e); }
+                    try { if (window.ExamManager && typeof ExamManager.init === 'function') ExamManager.init(); } catch (e) { console.error("EM Init Fail", e); }
+                    try { if (window.ResultsManagement && typeof ResultsManagement.init === 'function') ResultsManagement.init(); } catch (e) { console.error("RM Init Fail", e); }
+                }
+
+                if (panelId === 'analytics') {
+                    if (window.AnalyticsEngine && typeof AnalyticsEngine.syncDropdown === 'function') AnalyticsEngine.syncDropdown();
+                }
+            } catch (err) {
+                console.error("Critical Panel Init Error:", err);
+            }
+        }
+
+        /**
+         * Safe Reset functionality (Goal 6)
+         * Resets the active panel and config without deleting data
+         */
+        function resetDashboardUI() {
+            if (!confirm("This will reset the dashboard view state. Your data will remain intact. Continue?")) return;
+            localStorage.removeItem('mhm_v2_active_panel');
+            localStorage.removeItem('active_school_config'); // Reset context to default
+            location.reload();
+        }
+
+        // Expose to window
+        window.toggleSidebar = toggleSidebar;
+        window.switchPanel = switchPanel;
+    </script>
+
+    <script>
+        // Init logic moved to module block above
+        updateStats();
+    </script>
+
+    <!-- Results System Extension Modules -->
+    <script src="../../assets/js/academic-year-manager.js"></script>
+    <script src="../../assets/js/exam-manager.js"></script>
+    <script src="../../assets/js/analytics-engine.js"></script>
+    <script type="module">
+        import SchoolManager from '../../assets/js/school-manager.js';
+
+        // Wait for DOM to be ready
+        window.addEventListener('DOMContentLoaded', () => {
+            SchoolManager.init();
         });
 
-        // Hide site navigation in admin mode
-        document.addEventListener('DOMContentLoaded', () => {
-            const header = document.getElementById('main-header');
-            const footer = document.getElementById('main-footer');
-            if (header) header.style.display = 'none';
-            if (footer) footer.style.display = 'none';
-        });
+        // Expose to window for onclick handlers
+        window.SchoolManager = SchoolManager;
     </script>
 </body>
 

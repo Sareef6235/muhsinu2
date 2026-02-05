@@ -20,7 +20,18 @@ const FooterSystem = {
 
     // 3. Helper to get relative path
     getBasePath() {
-        return (window.Perf && window.Perf.getBasePath) ? window.Perf.getBasePath() : '';
+        const path = window.location.pathname;
+
+        if (path.includes('/pages/')) {
+            // Consistent logic with site-nav.js
+            if (path.match(/\/pages\/[^/]+\/[^/]+\//)) return '../../../';
+            if (path.match(/\/pages\/[^/]+\//)) return '../../';
+            return '../';
+        }
+
+        if (path.includes('/hn/')) return '../';
+
+        return '';
     },
 
     // 4. Initialization
@@ -84,11 +95,12 @@ const FooterSystem = {
                         <h4 data-t="quick_links">Quick Links</h4>
                         <div class="footer-links-wrapper">
                             <ul class="footer-links">
-                                <li><a href="${BP || './'}" data-t="home">Home</a></li>
-                                <li><a href="${BP}pages/services/" data-t="services">Services</a></li>
-                                <li><a href="${BP}pages/gallery/" data-t="gallery">Gallery</a></li>
-                                <li><a href="${BP}pages/about/" data-t="about">About Us</a></li>
-                                <li><a href="${BP}pages/booking/" data-t="booking">Book Tuition</a></li>
+                                <li><a href="${BP}index.html" data-t="home">Home</a></li>
+                                <li><a href="${BP}pages/services/index.html" data-t="services">Services</a></li>
+                                <li><a href="${BP}pages/gallery/index.html" data-t="gallery">Gallery</a></li>
+                                <li><a href="${BP}pages/about/index.html" data-t="about">About Us</a></li>
+                                <li><a href="${BP}pages/booking/index.html" data-t="booking">Book Tuition</a></li>
+                                <li><a href="${BP}pages/admin/dashboard.html" data-t="admin_portal" class="admin-only">Admin Portal</a></li>
                             </ul>
                         </div>
                     </div>
@@ -99,9 +111,9 @@ const FooterSystem = {
                         <div class="footer-links-wrapper">
                             <ul class="footer-links">
                                 <li><a href="${BP}pages/students/creative.html" data-t="fee_payment">Fee Payment</a></li>
-                                <li><a href="${BP}pages/results/" data-t="exam_results">Exam Results</a></li>
+                                <li><a href="${BP}pages/results/index.html" data-t="exam_results">Exam Results</a></li>
                                 <li><a href="${BP}pages/students/achievements.html" data-t="achievements">Achievements</a></li>
-                                <li><a href="${BP}pages/poster-builder/" data-t="poster_builder">Poster Builder</a></li>
+                                <li><a href="${BP}pages/poster-builder/index.html" data-t="poster_builder">Poster Builder</a></li>
                             </ul>
                         </div>
                     </div>
@@ -142,11 +154,11 @@ const FooterSystem = {
 
             <!-- Sticky Mini Footer for Mobile -->
             <div class="mini-footer" id="sticky-mini-footer">
-                <a href="${BP || './'}" class="mini-footer-item ${window.location.pathname.endsWith('/') || window.location.pathname.endsWith('index.html') ? 'active' : ''}">
+                <a href="${BP}index.html" class="mini-footer-item ${window.location.pathname.endsWith('index.html') ? 'active' : ''}">
                     <i class="ph-bold ph-house"></i>
                     <span data-t="home">Home</span>
                 </a>
-                <a href="${BP}pages/booking/" class="mini-footer-item ${window.location.pathname.includes('booking') ? 'active' : ''}">
+                <a href="${BP}pages/booking/index.html" class="mini-footer-item ${window.location.pathname.includes('booking') ? 'active' : ''}">
                     <i class="ph-bold ph-calendar-plus"></i>
                     <span data-t="booking">Booking</span>
                 </a>

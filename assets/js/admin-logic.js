@@ -1,63 +1,76 @@
 /**
- * Admin Dashboard Central Controller (Local Version)
- * Manages panels, settings, and data synchronization without Firebase.
+ * Admin Dashboard Central Controller (REBUILT FOR LOCAL CMS)
+ * Manages panels, settings, and local data persistence.
  */
 
-import { ServicesCMS } from './services-cms.js';
-import { NewsService } from './news-service.js';
-import { SubjectStorage } from './subject-storage.js';
-import { BookingsManager } from './modules/bookings.js';
-import { ResultManager } from './modules/results.js';
-import { GalleryManager } from './modules/gallery.js';
-import { AdminMedia } from './admin-media.js';
-import { AdminAuth } from './admin-auth.js'; // Ensure Auth is active
+import StorageManager from './storage-manager.js';
+import LocalAuth from './local-auth.js';
+import UploadUtils from './upload-utils.js';
+import ServicesCMS from './services-cms.js';
+import GoogleSheetsFetcher from './google-sheets-fetcher.js';
+import NavigationCMS from './nav-cms.js';
 
 const AdminLogic = {
     state: {
         activePanel: 'dashboard',
-        sidebarVisible: window.innerWidth > 992
+        sidebarVisible: window.innerWidth > 992,
+        selectedExamFilter: 'all'
     },
 
     // 1. Initialization
-    async init() {
-        console.log('🛠️ Admin Logic Initializing (Local Mode)...');
+    init() {
+        console.log('🚀 Admin Engine Starting (Local-Only Mode)...');
+
+        // Check Auth
+        if (!LocalAuth.isAuthenticated()) {
+            window.location.href = 'index.html';
+            return;
+        }
 
         this.renderLayout();
         this.bindEvents();
         this.loadPanelFromUrl();
         this.updateStats();
+
+        // Initialize Specialized CMS Engines
+        ServicesCMS.init();
+        ResultsCMS.init();
+        NavigationCMS.init();
     },
 
     // 2. DOM Rendering (Main Layout)
     renderLayout() {
         const body = document.body;
+        // Apply Global Theme
+        const theme = StorageManager.get('theme_config', { primary: '#00f3ff', secondary: '#bc13fe' });
+        document.documentElement.style.setProperty('--primary-color', theme.primary);
+        document.documentElement.style.setProperty('--secondary-color', theme.secondary);
+
         body.innerHTML = `
             <div class="admin-wrapper">
                 <!-- Sidebar -->
                 <aside class="admin-sidebar" id="admin-sidebar">
                     <div class="sidebar-header">
-                        <div class="logo">MHMV Admin</div>
+                        <div class="logo">MHMV <span style="color:var(--primary-color)">2026</span></div>
                         <button class="sidebar-close md-only"><i class="ph ph-x"></i></button>
                     </div>
                     <nav class="sidebar-nav">
                         <ul>
                             <li><a href="#dashboard" class="nav-link active" data-panel="dashboard"><i class="ph ph-layout"></i> Dashboard</a></li>
-                            <li class="nav-divider">Content</li>
-                            <li><a href="#subject-manager" class="nav-link" data-panel="subject-manager"><i class="ph ph-books"></i> Subjects</a></li>
-                            <li><a href="#services-cms" class="nav-link" data-panel="services-cms"><i class="ph ph-briefcase"></i> Services</a></li>
-                            <li><a href="#news-manager" class="nav-link" data-panel="news-manager"><i class="ph ph-newspaper"></i> News & Updates</a></li>
+                            <li class="nav-divider">Management</li>
+                            <li><a href="#services-cms" class="nav-link" data-panel="services-cms"><i class="ph ph-briefcase"></i> Services Engine</a></li>
                             <li><a href="#result-manager" class="nav-link" data-panel="result-manager"><i class="ph ph-exam"></i> Exam Results</a></li>
-                            <li class="nav-divider">Media</li>
-                            <li><a href="#gallery-admin" class="nav-link" data-panel="gallery-admin"><i class="ph ph-image"></i> Gallery</a></li>
-                            <li><a href="#media-manager" class="nav-link" data-panel="media-manager"><i class="ph ph-cloud-arrow-up"></i> Media Manager</a></li>
-                            <li class="nav-divider">Settings</li>
-                            <li><a href="#site-settings" class="nav-link" data-panel="site-settings"><i class="ph ph-gear"></i> Page Settings</a></li>
-                            <li><a href="#menu-management" class="nav-link" data-panel="menu-management"><i class="ph ph-list"></i> Menu Manager</a></li>
-                            <li><a href="#bookings-manager" class="nav-link" data-panel="bookings-manager"><i class="ph ph-calendar-check"></i> Bookings</a></li>
+                            <li><a href="#fee-submissions" class="nav-link" data-panel="fee-submissions"><i class="ph ph-receipt"></i> Fee Management</a></li>
+                            <li><a href="#news-manager" class="nav-link" data-panel="news-manager"><i class="ph ph-newspaper"></i> News & Events</a></li>
+                            <li class="nav-divider">Site Control</li>
+                            <li><a href="#menu-manager" class="nav-link" data-panel="menu-manager"><i class="ph ph-list-numbers"></i> Menu Control</a></li>
+                            <li><a href="#site-settings" class="nav-link" data-panel="site-settings"><i class="ph ph-gear"></i> Page Config</a></li>
+                            <li><a href="#theme-settings" class="nav-link" data-panel="theme-settings"><i class="ph ph-palette"></i> Theme & UI</a></li>
+                            <li><a href="#security-settings" class="nav-link" data-panel="security-settings"><i class="ph ph-shield-check"></i> Security</a></li>
                         </ul>
                     </nav>
                     <div class="sidebar-footer">
-                        <button id="admin-logout" class="btn-logout"><i class="ph ph-sign-out"></i> Logout</button>
+                        <button id="admin-logout" class="btn-logout"><i class="ph ph-sign-out"></i> End Session</button>
                     </div>
                 </aside>
 
@@ -66,24 +79,23 @@ const AdminLogic = {
                     <header class="admin-header">
                         <button class="sidebar-toggle md-only" id="sidebar-toggle"><i class="ph ph-list"></i></button>
                         <div class="header-breadcrumb">
-                            <span id="breadcrumb-parent">Admin</span> / <span id="breadcrumb-current">Dashboard</span>
+                            <span id="breadcrumb-parent">MHMV 2026</span> / <span id="breadcrumb-current">Dashboard</span>
                         </div>
                         <div class="header-actions">
-                            <a href="../../index.html" class="btn-view-site" target="_blank"><i class="ph ph-eye"></i> View Site</a>
+                            <a href="../../index.html" class="btn-view-site" target="_blank"><i class="ph ph-planet"></i> Open Site</a>
                             <div class="admin-profile">
                                 <i class="ph ph-user-circle"></i>
-                                <span>Administrator</span>
+                                <span>Master Admin</span>
                             </div>
                         </div>
                     </header>
 
                     <content class="admin-content" id="admin-panel-container">
-                        <!-- Panels injected here -->
+                        <!-- Dynamic Panels Injected Here -->
                     </content>
                 </main>
             </div>
             
-            <!-- Global Toast Container -->
             <div id="admin-toast-container"></div>
         `;
 
@@ -91,925 +103,832 @@ const AdminLogic = {
     },
 
     // 3. Panel Switcher Logic
-    switchPanel(panelId) {
+    async switchPanel(panelId) {
         this.state.activePanel = panelId;
         const container = document.getElementById('admin-panel-container');
         if (!container) return;
 
-        // Update Nav
+        // Toggle Active Class
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.toggle('active', link.dataset.panel === panelId);
         });
 
-        // Update Breadcrumb
         document.getElementById('breadcrumb-current').innerText = panelId.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
 
-        // Render Panel Content
+        // Routing Logic
         switch (panelId) {
             case 'dashboard': this.renderDashboard(container); break;
-            case 'site-settings': this.renderSiteSettings(container); break;
-            case 'subject-manager': this.renderSubjectManager(container); break;
             case 'services-cms': this.renderServicesCMS(container); break;
-            case 'news-manager': this.renderNewsManager(container); break;
             case 'result-manager': this.renderResultManager(container); break;
-            case 'menu-management': this.renderMenuManagement(container); break;
-            case 'gallery-admin': this.renderGalleryAdmin(container); break;
-            case 'media-manager': this.renderMediaManager(container); break;
-            case 'bookings-manager': this.renderBookingsManager(container); break;
-            default: container.innerHTML = `<h2>Panel ${panelId} coming soon...</h2>`;
+            case 'fee-submissions': this.renderFeeSubmissions(container); break;
+            case 'menu-manager': this.renderMenuManager(container); break;
+            case 'site-settings': this.renderSiteSettings(container); break;
+            case 'theme-settings': this.renderThemeSettings(container); break;
+            case 'security-settings': this.renderSecuritySettings(container); break;
+            default: container.innerHTML = `<div class="admin-card"><h2><i class="ph ph-construction"></i> Panel ${panelId} is under development.</h2></div>`;
         }
 
-        // Close sidebar on mobile
-        if (window.innerWidth <= 992) {
-            document.getElementById('admin-sidebar').classList.remove('visible');
-        }
-
-        // Update URL
-        history.pushState(null, null, `#${panelId}`);
+        if (window.innerWidth <= 992) document.getElementById('admin-sidebar').classList.remove('visible');
+        history.pushState(null, null, \`#\${panelId}\`);
     },
 
     // 4. Panel Renderers
-    async renderDashboard(container) {
+    renderDashboard(container) {
         container.innerHTML = `
-            <div class="dashboard-stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="ph ph-books"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="stat-subjects-count">...</div>
-                        <div class="stat-label">Active Subjects</div>
-                    </div>
-                </div>
+            < div class= "dashboard-stats-grid animate-fade-in" >
                 <div class="stat-card">
                     <div class="stat-icon"><i class="ph ph-briefcase"></i></div>
                     <div class="stat-info">
                         <div class="stat-value" id="stat-services-count">...</div>
-                        <div class="stat-label">Services</div>
+                        <div class="stat-label">Active Services</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon"><i class="ph ph-calendar-check"></i></div>
+                    <div class="stat-icon" style="color:var(--secondary-color)"><i class="ph ph-exam"></i></div>
                     <div class="stat-info">
-                        <div class="stat-value" id="stat-bookings-count">...</div>
-                        <div class="stat-label">Total Bookings</div>
+                        <div class="stat-value" id="stat-results-count">...</div>
+                        <div class="stat-label">Exam Records</div>
                     </div>
                 </div>
-            </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="color:#ffa502"><i class="ph ph-receipt"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-fees-count">...</div>
+                        <div class="stat-label">Fee Records</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="color:#2ed573"><i class="ph ph-hard-drive"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-storage-usage">...</div>
+                        <div class="stat-label">Storage Usage</div>
+                    </div>
+                </div>
+            </div >
 
-            <div class="dashboard-recent-grid">
-                <div class="admin-card">
-                    <h3>Quick Actions</h3>
-                    <div class="action-buttons">
-                        <button onclick="AdminLogic.switchPanel('site-settings')"><i class="ph ph-gear"></i> Site Settings</button>
-                        <button onclick="AdminLogic.switchPanel('subject-manager')"><i class="ph ph-plus"></i> New Subject</button>
-                        <button onclick="AdminLogic.switchPanel('services-cms')"><i class="ph ph-briefcase"></i> Manage Services</button>
-                        <button onclick="AdminLogic.switchPanel('result-manager')"><i class="ph ph-exam"></i> Manage Results</button>
-                    </div>
-                </div>
-                <div class="admin-card">
-                    <h3>System Status</h3>
-                    <ul class="status-list">
-                        <li><span>LocalStorage:</span> <span class="badge success">Active</span></li>
-                        <li><span>Offline Mode:</span> <span class="badge success">Ready</span></li>
-                    </ul>
-                </div>
+    <div class="dashboard-recent-grid">
+        <div class="admin-card">
+            <h3>Quick Launch</h3>
+            <div class="action-buttons">
+                <button onclick="AdminLogic.switchPanel('services-cms')"><i class="ph ph-plus"></i> New Service</button>
+                <button onclick="AdminLogic.switchPanel('result-manager')"><i class="ph ph-upload"></i> Upload Results</button>
+                <button onclick="AdminLogic.switchPanel('menu-manager')"><i class="ph ph-list-numbers"></i> Edit Navigation</button>
             </div>
-        `;
+        </div>
+        <div class="admin-card">
+            <h3>System Health</h3>
+            <ul class="status-list">
+                <li><span>CMS Engines:</span> <span class="badge success">Active</span></li>
+                <li><span>Local Auth:</span> <span class="badge success">Secure</span></li>
+                <li><span>Media Optimizer:</span> <span class="badge success">Ready</span></li>
+            </ul>
+        </div>
+    </div>
+`;
         this.updateStats();
     },
 
-    async updateStats() {
-        try {
-            const subjects = await SubjectStorage.getActive();
-            const services = await ServicesCMS.getAll();
-            const bookings = await BookingsManager.getAll();
-
-            document.getElementById('stat-subjects-count').innerText = subjects.length;
-            document.getElementById('stat-services-count').innerText = services.length;
-            document.getElementById('stat-bookings-count').innerText = bookings.length;
-        } catch (e) {
-            console.error("Error updating stats:", e);
-        }
-    },
-
-    // --- Bookings Manager ---
-    async renderBookingsManager(container) {
-        container.innerHTML = `
-            <div class="admin-card animate-fade-in">
-                <div class="card-header">
-                    <h2><i class="ph ph-calendar-check"></i> Bookings Management</h2>
-                    <p>View and manage tuition booking requests from students.</p>
-                </div>
-                <div id="bookings-list-container">
-                    <div class="loading">Loading bookings...</div>
-                </div>
-            </div>
-        `;
-
-        const listContainer = document.getElementById('bookings-list-container');
-        try {
-            const bookings = await BookingsManager.getAll();
-
-            if (bookings.length === 0) {
-                listContainer.innerHTML = '<div class="empty-state">No bookings yet.</div>';
-                return;
-            }
-
-            listContainer.innerHTML = `
-                <div class="table-container">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Student</th>
-                                <th>Class</th>
-                                <th>Subjects</th>
-                                <th>Amount</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${bookings.map(b => {
-                const date = b.createdAt ? new Date(b.createdAt).toLocaleDateString() : 'N/A';
-                return `
-                                    <tr>
-                                        <td>${date}</td>
-                                        <td>
-                                            <div style="font-weight:600;">${b.firstName} ${b.lastName}</div>
-                                            <div style="font-size:0.8rem; color:#888;">${b.email}</div>
-                                        </td>
-                                        <td><span class="badge">${b.class}</span></td>
-                                        <td><div style="max-width:200px; font-size:0.85rem;">${Array.isArray(b.subjects) ? b.subjects.join(', ') : b.subjects}</div></td>
-                                        <td style="font-weight:700; color:var(--primary-color);">₹${b.total}</td>
-                                        <td>
-                                            <button class="btn-icon danger" onclick="AdminLogic.deleteBooking('${b.id}')"><i class="ph ph-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                `;
-            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        } catch (e) {
-            console.error("Error loading bookings:", e);
-            listContainer.innerHTML = '<div class="error-state">Failed to load bookings.</div>';
-        }
-    },
-
-    async deleteBooking(id) {
-        if (!confirm("Are you sure you want to delete this booking?")) return;
-        try {
-            await BookingsManager.delete(id);
-            this.showToast("✅ Booking deleted");
-            this.renderBookingsManager(document.getElementById('admin-panel-container'));
-        } catch (e) {
-            console.error("Error deleting booking:", e);
-            this.showToast("❌ Delete failed", "error");
-        }
-    },
-
-    // --- Services CMS ---
     renderServicesCMS(container) {
-        const services = typeof ServicesCMS !== 'undefined' ?
-            // ServicesCMS.getAll() returns promise now!
-            // WAIT, ServicesCMS.getAll is async now. We need async render.
-            // But this method signature is synchronous in the switch? No, I can make it async in switch.
-            [] : [];
-
-        // This needs to be actively fetched
-        this._asyncRenderServices(container);
-    },
-
-    async _asyncRenderServices(container) {
-        const services = await ServicesCMS.getAll();
+        const services = ServicesCMS.getAll();
         container.innerHTML = `
-            <div class="admin-card">
-                 <div class="card-header-flex">
-                    <div>
-                        <h2><i class="ph ph-briefcase"></i> Services CMS</h2>
-                        <p>Manage dynamic service cards and their content.</p>
-                    </div>
-                    <button class="btn btn-primary" id="add-service-btn"><i class="ph ph-plus"></i> Add Service</button>
-                </div>
-                <div class="services-admin-grid">
-                    ${services.map(s => {
-            const content = s.content.en || s.content; // Handle legacy/migration
-            return `
-                            <div class="service-admin-card">
-                                <i class="${s.icon} card-icon"></i>
-                                <h3>${content.title}</h3>
-                                <p>${content.shortDesc || ''}</p>
-                                <div class="card-footer">
-                                    <span class="badge ${s.visible !== false ? 'success' : 'danger'}">${s.visible !== false ? 'Visible' : 'Hidden'}</span>
-                                    <div class="actions">
-                                        <button class="btn-icon" onclick="AdminLogic.editService('${s.id}')"><i class="ph ph-pencil"></i></button>
-                                        <button class="btn-icon danger" onclick="AdminLogic.deleteService('${s.id}')"><i class="ph ph-trash"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-        }).join('')}
-                </div>
-            </div>
-        `;
-        document.getElementById('add-service-btn').onclick = () => this.showServiceModal();
-    },
-
-    showServiceModal(service = null) {
-        const isEdit = !!service;
-        const modal = this.createModal(isEdit ? 'Edit Service' : 'Add New Service');
-        modal.body.innerHTML = `
-            <form id="modal-service-form" class="admin-form">
-                <div class="form-section">
-                    <h4>Basic Info</h4>
-                    <div class="form-group">
-                        <label>Service Title</label>
-                        <input type="text" name="title" value="${isEdit ? (service.content.en ? service.content.en.title : service.content.title) : ''}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Icon Class (Phosphor)</label>
-                        <input type="text" name="icon" value="${isEdit ? service.icon : 'ph ph-star'}" placeholder="ph ph-briefcase">
-                    </div>
-                    <div class="form-group">
-                        <label>Short Description</label>
-                        <textarea name="shortDesc">${isEdit ? (service.content.en ? service.content.en.shortDesc : service.content.shortDesc) : ''}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Detailed HTML Content</label>
-                        <textarea name="fullContent" rows="5">${isEdit ? (service.content.en ? service.content.en.full : service.content.full) : ''}</textarea>
-                    </div>
-                </div>
-                <div class="form-section">
-                    <h4>Media</h4>
-                    <div class="form-group">
-                        <label>Feature Image</label>
-                        <input type="file" id="service-image-input" accept="image/*">
-                        <div id="service-image-preview" class="media-preview-box">
-                             ${isEdit && service.image ? `<img src="${service.image}" style="max-width:100%; border-radius:10px; margin-top:10px;">` : ''}
-                        </div>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">${isEdit ? 'Save Changes' : 'Create Service'}</button>
-                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
-                </div>
-            </form>
-        `;
-
-        let uploadedImage = isEdit ? service.image : null;
-        document.getElementById('service-image-input').onchange = async (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                uploadedImage = await AdminMedia.handleImageUpload(file, document.getElementById('service-image-preview'));
-            }
-        };
-
-        modal.form.onsubmit = async (e) => {
-            e.preventDefault();
-            const data = {
-                id: isEdit ? service.id : undefined,
-                icon: e.target.icon.value,
-                image: uploadedImage,
-                content: {
-                    en: {
-                        title: e.target.title.value,
-                        shortDesc: e.target.shortDesc.value,
-                        full: e.target.fullContent.value
-                    }
-                },
-                visible: true
-            };
-
-            await ServicesCMS.save(data);
-            this.closeModal();
-            this.renderServicesCMS(document.getElementById('admin-panel-container'));
-            this.showToast(`✅ Service ${isEdit ? 'updated' : 'created'}`);
-        };
-    },
-
-    async editService(id) {
-        const service = await ServicesCMS.getById(id);
-        if (service) this.showServiceModal(service);
-    },
-
-    async deleteService(id) {
-        if (!confirm("Delete this service?")) return;
-        await ServicesCMS.delete(id);
-        this.renderServicesCMS(document.getElementById('admin-panel-container'));
-        this.showToast("🗑️ Service deleted", "error");
-    },
-
-    // --- Subject Manager ---
-    async renderSubjectManager(container) {
-        const subjects = await SubjectStorage.getAll();
-        container.innerHTML = `
-            <div class="admin-card">
+    < div class="admin-card animate-fade-in" >
                 <div class="card-header-flex">
                     <div>
-                        <h2><i class="ph ph-books"></i> Subject Management</h2>
-                        <p>Manage tuition subjects and their associated prices.</p>
+                        <h2><i class="ph ph-briefcase"></i> Services CMS</h2>
+                        <p>Manage 20+ services with multi-language support (EN/ML/AR).</p>
                     </div>
-                    <button class="btn btn-primary" id="add-subject-btn"><i class="ph ph-plus"></i> Add Subject</button>
+                    <button class="btn btn-primary" onclick="AdminLogic.showServiceModal()"><i class="ph ph-plus"></i> Add Service</button>
                 </div>
 
-                <div class="table-container">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Subject Name</th>
-                                <th>Base Price</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="subjects-table-body">
-                            ${subjects.map(s => `
-                                <tr>
-                                    <td>${s.name} ${s.rtl ? '<span class="badge">RTL</span>' : ''}</td>
-                                    <td>₹${s.price}</td>
-                                    <td><span class="badge ${s.active ? 'success' : 'danger'}">${s.active ? 'Active' : 'Hidden'}</span></td>
-                                    <td class="table-actions">
-                                        <button class="btn-icon" onclick="AdminLogic.toggleSubject('${s.id}')" title="Toggle Visibility"><i class="ph ph-eye"></i></button>
-                                        <button class="btn-icon danger" onclick="AdminLogic.deleteSubject('${s.id}')" title="Delete"><i class="ph ph-trash"></i></button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-        document.getElementById('add-subject-btn').onclick = () => this.showSubjectModal();
-    },
-
-    showSubjectModal(subject = null) {
-        const isEdit = !!subject;
-        const modal = this.createModal(isEdit ? 'Edit Subject' : 'Add New Subject');
-        modal.body.innerHTML = `
-            <form id="modal-subject-form" class="admin-form">
-                <div class="form-group">
-                    <label>Subject Name</label>
-                    <input type="text" name="name" value="${isEdit ? subject.name : ''}" required>
-                </div>
-                <div class="form-group">
-                    <label>Base Price (₹)</label>
-                    <input type="number" name="price" value="${isEdit ? subject.price : '1000'}" required>
-                </div>
-                <div class="form-group">
-                    <label><input type="checkbox" name="active" ${(!isEdit || subject.active) ? 'checked' : ''}> Active</label>
-                </div>
-                <div class="form-group">
-                    <label><input type="checkbox" name="rtl" ${isEdit && subject.rtl ? 'checked' : ''}> RTL Support</label>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">${isEdit ? 'Update' : 'Add'} Subject</button>
-                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
-                </div>
-            </form>
-        `;
-
-        modal.form.onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = {
-                id: isEdit ? subject.id : undefined,
-                name: formData.get('name'),
-                price: formData.get('price'),
-                active: e.target.active.checked,
-                rtl: e.target.rtl.checked
-            };
-
-            await SubjectStorage.save(data);
-            this.closeModal();
-            this.renderSubjectManager(document.getElementById('admin-panel-container'));
-            this.showToast(`✅ Subject ${isEdit ? 'updated' : 'added'}`);
-        };
-    },
-
-    async toggleSubject(id) {
-        await SubjectStorage.toggle(id);
-        this.renderSubjectManager(document.getElementById('admin-panel-container'));
-    },
-
-    async deleteSubject(id) {
-        if (confirm("Delete this subject?")) {
-            await SubjectStorage.delete(id);
-            this.renderSubjectManager(document.getElementById('admin-panel-container'));
-            this.showToast("🗑️ Subject deleted", "error");
-        }
-    },
-
-    // --- News Manager ---
-    async renderNewsManager(container) {
-        container.innerHTML = '<div class="loading">Loading news...</div>';
-        const news = await new NewsService().getAllNews();
-        container.innerHTML = `
-            <div class="admin-card">
-                 <div class="card-header-flex">
-                    <div>
-                        <h2><i class="ph ph-newspaper"></i> News & Updates</h2>
-                    </div>
-                    <button class="btn btn-primary" id="add-news-btn"><i class="ph ph-plus"></i> Add News</button>
-                </div>
-                <div id="news-admin-list" class="admin-grid-list">
-                    ${news.map(item => `
-                        <div class="admin-item-card">
-                            <div class="item-info">
-                                <h4>${item.title.en || 'Untitled'}</h4>
-                                <p>${new Date(item.date).toLocaleDateString()}</p>
+                <div class="services-admin-grid">
+                    ${services.map(s => `
+                        <div class="service-admin-card glass-mhm">
+                            <div class="card-options">
+                                <span class="badge ${s.visible ? 'success' : 'danger'}">${s.visible ? 'Visible' : 'Hidden'}</span>
                             </div>
-                            <div class="item-actions">
-                                <button onclick="AdminLogic.editNews('${item.id}')" class="btn-icon"><i class="ph ph-pencil"></i></button>
-                                <button onclick="AdminLogic.deleteNews('${item.id}')" class="btn-icon btn-danger"><i class="ph ph-trash"></i></button>
+                            <i class="${s.icon || 'ph ph-app-window'} card-icon"></i>
+                            <h3>${s.title.en}</h3>
+                            <p>${s.desc.en.substring(0, 50)}...</p>
+                            <div class="card-footer">
+                                <div class="lang-indicators">
+                                    <span title="English" class="active">EN</span>
+                                    <span title="Malayalam" class="${s.title.ml ? 'active' : ''}">ML</span>
+                                    <span title="Arabic" class="${s.title.ar ? 'active' : ''}">AR</span>
+                                </div>
+                                <div class="actions">
+                                    <button class="btn-icon" onclick="AdminLogic.showServiceModal('${s.id}')"><i class="ph ph-pencil"></i></button>
+                                    <button class="btn-icon danger" onclick="AdminLogic.deleteService('${s.id}')"><i class="ph ph-trash"></i></button>
+                                </div>
                             </div>
                         </div>
                     `).join('')}
                 </div>
-            </div>
-        `;
-        document.getElementById('add-news-btn').onclick = () => this.showNewsModal();
+            </div >
+    `;
     },
 
-    showNewsModal(newsItem = null) {
-        const isEdit = !!newsItem;
-        const modal = this.createModal(isEdit ? 'Edit News' : 'Add News');
-        modal.body.innerHTML = `
-            <form id="modal-news-form" class="admin-form">
-                <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" name="title" value="${isEdit ? newsItem.title.en : ''}" required>
+    showServiceModal(id = null) {
+        const service = id ? ServicesCMS.getById(id) : {
+            title: { en: '', ml: '', ar: '' },
+            desc: { en: '', ml: '', ar: '' },
+            icon: 'ph ph-star',
+            visible: true,
+            image: ''
+        };
+
+        const modal = document.createElement('div');
+        modal.className = 'admin-modal active';
+        modal.innerHTML = `
+    < div class="modal-content glass-mhm animate-pop-in" >
+                <div class="modal-header">
+                    <h3>${id ? 'Edit' : 'Create'} Service</h3>
+                    <button class="modal-close"><i class="ph ph-x"></i></button>
                 </div>
-                <div class="form-group">
-                    <label>Short Description</label>
-                    <textarea name="shortDesc">${isEdit ? newsItem.shortDesc : ''}</textarea>
-                </div>
-                <div class="form-group">
-                    <label>News Image</label>
-                    <input type="file" id="news-image-input" accept="image/*">
-                    <div id="news-image-preview">
-                        ${isEdit && newsItem.image ? `<img src="${newsItem.image}" style="max-height:100px;">` : ''}
+                <form id="service-form" class="admin-form">
+                    <div class="form-tabs">
+                        <button type="button" class="tab-btn active" data-tab="en">English</button>
+                        <button type="button" class="tab-btn" data-tab="ml">Malayalam</button>
+                        <button type="button" class="tab-btn" data-tab="ar">Arabic</button>
                     </div>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
-                </div>
-            </form>
-        `;
 
-        let uploadedImage = isEdit ? newsItem.image : null;
-        document.getElementById('news-image-input').onchange = async (e) => {
-            uploadedImage = await AdminMedia.handleImageUpload(e.target.files[0], document.getElementById('news-image-preview'));
-        };
+                    <div class="tab-content" id="tab-en">
+                        <div class="form-group">
+                            <label>Service Title (EN)</label>
+                            <input type="text" name="title_en" value="${service.title.en}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description (EN)</label>
+                            <textarea name="desc_en" required>${service.desc.en}</textarea>
+                        </div>
+                    </div>
 
-        modal.form.onsubmit = async (e) => {
-            e.preventDefault();
-            const data = {
-                title: { en: e.target.title.value },
-                shortDesc: e.target.shortDesc.value,
-                image: uploadedImage,
-                date: isEdit ? newsItem.date : new Date().toISOString()
+                    <div class="tab-content hidden" id="tab-ml">
+                        <div class="form-group">
+                            <label>Service Title (ML)</label>
+                            <input type="text" name="title_ml" value="${service.title.ml || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Description (ML)</label>
+                            <textarea name="desc_ml">${service.desc.ml || ''}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="tab-content hidden" id="tab-ar">
+                        <div class="form-group">
+                            <label>Service Title (AR)</label>
+                            <input type="text" name="title_ar" value="${service.title.ar || ''}" dir="rtl">
+                        </div>
+                        <div class="form-group">
+                            <label>Description (AR)</label>
+                            <textarea name="desc_ar" dir="rtl">${service.desc.ar || ''}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Icon Class (Phosphor)</label>
+                            <input type="text" name="icon" value="${service.icon}">
+                        </div>
+                        <div class="form-group">
+                            <label>Visibility</label>
+                            <select name="visible">
+                                <option value="true" ${service.visible ? 'selected' : ''}>Active</option>
+                                <option value="false" ${!service.visible ? 'selected' : ''}>Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Service Image</label>
+                        <div class="image-upload-wrapper">
+                            <input type="file" id="service-img-input" accept="image/*" hidden>
+                            <div class="upload-area" onclick="document.getElementById('service-img-input').click()">
+                                ${service.image ? `<img src="${service.image}" class="preview-img">` : '<i class="ph ph-image"></i> <span>Click to Upload</span>'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Save Service</button>
+                </form>
+            </div >
+    `;
+
+        document.body.appendChild(modal);
+
+        // Tab Logic
+        modal.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = () => {
+                modal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                modal.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                btn.classList.add('active');
+                modal.querySelector(`#tab - ${ btn.dataset.tab } `).classList.remove('hidden');
             };
-            await new NewsService().saveNews(data, isEdit ? newsItem.id : null);
-            this.closeModal();
-            this.renderNewsManager(document.getElementById('admin-panel-container'));
+        });
+
+        // Image Handling
+        let imageData = service.image;
+        modal.querySelector('#service-img-input').onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const res = await UploadUtils.processImage(file);
+                imageData = res.data;
+                modal.querySelector('.upload-area').innerHTML = `< img src = "${res.data}" class="preview-img" > `;
+                this.showToast(`✨ compressed to ${ UploadUtils.formatBytes(res.size) } `);
+            } catch (err) {
+                this.showToast(err.message, 'error');
+            }
         };
+
+        // Form Submit
+        modal.querySelector('#service-form').onsubmit = (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalHtml = btn.innerHTML;
+
+            const fd = new FormData(e.target);
+            const data = {
+                id: id,
+                title: { en: fd.get('title_en'), ml: fd.get('title_ml'), ar: fd.get('title_ar') },
+                desc: { en: fd.get('desc_en'), ml: fd.get('desc_ml'), ar: fd.get('desc_ar') },
+                icon: fd.get('icon'),
+                visible: fd.get('visible') === 'true',
+                image: imageData
+            };
+
+            if (window.uiLock) window.uiLock(btn, true, originalHtml);
+
+            try {
+                ServicesCMS.save(data);
+                this.showToast('✅ Service saved successfully!');
+                modal.remove();
+                this.switchPanel('services-cms');
+            } catch (err) {
+                this.showToast('❌ Error saving service: ' + err.message, 'danger');
+                if (window.uiLock) window.uiLock(btn, false, originalHtml);
+            }
+        };
+
+        modal.querySelector('.modal-close').onclick = () => modal.remove();
     },
 
-    async editNews(id) {
-        const news = await new NewsService().getAllNews();
-        const item = news.find(n => n.id === id);
-        if (item) this.showNewsModal(item);
+    deleteService(id) {
+        if (!confirm('Permanently delete this service?')) return;
+        ServicesCMS.delete(id);
+        this.showToast('🗑️ Service deleted');
+        this.switchPanel('services-cms');
     },
 
-    async deleteNews(id) {
-        if (!confirm("Delete update?")) return;
-        await new NewsService().deleteNews(id);
-        this.renderNewsManager(document.getElementById('admin-panel-container'));
-    },
-
-    // --- Result Manager ---
     async renderResultManager(container) {
         container.innerHTML = `
-            <div class="admin-card">
-                 <div class="card-header-flex">
-                    <div>
-                        <h2><i class="ph ph-exam"></i> Exam Results</h2>
-                        <p>Manage examinations and publish student results.</p>
-                    </div>
-                    <button class="btn btn-primary" id="create-exam-btn"><i class="ph ph-plus"></i> Create Exam</button>
-                </div>
-                <div id="exams-list-container" class="admin-grid-list">
-                    <div class="loading">Loading exams...</div>
-                </div>
-            </div>
-        `;
-
-        const exams = await ResultManager.getAllExams();
-        const listContainer = document.getElementById('exams-list-container');
-
-        if (exams.length === 0) {
-            listContainer.innerHTML = '<div class="empty-state">No exams created yet.</div>';
-        } else {
-            listContainer.innerHTML = exams.map(exam => `
-                <div class="admin-item-card">
-                    <div class="item-info">
-                        <h4>${exam.name}</h4>
-                        <p>${new Date(exam.date).toLocaleDateString()} • ${exam.type || 'General'}</p>
-                    </div>
-                    <div class="item-actions">
-                        <button onclick="AdminLogic.manageExamResults('${exam.id}')" class="btn-secondary"><i class="ph ph-table"></i> Results</button>
-                        <button onclick="AdminLogic.deleteExam('${exam.id}')" class="btn-icon btn-danger"><i class="ph ph-trash"></i></button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        document.getElementById('create-exam-btn').onclick = () => this.showExamModal();
-    },
-
-    showExamModal() {
-        const modal = this.createModal('Create New Exam');
-        modal.body.innerHTML = `
-            <form id="create-exam-form" class="admin-form">
-                <div class="form-group">
-                    <label>Exam Name</label>
-                    <input type="text" name="name" placeholder="e.g. Mid Term 2026" required>
-                </div>
-                <div class="form-group">
-                    <label>Exam Date</label>
-                    <input type="date" name="date" required>
-                </div>
-                <div class="form-group">
-                    <label>Type</label>
-                    <select name="type">
-                        <option value="Public">Public Exam</option>
-                        <option value="Internal">Internal Exam</option>
-                        <option value="Entrance">Entrance</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Create Exam</button>
-                </div>
-            </form>
-        `;
-
-        modal.form.onsubmit = async (e) => {
-            e.preventDefault();
-            const data = Object.fromEntries(new FormData(e.target).entries());
-            await ResultManager.saveExam(data);
-            this.closeModal();
-            this.renderResultManager(document.getElementById('admin-panel-container'));
-            this.showToast('✅ Exam created successfully');
-        };
-    },
-
-    async deleteExam(id) {
-        if (!confirm("Are you sure? This will delete all results for this exam.")) return;
-        await ResultManager.deleteExam(id);
-        this.renderResultManager(document.getElementById('admin-panel-container'));
-        this.showToast('🗑️ Exam deleted');
-    },
-
-    async manageExamResults(examId) {
-        const exam = await ResultManager.getExamById(examId);
-        const results = await ResultManager.getResultsByExam(examId);
-
-        const container = document.getElementById('admin-panel-container');
-        container.innerHTML = `
-            <div class="admin-card">
+    < div class="admin-card animate-fade-in" >
                 <div class="card-header-flex">
                     <div>
-                        <button onclick="AdminLogic.switchPanel('result-manager')" class="btn-text"><i class="ph ph-arrow-left"></i> Back</button>
-                        <h2 style="margin-top:10px;">Results: ${exam.name}</h2>
-                        <p>${results.length} records found.</p>
+                        <h2><i class="ph ph-exam"></i> Exam Result System (Google Sheets)</h2>
+                        <p>Results are managed externally via Google Sheets. This view is read-only.</p>
                     </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" id="import-csv-btn"><i class="ph ph-upload"></i> Import CSV</button>
-                        <button class="btn btn-primary" id="add-result-btn"><i class="ph ph-plus"></i> Add Single</button>
+                    <div class="action-group">
+                        <button class="btn btn-primary" onclick="AdminLogic.refreshResultsWithoutReload()"><i class="ph ph-arrows-clockwise"></i> Sync Now</button>
+                        <a href="https://docs.google.com/spreadsheets/d/1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU/edit" target="_blank" class="btn btn-secondary"><i class="ph ph-arrow-square-out"></i> Open Sheet</a>
                     </div>
                 </div>
 
-                <div class="table-container">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Reg No</th>
-                                <th>Student Name</th>
-                                <th>Score</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${results.map(r => `
-                                <tr>
-                                    <td>${r.regNo}</td>
-                                    <td>${r.name}</td>
-                                    <td>${r.score}</td>
-                                    <td><span class="badge ${r.status === 'Pass' ? 'success' : 'danger'}">${r.status}</span></td>
-                                    <td>
-                                        <button onclick="AdminLogic.deleteResult('${r.id}', '${examId}')" class="btn-icon danger"><i class="ph ph-trash"></i></button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                <div class="results-admin-layout">
+                    <div class="results-panel animate-fade-in" style="width:100%">
+                        <div class="panel-header">
+                            <h3><i class="ph ph-database"></i> Cached Records</h3>
+                            <select id="admin-exam-filter" onchange="AdminLogic.filterAdminResults(this.value)" style="padding:8px; border-radius:8px; background:rgba(255,255,255,0.05); color:#fff; border:1px solid #333;">
+                                <option value="all">All Exams</option>
+                            </select>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table" id="admin-results-table">
+                                <thead>
+                                    <tr>
+                                        <th>Roll No</th>
+                                        <th>Student Name</th>
+                                        <th>Exam</th>
+                                        <th>Class</th>
+                                        <th>Status</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-results-body">
+                                    <tr><td colspan="6" style="text-align:center; padding:20px;">Loading data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        `;
+            </div >
+    `;
 
-        document.getElementById('add-result-btn').onclick = () => this.showAddResultModal(examId);
-        document.getElementById('import-csv-btn').onclick = () => this.showImportCSVModal(examId);
+        // Load data properly
+        try {
+            const results = await GoogleSheetsFetcher.fetchResults(); // Fetch or get cached
+            const exams = GoogleSheetsFetcher.getExamNames(results);
+            
+            // Populate Filter
+            const filterDropdown = document.getElementById('admin-exam-filter');
+            if(filterDropdown) {
+                 exams.forEach(ex => {
+                    const opt = document.createElement('option');
+                    opt.value = ex;
+                    opt.innerText = ex;
+                    if(this.state.selectedExamFilter === ex) opt.selected = true;
+                    filterDropdown.appendChild(opt);
+                 });
+            }
+
+            this.renderAdminResultsTable(results);
+
+        } catch (e) {
+            document.getElementById('admin-results-body').innerHTML = `< tr > <td colspan="6" style="text-align:center; color:red;">Error loading results: ${e.message}</td></tr > `;
+        }
     },
 
-    showAddResultModal(examId) {
-        const modal = this.createModal('Add Result');
-        modal.body.innerHTML = `
-            <form id="add-result-form" class="admin-form">
+    renderAdminResultsTable(results) {
+        const tbody = document.getElementById('admin-results-body');
+        if (!tbody) return;
+
+        const filtered = this.state.selectedExamFilter === 'all' 
+            ? results 
+            : results.filter(r => (r['Exam Name'] || r['ExamName'] || r['exam']) === this.state.selectedExamFilter);
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#666;">No records found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filtered.slice(0, 100).map(r => `
+    < tr >
+                <td><b>${r['Roll Number'] || r['RollNumber'] || r['rollNo']}</b></td>
+                <td>${r['Student Name'] || r['Name'] || r['name']}</td>
+                <td>${r['Exam Name'] || r['ExamName'] || r['exam']}</td>
+                <td>${r['Class'] || r['class']}</td>
+                <td><span class="status-badge ${(r['Status'] || r['status'] || 'pass').toLowerCase() === 'pass' ? 'approved' : 'pending'}">${r['Status'] || r['status']}</span></td>
+                <td>${r['Total'] || r['total']}</td>
+            </tr >
+    `).join('') + (filtered.length > 100 ? ` < tr > <td colspan="6" style="text-align:center; padding:10px; color:#888;">...and ${filtered.length - 100} more records</td></tr > ` : '');
+    },
+
+    filterAdminResults(examName) {
+        this.state.selectedExamFilter = examName;
+        // Re-fetch from cache is fast
+        const results = GoogleSheetsFetcher.getCachedResults();
+        this.renderAdminResultsTable(results);
+    },
+
+    async refreshResultsWithoutReload() {
+        if(!confirm('This will clear the local cache and fetch fresh data from Google Sheets. Continue?')) return;
+        
+        GoogleSheetsFetcher.clearCache();
+        this.showToast('🔄 Syncing with Google Sheets...');
+        try {
+            await GoogleSheetsFetcher.fetchResults(true);
+            this.showToast('✅ Data Synced Successfully!');
+            this.renderResultManager(document.getElementById('admin-panel-container'));
+            this.updateStats();
+        } catch(e) {
+            this.showToast('❌ Sync Failed: ' + e.message, 'danger');
+        }
+    },
+
+
+    renderMenuManager(container) {
+    const config = NavigationCMS.getMenu();
+    container.innerHTML = `
+        < div class="admin-card animate-fade-in" >
+            <div class="card-header-flex">
+                <div>
+                    <h2><i class="ph ph-list-numbers"></i> Menu Management</h2>
+                    <p>Control site navigation links, dropdowns, and order.</p>
+                </div>
+                <button class="btn btn-primary" onclick="AdminLogic.showMenuItemModal()">
+                    <i class="ph ph-plus"></i> Add Menu Item
+                </button>
+            </div>
+            <div class="menu-list-container">
+                ${config.map(item => `
+                    <div class="menu-item-row glass-mhm">
+                        <div class="item-info">
+                            <i class="ph ph-dots-six-vertical"></i>
+                            <div class="item-details">
+                                <span class="label">${item.label}</span>
+                                <small class="path">${item.href}</small>
+                                ${item.type === 'dropdown' ? '<span class="badge info">Dropdown</span>' : ''}
+                                ${item.adminOnly ? '<span class="badge danger">Admin Only</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn-icon" onclick="AdminLogic.showMenuItemModal('${item.id}')" title="Edit"><i class="ph ph-pencil"></i></button>
+                            <button class="btn-icon danger" onclick="AdminLogic.deleteMenuItem('${item.id}')" title="Delete"><i class="ph ph-trash"></i></button>
+                            <label class="switch">
+                                <input type="checkbox" ${item.visible ? 'checked' : ''} onchange="AdminLogic.toggleMenu('${item.id}')">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div >
+    `;
+},
+
+showMenuItemModal(id = null) {
+    const item = id ? NavigationCMS.getMenu().find(m => m.id === id) : { label: '', href: '', type: 'link', visible: true, adminOnly: false };
+    const modal = document.createElement('div');
+    modal.className = 'admin-modal active';
+    modal.innerHTML = `
+    < div class="modal-content glass-mhm animate-slide-up" >
+            <h3>${id ? 'Edit' : 'Add'} Menu Item</h3>
+            <form id="menu-item-form">
+                <input type="hidden" name="id" value="${id || ''}">
                 <div class="form-group">
-                    <label>Register No</label>
-                    <input type="text" name="regNo" required>
+                    <label>Label</label>
+                    <input type="text" name="label" value="${item.label}" placeholder="Link Text" required>
                 </div>
                 <div class="form-group">
-                    <label>Student Name</label>
-                    <input type="text" name="name" required>
+                    <label>URL / Path</label>
+                    <input type="text" name="href" value="${item.href}" placeholder="/pages/..." required>
                 </div>
-                <div class="form-group">
-                    <label>Score / Marks</label>
-                    <input type="text" name="score" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select name="type">
+                            <option value="link" ${item.type === 'link' ? 'selected' : ''}>Standard Link</option>
+                            <option value="dropdown" ${item.type === 'dropdown' ? 'selected' : ''}>Dropdown Menu</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Order</label>
+                        <input type="number" name="order" value="${item.order || 0}">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select name="status">
-                        <option value="Pass">Pass</option>
-                        <option value="Fail">Fail</option>
-                        <option value="Withheld">Withheld</option>
-                    </select>
+                <div class="form-check-group">
+                    <label class="check-container">
+                        Visible to all
+                        <input type="checkbox" name="visible" ${item.visible ? 'checked' : ''}>
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="check-container">
+                        Admin Only
+                        <input type="checkbox" name="adminOnly" ${item.adminOnly ? 'checked' : ''}>
+                        <span class="checkmark"></span>
+                    </label>
                 </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Add Result</button>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.admin-modal').remove()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Item</button>
                 </div>
             </form>
-        `;
+        </div >
+    `;
+    document.body.appendChild(modal);
 
-        modal.form.onsubmit = async (e) => {
-            e.preventDefault();
-            const data = Object.fromEntries(new FormData(e.target).entries());
-            data.examId = examId;
-            await ResultManager.addResult(data);
-            this.closeModal();
-            this.manageExamResults(examId);
-            this.showToast('✅ Result added');
-        };
-    },
+    modal.querySelector('form').onsubmit = (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalHtml = btn.innerHTML;
 
-    showImportCSVModal(examId) {
-        const modal = this.createModal('Import Results via CSV');
-        modal.body.innerHTML = `
-             <div class="admin-form">
-                <p>Paste CSV Data (Format: RegNo, Name, Score, Status)</p>
-                <textarea id="csv-input" rows="10" placeholder="1001, John Doe, 95%, Pass\n1002, Jane Smith, 88%, Pass"></textarea>
-                <div class="form-actions">
-                    <button id="process-import-btn" class="btn btn-primary">Process Import</button>
-                </div>
-             </div>
-        `;
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        data.visible = !!data.visible;
+        data.adminOnly = !!data.adminOnly;
+        data.order = parseInt(data.order) || 0;
 
-        document.getElementById('process-import-btn').onclick = async () => {
-            const text = document.getElementById('csv-input').value;
-            const count = await ResultManager.importResults(examId, text);
-            this.closeModal();
-            this.manageExamResults(examId);
-            this.showToast(`✅ Imported ${count} results`);
-        };
-    },
+        if (window.uiLock) window.uiLock(btn, true, originalHtml);
 
-    async deleteResult(id, examId) {
-        if (!confirm("Delete this result?")) return;
-        await ResultManager.deleteResult(id);
-        this.manageExamResults(examId);
-    },
+        try {
+            if (data.id) {
+                NavigationCMS.updateItem(data.id, data);
+            } else {
+                NavigationCMS.addItem(data);
+            }
+            modal.remove();
+            this.switchPanel('menu-manager');
+            this.showToast('Navigation updated! 🚀');
+        } catch (err) {
+            this.showToast('❌ Error saving menu: ' + err.message, 'danger');
+            if (window.uiLock) window.uiLock(btn, false, originalHtml);
+        }
+    };
+},
 
-    // --- Gallery & Site Settings (Simplified Reuse) ---
-    renderSiteSettings(container) {
-        // Reuse existing logic, but ensure it saves to localStorage 'mhm_site_settings'
-        // Copied from previous logic, ensuring it works
-        const settings = JSON.parse(localStorage.getItem('mhm_site_settings')) || {
-            siteName: 'MIFTHAHUL HUDA MADRASA',
-            siteDescription: 'Empowering students through knowledge.',
-            contactPhone: '+91 6235989198'
-        };
+deleteMenuItem(id) {
+    if (confirm('Delete this menu item?')) {
+        NavigationCMS.deleteItem(id);
+        this.switchPanel('menu-manager');
+        this.showToast('Item removed 🗑️');
+    }
+},
+
+toggleMenu(id) {
+    NavigationCMS.toggleVisibility(id);
+    this.showToast('Visibility toggled 👁️');
+},
+
+    renderFeeSubmissions(container) {
+        const fees = StorageManager.get('fee_submissions', []);
         container.innerHTML = `
-            <div class="admin-card">
-                <h2>Site Settings</h2>
-                <form id="settings-form">
-                    <div class="form-group"><label>Site Name</label><input name="siteName" value="${settings.siteName}"></div>
-                    <button type="submit" class="btn btn-primary">Save</button>
+    < div class="admin-card" >
+                <div class="card-header-flex">
+                    <h2><i class="ph ph-receipt"></i> Fee Submissions</h2>
+                    <p>Total: ${fees.length} student records found.</p>
+                </div>
+                <div class="fees-list-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-top:25px;">
+                    ${fees.length === 0 ? '<p style="color:#666; grid-column:1/-1; text-align:center;">No submissions yet.</p>' : ''}
+                    ${fees.reverse().map(f => `
+                        <div class="fee-item-card glass-mhm" style="padding:20px; border-radius:15px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.02)">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                                <span class="badge ${f.status === 'pending' ? 'warning' : 'success'}">${f.status.toUpperCase()}</span>
+                                <span style="font-size:0.8rem; color:#555">${new Date(f.timestamp).toLocaleDateString()}</span>
+                            </div>
+                            <h4 style="margin-bottom:5px;">${f.student}</h4>
+                            <p style="font-size:0.85rem; color:#888;">Reg: ${f.regNo} | Class: ${f.class} | Month: ${f.month}</p>
+                            <div style="margin: 15px 0; padding:10px; background:rgba(255,255,255,0.03); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:700; color:var(--primary-color)">₹${f.amount}</span>
+                                <button class="btn btn-icon" onclick="AdminLogic.viewReceipt('${f.receipt}')"><i class="ph ph-eye"></i> View</button>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn btn-primary" style="flex:1; padding:8px;" onclick="AdminLogic.updateFeeStatus('${f.id}', 'verified')">Approve</button>
+                                <button class="btn btn-secondary" style="flex:1; padding:8px; border-color:#ff4757; color:#ff4757" onclick="AdminLogic.deleteFee('${f.id}')">Delete</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div >
+    `;
+    },
+
+    viewReceipt(dataUrl) {
+        const win = window.open();
+        win.document.write(`< img src = "${dataUrl}" style = "max-width:100%" > `);
+    },
+
+    updateFeeStatus(id, status) {
+        const fees = StorageManager.get('fee_submissions', []);
+        const idx = fees.findIndex(f => f.id === id);
+        if (idx !== -1) {
+            fees[idx].status = status;
+            StorageManager.set('fee_submissions', fees);
+            this.showToast('✅ Status updated!');
+            this.switchPanel('fee-submissions');
+        }
+    },
+
+    deleteFee(id) {
+        if (!confirm('Are you sure you want to delete this record?')) return;
+        StorageManager.delete('fee_submissions', f => f.id === id);
+        this.showToast('🗑️ Record deleted');
+        this.switchPanel('fee-submissions');
+    },
+
+    renderThemeSettings(container) {
+        const theme = StorageManager.get('theme_config', { primary: '#00f3ff', secondary: '#bc13fe' });
+        container.innerHTML = `
+    < div class="admin-card" >
+                <h2><i class="ph ph-palette"></i> Theme Customization</h2>
+                <form id="theme-form" class="admin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Primary Brand Color</label>
+                            <input type="color" name="primary" value="${theme.primary}">
+                        </div>
+                        <div class="form-group">
+                            <label>Secondary Accent</label>
+                            <input type="color" name="secondary" value="${theme.secondary}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Apply Theme</button>
                 </form>
-            </div>
-        `;
+            </div >
+    `;
+
+        document.getElementById('theme-form').onsubmit = (e) => {
+            e.preventDefault();
+            const config = Object.fromEntries(new FormData(e.target).entries());
+            StorageManager.set('theme_config', config);
+            document.documentElement.style.setProperty('--primary-color', config.primary);
+            document.documentElement.style.setProperty('--secondary-color', config.secondary);
+            this.showToast('✨ Theme updated instantly!');
+        };
+    },
+
+    renderSiteSettings(container) {
+        const settings = StorageManager.get('site_settings', {
+            siteName: 'MIFTHAHUL HUDA 2026',
+            description: 'Educational Excellence'
+        });
+        container.innerHTML = `
+    < div class="admin-card" >
+                <h2><i class="ph ph-gear"></i> Page Settings</h2>
+                <form id="settings-form" class="admin-form">
+                    <div class="form-group">
+                        <label>Site Title</label>
+                        <input type="text" name="siteName" value="${settings.siteName}">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description">${settings.description}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Config</button>
+                </form>
+            </div >
+    `;
         document.getElementById('settings-form').onsubmit = (e) => {
             e.preventDefault();
             const data = Object.fromEntries(new FormData(e.target).entries());
-            localStorage.setItem('mhm_site_settings', JSON.stringify({ ...settings, ...data }));
-            this.showToast('Settings saved');
+            StorageManager.set('site_settings', data);
+            this.showToast('✅ Configuration saved!');
         };
     },
 
-    // --- Gallery Manager ---
-    async renderGalleryAdmin(container) {
-        container.innerHTML = `
-            <div class="admin-card">
-                 <div class="card-header-flex">
-                    <div>
-                        <h2><i class="ph ph-image"></i> Gallery Management</h2>
-                        <p>Manage photos and videos for the site gallery.</p>
-                    </div>
-                    <button class="btn btn-primary" id="add-gallery-btn"><i class="ph ph-plus"></i> Add Media</button>
-                </div>
-                <div id="gallery-admin-list" class="gallery-grid">
-                    <div class="loading">Loading gallery...</div>
-                </div>
-            </div>
-        `;
 
-        const items = await GalleryManager.getAll();
-        const listContainer = document.getElementById('gallery-admin-list');
-
-        if (items.length === 0) {
-            listContainer.innerHTML = '<div class="empty-state">No items in gallery.</div>';
-        } else {
-            listContainer.innerHTML = items.map(item => `
-                <div class="gallery-item-card">
-                    <div class="media-wrapper">
-                        ${item.type === 'video'
-                    ? `<video src="${item.src}" controls></video>`
-                    : `<img src="${item.src}" alt="${item.caption || 'Gallery Image'}" loading="lazy">`
-                }
-                    </div>
-                    <div class="caption">${item.caption || 'No Caption'}</div>
-                    <button onclick="AdminLogic.deleteGalleryItem('${item.id}')" class="delete-btn"><i class="ph ph-trash"></i></button>
-                </div>
-            `).join('');
-        }
-
-        document.getElementById('add-gallery-btn').onclick = () => this.showGalleryModal();
-    },
-
-    showGalleryModal() {
-        const modal = this.createModal('Add to Gallery');
-        modal.body.innerHTML = `
-            <form id="add-gallery-form" class="admin-form">
-                <div class="form-group">
-                    <label>Caption</label>
-                    <input type="text" name="caption" placeholder="Short description...">
-                </div>
-                <div class="form-group">
-                    <label>Media File</label>
-                    <input type="file" id="gallery-file-input" accept="image/*,video/*" required>
-                    <div id="gallery-preview" class="media-preview-box"></div>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Upload & Save</button>
-                </div>
-            </form>
-        `;
-
-        let uploadedFile = null;
-        document.getElementById('gallery-file-input').onchange = async (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                try {
-                    if (file.type.startsWith('image/')) {
-                        const src = await AdminMedia.handleImageUpload(file, document.getElementById('gallery-preview'));
-                        uploadedFile = { src, type: 'image' };
-                    } else if (file.type.startsWith('video/')) {
-                        // Note: AdminMedia might need adjustment for pure local if not using Blob logic for persistence
-                        // But for now assuming AdminMedia returns proper src
-                        // We used URL.createObjectURL in AdminMedia, which is session-only.
-                        // But wait, my MediaOptimizer in modules/media.js handles persistence with Base64 for small videos.
-                        // AdminLogic imports AdminMedia.js. I should check AdminMedia.js to see if it uses MediaOptimizer correctly.
-                        // Let's assume AdminMedia.handleVideoUpload returns a file/blob, we need to convert it for storage if we want persistence.
-
-                        // Re-implementing logic here to be safe and use local MediaOptimizer directly if needed,
-                        // OR just trust AdminMedia returns a blob url which warns user.
-                        // For true "local json" site, video persistence is hard. 
-                        // Let's use the modules/media.js logic here explicitly for robust local handling.
-
-                        const { MediaOptimizer } = await import('./modules/media.js');
-                        const result = await MediaOptimizer.processVideo(file);
-
-                        if (result.src) {
-                            // Preview it
-                            const container = document.getElementById('gallery-preview');
-                            container.innerHTML = `<video src="${result.src}" controls style="max-width:100%"></video>`;
-                            if (result.warning) this.showToast(result.warning, 'warning');
-                            uploadedFile = { src: result.src, type: 'video' };
-                        }
-                    }
-                } catch (err) {
-                    this.showToast(err, 'error');
-                }
-            }
+    // 5. Utility Functions
+    updateStats() {
+        const stats = {
+            services: ServicesCMS.getAll().length,
+            results: GoogleSheetsFetcher.getCachedResults().length,
+            fees: StorageManager.get('fee_submissions', []).length,
+            storage: (JSON.stringify(localStorage).length / 1024).toFixed(1) + ' KB'
         };
 
-        modal.form.onsubmit = async (e) => {
-            e.preventDefault();
-            if (!uploadedFile) {
-                this.showToast('Please upload a file first', 'error');
-                return;
-            }
-
-            const data = {
-                caption: e.target.caption.value,
-                src: uploadedFile.src,
-                type: uploadedFile.type
-            };
-
-            try {
-                await GalleryManager.add(data);
-                this.closeModal();
-                this.renderGalleryAdmin(document.getElementById('admin-panel-container'));
-                this.showToast('✅ Added to Gallery');
-            } catch (err) {
-                // Quota check
-                this.showToast('Failed to save. storage full?', 'error');
-            }
+        const updateVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = val;
         };
-    },
 
-    async deleteGalleryItem(id) {
-        if (!confirm("Remove this item?")) return;
-        await GalleryManager.delete(id);
-        this.renderGalleryAdmin(document.getElementById('admin-panel-container'));
-        this.showToast('🗑️ Item removed');
-    },
-
-    // --- Utilities ---
-    createModal(title) {
-        // Remove existing
-        const existing = document.querySelector('.admin-modal-overlay');
-        if (existing) existing.remove();
-
-        // Create new
-        const overlay = document.createElement('div');
-        overlay.className = 'admin-modal-overlay active';
-        overlay.innerHTML = `
-            <div class="admin-modal animate-scale-in">
-                <div class="modal-header">
-                    <h3>${title}</h3>
-                    <button class="modal-close"><i class="ph ph-x"></i></button>
-                </div>
-                <div class="modal-body"></div>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-
-        const close = () => overlay.remove();
-        overlay.querySelector('.modal-close').onclick = close;
-        overlay.onclick = (e) => { if (e.target === overlay) close(); };
-
-        return {
-            body: overlay.querySelector('.modal-body'),
-            close: close,
-            form: null // To be assigned
-        };
-    },
-
-    closeModal() {
-        const existing = document.querySelector('.admin-modal-overlay');
-        if (existing) existing.remove();
-    },
-
-    showToast(msg, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `admin-toast ${type}`;
-        toast.innerText = msg;
-        document.getElementById('admin-toast-container').appendChild(toast);
-        setTimeout(() => toast.classList.add('visible'), 10);
-        setTimeout(() => { toast.remove(); }, 3000);
-    },
-
-    applyStyles() {
-        // Reuse global styles
+        updateVal('stat-services-count', stats.services);
+        updateVal('stat-results-count', stats.results);
+        updateVal('stat-fees-count', stats.fees);
+        updateVal('stat-storage-usage', stats.storage);
     },
 
     bindEvents() {
-        // Logout
-        const logout = document.getElementById('admin-logout');
-        if (logout) {
-            logout.onclick = () => {
-                if (typeof AdminAuth !== 'undefined') AdminAuth.logout(); // Wait, AdminAuth might have different method signature
-                // Actually AdminAuth in admin-auth.js binds the logout button itself?
-                // In my refactored admin-auth.js, I bound it.
-                // But AdminLogic often overrides it.
-                // Let's use Auth.logout() directly if needed.
-                import('./core/auth.js').then(m => m.Auth.logout());
+        // Nav Links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.onclick = (e) => {
+                e.preventDefault();
+                this.switchPanel(link.dataset.panel);
             };
-        }
+        });
+
+        // Toggle Sidebar
+        const toggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('admin-sidebar');
+        if (toggle && sidebar) toggle.onclick = () => sidebar.classList.toggle('visible');
+
+        // Logout
+        document.getElementById('admin-logout').onclick = () => LocalAuth.logout();
+    },
+
+    loadPanelFromUrl() {
+        const hash = window.location.hash.substring(1) || 'dashboard';
+        this.switchPanel(hash);
+    },
+
+    showToast(message, type = 'success') {
+        const container = document.getElementById('admin-toast-container');
+        const toast = document.createElement('div');
+        toast.className = \`admin-toast \${type}\`;
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('visible'), 10);
+        setTimeout(() => {
+            toast.classList.remove('visible');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    },
+
+    // 10. Security & PIN Management
+    renderSecuritySettings(container) {
+        container.innerHTML = `
+    < div class="admin-card animate-fade-in" style = "max-width: 600px; margin: 0 auto;" >
+                <div class="card-header-flex">
+                    <div>
+                        <h2><i class="ph ph-shield-check"></i> Security Settings</h2>
+                        <p>Protect your dashboard by managing your access PIN.</p>
+                    </div>
+                </div>
+
+                <div class="security-form-container glass-mhm" style="padding: 30px; border-radius: 20px;">
+                    <form id="change-pin-form">
+                        <div class="form-group">
+                            <label>Current PIN</label>
+                            <input type="password" name="currentPin" maxlength="4" placeholder="••••" required>
+                            <small>Required to verify your identity</small>
+                        </div>
+                        <div class="form-divider" style="margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.05);"></div>
+                        <div class="form-group">
+                            <label>New 4-Digit PIN</label>
+                            <input type="password" name="newPin" maxlength="4" placeholder="••••" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New PIN</label>
+                            <input type="password" name="confirmPin" maxlength="4" placeholder="••••" required>
+                        </div>
+                        
+                        <div class="form-actions" style="margin-top: 30px;">
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i class="ph ph-check"></i> Update Access PIN
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="security-info" style="margin-top: 30px; padding: 20px; background: rgba(0,243,255,0.05); border-radius: 12px; border: 1px dashed rgba(0,243,255,0.2);">
+                    <p style="font-size: 0.85rem; color: #888; margin: 0;">
+                        <i class="ph ph-info" style="color: var(--primary-color);"></i>
+                        <b>Security Tip:</b> Avoid using simple patterns like "1234" or "0000". Your PIN is stored as a secure SHA-256 hash locally.
+                    </p>
+                </div>
+            </div >
+    `;
+
+        const form = document.getElementById('change-pin-form');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target).entries());
+
+            if (data.newPin.length !== 4) {
+                this.showToast('❌ PIN must be exactly 4 digits.', 'danger');
+                return;
+            }
+
+            if (data.newPin !== data.confirmPin) {
+                this.showToast('❌ New PINs do not match.', 'danger');
+                return;
+            }
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Updating...';
+            btn.disabled = true;
+
+            try {
+                await LocalAuth.changePin(data.currentPin, data.newPin);
+                this.showToast('✅ Security PIN updated successfully! 🚀');
+                e.target.reset();
+            } catch (err) {
+                this.showToast(`❌ ${ err.message } `, 'danger');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+    },
+
+    applyStyles() {
+        const style = document.createElement('style');
+        style.innerHTML = `
+            :root {
+    --sidebar - width: 280px;
+    --sidebar - bg: #0a0a0a;
+    --main - bg: #050505;
+    --card - bg: rgba(255, 255, 255, 0.03);
+    --glass - border: rgba(255, 255, 255, 0.1);
+}
+
+            .admin - wrapper { display: flex; min - height: 100vh; background: var(--main - bg); color: #fff; font - family: 'Outfit', sans - serif; }
+            .admin - sidebar { width: var(--sidebar - width); background: var(--sidebar - bg); border - right: 1px solid var(--glass - border); display: flex; flex - direction: column; transition: 0.3s; z - index: 100; }
+            .sidebar - header { padding: 40px; text - align: center; font - size: 1.5rem; font - weight: 800; }
+            .sidebar - nav { flex: 1; padding: 0 20px; }
+            .sidebar - nav ul { list - style: none; padding: 0; }
+            .nav - link { display: flex; align - items: center; gap: 12px; padding: 12px 20px; color: #888; text - decoration: none; border - radius: 12px; margin - bottom: 5px; cursor: pointer; transition: 0.3s; }
+            .nav - link: hover, .nav - link.active { background: rgba(var(--primary - color), 0.1); color: var(--primary - color); }
+            .nav - divider { padding: 25px 20px 10px; font - size: 0.7rem; color: #444; letter - spacing: 1px; font - weight: 800; }
+            
+            .admin - main { flex: 1; display: flex; flex - direction: column; }
+            .admin - header { height: 80px; border - bottom: 1px solid var(--glass - border); display: flex; align - items: center; justify - content: space - between; padding: 0 40px; }
+            .admin - content { padding: 40px; flex: 1; overflow - y: auto; }
+
+            .dashboard - stats - grid { display: grid; grid - template - columns: repeat(auto - fit, minmax(260px, 1fr)); gap: 30px; margin - bottom: 40px; }
+            .stat - card { background: var(--card - bg); border: 1px solid var(--glass - border); padding: 30px; border - radius: 25px; display: flex; align - items: center; gap: 20px; }
+            .stat - icon { font - size: 2rem; color: var(--primary - color); }
+            .stat - value { font - size: 2.2rem; font - weight: 700; }
+            
+            .admin - card { background: var(--card - bg); border: 1px solid var(--glass - border); padding: 35px; border - radius: 30px; margin - bottom: 30px; }
+            .services - admin - grid { display: grid; grid - template - columns: repeat(auto - fill, minmax(280px, 1fr)); gap: 25px; margin - top: 30px; }
+            .service - admin - card { padding: 25px; border - radius: 20px; text - align: center; border: 1px solid var(--glass - border); background: rgba(255, 255, 255, 0.02); }
+            .card - icon { font - size: 2.5rem; color: var(--primary - color); margin - bottom: 20px; display: block; }
+            
+            .btn { padding: 12px 25px; border - radius: 12px; cursor: pointer; font - weight: 600; border: none; transition: 0.3s; }
+            .btn - primary { background: var(--primary - color); color: #000; }
+            .btn - primary:hover { transform: translateY(-2px); box - shadow: 0 5px 15px rgba(0, 243, 255, 0.4); }
+
+#admin - toast - container { position: fixed; bottom: 30px; right: 30px; }
+            .admin - toast { background: #2ed573; padding: 15px 30px; border - radius: 15px; transform: translateX(120 %); transition: 0.4s; font - weight: 700; color: #000; }
+            .admin - toast.visible { transform: translateX(0); }
+            
+            .form - group { margin - bottom: 20px; }
+            .form - group label { display: block; margin - bottom: 10px; color: #888; }
+            .form - group input, .form - group textarea { width: 100 %; padding: 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass - border); border - radius: 12px; color: #fff; }
+`;
+        document.head.appendChild(style);
     }
 };
 
-window.AdminLogic = AdminLogic;
+// Auto-Launch
 document.addEventListener('DOMContentLoaded', () => AdminLogic.init());
+window.AdminLogic = AdminLogic;
+export default AdminLogic;

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Meelad Result Portal | MIFTHAHUL HUDA MADRASA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --primary-color: #ffd700;
+            /* Gold for Meelad */
+            --secondary-color: #00ff88;
+            --accent-color: #ff00c1;
+            --bg-color: #050505;
+            --text-color: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-gradient: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(0, 255, 136, 0.1) 100%);
+            --glow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Elements */
+        .bg-blob {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.15;
+            animation: move 20s infinite alternate;
+        }
+
+        .blob1 {
+            background: var(--primary-color);
+            top: -100px;
+            left: -100px;
+        }
+
+        .blob2 {
+            background: var(--secondary-color);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -10s;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(100px, 100px);
+            }
+        }
+
+        .portal-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: slideDown 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .sub {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .search-section {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 18px 25px;
+            color: #fff;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-search {
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            border-radius: 15px;
+            padding: 0 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .coming-soon-badge {
+            display: block;
+            text-align: center;
+            margin-top: 50px;
+            padding: 40px;
+            border: 2px dashed var(--glass-border);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .coming-soon-badge i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .coming-soon-badge h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .coming-soon-badge p {
+            color: #666;
+        }
+
+        .nav-back {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+        }
+
+        .btn-back {
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover {
+            color: #fff;
+        }
+
+        @media (max-width: 480px) {
+            .portal-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .input-wrapper {
+                flex-direction: column;
+            }
+
+            .btn-search {
+                padding: 18px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blob blob1"></div>
+    <div class="bg-blob blob2"></div>
+
+    <div class="portal-container">
+        <div class="nav-back">
+            <a href="index.html" class="btn-back"><i class="ph ph-arrow-left"></i> Home</a>
+        </div>
+
+        <div class="header">
+            <div class="logo-badge">
+                <i class="ph ph-star-four"></i> Meelad Celebration 2026
+            </div>
+            <h1>Meelad Competition</h1>
+            <p class="sub">View individual and group performance results</p>
+        </div>
+
+        <div class="search-section">
+            <div class="input-wrapper">
+                <input type="text" id="regno" placeholder="Enter Chest No / Register ID" autocomplete="off">
+                <button onclick="alert('Meelad results are being processed. Please check back later!')"
+                    class="btn-search">View Result</button>
+            </div>
+        </div>
+
+        <div class="coming-soon-badge">
+            <i class="ph ph-hourglass-high"></i>
+            <h2>Results Coming Soon!</h2>
+            <p>The Meelad results are currently being compiled and reviewed by the committee. They will be published
+                here shortly.</p>
+        </div>
+
+        <footer
+            style="margin-top: 40px; text-align: center; color: #555; font-size: 0.8rem; border-top: 1px solid var(--glass-border); padding-top: 20px;">
+            &copy; 2026 MIFTHAHUL HUDA MADRASA. Official Results Portal.
+        </footer>
+    </div>
+</body>
+
+</html>

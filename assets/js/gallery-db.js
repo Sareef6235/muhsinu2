@@ -1,92 +1,81 @@
 /**
- * Gallery Database Layer - Firestore Implementation
+ * Gallery & Navigation Database Layer
+ * Zero Firebase - Pure IndexedDB implementation
  */
-
-import { db } from './firebase-config.js';
-import {
-    collection,
-    addDoc,
-    getDocs,
-    getDoc,
-    setDoc,
-    deleteDoc,
-    doc,
-    query,
-    orderBy,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 class GalleryDB {
     constructor() {
-        this.COLLECTION = 'gallery';
+        this.dbName = 'GalleryUltraDB';
+        this.dbVersion = 1;
+        this.db = null;
     }
 
     async init() {
-        console.log('📁 Gallery Firestore Layer Ready');
-        return true;
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.dbName, this.dbVersion);
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+
+                // Media Store
+                if (!db.objectStoreNames.contains('media')) {
+                    db.createObjectStore('media', { keyPath: 'id', autoIncrement: true });
+                }
+
+                // Settings Store
+                if (!db.objectStoreNames.contains('settings')) {
+                    db.createObjectStore('settings', { keyPath: 'key' });
+                }
+            };
+
+            request.onsuccess = (event) => {
+                this.db = event.target.result;
+                resolve(this.db);
+            };
+
+            request.onerror = (event) => {
+                console.error('IndexedDB Error:', event.target.error);
+                reject(event.target.error);
+            };
+        });
     }
 
     // --- Media Operations ---
     async addMedia(item) {
-        try {
-            const data = {
-                ...item,
-                createdAt: serverTimestamp()
-            };
-            const docRef = await addDoc(collection(db, this.COLLECTION), data);
-            return docRef.id;
-        } catch (e) {
-            console.error("Error adding media:", e);
-            throw e;
-        }
+        return this._execute('media', 'readwrite', (store) => store.add(item));
     }
 
     async getAllMedia() {
-        try {
-            const q = query(collection(db, this.COLLECTION), orderBy("createdAt", "desc"));
-            const snapshot = await getDocs(q);
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        } catch (e) {
-            console.error("Error fetching media:", e);
-            return [];
-        }
+        return this._execute('media', 'readonly', (store) => store.getAll());
     }
 
     async deleteMedia(id) {
-        try {
-            await deleteDoc(doc(db, this.COLLECTION, id));
-            return true;
-        } catch (e) {
-            console.error("Error deleting media:", e);
-            throw e;
-        }
+        return this._execute('media', 'readwrite', (store) => store.delete(id));
     }
 
     // --- Settings Operations ---
     async saveSetting(key, value) {
-        try {
-            await setDoc(doc(db, 'settings', key), { value, updatedAt: serverTimestamp() });
-            return true;
-        } catch (e) {
-            console.error("Error saving setting:", e);
-            throw e;
-        }
+        return this._execute('settings', 'readwrite', (store) => store.put({ key, value }));
     }
 
     async getSetting(key) {
-        try {
-            const docSnap = await getDoc(doc(db, 'settings', key));
-            return docSnap.exists() ? docSnap.data().value : null;
-        } catch (e) {
-            console.error("Error fetching setting:", e);
-            return null;
-        }
+        const result = await this._execute('settings', 'readonly', (store) => store.get(key));
+        return result ? result.value : null;
+    }
+
+    // Helper to execute transactions
+    _execute(storeName, mode, callback) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(storeName, mode);
+            const store = transaction.objectStore(storeName);
+            const request = callback(store);
+
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
     }
 }
 
 // Global DB instance
 window.galleryDB = new GalleryDB();
-window.galleryDB.init();
-
-export { GalleryDB };
-export const galleryDB = window.galleryDB;
+window.galleryDB.init().then(() => console.log('📁 GalleryDB Initialized'));

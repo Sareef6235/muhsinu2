@@ -1,0 +1,382 @@
+/* ============================================
+   DASHBOARD PANEL STYLES - SCSS VERSION
+   Modern, Clean, Professional UI/UX
+   With nested selectors and mixins for easier maintenance
+   ============================================ */
+
+// ============================================
+// VARIABLES - Easy Theme Customization
+// ============================================
+
+// Light Mode Colors
+$bg-primary-light: #f9fafb;
+$bg-secondary-light: #ffffff;
+$bg-elevated-light: #ffffff;
+
+$text-primary-light: #111827;
+$text-secondary-light: #6b7280;
+$text-muted-light: #9ca3af;
+
+// Dark Mode Colors
+$bg-primary-dark: #0f172a;
+$bg-secondary-dark: #1e293b;
+$bg-elevated-dark: #334155;
+
+$text-primary-dark: #f1f5f9;
+$text-secondary-dark: #cbd5e1;
+$text-muted-dark: #94a3b8;
+
+// Accent Colors
+$accent-primary: #4f46e5;
+$accent-hover: #4338ca;
+$accent-active: #3730a3;
+
+// Border & Radius
+$border-color-light: #e5e7eb;
+$border-color-dark: #334155;
+$border-radius-sm: 8px;
+$border-radius-md: 12px;
+$border-radius-lg: 16px;
+
+// Shadows
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+// Dark mode shadows
+$shadow-sm-dark: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+$shadow-md-dark: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+$shadow-lg-dark: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+$shadow-xl-dark: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+
+// Transitions
+$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+// ============================================
+// MIXINS
+// ============================================
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@mixin card-elevated {
+    background: var(--bg-elevated);
+    border-radius: $border-radius-md;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+}
+
+@mixin smooth-transition($properties: all) {
+    transition: $properties $transition-base;
+}
+
+@mixin hover-lift {
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+}
+
+// ============================================
+// ROOT VARIABLES
+// ============================================
+
+:root {
+    --bg-primary: #{$bg-primary-light};
+    --bg-secondary: #{$bg-secondary-light};
+    --bg-elevated: #{$bg-elevated-light};
+
+    --text-primary: #{$text-primary-light};
+    --text-secondary: #{$text-secondary-light};
+    --text-muted: #{$text-muted-light};
+
+    --accent-primary: #{$accent-primary};
+    --accent-hover: #{$accent-hover};
+    --accent-active: #{$accent-active};
+
+    --border-color: #{$border-color-light};
+
+    --shadow-sm: #{$shadow-sm};
+    --shadow-md: #{$shadow-md};
+    --shadow-lg: #{$shadow-lg};
+    --shadow-xl: #{$shadow-xl};
+}
+
+[data-theme="dark"],
+.dark-mode {
+    --bg-primary: #{$bg-primary-dark};
+    --bg-secondary: #{$bg-secondary-dark};
+    --bg-elevated: #{$bg-elevated-dark};
+
+    --text-primary: #{$text-primary-dark};
+    --text-secondary: #{$text-secondary-dark};
+    --text-muted: #{$text-muted-dark};
+
+    --border-color: #{$border-color-dark};
+
+    --shadow-sm: #{$shadow-sm-dark};
+    --shadow-md: #{$shadow-md-dark};
+    --shadow-lg: #{$shadow-lg-dark};
+    --shadow-xl: #{$shadow-xl-dark};
+}
+
+// ============================================
+// PANEL HEADER
+// ============================================
+
+.panel-header {
+    @include flex-between;
+    @include card-elevated;
+    @include smooth-transition;
+    margin-bottom: 24px;
+    padding: 20px 24px;
+
+    &:hover {
+        box-shadow: var(--shadow-lg);
+    }
+
+    h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+    }
+
+    button.nav-item {
+        @extend %button-primary;
+    }
+}
+
+// ============================================
+// BUTTON STYLES
+// ============================================
+
+%button-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #ffffff;
+    background: linear-gradient(135deg, $accent-primary 0%, $accent-hover 100%);
+    border: none;
+    border-radius: $border-radius-sm;
+    box-shadow: $shadow-sm;
+    cursor: pointer;
+    transition: all $transition-base;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+        background: linear-gradient(135deg, $accent-hover 0%, $accent-active 100%);
+        box-shadow: $shadow-md;
+        transform: translateY(-2px);
+
+        i {
+            transform: scale(1.1);
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: $shadow-sm;
+
+        &::before {
+            width: 300px;
+            height: 300px;
+        }
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($accent-primary, 0.3);
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width $transition-fast, height $transition-fast;
+    }
+
+    i {
+        font-size: 1.1rem;
+        transition: transform $transition-base;
+    }
+}
+
+button.panel-action-btn {
+    @extend %button-primary;
+}
+
+// ============================================
+// SIDEBAR NAVIGATION
+// ============================================
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: $border-radius-md;
+    box-shadow: $shadow-sm;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-left: 3px solid transparent;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    transition: all $transition-base;
+    position: relative;
+
+    i {
+        font-size: 1.25rem;
+        transition: transform $transition-base;
+    }
+
+    &:hover {
+        color: var(--text-primary);
+        background: var(--bg-primary);
+        border-left-color: var(--accent-primary);
+        padding-left: 20px;
+
+        i {
+            transform: scale(1.1);
+        }
+    }
+
+    &.active {
+        color: var(--accent-primary);
+        background: linear-gradient(90deg, rgba($accent-primary, 0.1) 0%, transparent 100%);
+        border-left-color: var(--accent-primary);
+        font-weight: 600;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--accent-primary);
+            box-shadow: 0 0 8px var(--accent-primary);
+        }
+
+        i {
+            transform: scale(1.1);
+        }
+    }
+}
+
+// ============================================
+// RESPONSIVE DESIGN
+// ============================================
+
+@media (max-width: 768px) {
+    .panel-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+        padding: 16px;
+
+        h3 {
+            font-size: 1.25rem;
+            text-align: center;
+        }
+
+        button.nav-item {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .sidebar-nav {
+        padding: 12px;
+    }
+
+    .nav-item {
+        padding: 10px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .panel-header {
+        margin-bottom: 16px;
+        padding: 12px;
+
+        h3 {
+            font-size: 1.1rem;
+        }
+
+        button.nav-item {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+        }
+    }
+
+    .nav-item {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+}
+
+// ============================================
+// UTILITY CLASSES
+// ============================================
+
+.dashboard-panel {
+    background: var(--bg-secondary);
+    border-radius: $border-radius-lg;
+    padding: 24px;
+    box-shadow: $shadow-md;
+    border: 1px solid var(--border-color);
+}
+
+.card-flat {
+    box-shadow: none;
+    border: 1px solid var(--border-color);
+}
+
+.card-elevated {
+    box-shadow: var(--shadow-lg);
+}
+
+.card-floating {
+    box-shadow: var(--shadow-xl);
+}
+
+*:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}

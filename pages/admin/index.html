@@ -4,137 +4,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MHMV | Admin Login</title>
+    <title>Admin Login | MIFTHAHUL HUDA</title>
     <link rel="stylesheet" href="../../assets/css/styles.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Config Local Auth -->
-    <script type="module" src="../../assets/js/core/auth.js"></script>
-    <script type="module" src="../../assets/js/admin-auth.js"></script>
-</head>
-
-<body class="admin-login-body">
-
-    <div class="login-container animate-fade-in-up">
-        <div class="login-header">
-            <div class="logo">MHMV</div>
-            <h2>Admin Portal</h2>
-            <p>Secure Access Area</p>
-        </div>
-
-        <form id="admin-login-form" class="login-form">
-            <div class="form-group">
-                <label><i class="ph ph-envelope"></i> Email Address</label>
-                <input type="email" id="admin-email" placeholder="admin@mhmv.org" required>
-            </div>
-            <div class="form-group">
-                <label><i class="ph ph-lock"></i> Password</label>
-                <input type="password" id="admin-password" placeholder="••••••••" required>
-            </div>
-            <div id="login-error" class="error-msg"
-                style="display:none; color:red; margin-bottom:15px; font-size:0.9rem;"></div>
-
-            <button type="submit" class="btn btn-primary btn-block btn-lg">
-                <i class="ph ph-sign-in"></i> Access Dashboard
-            </button>
-        </form>
-
-        <div class="login-footer">
-            <a href="../../index.html" class="back-link"><i class="ph ph-arrow-left"></i> Back to Website</a>
-        </div>
-    </div>
-
     <style>
-        .admin-login-body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        body {
+            background-color: #050505;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
         }
 
-        .login-container {
-            width: 100%;
-            max-width: 400px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        .login-card {
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 50px 40px;
             text-align: center;
+            max-width: 450px;
+            width: 100%;
         }
 
-        .logo {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            display: inline-block;
-        }
-
-        .login-header h2 {
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .login-header p {
-            color: #666;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            text-align: left;
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
             margin-bottom: 20px;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #444;
-        }
-
-        .form-group input {
+        .btn-login {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border 0.3s;
-        }
-
-        .form-group input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-
-        .btn-block {
-            width: 100%;
-        }
-
-        .btn-lg {
-            padding: 14px;
-            font-size: 1.1rem;
-        }
-
-        .login-footer {
-            margin-top: 30px;
-        }
-
-        .back-link {
-            color: #666;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s;
-        }
-
-        .back-link:hover {
-            color: var(--primary-color);
+            padding: 16px;
+            background: #00f3ff;
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
         }
     </style>
+</head>
 
+<body>
+    <div class="login-card animate-fade-up">
+        <h1 style="color: #fff; margin-bottom: 30px;">Admin Access</h1>
+        <form id="loginForm">
+            <input type="password" id="admin-pin" class="login-input" placeholder="Enter Access PIN" required
+                maxlength="4">
+            <button type="submit" class="btn-login" id="login-btn">Login to Dashboard</button>
+            <p id="error-msg" style="color: #ff4d4d; margin-top: 15px; display: none; font-size: 0.9rem;"></p>
+        </form>
+    </div>
+
+    <script type="module">
+        import LocalAuth from '../../assets/js/local-auth.js';
+
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('login-btn');
+        const errorMsg = document.getElementById('error-msg');
+
+        async function initAuth() {
+            // Initial PIN if not set (Default: 2026)
+            await LocalAuth.init('2026');
+
+            // Auto-redirect if already logged in
+            if (LocalAuth.isAuthenticated()) {
+                window.location.href = 'dashboard.html';
+            }
+        }
+
+        initAuth();
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            errorMsg.style.display = 'none';
+            loginBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Authenticating...';
+            loginBtn.disabled = true;
+
+            const pin = document.getElementById('admin-pin').value;
+
+            try {
+                // Hashing + Validation
+                const success = await LocalAuth.login(pin);
+
+                if (success) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    throw new Error('Invalid PIN');
+                }
+            } catch (err) {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = '⚠️ Invalid Access PIN. Please try again.';
+                loginBtn.innerHTML = 'Login to Dashboard';
+                loginBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 
 </html>

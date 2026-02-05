@@ -206,19 +206,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 config[id] = { visible: cb.checked, label };
             });
 
-            try {
-                if (window.galleryDB) {
-                    await window.galleryDB.saveSetting('menu_config', config);
-                    // Instead of alert and full reload, we can just refresh the menu rows
-                    // and potentially show a toast notification if a toast system exists.
-                    // For now, we'll just refresh the rows.
-                    alert('✅ Menu settings saved!'); // Keeping alert for now as no toast system is defined
-                    loadCurrentMenuSettings(); // Refresh the menu rows
-                }
-            } catch (e) {
-                console.error("Save menu config error:", e);
-                alert('❌ Failed to save menu settings.'); // Keeping alert for now
-            }
+            await window.galleryDB.saveSetting('menu_config', config);
+            alert('✅ Menu settings saved!');
+            location.reload();
         };
     }
 

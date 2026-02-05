@@ -19,34 +19,6 @@
     transition: all 0.3s ease;
 }
 
-/* ============================================
-   SINGLE INSTANCE CONTROL
-   Only ONE switcher appears per page
-   ============================================ */
-
-/* Hide all switchers by default */
-.site-lang-switcher {
-    display: none;
-}
-
-/* Show ONLY in header (top placement) */
-header#main-header .site-lang-switcher:first-of-type {
-    display: inline-flex;
-}
-
-/* Prevent switchers in sections (force hide) */
-section .site-lang-switcher {
-    display: none !important;
-}
-
-/* Alternative: Show ONLY in footer (bottom placement)
-   Uncomment below and comment out header rule above to switch */
-/*
-footer#main-footer .site-lang-switcher:first-of-type {
-    display: inline-flex;
-}
-*/
-
 .site-lang-switcher.in-header {
     margin-left: 15px;
 }

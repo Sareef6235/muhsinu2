@@ -130,9 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('g-booking-price-hidden').value = "₹" + amount;
 
                 // 1. Write to Firestore asynchronously
-                if (window.db) {
+                if (window.db && window.firestoreUtils) {
                     try {
-                        const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        const { collection, addDoc, serverTimestamp } = window.firestoreUtils;
                         await addDoc(collection(window.db, "bookings"), {
                             firstName,
                             lastName,

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Exam Result Portal | MIFTHAHUL HUDA MADRASA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    :root {
+      --primary-color: #00f3ff;
+      --secondary-color: #bc13fe;
+      --accent-color: #ff00c1;
+      --bg-color: #050505;
+      --text-color: #ffffff;
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --card-gradient: linear-gradient(135deg, rgba(188, 19, 254, 0.1) 0%, rgba(0, 243, 255, 0.1) 100%);
+      --glow: 0 0 20px rgba(0, 243, 255, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Background Elements */
+    .bg-blob {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      filter: blur(100px);
+      z-index: -1;
+      opacity: 0.15;
+      animation: move 20s infinite alternate;
+    }
+
+    .blob1 {
+      background: var(--primary-color);
+      top: -100px;
+      left: -100px;
+    }
+
+    .blob2 {
+      background: var(--secondary-color);
+      bottom: -100px;
+      right: -100px;
+      animation-delay: -5s;
+    }
+
+    .blob3 {
+      background: var(--accent-color);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-duration: 25s;
+    }
+
+    @keyframes move {
+      from {
+        transform: translate(0, 0) scale(1);
+      }
+
+      to {
+        transform: translate(100px, 100px) scale(1.2);
+      }
+    }
+
+    .portal-container {
+      max-width: 600px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      padding: 60px 40px;
+      border-radius: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      animation: containerAppear 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .portal-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(255, 255, 255, 0.05),
+          transparent);
+      transition: 0.5s;
+    }
+
+    .portal-container:hover::before {
+      left: 100%;
+    }
+
+    @keyframes containerAppear {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .header-section {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-wrapper {
+      width: 80px;
+      height: 80px;
+      background: var(--card-gradient);
+      border-radius: 20px;
+      margin: 0 auto 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid var(--glass-border);
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      text-shadow: var(--glow);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #fff, var(--primary-color));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      color: #888;
+      font-size: 1rem;
+    }
+
+    .search-wrapper {
+      position: relative;
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 5px;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-box:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .search-icon {
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      color: #666;
+      font-size: 1.4rem;
+    }
+
+    .search-box:focus-within .search-icon {
+      color: var(--primary-color);
+    }
+
+    input {
+      flex: 1;
+      padding: 15px 0;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.1rem;
+      outline: none;
+    }
+
+    input::placeholder {
+      color: #555;
+    }
+
+    .btn-search {
+      padding: 0 30px;
+      background: var(--primary-color);
+      border: none;
+      border-radius: 15px;
+      color: #000;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      margin: 5px;
+    }
+
+    .btn-search:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px var(--primary-color);
+    }
+
+    .btn-search:active {
+      transform: scale(0.95);
+    }
+
+    #status {
+      text-align: center;
+      height: 20px;
+      margin-top: -10px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .loading-dots::after {
+      content: '...';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+
+      0%,
+      20% {
+        content: '';
+      }
+
+      40% {
+        content: '.';
+      }
+
+      60% {
+        content: '..';
+      }
+
+      80% {
+        content: '...';
+      }
+    }
+
+    .result-container {
+      display: none;
+      margin-top: 30px;
+    }
+
+    .student-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+      padding: 40px;
+      border-radius: 30px;
+      border: 1px solid var(--glass-border);
+      position: relative;
+      animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--primary-color);
+      opacity: 0.5;
+    }
+
+    .student-header {
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: 25px;
+      margin-bottom: 30px;
+    }
+
+    .student-name {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 5px;
+    }
+
+    .student-info {
+      color: #888;
+      font-size: 0.95rem;
+      display: flex;
+      gap: 15px;
+    }
+
+    .marks-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    .marks-table th {
+      text-align: left;
+      padding-bottom: 15px;
+      color: #555;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .mark-row td {
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .subject-cell {
+      font-weight: 500;
+      color: #ccc;
+    }
+
+    .score-cell {
+      text-align: right;
+      color: var(--primary-color);
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .footer-result {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 25px;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .status-badge {
+      padding: 10px 25px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9rem;
+    }
+
+    .status-pass {
+      background: rgba(0, 255, 136, 0.1);
+      color: #00ff88;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+    }
+
+    .status-fail {
+      background: rgba(255, 68, 68, 0.1);
+      color: #ff4444;
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      box-shadow: 0 0 20px rgba(255, 68, 68, 0.1);
+    }
+
+    .btn-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .btn-secondary {
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      color: white;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #555;
+    }
+
+    .troubleshoot {
+      background: rgba(255, 68, 68, 0.05);
+      border: 1px solid rgba(255, 68, 68, 0.2);
+      padding: 25px;
+      border-radius: 20px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .troubleshoot h3 {
+      color: #ff4444;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .home-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 40px;
+      color: #555;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .home-link:hover {
+      color: var(--primary-color);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        color: black;
+        padding: 0;
+      }
+
+      .portal-container {
+        border: none;
+        box-shadow: none;
+        background: white;
+        padding: 0;
+      }
+
+      .bg-blob,
+      .search-wrapper,
+      #status,
+      .btn-actions,
+      .home-link {
+        display: none !important;
+      }
+
+      .student-card {
+        border: 1px solid #eee;
+        background: white;
+        margin: 0;
+      }
+
+      .student-name,
+      .score-cell {
+        color: black !important;
+      }
+
+      .status-badge {
+        border: 1px solid #ccc;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-blob blob1"></div>
+  <div class="bg-blob blob2"></div>
+  <div class="bg-blob blob3"></div>
+
+  <div class="portal-container">
+    <div class="header-section">
+      <div class="logo-wrapper">
+        <i class="ph-bold ph-graduation-cap"></i>
+      </div>
+      <h1>Result Portal</h1>
+      <p class="subtitle">Mifthahul Huda Madrasa Official Examination Results</p>
+    </div>
+
+    <div class="search-wrapper">
+      <div class="search-box">
+        <div class="search-icon">
+          <i class="ph-bold ph-magnifying-glass"></i>
+        </div>
+        <input type="text" id="regno" placeholder="Enter Register Number" autofocus>
+        <button onclick="fetchResult()" class="btn-search">View Result</button>
+      </div>
+    </div>
+
+    <div id="status"></div>
+
+    <div id="troubleshoot" class="troubleshoot">
+      <h3><i class="ph-bold ph-warning-circle"></i> Connection Error</h3>
+      <p style="color: #ff8888; font-size: 0.9rem; margin-bottom: 15px;">We couldn't reach the database. Please check:
+      </p>
+      <ul style="color: #aaa; font-size: 0.85rem; padding-left: 20px; line-height: 1.6;">
+        <li>Sheet sharing is set to "Anyone with the link".</li>
+        <li>The tab name is exactly "class1".</li>
+      </ul>
+      <p style="margin-top: 15px; font-family: monospace; font-size: 0.7rem; color: #666;" id="error-details"></p>
+    </div>
+
+    <div id="result-area" class="result-container"></div>
+
+    <a href="index.html" class="home-link">
+      <i class="ph-bold ph-arrow-left"></i>
+      Return to Home
+    </a>
+  </div>
+
+  <script>
+    const SHEET_ID = "1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU";
+    const SHEET_NAME = "class1";
+
+    async function fetchResult() {
+      const regnoInput = document.getElementById("regno");
+      const regnoValue = regnoInput.value.trim().toUpperCase();
+      const resultArea = document.getElementById("result-area");
+      const status = document.getElementById("status");
+      const ts = document.getElementById("troubleshoot");
+      const errDetails = document.getElementById("error-details");
+
+      if (!regnoValue) return;
+
+      // Reset UI
+      resultArea.style.display = "none";
+      ts.style.display = "none";
+      status.innerHTML = `<span class="loading-dots" style="color: var(--primary-color)">Accessing Sheet Database</span>`;
+      status.style.opacity = "1";
+
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("HTTP connection failed (" + response.status + ")");
+
+        const text = await response.text();
+        if (text.includes("ServiceLogin")) {
+          throw new Error("ACCESS DENIED: Please check if 'Anyone with the link' is selected in Share settings.");
+        }
+
+        const json = JSON.parse(text.substring(47).slice(0, -2));
+        const cols = json.table.cols;
+        const rows = json.table.rows;
+
+        if (!rows || rows.length === 0) {
+          throw new Error("EMPTY SHEET: No data found in tab '" + SHEET_NAME + "'.");
+        }
+
+        // 1. Identify key columns
+        const findIdx = (keywords) => cols.findIndex(c => keywords.some(k => (c.label || "").toLowerCase().includes(k)));
+
+        const idxMap = {
+          id: findIdx(['id', 'reg']),
+          name: findIdx(['name']),
+          class: findIdx(['class'])
+        };
+
+        // 2. Identify subject columns (anything not id, name, or class in the first 12 columns)
+        const subjectCols = [];
+        cols.forEach((col, idx) => {
+          const label = (col.label || "").trim();
+          if (idx > 2 && label && !label.toLowerCase().includes('column') && !label.includes('@')) {
+            subjectCols.push({ idx, label });
+          }
+        });
+
+        const getVal = (row, idx) => {
+          if (!row.c[idx]) return "";
+          return row.c[idx].f || String(row.c[idx].v) || "";
+        };
+
+        // 3. Find the student
+        const studentRow = rows.find(r => {
+          const idVal = getVal(r, idxMap.id).trim().toUpperCase();
+          return idVal === regnoValue;
+        });
+
+        if (!studentRow) {
+          status.innerHTML = `<span style="color: #ff4444">ID Not Found: ${regnoValue}</span>`;
+          setTimeout(() => { status.style.opacity = "0"; }, 3000);
+          return;
+        }
+
+        // 4. Collect student data
+        const studentData = {
+          id: getVal(studentRow, idxMap.id),
+          name: getVal(studentRow, idxMap.name),
+          class: getVal(studentRow, idxMap.class),
+          marks: []
+        };
+
+        subjectCols.forEach(sub => {
+          const mark = getVal(studentRow, sub.idx);
+          if (mark && mark !== "-") {
+            studentData.marks.push({ subject: sub.label, mark: mark });
+          }
+        });
+
+        status.innerHTML = `<span style="color: #00ff88">Connection Verified</span>`;
+        renderResult(studentData);
+        setTimeout(() => { status.style.opacity = "0"; }, 2000);
+
+      } catch (error) {
+        console.error(error);
+        status.innerHTML = "";
+        ts.style.display = "block";
+        errDetails.innerHTML = "System Message: " + error.message;
+      }
+    }
+
+    function renderResult(data) {
+      const resultArea = document.getElementById("result-area");
+
+      // Determine Pass/Fail (Simple logic: if they have marks, we say Published)
+      // You can adjust this if the sheet has a specific "Result" column
+      const resultStatus = "PASSED";
+      const isPass = true;
+      const statusClass = isPass ? 'status-pass' : 'status-fail';
+      const statusIcon = isPass ? 'ph-check-circle' : 'ph-x-circle';
+
+      let marksHtml = "";
+      data.marks.forEach(m => {
+        marksHtml += `
+          <tr class="mark-row">
+            <td class="subject-cell">${m.subject}</td>
+            <td class="score-cell">${m.mark}</td>
+          </tr>`;
+      });
+
+      resultArea.innerHTML = `
+        <div class="student-card">
+          <div class="card-badge">Official Transcript</div>
+          <div class="student-header">
+            <div class="student-name" style="direction: rtl;">${data.name}</div>
+            <div class="student-info">
+              <span><i class="ph-bold ph-identification-card"></i> ID: ${data.id}</span>
+              <span><i class="ph-bold ph-chalkboard"></i> Class: ${data.class}</span>
+            </div>
+          </div>
+          
+          <table class="marks-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th style="text-align:right">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${marksHtml || '<tr><td colspan="2" style="text-align:center; padding:20px; color:#666;">No marks recorded for this student yet.</td></tr>'}
+            </tbody>
+          </table>
+
+          <div class="footer-result">
+            <div style="color: #666; font-size: 0.9rem;">
+              Result Status
+            </div>
+            <div class="status-badge ${statusClass}">
+              <i class="ph-bold ${statusIcon}"></i> ${resultStatus}
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-actions">
+          <button onclick="window.print()" class="btn-secondary">
+            <i class="ph-bold ph-printer"></i> Download / Print
+          </button>
+          <button onclick="location.reload()" class="btn-secondary">
+            <i class="ph-bold ph-arrow-counter-clockwise"></i> New Search
+          </button>
+        </div>
+      `;
+      resultArea.style.display = "block";
+      resultArea.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.getElementById("regno").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") fetchResult();
+    });
+  </script>
+
+</body>
+
+</html>

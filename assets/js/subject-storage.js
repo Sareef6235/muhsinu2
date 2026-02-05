@@ -1,64 +1,106 @@
 /**
- * Subject Storage Utility (Local Version)
- * Manages subject data using the local Storage engine.
+ * Subject Storage Utility
+ * Manages subject data using namespaced StorageManager
  */
+import StorageManager from './storage-manager.js';
 
-import { Storage } from './core/storage.js';
+const STORAGE_KEY = 'tuition_subjects';
 
-const COLLECTION = 'subjects';
-
-export const SubjectStorage = {
+const SubjectStorage = {
     /**
-     * Get all subjects
+     * Get all subjects from storage (namespaced)
      */
-    async getAll() {
-        return Storage.getAll(COLLECTION);
+    getAll() {
+        return StorageManager.get(STORAGE_KEY, []);
     },
 
     /**
      * Get only active subjects
      */
-    async getActive() {
-        const list = Storage.getAll(COLLECTION);
-        return list.filter(s => s.active !== false);
+    getActive() {
+        return this.getAll().filter(subject => subject.active !== false);
+    },
+
+    /**
+     * Get subject by ID
+     */
+    getById(id) {
+        const subjects = this.getAll();
+        return subjects.find(s => s.id === id) || null;
     },
 
     /**
      * Save or update a subject
      */
-    async save(subject) {
-        if (!subject.id) subject.id = 'sub_' + Date.now();
+    save(subject) {
+        const subjects = this.getAll();
+        const now = new Date().toISOString();
 
-        const data = {
-            id: subject.id,
+        if (subject.id) {
+            // Update existing
+            const index = subjects.findIndex(s => s.id === subject.id);
+            if (index !== -1) {
+                subjects[index] = {
+                    ...subjects[index],
+                    ...subject,
+                    updatedAt: now
+                };
+                StorageManager.set(STORAGE_KEY, subjects);
+                return subjects[index];
+            }
+        }
+
+        // Create new
+        const newSubject = {
+            id: 'subj_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
             name: subject.name,
+            teacher: subject.teacher || '',
             price: Number(subject.price),
             active: subject.active !== false,
-            rtl: !!subject.rtl
+            createdAt: now,
+            updatedAt: now
         };
 
-        Storage.save(COLLECTION, data);
-        return data;
+        subjects.push(newSubject);
+        StorageManager.set(STORAGE_KEY, subjects);
+        return newSubject;
     },
 
     /**
-     * Delete a subject
+     * Delete a subject by ID
      */
-    async delete(id) {
-        Storage.delete(COLLECTION, id);
+    delete(id) {
+        let subjects = this.getAll();
+        const filtered = subjects.filter(s => s.id !== id);
+        if (filtered.length < subjects.length) {
+            StorageManager.set(STORAGE_KEY, filtered);
+            return true;
+        }
+        return false;
     },
 
     /**
-     * Toggle status
+     * Toggle subject active status
      */
-    async toggle(id) {
-        const subject = Storage.getById(COLLECTION, id);
+    toggle(id) {
+        const subjects = this.getAll();
+        const subject = subjects.find(s => s.id === id);
         if (subject) {
             subject.active = !subject.active;
-            Storage.save(COLLECTION, subject);
+            subject.updatedAt = new Date().toISOString();
+            StorageManager.set(STORAGE_KEY, subjects);
+            return subject;
         }
+        return null;
+    },
+
+    /**
+     * Get count of active subjects
+     */
+    getActiveCount() {
+        return this.getActive().length;
     }
 };
 
-// Global Exposure
 window.SubjectStorage = SubjectStorage;
+export default SubjectStorage;

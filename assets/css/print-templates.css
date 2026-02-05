@@ -1,0 +1,242 @@
+/**
+ * print-templates.css
+ * Premium Printable Marksheet Designs
+ * Optimized for A4 (portrait & landscape)
+ */
+
+/* Base Print Optimization */
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    @page {
+        margin: 1cm;
+    }
+}
+
+#print-preview-container {
+    background: white;
+    color: black;
+    width: 210mm;
+    /* A4 Width */
+    min-height: 297mm;
+    margin: 0 auto;
+    position: relative;
+    box-sizing: border-box;
+    font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+/* Watermark Overlay */
+.watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 100px;
+    color: rgba(0, 0, 0, 0.03);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+}
+
+/* Template Components */
+.marks-table-print {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.marks-table-print th {
+    background: #f4f4f4;
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.marks-table-print td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+/* --- 1. CLASSIC ACADEMIC --- */
+.tpl-classic {
+    padding: 40px;
+    border: 10px double #333;
+}
+
+.tpl-classic .header {
+    text-align: center;
+    border-bottom: 2px solid #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+/* --- 2. MODERN CARD --- */
+.tpl-modern {
+    padding: 30px;
+    background: #fafafa;
+}
+
+.tpl-modern .inner-card {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #eee;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.tpl-modern .grade-highlight {
+    background: var(--theme-color, #00e5ff);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+/* --- 3. CERTIFICATE STYLE --- */
+.tpl-certificate {
+    padding: 50px;
+    border: 15px solid #d4af37;
+    background: #fffdf5;
+    text-align: center;
+}
+
+.tpl-certificate h1 {
+    font-family: 'Serif';
+    font-size: 3rem;
+    color: #d4af37;
+}
+
+.tpl-certificate .signature-box {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 50px;
+}
+
+/* --- 4. MINIMAL CLEAN --- */
+.tpl-minimal {
+    padding: 60px;
+    line-height: 1.6;
+}
+
+.tpl-minimal .header {
+    margin-bottom: 40px;
+}
+
+.tpl-minimal .marks-table-print,
+.tpl-minimal td,
+.tpl-minimal th {
+    border: none;
+    border-bottom: 1px solid #eee;
+}
+
+/* --- 5. DARK MODE PRINT (Digital Optimized) --- */
+.tpl-dark {
+    padding: 40px;
+    background: #1a1a1a;
+    color: #eee;
+}
+
+.tpl-dark .marks-table-print th {
+    background: #333;
+    color: #fff;
+    border-color: #444;
+}
+
+.tpl-dark td {
+    border-color: #444;
+}
+
+/* --- 6. VERTICAL INFO --- */
+.tpl-vertical .layout {
+    display: flex;
+    gap: 30px;
+}
+
+.tpl-vertical .sidebar {
+    width: 30%;
+    border-right: 1px solid #eee;
+    padding-right: 20px;
+}
+
+.tpl-vertical .main-body {
+    width: 70%;
+}
+
+/* --- 7. LANDSCAPE TABLE (Wide) --- */
+.tpl-landscape {
+    width: 297mm !important;
+    min-height: 210mm !important;
+    padding: 30px;
+}
+
+/* --- 8. TABLE-FOCUSED --- */
+.tpl-table-heavy th {
+    background: #333;
+    color: white;
+}
+
+.tpl-table-heavy tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+/* --- 9. GRADE-HIGHLIGHT --- */
+.tpl-grade-big {
+    padding: 40px;
+    text-align: center;
+}
+
+.tpl-grade-big .huge-grade {
+    font-size: 8rem;
+    font-weight: 900;
+    color: #000;
+    margin: 20px 0;
+    border: 5px solid #000;
+    display: inline-block;
+    padding: 0 40px;
+}
+
+/* --- 10. LOGO-CENTRIC --- */
+.tpl-logo-focus {
+    padding: 40px;
+}
+
+.tpl-logo-focus .main-logo {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 30px;
+    background: #eee;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+}
+
+/* Footer components */
+.print-footer {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.qr-code {
+    width: 80px;
+    height: 80px;
+    background: #eee;
+}
+
+.signature-line {
+    width: 150px;
+    border-top: 1px solid #333;
+    text-align: center;
+    font-size: 0.8rem;
+    padding-top: 5px;
+}

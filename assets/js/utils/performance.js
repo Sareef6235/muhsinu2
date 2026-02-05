@@ -113,32 +113,6 @@ const Perf = {
         }, { rootMargin: '50px' });
 
         targets.forEach(el => observer.observe(el));
-    },
-
-    /**
-     * Get Base Path: Calculates the relative path to the project root
-     * Works for nested directories in /pages/ and handles root correctly.
-     */
-    getBasePath() {
-        const path = window.location.pathname;
-
-        // If we are at root or index.html in root
-        if (path === '/' || path.endsWith('/index.html') || (!path.includes('/pages/') && !path.includes('/assets/'))) {
-            return '';
-        }
-
-        // Calculate depth based on /muhsin2/ or root if not local
-        // We look for the "muhsin2" segment or count from the first "pages" segment
-        const segments = path.split('/').filter(p => p.length > 0);
-        const pagesIdx = segments.findIndex(s => s === 'pages');
-
-        if (pagesIdx === -1) return '';
-
-        // Depth is the number of segments after 'pages' plus 1 (for 'pages' itself)
-        // Example: /pages/admin/dashboard.html -> segments are [pages, admin, dashboard.html]
-        // pagesIdx is 0. segments.length is 3. depth = 3 - 0 - 1 = 2 steps up (../../)
-        const depth = segments.length - pagesIdx - 1;
-        return '../'.repeat(depth + 1);
     }
 };
 

@@ -1,44 +1,38 @@
 /**
  * Media Optimizer & Validator
- * Handles client-side compression and validation for the Services System.
+ * Handles client-side compression for high performance.
  */
 export const MediaOptimizer = {
+    LIMITS: {
+        IMAGE: 100 * 1024, // 100 KB
+        VIDEO: 5 * 1024 * 1024 // 5 MB
+    },
+
     /**
-     * Compress an image file to WebP < 100KB
-     * @param {File} file - The input image file
-     * @returns {Promise<string>} - Base64 data URL of the compressed image
+     * Compress an image file
+     * @returns {Promise<{data: string, originalSize: number, newSize: number}>}
      */
-    async processImage(file) {
+    async compressImage(file) {
         return new Promise((resolve, reject) => {
-            if (!file.type.startsWith('image/')) {
-                reject('Invalid file type. Please upload an image.');
-                return;
-            }
+            if (!file.type.startsWith('image/')) return reject('Invalid image file');
 
             const reader = new FileReader();
+            const originalSize = file.size;
             reader.readAsDataURL(file);
-            reader.onload = (event) => {
+
+            reader.onload = (e) => {
                 const img = new Image();
-                img.src = event.target.result;
+                img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
 
-                    // Max dimensions (HD is usually enough for web)
-                    const MAX_WIDTH = 1280;
-                    const MAX_HEIGHT = 1280;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
+                    // Step 1: Max width constraint
+                    const MAX_WIDTH = 1000;
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
                     }
 
                     canvas.width = width;
@@ -46,50 +40,45 @@ export const MediaOptimizer = {
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Aggressive compression logic
+                    // Step 2: Iterative quality reduction to reach < 100KB
                     let quality = 0.8;
-                    let dataUrl = canvas.toDataURL('image/webp', quality);
+                    let dataUrl = canvas.toDataURL('image/jpeg', quality);
 
-                    // Loop to ensure < 100KB
-                    while (dataUrl.length > 100 * 1024 && quality > 0.1) {
+                    while (dataUrl.length > this.LIMITS.IMAGE && quality > 0.1) {
                         quality -= 0.1;
-                        dataUrl = canvas.toDataURL('image/webp', quality);
+                        dataUrl = canvas.toDataURL('image/jpeg', quality);
                     }
 
-                    resolve(dataUrl);
+                    resolve({
+                        data: dataUrl,
+                        originalSize: originalSize,
+                        newSize: dataUrl.length
+                    });
                 };
-                img.onerror = (err) => reject('Failed to load image for processing.');
             };
-            reader.onerror = (err) => reject('Failed to read file.');
+            reader.onerror = reject;
         });
     },
 
     /**
-     * Validate Video File
-     * @param {File} file 
-     * @returns {Promise<boolean>}
+     * Validate video size
      */
-    async validateVideo(file) {
-        return new Promise((resolve, reject) => {
-            if (!file.type.startsWith('video/')) {
-                reject('Invalid file type. Please upload a video.');
-                return;
-            }
+    validateVideo(file) {
+        if (!file.type.startsWith('video/')) return { valid: false, error: 'Invalid video file' };
 
-            // Client-side limit: 5MB
-            const maxSize = 5 * 1024 * 1024;
-            if (file.size > maxSize) {
-                reject(`Video is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Max allowed is 5MB.`);
-                return;
-            }
+        const isValid = file.size <= this.LIMITS.VIDEO;
+        return {
+            valid: isValid,
+            size: file.size,
+            error: isValid ? null : `Video exceeds 5MB limit. Current: ${(file.size / 1024 / 1024).toFixed(2)}MB`
+        };
+    },
 
-            // Ideal formatted check (optional, but good for UX)
-            if (file.type !== 'video/webm' && file.type !== 'video/mp4') {
-                // Not rejecting strictly, but warning could be added here
-                console.warn('Preferred format is WebM or MP4.');
-            }
-
-            resolve(true);
-        });
+    formatBytes(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 };

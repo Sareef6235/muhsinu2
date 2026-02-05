@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Features Verification</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+        }
+
+        .pass {
+            color: #00ff00;
+        }
+
+        .fail {
+            color: #ff0000;
+        }
+
+        .info {
+            color: #569cd6;
+        }
+
+        .group {
+            border-left: 2px solid #555;
+            padding-left: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Verification Suite: Advanced Features</h1>
+    <div id="output"></div>
+
+    <!-- Mocks & Logic -->
+    <script>
+        // Mock localStorage
+        const storage = {};
+        const localStorageMock = {
+            getItem: (key) => storage[key] || null,
+            setItem: (key, val) => storage[key] = val,
+            removeItem: (key) => delete storage[key],
+            clear: () => Object.keys(storage).forEach(k => delete storage[k])
+        };
+        // Override global
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
+        function log(msg, type = '') {
+            const div = document.createElement('div');
+            div.textContent = msg;
+            div.className = type;
+            document.getElementById('output').appendChild(div);
+        }
+
+        function assert(condition, desc) {
+            if (condition) log(`[PASS] ${desc}`, 'pass');
+            else log(`[FAIL] ${desc}`, 'fail');
+        }
+
+        function group(name) {
+            log(`\n--- ${name} ---`, 'info');
+        }
+    </script>
+
+    <!-- Dependencies -->
+    <script type="module">
+        import StorageManager from '../assets/js/storage-manager.js';
+        import SchoolManager from '../assets/js/school-manager.js';
+
+        // Mock ResultsManagement needed for AnalyticsEngine
+        window.ResultsManagement = {
+            getAllResults: () => [],
+            getExamList: () => []
+        };
+
+        window.StorageManager = StorageManager;
+        window.SchoolManager = SchoolManager;
+        window.runTests = async () => {
+            // 1. School Isolation Test
+            group("1. Multi-School Isolation");
+
+            // Setup School 1
+            SchoolManager.save({ id: 'sch_1', name: 'School 1' });
+            SchoolManager.switchSchool('sch_1', false); // Mock switch (no reload)
+            // Force active update since switchSchool normally reloads
+            StorageManager.setGlobal(SchoolManager.KEYS.ACTIVE, { id: 'sch_1', name: 'School 1' });
+
+            // Write Data to Sch 1
+            StorageManager.set('test_key', 'value_for_school_1');
+            assert(StorageManager.get('test_key') === 'value_for_school_1', 'School 1 data written');
+
+            // Setup School 2
+            SchoolManager.save({ id: 'sch_2', name: 'School 2' });
+            StorageManager.setGlobal(SchoolManager.KEYS.ACTIVE, { id: 'sch_2', name: 'School 2' });
+
+            // Verify Isolation
+            assert(StorageManager.get('test_key') === null, 'School 2 should NOT see School 1 data');
+
+            // Write Data to Sch 2
+            StorageManager.set('test_key', 'value_for_school_2');
+            assert(StorageManager.get('test_key') === 'value_for_school_2', 'School 2 data written');
+
+            // Switch Back to Sch 1
+            StorageManager.setGlobal(SchoolManager.KEYS.ACTIVE, { id: 'sch_1', name: 'School 1' });
+            assert(StorageManager.get('test_key') === 'value_for_school_1', 'School 1 data preserved & restored');
+
+
+            // 2. Analytics Test
+            group("2. Analytics Calculation");
+
+            // Load AnalyticsEngine (dynamic import or assuming loaded via script tag if not module)
+            // Since it's IIFE in file, we need to manually load it or mock it.
+            // We will fetch the file content eval it since it's not an ES module
+            const response = await fetch('../assets/js/analytics-engine.js');
+            const code = await response.text();
+            eval(code); // Loads window.AnalyticsEngine
+
+            // Mock Data
+            const mockResults = [
+                { examId: 'ex_1', subjects: { 'Math': 90, 'Science': 85 } }, // A+, A
+                { examId: 'ex_1', subjects: { 'Math': 45, 'Science': 95 } }, // C, A+
+                { examId: 'ex_1', subjects: { 'Math': 25, 'Science': 60 } }  // F, B
+            ];
+
+            // Override ResultsManagement for test
+            window.ResultsManagement.getAllResults = () => mockResults;
+
+            const metrics = window.AnalyticsEngine.calculate('ex_1');
+
+            // Math Stats: 90, 45, 25. Avg = 53.3. Pass = 2/3 (66.7%). Top = 90.
+            const math = metrics.find(m => m.subject === 'Math');
+            assert(math.avg === '53.3', 'Math Average Calculation');
+            assert(math.passPct === '66.7', 'Math Pass % Calculation');
+            assert(math.top === 90, 'Math Top Score');
+            assert(math.grades['A+'] === 1, 'Math Grade Distribution A+');
+            assert(math.grades['F'] === 0, 'Math Grade Dist F (Assuming F is E/F bucket logic)');
+            // Default logic: <30 is E? 
+            // Logic in engine: <30 is E. 
+            assert(math.grades['E'] === 1, 'Math Grade Dist E (<30)');
+
+            // Science Stats: 85, 95, 60. Avg = 80. Pass = 3/3 (100%).
+            const sci = metrics.find(m => m.subject === 'Science');
+            assert(sci.avg === '80.0', 'Science Average Calculation');
+            assert(sci.passPct === '100.0', 'Science Pass % Calculation');
+        };
+
+        // Wait for modules
+        setTimeout(window.runTests, 500);
+    </script>
+</body>
+
+</html>

@@ -65,8 +65,7 @@ const LanguageSystem = {
             vision_title: "Our Vision",
             vision_desc: "To be a beacon of excellence in education, fostering innovation, critical thinking, and character development. We envision a future where our students become global citizens who make meaningful contributions to society.",
             mission_title: "Our Mission",
-            mission_desc: "We are committed to providing world-class education that combines academic rigor with holistic development. Our mission is to create an inclusive, supportive environment where every student can thrive intellectually, emotionally, and socially.",
-            back_to_services: "Back to Services"
+            mission_desc: "We are committed to providing world-class education that combines academic rigor with holistic development. Our mission is to create an inclusive, supportive environment where every student can thrive intellectually, emotionally, and socially."
         },
         ml: {
             home: "ഹോം",
@@ -123,8 +122,7 @@ const LanguageSystem = {
             vision_title: "ഞങ്ങളുടെ കാഴ്ചപ്പാട്",
             vision_desc: "വിദ്യാഭ്യാസത്തിൽ മികവിന്റെ വിളക്കുമാടമാകുക, നൂതനത്വം, വിമർശനാത്മക ചിന്ത, സ്വഭാവ വികസനം എന്നിവ പ്രോത്സാഹിപ്പിക്കുക. ഞങ്ങളുടെ വിദ്യാർത്ഥികൾ സമൂഹത്തിന് അർത്ഥവത്തായ സംഭാവനകൾ നൽകുന്ന ആഗോള പൗരന്മാരായി മാറുന്ന ഒരു ഭാവി ഞങ്ങൾ വിഭാവനം ചെയ്യുന്നു.",
             mission_title: "ഞങ്ങളുടെ ദൗത്യം",
-            mission_desc: "അക്കാദമിക് കാർക്കശ്യവും സമഗ്രമായ വികസനവും സമന്വയിപ്പിക്കുന്ന ലോകോത്തര വിദ്യാഭ്യാസം നൽകാൻ ഞങ്ങൾ പ്രതിജ്ഞാബദ്ധരാണ്. എല്ലാ വിദ്യാർത്ഥികൾക്കും ബൗദ്ധികമായും വൈകാരികമായും സാമൂഹികമായും അഭിവൃദ്ധി പ്രാപിക്കാൻ കഴിയുന്ന ഉൾക്കൊള്ളുന്നതും പിന്തുണ നൽകുന്നതുമായ അന്തരീക്ഷം സൃഷ്ടിക്കുക എന്നതാണ് ഞങ്ങളുടെ ദൗത്യം.",
-            back_to_services: "സേവനങ്ങളിലേക്ക് തിരികെ പോകുക"
+            mission_desc: "അക്കാദമിക് കാർക്കശ്യവും സമഗ്രമായ വികസനവും സമന്വയിപ്പിക്കുന്ന ലോകോത്തര വിദ്യാഭ്യാസം നൽകാൻ ഞങ്ങൾ പ്രതിജ്ഞാബദ്ധരാണ്. എല്ലാ വിദ്യാർത്ഥികൾക്കും ബൗദ്ധികമായും വൈകാരികമായും സാമൂഹികമായും അഭിവൃദ്ധി പ്രാപിക്കാൻ കഴിയുന്ന ഉൾക്കൊള്ളുന്നതും പിന്തുണ നൽകുന്നതുമായ അന്തരീക്ഷം സൃഷ്ടിക്കുക എന്നതാണ് ഞങ്ങളുടെ ദൗത്യം."
         },
         ar: {
             home: "الرئيسية",
@@ -181,10 +179,8 @@ const LanguageSystem = {
             vision_title: "رؤيتنا",
             vision_desc: "أن نكون مناراً للتميز في التعليم، ونعزز الابتكار والتفكير النقدي وتطوير الشخصية. نتصور مستقبلاً يصبح فيه طلابنا مواطنين عالميين يقدمون مساهمات ذات معنى للمجتمع.",
             mission_title: "مهمتنا",
-            mission_desc: "نحن ملتزمون بتوفير تعليم عالمي المستوى يجمع بين الصرامة الأكاديمية والتنمية الشاملة. مهمتنا هي خلق بيئة شاملة وداعمة حيث يمكن لكل طالب أن يزدهر فكرياً وعاطفياً واجتماعياً.",
-            back_to_services: "العودة إلى الخدمات"
+            mission_desc: "نحن ملتزمون بتوفير تعليم عالمي المستوى يجمع بين الصرامة الأكاديمية والتنمية الشاملة. مهمتنا هي خلق بيئة شاملة وداعمة حيث يمكن لكل طالب أن يزدهر فكرياً وعاطفياً واجتماعياً."
         }
-
     },
 
     state: {
@@ -323,28 +319,20 @@ const LanguageSystem = {
 
         // Debounce the observer to handle many changes at once and avoid recursion
         const debouncedTask = window.Perf.debounce(() => {
-            if (this._isUpdating) return; // Prevent re-entry if already updating
-            this._isUpdating = true; // Set flag to indicate update in progress
-
-            this.stopObserver(); // Temporarily disconnect to avoid loop during our own modifications
+            // Temporarily disconnect to avoid loop during our own modifications
+            this.stopObserver();
             this.injectSwitchers();
             this.applyTranslations();
-            this.startObserver(); // Reconnect observer
-
-            this._isUpdating = false; // Reset flag
-        }, 150); // Increased debounce time slightly
+            this.startObserver();
+        }, 100);
 
         this.observer = new MutationObserver((mutations) => {
-            if (this._isUpdating) return; // Skip if an update is already in progress
-
             let shouldUpdate = false;
             for (const mutation of mutations) {
                 if (mutation.addedNodes.length) {
-                    // Only update if the added nodes aren't our own switchers or children of switchers
+                    // Only update if the added nodes aren't our own switchers
                     const hasExternalNodes = Array.from(mutation.addedNodes).some(node =>
-                        node.nodeType === 1 &&
-                        !node.classList.contains('site-lang-switcher') &&
-                        !node.closest('.site-lang-switcher')
+                        node.nodeType === 1 && !node.classList.contains('site-lang-switcher')
                     );
                     if (hasExternalNodes) {
                         shouldUpdate = true;

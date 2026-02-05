@@ -15,8 +15,6 @@ class UltraPosterBuilder {
         this.init();
         this.favorites = new Set(JSON.parse(localStorage.getItem('mhmv_favs') || '[]'));
         this.recent = new Set(JSON.parse(localStorage.getItem('mhmv_recent') || '[]'));
-        this.controls = new PosterControlEngine(this);
-        this.isDirty = false;
     }
 
     async init() {
@@ -255,7 +253,7 @@ class UltraPosterBuilder {
         this.activeElement = el;
         this.activeElement.classList.add('element-selected');
         this.createHandles(el);
-        this.controls.render(el);
+        this.renderProperties();
     }
 
     createHandles(el) {
@@ -630,7 +628,68 @@ class UltraPosterBuilder {
     }
 
     renderProperties() {
-        // Legacy method replaced by PosterControlEngine
+        const active = document.getElementById('active-properties');
+        if (!this.activeElement) return;
+        active.style.display = 'block';
+
+        const type = this.activeElement.getAttribute('data-editable') || 'Element';
+        let html = `<div class="prop-group"><label>Editing ${type}</label></div>`;
+
+        if (type !== 'shape' && type !== 'image') {
+            html += `
+                <div class="prop-group">
+                    <label>Text Content</label>
+                    <textarea id="prop-text" rows="3">${this.activeElement.innerText}</textarea>
+                </div>
+                <div class="prop-group">
+                    <label>Typography</label>
+                    <div class="tool-row" style="margin-bottom: 10px;">
+                        <select id="prop-font" class="tool-select">
+                            <option value="Inter">Modern (EN)</option>
+                            <option value="'Amiri', serif">Calligraphy (AR/ML)</option>
+                            <option value="'Cairo', sans-serif">Modern (AR)</option>
+                            <option value="'Manjari', sans-serif">Modern (ML)</option>
+                        </select>
+                        <button class="preset-btn" id="prop-rtl" title="Toggle RTL"><i class="ph ph-text-align-right"></i></button>
+                    </div>
+                    <label>Size</label>
+                    <input type="range" id="prop-size" min="10" max="250" value="${parseInt(window.getComputedStyle(this.activeElement).fontSize)}">
+                </div>
+            `;
+        }
+
+        html += `
+            <div class="prop-group">
+                <label>Color & Effects</label>
+                <div class="tool-row">
+                    <input type="color" id="prop-color" value="${this.rgbToHex(window.getComputedStyle(this.activeElement).color || '#ffffff')}">
+                    <button class="preset-btn" id="prop-glow">Toggle Glow</button>
+                </div>
+            </div>
+            <div class="prop-group">
+                 <button class="preset-btn" onclick="builder.deleteActive()"><i class="ph ph-trash"></i> Delete Element</button>
+            </div>
+        `;
+
+        active.innerHTML = html;
+
+        // Binders
+        document.getElementById('prop-text')?.addEventListener('input', (e) => this.activeElement.innerText = e.target.value);
+        document.getElementById('prop-size')?.addEventListener('input', (e) => this.activeElement.style.fontSize = e.target.value + 'px');
+        document.getElementById('prop-color')?.addEventListener('input', (e) => {
+            if (type === 'shape') this.activeElement.style.backgroundColor = e.target.value;
+            else this.activeElement.style.color = e.target.value;
+        });
+        document.getElementById('prop-font')?.addEventListener('change', (e) => this.activeElement.style.fontFamily = e.target.value);
+        document.getElementById('prop-rtl')?.addEventListener('click', () => {
+            const current = this.activeElement.style.direction;
+            this.activeElement.style.direction = current === 'rtl' ? 'ltr' : 'rtl';
+            this.activeElement.style.textAlign = current === 'rtl' ? 'left' : 'right';
+        });
+        document.getElementById('prop-glow')?.onclick = () => {
+            const current = this.activeElement.style.textShadow;
+            this.activeElement.style.textShadow = current && current !== 'none' ? 'none' : '0 0 20px rgba(0,243,255,0.8)';
+        };
     }
 
     deleteActive() {
@@ -754,7 +813,7 @@ class UltraPosterBuilder {
 
     // --- Persistence ---
     async saveDesign() {
-        if (!this.db || !this.isDirty) return;
+        if (!this.db) return;
         const canvas = document.getElementById('poster-canvas');
         const data = {
             id: 'last_design',
@@ -762,8 +821,6 @@ class UltraPosterBuilder {
             css: document.querySelector('style.template-style')?.textContent || ''
         };
         await this.saveToDB('designs', data);
-        this.isDirty = false;
-        console.log("💾 Design auto-saved (dirty flag cleared)");
     }
 
     async loadSavedDesign() {
@@ -886,23 +943,17 @@ class UltraPosterBuilder {
     // --- History Management ---
     pushHistory() {
         const canvas = document.getElementById('poster-canvas');
-        const state = {
-            html: canvas.innerHTML,
-            css: document.querySelector('style.template-style')?.textContent || ''
-        };
+        const state = canvas.innerHTML;
 
-        // If same as last, don't push
-        if (this.historyIndex >= 0 && this.history[this.historyIndex].html === state.html) return;
-
-        this.history = this.history.slice(0, this.historyIndex + 1);
-        this.history.push(state);
-        this.historyIndex++;
-        this.isDirty = true;
-
-        if (this.history.length > 30) {
-            this.history.shift();
-            this.historyIndex--;
+        // truncate future history if we're in the middle of the stack
+        if (this.historyIndex < this.history.length - 1) {
+            this.history = this.history.slice(0, this.historyIndex + 1);
         }
+
+        this.history.push(state);
+        if (this.history.length > 50) this.history.shift(); // Max 50 undos
+        this.historyIndex = this.history.length - 1;
+
         this.updateHistoryButtons();
     }
 

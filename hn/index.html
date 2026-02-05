@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIFTHAHUL HUDA MADRASA</title>
+    <meta name="description" content="Portfolio of MIFTHAHUL HUDA MADRASA. Exploring technology and sharing knowledge.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header id="main-header">
+        <nav class="container">
+            <a href="#" class="logo">MHMV 2026.</a>
+            <ul class="nav-links">
+                <li><a href="#hero">Home</a></li>
+                <li class="dropdown">
+                    <a href="#gallery" class="dropdown-toggle">Gallery</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#gallerySection">Photo Gallery</a></li>
+                        <li><a href="#video-gallery">Video Gallery</a></li>
+                    </ul>
+                </li>
+                <li><a href="creations.html">Creations</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Result</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="exam_result.html">Exam Result</a></li>
+                        <li><a href="meelad_result.html">Meelad Result</a></li>
+                    </ul>
+                </li>
+                <li><a href="#news-notice">News</a></li>
+                <li><a href="#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-btn" aria-label="Toggle navigation">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero"
+            style="position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden;">
+            <!-- Full-width background image -->
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+                <img src="assets/refont_calligraphic (4).png" alt="Madrasa Logo"
+                    style="width: 100%; height: 100%; object-fit: cover; opacity: 0.15;">
+            </div>
+
+            <!-- Content overlay -->
+            <div class="container hero-content" style="position: relative; z-index: 1;">
+                <h2 class="animate-fade-up">Welcome to</h2>
+                <h1 class="animate-fade-up delay-1">MIFTHAHUL HUDA MADRASA</h1>
+                <h3 class="animate-fade-up delay-2">Vengara S S Road</h3>
+                <p class="animate-fade-up delay-3">
+                    A simple reminder that consistent effort and dedication in learning today pave the way for
+                    achievement and success in the future.
+                </p>
+                <div class="cta-group animate-fade-up delay-4">
+                    <a href="#gallery" class="btn btn-primary">View Gallery</a>
+                    <a href="#contact" class="btn btn-secondary">Contact Us</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <div class="about-grid overhaul-content">
+                    <div class="about-text">
+                        <h2 class="section-title">Student Results</h2>
+                        <p>
+                            Verify student performance directly from our official examination database.
+                            Enter your Register Number below to view immediate results and standigs.
+                        </p>
+
+                        <!-- Premium Search Box for Homepage -->
+                        <div class="search-premium" style="margin-top: 30px; margin-bottom: 40px; max-width: 500px;">
+                            <div class="home-search-box"
+                                style="display: flex; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 5px; transition: all 0.3s ease;">
+                                <input type="text" id="home-regno" placeholder="Enter Register No (e.g. 101)"
+                                    style="flex: 1; background: none; border: none; font-family: inherit; padding: 12px 20px; color: #fff; font-size: 1rem; outline: none;">
+                                <button onclick="fetchHomeResult()"
+                                    style="background: var(--primary-color); border: none; padding: 0 25px; border-radius: 8px; color: #000; font-weight: 700; cursor: pointer; transition: 0.3s; height: 45px;">View</button>
+                            </div>
+                            <div id="home-status"
+                                style="margin-top: 10px; font-size: 0.85rem; color: #888; text-align: center; height: 20px;">
+                            </div>
+                        </div>
+
+                        <!-- Result Modal/Overlay (Simple version for homepage) -->
+                        <div id="home-result-container"
+                            style="display: none; background: rgba(0, 243, 255, 0.03); border: 1px solid rgba(0, 243, 255, 0.2); padding: 25px; border-radius: 15px; margin-top: 20px; animation: fadeIn 0.5s ease;">
+                            <div id="home-result-area"></div>
+                            <a href="exam_result.html" class="btn-link"
+                                style="display: inline-block; margin-top: 15px; color: var(--primary-color);">View Full
+                                Transcript →</a>
+                        </div>
+
+
+                        <h2 class="section-title">Educational Programs</h2>
+                        <p>
+                            Our Madrasa offers a range of structured educational programs designed to develop both
+                            religious and
+                            academic knowledge. These include Qur’an memorization classes, Tajweed and Arabic language
+                            lessons,
+                            Islamic studies, and age‑based learning tracks that are updated regularly. Each program is
+                            tailored
+                            to help students grow in knowledge, character, and spiritual understanding.
+                        </p>
+
+                        <h2 class="section-title">Meetings & Community Engagement</h2>
+                        <p>
+                            Regular meetings are held with students, parents, and faculty to discuss progress reports,
+                            upcoming
+                            events, and educational goals. These gatherings help build strong communication between home
+                            and
+                            school and ensure that everyone works together to support student success. Meetings are
+                            documented
+                            with minutes and action points so key decisions and follow‑ups are clear and actionable.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="news-notice">
+            <div class="container">
+                <h2 class="section-title">News & Notice</h2>
+                <div class="news-container">
+                    <p>Stay updated with our latest announcements via Telegram.</p>
+                    <a href="https://t.me/+916235989198" target="_blank" class="btn btn-primary">Join Telegram
+                        Channel</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="booking">
+            <div class="container">
+                <h2 class="section-title">Book a Tuition Session</h2>
+                <div class="booking-container">
+                    <form class="booking-form" id="tuition-form"
+                        action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfzhjNS8F_8_BvbwYFFZMxqfmdJqMTJx2rik6C29szqPPc9EA/formResponse"
+                        method="POST" target="hidden_iframe">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fname">First Name</label>
+                                <input type="text" name="entry.819151435" id="fname" placeholder="First Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lname">Last Name</label>
+                                <input type="text" name="entry.1242527177" id="lname" placeholder="Last Name" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" placeholder="Your Email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Subject (Max 8)</label>
+                            <!-- Hidden inputs for granular Google Form mapping -->
+                            <input type="hidden" name="entry.63709490" id="booking-subjects-hidden">
+                            <input type="hidden" name="entry.9885691" id="booking-class-hidden">
+                            <input type="hidden" name="entry.116107118" id="booking-price-hidden">
+
+                            <div class="checkbox-grid" id="subject-checkboxes">
+                                <label><input type="checkbox" name="subject[]" value="Malayalam" data-price="500">
+                                    Malayalam</label>
+                                <label><input type="checkbox" name="subject[]" value="Arabic" data-price="600">
+                                    Arabic</label>
+                                <label><input type="checkbox" name="subject[]" value="Maths" data-price="700">
+                                    Maths</label>
+                                <label><input type="checkbox" name="subject[]" value="Social Science" data-price="550">
+                                    Social Science</label>
+                                <label><input type="checkbox" name="subject[]" value="English" data-price="500">
+                                    English</label>
+                                <label><input type="checkbox" name="subject[]" value="Science" data-price="650">
+                                    Science</label>
+                                <label><input type="checkbox" name="subject[]" value="Hindi" data-price="450">
+                                    Hindi</label>
+                                <label><input type="checkbox" name="subject[]" value="Islamic Studies" data-price="550">
+                                    Islamic Studies</label>
+                                <label><input type="checkbox" name="subject[]" value="Computer" data-price="750">
+                                    Computer</label>
+                                <label><input type="checkbox" name="subject[]" value="General Knowledge"
+                                        data-price="400">
+                                    General Knowledge</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Class</label>
+                            <div class="radio-group classes-grid" id="class-radios">
+                                <label class="radio-label"><input type="radio" name="class" value="1" required
+                                        data-multiplier="1"> 1</label>
+                                <label class="radio-label"><input type="radio" name="class" value="2"
+                                        data-multiplier="1">
+                                    2</label>
+                                <label class="radio-label"><input type="radio" name="class" value="3"
+                                        data-multiplier="1">
+                                    3</label>
+                                <label class="radio-label"><input type="radio" name="class" value="4"
+                                        data-multiplier="1">
+                                    4</label>
+                                <label class="radio-label"><input type="radio" name="class" value="5"
+                                        data-multiplier="1.1">
+                                    5</label>
+                                <label class="radio-label"><input type="radio" name="class" value="6"
+                                        data-multiplier="1.2">
+                                    6</label>
+                                <label class="radio-label"><input type="radio" name="class" value="7"
+                                        data-multiplier="1.3">
+                                    7</label>
+                                <label class="radio-label"><input type="radio" name="class" value="8"
+                                        data-multiplier="1.4">
+                                    8</label>
+                                <label class="radio-label"><input type="radio" name="class" value="9"
+                                        data-multiplier="1.5">
+                                    9</label>
+                                <label class="radio-label"><input type="radio" name="class" value="10"
+                                        data-multiplier="1.6">
+                                    10</label>
+                                <label class="radio-label"><input type="radio" name="class" value="+1"
+                                        data-multiplier="1.8">
+                                    +1</label>
+                                <label class="radio-label"><input type="radio" name="class" value="+2"
+                                        data-multiplier="2.0">
+                                    +2</label>
+                            </div>
+                        </div>
+
+                        <div class="price-box">
+                            <h3>Total Price: <span id="total-price">₹0</span></h3>
+                        </div>
+
+                        <div class="payment-section">
+
+                            <!-- QR Code -->
+                            <div class="upi-qr">
+                                <img src="upi-qr.jpeg" alt="UPI QR Code">
+                                <p><strong>Scan & Pay (UPI)</strong></p>
+                                <p>UPI ID: <b>mmuhsinu2-1@okaxis</b></p>
+                                <p>Name: Mo Mhn</p>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="payment-buttons-dual">
+                                <button type="submit" id="btn-submit-only" class="btn-choice btn-outline">
+                                    Register Only
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="latest-sessions">
+            <div class="container">
+                <h2 class="section-title">My Latest Sessions</h2>
+                <div class="sessions-list">
+                    <!-- Section for Dynamic PDFs -->
+                    <div id="pdf-list" class="pdf-category-list">
+                        <!-- Dynamic PDF cards -->
+                    </div>
+
+                    <!-- Section for Local Bookings -->
+                    <div id="sessions-list" class="booking-category-list">
+                        <p class="no-sessions hidden">No sessions booked yet.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="contact">
+            <div class="container">
+                <div class="contact-content">
+                    <h2 class="section-title">Get In Touch</h2>
+                    <p>Interested in collaborating or having me speak at your event? Let's connect.</p>
+
+                    <!-- Form Submission Feedback -->
+                    <script type="text/javascript">var submitted = false;</script>
+                    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"
+                        onload="if(submitted) {document.getElementById('contact-status').innerHTML = 'Message Sent Successfully!'; document.getElementById('contact-form-el').reset(); submitted=false;}"></iframe>
+
+                    <form class="contact-form" id="contact-form-el"
+                        action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfq5PjEIs83m4gq7_-ihVbqAWJa_KNKgtQ2huzvKCQSfesDYQ/formResponse"
+                        method="POST" target="hidden_iframe" onsubmit="submitted=true;">
+                        <div class="form-group">
+                            <input type="text" name="entry.456300294" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="entry.1582502936" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea name="entry.1231984071" placeholder="Your Message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                        <div id="contact-status"
+                            style="margin-top: 15px; color: var(--primary-color); font-weight: 600; min-height: 24px;">
+                        </div>
+                    </form>
+
+                    <div class="contact-info">
+                        <p>Telegram: <a href="https://t.me/+916235989198">+91 6235989198</a></p>
+                        <div class="social-links-large">
+                            <a href="https://github.com/sareef6235" class="social-icon">GitHub</a>
+                            <a href="https://t.me/+916235989198" class="social-icon">Telegram</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="video-gallery">
+            <div class="container">
+                <h2 class="section-title">Video Gallery</h2>
+                <div class="video-grid" id="video-list">
+                    <p class="no-items" style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">
+                        Loading official videos...</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallerySection">
+            <div class="container">
+                <h2 class="section-title">Gallery</h2>
+                <div class="projects-grid gallery-grid" id="gallery-list">
+
+                    <div class="gallery-item animate-fade-up">
+                        <img src="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/1920x1080-1.jpg"
+                            alt="Gallery Photo" class="gallery-img">
+                        <div class="media-info">
+                            <a href="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/1920x1080-1.jpg"
+                                download target="_blank" class="download-btn">
+                                <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;">
+                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                                </svg> Download</a>
+                        </div>
+                    </div>
+                    <div class="gallery-item animate-fade-up">
+                        <img src="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/1920x1080-2%20(1).jpg"
+                            alt="Gallery Photo" class="gallery-img">
+                        <div class="media-info">
+                            <a href="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/1920x1080-2%20(1).jpg"
+                                download target="_blank" class="download-btn">
+                                <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;">
+                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                                </svg> Download</a>
+                        </div>
+                    </div>
+                    <div class="gallery-item animate-fade-up">
+                        <img src="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/1920x1080-2.jpg"
+                            alt="Gallery Photo" class="gallery-img">
+                        <div class="media-info">
+                            <a href="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/1920x1080-2.jpg"
+                                download target="_blank" class="download-btn">
+                                <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;">
+                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                                </svg> Download</a>
+                        </div>
+                    </div>
+                    <div class="gallery-item animate-fade-up">
+                        <img src="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/800-1.jpg"
+                            alt="Gallery Photo" class="gallery-img">
+                        <div class="media-info">
+                            <a href="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/800-1.jpg"
+                                download target="_blank" class="download-btn">
+                                <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;">
+                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                                </svg> Download</a>
+                        </div>
+                    </div>
+                    <div class="gallery-item animate-fade-up">
+                        <img src="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/800-2.jpg"
+                            alt="Gallery Photo" class="gallery-img">
+                        <div class="media-info">
+                            <a href="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/800-2.jpg"
+                                download target="_blank" class="download-btn">
+                                <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;">
+                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                                </svg> Download</a>
+                        </div>
+                    </div>
+                    <div class="gallery-item animate-fade-up">
+                        <img src="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/800-3%20copy.jpg"
+                            alt="Gallery Photo" class="gallery-img">
+                        <div class="media-info">
+                            <a href="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/800-3%20copy.jpg"
+                                download target="_blank" class="download-btn">
+                                <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;">
+                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                                </svg> Download</a>
+                        </div>
+                    </div>
+                    <div class="gallery-item animate-fade-up">
+                        <img src="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/800-4.jpg"
+                            alt="Gallery Photo" class="gallery-img">
+                        <div class="media-info">
+                            <a href="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/800-4.jpg"
+                                download target="_blank" class="download-btn">
+                                <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;">
+                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                                </svg> Download</a>
+                        </div>
+                    </div>
+                    <div class="gallery-item animate-fade-up">
+                        <img src="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/WhatsApp%20Image%202025-11-21%20at%2023.29.40_8ea24adc.jpg"
+                            alt="Gallery Photo" class="gallery-img">
+                        <div class="media-info">
+                            <a href="https://raw.githubusercontent.com/Sareef6235/muhsinu2/main/assets/gallary/WhatsApp%20Image%202025-11-21%20at%2023.29.40_8ea24adc.jpg"
+                                download target="_blank" class="download-btn">
+                                <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;">
+                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                                </svg> Download</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+
+    <!-- Bottom Navigation (Popup/Glassmorphism Style) -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-container">
+            <a href="#hero" class="nav-item">
+                <i class="ph ph-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="creations.html" class="nav-item">
+                <i class="ph ph-paint-brush"></i>
+                <span>Creations</span>
+            </a>
+            <a href="#gallerySection" class="nav-item">
+                <i class="ph ph-image"></i>
+                <span>Gallery</span>
+            </a>
+            <a href="#booking" class="btn-book-nav">
+                <i class="ph ph-calendar-plus"></i>
+                Book Tuition
+            </a>
+            <a href="exam_result.html" class="nav-item">
+                <i class="ph ph-exam"></i>
+                <span>Result</span>
+            </a>
+            <a href="#contact" class="nav-item">
+                <i class="ph ph-chat-circle"></i>
+                <span>Contact</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Firebase Realtime Logic -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <!-- Booking Confirmation Modal -->
+    <div id="booking-modal" class="modal-overlay">
+        <div class="modal-content animate-fade-up">
+            <div class="modal-icon">
+                <i class="ph ph-check-circle"></i>
+            </div>
+            <h2>Booking Summary</h2>
+            <div class="modal-body">
+                <p>Hello <span id="modal-name"></span>,</p>
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin: 15px 0;">
+                    <p style="margin: 0; color: #888; font-size: 0.85rem;">Subjects:</p>
+                    <p id="modal-subjects" style="color: #fff; font-weight: 600;"></p>
+                    <div style="height: 1px; background: var(--glass-border); margin: 10px 0;"></div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #888;">Class: <strong id="modal-class" style="color: #fff;"></strong></span>
+                        <span style="color: #888;">Total: <strong id="modal-price"
+                                style="color: var(--primary-color);"></strong></span>
+                    </div>
+                </div>
+
+                <!-- UPI QR Code Section (Using User's Specific Info) -->
+                <div class="modal-qr-section"
+                    style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--glass-border);">
+                    <p style="margin-bottom: 15px; color: #bbb; font-size: 0.9rem;">Scan to Pay via UPI</p>
+                    <div class="modal-qr-container"
+                        style="background: white; padding: 15px; border-radius: 15px; display: inline-block;">
+                        <img src="upi-qr.jpeg" alt="UPI QR Code" class="modal-qr-img"
+                            style="max-width: 180px; width: 100%; display: block; height: auto; border-radius: 8px;">
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <p style="font-size: 0.9rem; color: #fff; margin-bottom: 5px;">UPI ID: <b>mmuhsinu2-1@okaxis</b>
+                        </p>
+                        <p style="font-size: 0.8rem; color: #888;">Name: Mo Mhn</p>
+                    </div>
+                </div>
+
+                <p class="modal-note">Click "Proceed to Pay" to visit your UPI app and confirm the booking.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="modal-pay-btn" style="width: 100%; padding: 15px;">Proceed to
+                    Pay</button>
+                <button onclick="closeBookingModal()"
+                    style="margin-top: 15px; background: none; border: none; color: #666; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Config for MIFTHAHUL HUDA MADRASA
+        var firebaseConfig = {
+            apiKey: "AIzaSyD4mpleKey12345abcdef67890",
+            authDomain: "my-pc-895cd.firebaseapp.com",
+            databaseURL: "https://my-pc-895cd-default-rtdb.firebaseio.com",
+            projectId: "my-pc-895cd"
+        };
+
+        if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+
+            // 2. Real-time Listeners
+            db.ref("notice").on("value", function (snapshot) {
+                if (snapshot.val() === true) {
+                    const target = document.getElementById("gallerySection");
+                    if (target) {
+                        target.scrollIntoView({ behavior: "smooth" });
+                        setTimeout(() => db.ref("notice").set(false), 5000);
+                    }
+                }
+            });
+
+            // 3. Automatic GitHub Media Sync
+            const galleryList = document.getElementById('gallery-list');
+            const videoList = document.getElementById('video-list');
+
+            const downloadIcon = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+
+            function addImageToGallery(url) {
+                const existing = Array.from(galleryList.querySelectorAll('img')).some(img => img.src === url);
+                if (existing) return;
+
+                const item = document.createElement("div");
+                item.className = "gallery-item animate-fade-up";
+                item.innerHTML = `
+                    <img src="${url}" alt="Gallery Photo" class="gallery-img" loading="lazy">
+                    <div class="media-info">
+                        <a href="${url}" download target="_blank" class="download-btn">
+                            ${downloadIcon} Download Image
+                        </a>
+                    </div>
+                `;
+                galleryList.appendChild(item);
+            }
+
+            function addVideoToGallery(url) {
+                const existing = Array.from(videoList.querySelectorAll('source')).some(src => src.src === url);
+                if (existing) return;
+
+                const item = document.createElement("div");
+                item.className = "video-item animate-fade-up";
+                item.innerHTML = `
+                    <video controls preload="none">
+                        <source src="${url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `;
+                videoList.appendChild(item);
+            }
+
+            // Fetch Images
+            fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallary")
+                .then(res => res.json())
+                .then(files => {
+                    if (Array.isArray(files)) {
+                        const hasImages = files.some(f => f.name.match(/\.(jpg|jpeg|png|webp|gif)$/i));
+                        if (hasImages) galleryList.innerHTML = '';
+                        files.forEach(file => {
+                            if (file.type === "file" && file.name.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
+                                addImageToGallery(file.download_url);
+                            }
+                        });
+                    }
+                }).catch(err => console.error("Image sync failed:", err));
+
+            // Fetch Videos
+            fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallary/videos")
+                .then(res => res.json())
+                .then(files => {
+                    if (Array.isArray(files)) {
+                        const hasVideos = files.some(f => f.name.match(/\.(mp4|mov|webm)$/i));
+                        if (hasVideos) videoList.innerHTML = '';
+                        files.forEach(file => {
+                            if (file.type === "file" && file.name.match(/\.(mp4|mov|webm)$/i)) {
+                                addVideoToGallery(file.download_url);
+                            }
+                        });
+                    } else {
+                        videoList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #555;">No videos found.</p>';
+                    }
+                }).catch(err => {
+                    console.error("Video sync failed:", err);
+                    videoList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #555;">Video folder not found.</p>';
+                });
+
+            // 4. Automatic PDF Sync for "Latest Sessions"
+            const pdfList = document.getElementById('pdf-list');
+
+            function addPdfToSessions(name, url) {
+                const item = document.createElement("div");
+                item.className = "session-card pdf-card animate-fade-up";
+                item.innerHTML = `
+                    <div class="pdf-info">
+                        <i class="ph ph-file-pdf" style="font-size: 2rem; color: #ff4d4d;"></i>
+                        <div>
+                            <h4>${name.replace(/\.pdf$/i, '')}</h4>
+                            <p>Official Document / Certificate</p>
+                        </div>
+                    </div>
+                    <a href="${url}" target="_blank" class="btn-pdf">View Document</a>
+                `;
+                pdfList.appendChild(item);
+            }
+
+            fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/pdfs")
+                .then(res => res.json())
+                .then(files => {
+                    if (Array.isArray(files)) {
+                        const hasPdfs = files.some(f => f.name.match(/\.(pdf)$/i));
+                        if (hasPdfs) pdfList.innerHTML = '';
+                        files.forEach(file => {
+                            if (file.type === "file" && file.name.match(/\.(pdf)$/i)) {
+                                addPdfToSessions(file.name, file.download_url);
+                            }
+                        });
+                    }
+                }).catch(err => console.error("PDF sync failed:", err));
+        }
+
+        // Exam Result Logic for Homepage
+        const RESULT_SHEET_ID = "1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU";
+        const RESULT_TAB_NAME = "class1";
+
+        async function fetchHomeResult() {
+            const regnoInput = document.getElementById('home-regno');
+            const regno = regnoInput.value.trim().toUpperCase();
+            const status = document.getElementById('home-status');
+            const container = document.getElementById('home-result-container');
+            const area = document.getElementById('home-result-area');
+
+            if (!regno) return;
+
+            status.innerHTML = "Syncing with database...";
+            container.style.display = "none";
+
+            const url = `https://docs.google.com/spreadsheets/d/${RESULT_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${RESULT_TAB_NAME}`;
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const json = JSON.parse(text.substring(47).slice(0, -2));
+                const cols = json.table.cols;
+                const rows = json.table.rows;
+
+                const findIdx = (keywords) => cols.findIndex(c => keywords.some(k => (c.label || "").toLowerCase().includes(k)));
+                const idxMap = {
+                    id: findIdx(['id', 'reg']),
+                    name: findIdx(['name']),
+                };
+
+                const getVal = (row, idx) => {
+                    if (!row || !row.c[idx]) return "";
+                    return row.c[idx].f || String(row.c[idx].v) || "";
+                };
+
+                const student = rows.find(r => getVal(r, idxMap.id).trim().toUpperCase() === regno);
+
+                if (student) {
+                    const name = getVal(student, idxMap.name);
+                    const result = "PUBLISHED";
+
+                    status.innerHTML = "✅ Record Found";
+                    area.innerHTML = `
+                        <div style="font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 8px; direction: rtl;">${name}</div>
+                        <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 8px;">
+                            <span style="color: #888; font-size: 0.9rem;">Exam Status:</span>
+                            <span style="color: #00ff88; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">${result}</span>
+                        </div>
+                    `;
+                    container.style.display = "block";
+                } else {
+                    status.innerHTML = "❌ ID not found in database";
+                }
+            } catch (err) {
+                console.error(err);
+                status.innerHTML = "⚠️ Connection Error";
+            }
+        }
+
+        document.getElementById('home-regno')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') fetchHomeResult();
+        });
+    </script>
+
+
+    <footer
+        style="background: #0a0a0a; border-top: 1px solid var(--glass-border); padding: 60px 0 30px; margin-top: 80px;">
+        <div class="container">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <div>
+                    <h3 style="color: var(--primary-color); margin-bottom: 20px; font-size: 1.3rem;">MIFTHAHUL HUDA
+                        MADRASA</h3>
+                    <p style="color: #888; line-height: 1.8;">Empowering students through quality education and Islamic
+                        values at Vengara S S Road.</p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Quick Links</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 12px;"><a href="#about"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">About Us</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#booking"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Book Tuition</a></li>
+                        <li style="margin-bottom: 12px;"><a href="exam_result.html"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Exam Results</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#gallery"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Gallery</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Contact</h4>
+                    <p style="color: #888; margin-bottom: 10px;">📍 Vengara S S Road</p>
+                    <p style="color: #888; margin-bottom: 10px;">📞 <a href="https://t.me/+916235989198"
+                            style="color: #888; text-decoration: none;">+91 6235989198</a></p>
+                    <p style="color: #888;">✉️ Contact via Telegram</p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Enroll Now</h4>
+                    <p style="color: #888; margin-bottom: 20px; line-height: 1.6;">Start your learning journey with us
+                        today!</p>
+                    <a href="#booking" class="btn btn-primary" style="display: inline-block;">Book a Tuition Session</a>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; text-align: center;">
+                <p style="color: #666; font-size: 0.9rem;">© 2026 MHMV. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

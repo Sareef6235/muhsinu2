@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Wizard Demo | MIFTHAHUL HUDA</title>
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <link rel="stylesheet" href="../../assets/css/wizard-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            background: #080808;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            padding: 50px 20px;
+        }
+
+        .wizard-card {
+            max-width: 600px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        .btn-primary {
+            background: #00e5ff;
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wizard-card">
+        <h2 style="text-align: center; margin-bottom: 30px;">Registration Wizard</h2>
+
+        <!-- Progress Tracker -->
+        <div class="wizard-progress">
+            <div class="progress-step active" data-step="1">1</div>
+            <div class="progress-step" data-step="2">2</div>
+            <div class="progress-step" data-step="3">3</div>
+        </div>
+
+        <div id="wizard-container">
+            <!-- Step 1 -->
+            <div class="form-step active" data-step="1">
+                <h3>Personal Information</h3>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="wiz-name" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="wiz-email" placeholder="john@example.com" required>
+                </div>
+                <button type="button" class="btn-primary" onclick="nextStep(2)">
+                    Continue <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="form-step" data-step="2">
+                <h3>Course Selection</h3>
+                <div class="form-group">
+                    <label>Preferred Class</label>
+                    <select id="wiz-class" required>
+                        <option value="">Select a class</option>
+                        <option value="primary">Primary Section</option>
+                        <option value="secondary">Secondary Section</option>
+                        <option value="higher">Higher Secondary</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Exam Name</label>
+                    <input type="text" id="wiz-exam" placeholder="Annual Exam 2026" required>
+                </div>
+                <button type="button" class="btn-primary" onclick="nextStep(3)">
+                    Next Details <i class="ph-bold ph-arrow-right"></i>
+                </button>
+                <button type="button" class="btn-outline" onclick="prevStep()">
+                    Go Back
+                </button>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="form-step" data-step="3">
+                <h3>Final Confirmation</h3>
+                <p style="color: #888;">Please review your details before submitting. All progress is saved
+                    automatically.</p>
+
+                <div
+                    style="background: rgba(0,229,255,0.05); padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid rgba(0,229,255,0.2);">
+                    <p>✅ Info validation passed</p>
+                    <p>✅ Data persistence active</p>
+                    <p>✅ Mobile responsive ready</p>
+                </div>
+
+                <button type="button" class="btn-primary" onclick="alert('Form Submitted successfully!')">
+                    Submit Registration
+                </button>
+                <button type="button" class="btn-outline" onclick="prevStep()">
+                    Go Back
+                </button>
+                <button type="button" class="btn-outline" style="border-color: #ff3d3d; color: #ff3d3d;"
+                    onclick="wizard.reset()">
+                    Reset Form
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import FormWizard from '../../assets/js/form-wizard.js';
+
+        // Initialize Wizard
+        window.wizard = new FormWizard({
+            containerId: 'wizard-container',
+            storageKey: 'demo_wizard_save', // Supports multiple wizards on site
+            onStepChange: (step) => {
+                console.log('Moved to step:', step);
+            }
+        });
+    </script>
+</body>
+
+</html>

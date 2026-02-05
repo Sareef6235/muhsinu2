@@ -1,106 +1,39 @@
-import { auth, db } from "./firebase.js";
-window.db = db;
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
 /**
- * Shared Auth Nav Guard
- * Toggles visibility of elements and provides global auth helpers.
+ * Auth Navigation Guard - REBUILT FOR LOCAL CMS
+ * Controls visibility of admin-only elements based on local auth.
  */
+import LocalAuth from './local-auth.js';
 
-window.currentUser = null;
-window.userData = null;
-
-onAuthStateChanged(auth, async (user) => {
-    window.currentUser = user;
+function updateAdminNavigation() {
+    const isAdmin = LocalAuth.isAuthenticated();
     const adminElements = document.querySelectorAll('.admin-only');
-    const authOnlyElements = document.querySelectorAll('.auth-only');
-    const guestOnlyElements = document.querySelectorAll('.guest-only');
 
-    if (!user) {
-        window.userData = null;
-        adminElements.forEach(el => el.style.display = 'none');
-        authOnlyElements.forEach(el => el.style.display = 'none');
-        guestOnlyElements.forEach(el => el.style.display = 'block');
-        return;
-    }
-
-    // User is logged in
-    authOnlyElements.forEach(el => el.style.display = 'block');
-    guestOnlyElements.forEach(el => el.style.display = 'none');
-
-    try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-            window.userData = userDoc.data();
-            if (window.userData.role === 'admin') {
-                console.log("👑 Admin detected, revealing protected elements...");
-                adminElements.forEach(el => el.style.display = 'block');
-            } else {
-                adminElements.forEach(el => el.style.display = 'none');
-            }
+    adminElements.forEach(el => {
+        if (isAdmin) {
+            el.style.display = 'block';
+            el.classList.add('admin-active');
+        } else {
+            el.style.display = 'none';
+            el.classList.remove('admin-active');
         }
-    } catch (e) {
-        console.error("Auth Nav Guard Error:", e);
+    });
+
+    // Handle nested flex/grid displays if needed
+    const adminFlex = document.querySelectorAll('.admin-only-flex');
+    adminFlex.forEach(el => {
+        el.style.display = isAdmin ? 'flex' : 'none';
+    });
+}
+
+// Run on load
+document.addEventListener('DOMContentLoaded', updateAdminNavigation);
+
+// Listen for local login/logout events
+window.addEventListener('storage', (e) => {
+    if (e.key === 'mhm_admin_session') {
+        updateAdminNavigation();
     }
 });
 
-/**
- * Global Logout Helper
- */
-window.logout = async () => {
-    try {
-        await signOut(auth);
-        const getRootPath = () => {
-            const path = window.location.pathname;
-            if (path.includes('/pages/')) {
-                if (path.match(/\/pages\/[^/]+\/[^/]+\//)) return '../../../';
-                if (path.match(/\/pages\/[^/]+\//)) return '../../';
-                return '../';
-            }
-            return '';
-        };
-        const ROOT = getRootPath();
-        window.location.href = ROOT + 'index.html';
-    } catch (e) {
-        console.error("Logout Error:", e);
-    }
-};
-
-/**
- * Route Protection Helper
- * @param {string} roleRequired - 'student' or 'admin'
- */
-window.requireAuth = (roleRequired = 'student') => {
-    return new Promise((resolve) => {
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                const getRootPath = () => {
-                    const path = window.location.pathname;
-                    if (path.includes('/pages/')) {
-                        if (path.match(/\/pages\/[^/]+\/[^/]+\//)) return '../../../';
-                        if (path.match(/\/pages\/[^/]+\//)) return '../../';
-                        return '../';
-                    }
-                    return '';
-                };
-                const ROOT = getRootPath();
-                window.location.href = ROOT + `pages/admin/index.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
-                return;
-            }
-
-            if (roleRequired === 'admin') {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (!userDoc.exists() || userDoc.data().role !== 'admin') {
-                    alert("Unauthorized access. Admin privileges required.");
-                    const ROOT = (window.location.pathname.includes('/pages/')) ?
-                        (window.location.pathname.match(/\/pages\/[^/]+\/[^/]+\//) ? '../../../' : '../../') : '';
-                    window.location.href = ROOT + 'index.html';
-                    return;
-                }
-            }
-            resolve(user);
-        });
-    });
-};
-
+// Export for manual trigger
+export default { updateAdminNavigation };

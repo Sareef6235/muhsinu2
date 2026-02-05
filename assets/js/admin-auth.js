@@ -1,68 +1,66 @@
 /**
- * Admin Authentication Guard (Local Version)
- * Protects admin pages using local session logic.
+ * Firebase Admin Authentication Guard
+ * Protects admin pages and provides auth state helpers.
  */
+import { auth } from "./firebase-config.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import { Auth } from './core/auth.js';
-
-export class AdminAuth {
-    constructor() {
-        this.init();
-    }
-
+const AdminAuth = {
+    /**
+     * Initialize Auth Guard
+     */
     init() {
-        // 1. Check if we are on a protected page
-        if (this.isProtectedPage()) {
-            // Strict check: Redirects if not logged in
-            Auth.check(true);
-        }
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Logged in
+                window.adminLoggedIn = true;
+                window.adminUser = user;
+                this.updateUI(true);
+            } else {
+                // Logged out
+                window.adminLoggedIn = false;
+                window.adminUser = null;
+                this.updateUI(false);
 
-        // 2. Handle Login Form (if on login page)
-        this.bindLogin();
-
-        // 3. Handle Logout (if on dashboard)
-        this.bindLogout();
-    }
-
-    isProtectedPage() {
-        const path = window.location.pathname;
-        return path.includes('/admin/') &&
-            !path.endsWith('/admin/') &&
-            !path.endsWith('/admin/index.html');
-    }
-
-    bindLogin() {
-        const loginForm = document.getElementById('admin-login-form');
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const email = document.getElementById('admin-email').value;
-                const password = document.getElementById('admin-password').value;
-                const errorMsg = document.getElementById('login-error');
-
-                if (Auth.login(email, password)) {
-                    // Success
-                    window.location.href = 'dashboard.html';
-                } else {
-                    // Fail
-                    if (errorMsg) errorMsg.textContent = 'Invalid credentials. Try admin@mhmv.org / admin123';
-                    if (errorMsg) errorMsg.style.display = 'block';
+                // Protect admin pages
+                if (window.location.pathname.includes('/admin/dashboard.html')) {
+                    window.location.href = 'index.html';
                 }
-            });
-        }
-    }
+            }
+        });
+    },
 
-    bindLogout() {
-        const logoutBtn = document.getElementById('admin-logout');
+    /**
+     * Logout logic
+     */
+    async logout() {
+        try {
+            await signOut(auth);
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error("Logout Error:", error);
+        }
+    },
+
+    /**
+     * Update UI based on auth state
+     */
+    updateUI(isLoggedIn) {
+        document.querySelectorAll('.admin-only').forEach(el => {
+            el.style.display = isLoggedIn ? 'block' : 'none';
+        });
+
+        const logoutBtn = document.getElementById('admin-logout-btn');
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to logout?')) {
-                    Auth.logout();
-                }
-            });
+            logoutBtn.onclick = () => this.logout();
         }
     }
+};
+
+// Auto-init if browser
+if (typeof window !== 'undefined') {
+    AdminAuth.init();
+    window.AdminAuth = AdminAuth;
 }
 
-// Auto-init
-window.AdminAuth = new AdminAuth();
+export default AdminAuth;

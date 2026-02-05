@@ -1,60 +1,76 @@
 /**
- * News Service (Local Version)
- * Manages news and updates using the local Storage engine.
+ * News Service - REBUILT FOR LOCAL CMS (V2)
+ * Manages news, notices, and updates entirely client-side.
  */
-
-import { Storage } from './core/storage.js';
-
-const COLLECTION = 'news';
+import StorageManager from './storage-manager.js';
 
 export class NewsService {
-
     constructor() {
-        // Ensure default news exists
-        const existing = Storage.getAll(COLLECTION);
-        if (existing.length === 0) {
-            Storage.init(COLLECTION, [
-                {
-                    id: 'news_init_1',
-                    title: { en: 'Welcome to our new website!', ar: 'مرحبا بكم' },
-                    shortDesc: 'We have launched our new digital platform.',
-                    date: new Date().toISOString(),
-                    image: null
-                }
-            ]);
-        }
+        this.STORAGE_KEY = 'site_news';
+        this.news = [];
+        this.init();
     }
 
-    async getAllNews() {
-        // Sort by date desc
-        const news = Storage.getAll(COLLECTION);
-        return news.sort((a, b) => new Date(b.date) - new Date(a.date));
+    init() {
+        this.news = StorageManager.get(this.STORAGE_KEY, [
+            {
+                id: 'n1',
+                title: 'Admission Open 2026',
+                desc: 'We are now accepting registrations for the new academic session. Join our community today!',
+                date: new Date().toISOString(),
+                status: 'published',
+                category: 'Admission',
+                image: ''
+            },
+            {
+                id: 'n2',
+                title: 'Annual Arts Festival',
+                desc: 'Get ready for the grand cultural event of the year. Talent and creativity at its best.',
+                date: new Date().toISOString(),
+                status: 'published',
+                category: 'Event',
+                image: ''
+            }
+        ]);
+        StorageManager.set(this.STORAGE_KEY, this.news);
     }
 
-    async getLatestNews(limit = 3) {
-        const news = await this.getAllNews();
-        return news.slice(0, limit);
+    sync() {
+        this.news = StorageManager.get(this.STORAGE_KEY, []);
+        window.dispatchEvent(new CustomEvent('news-updated'));
+        return this.news;
     }
 
-    async saveNews(data, id = null) {
-        if (id) {
-            data.id = id;
-        } else {
-            data.id = 'news_' + Date.now();
-            data.createdAt = new Date().toISOString();
-        }
+    getPublishedNews() {
+        return this.news.filter(n => n.status === 'published');
+    }
 
-        // Ensure date field works
-        if (!data.date) data.date = new Date().toISOString();
+    getAllNews() {
+        return this.news;
+    }
 
-        Storage.save(COLLECTION, data);
-        return data;
+    async saveNews(newsItem) {
+        const id = newsItem.id || 'news_' + Date.now();
+        const updatedItem = {
+            ...newsItem,
+            id,
+            date: newsItem.date || new Date().toISOString(),
+            status: newsItem.status || 'published'
+        };
+
+        this.news = this.news.filter(n => n.id !== id);
+        this.news.unshift(updatedItem);
+        StorageManager.set(this.STORAGE_KEY, this.news);
+        this.sync();
+        return updatedItem;
     }
 
     async deleteNews(id) {
-        Storage.delete(COLLECTION, id);
+        this.news = this.news.filter(n => n.id !== id);
+        StorageManager.set(this.STORAGE_KEY, this.news);
+        this.sync();
     }
 }
 
-// Global Exposure
-window.NewsService = NewsService;
+const newsInstance = new NewsService();
+export default newsInstance;
