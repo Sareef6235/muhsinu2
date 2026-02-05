@@ -283,14 +283,49 @@ const ResultsManagement = (() => {
     };
 
 
-    const calculateGrade = (total) => {
-        if (total >= 450) return 'A+';
-        if (total >= 400) return 'A';
-        if (total >= 350) return 'B+';
-        if (total >= 300) return 'B';
-        if (total >= 250) return 'C';
-        if (total >= 180) return 'D';
+    /**
+     * Calculate grade based on percentage (NOT fixed totals)
+     * @param {number} percentage - Percentage score (0-100)
+     * @returns {string} Grade (A+, A, B, C, D, F)
+     */
+    const calculateGrade = (percentage) => {
+        if (percentage >= 90) return 'A+';
+        if (percentage >= 80) return 'A';
+        if (percentage >= 70) return 'B';
+        if (percentage >= 60) return 'C';
+        if (percentage >= 50) return 'D';
         return 'F';
+    };
+
+    /**
+     * Calculate percentage from marks
+     * @param {number} obtained - Total marks obtained
+     * @param {number} maxMarks - Maximum possible marks
+     * @returns {number} Percentage (0-100)
+     */
+    const calculatePercentage = (obtained, maxMarks) => {
+        if (maxMarks === 0) return 0;
+        return Math.round((obtained / maxMarks) * 100 * 100) / 100; // Round to 2 decimals
+    };
+
+    /**
+     * Determine pass/fail status
+     * @param {object} subjects - Subject marks object {subjectName: marks}
+     * @param {number} passMark - Minimum passing marks per subject (default: 33)
+     * @returns {string} 'Pass' or 'Fail'
+     */
+    const calculateStatus = (subjects, passMark = 33) => {
+        const marks = Object.values(subjects);
+        if (marks.length === 0) return 'Absent';
+
+        // Check if any subject has marks below pass mark
+        const hasFailed = marks.some(mark => mark < passMark && mark > 0);
+
+        // If all marks are 0, mark as Absent
+        const allZero = marks.every(mark => mark === 0);
+        if (allZero) return 'Absent';
+
+        return hasFailed ? 'Fail' : 'Pass';
     };
 
 
@@ -636,15 +671,15 @@ const ResultsManagement = (() => {
             return;
         }
 
-        // 2. Mapping Configuration Validation
+        // 2. Mapping Configuration Validation (ONLY Roll No and Name required)
         const mapping = {
             roll: document.getElementById('map-roll')?.value,
             name: document.getElementById('map-name')?.value,
-            dob: document.getElementById('map-dob')?.value,
-            status: document.getElementById('map-status')?.value,
+            dob: document.getElementById('map-dob')?.value || null, // Optional
             subjects: Array.from(document.querySelectorAll('.map-subject-checkbox:checked')).map(cb => cb.value)
         };
 
+        // STRICT VALIDATION: Only Roll No and Name are mandatory
         if (!mapping.roll || !mapping.name) {
             showStatus('<span style="color:#ff4444;">❌ Error: Roll No and Name columns must be mapped.</span>', 'error');
             const mappingUI = document.getElementById('column-mapping-ui');
@@ -652,11 +687,19 @@ const ResultsManagement = (() => {
             return;
         }
 
+        // Validate at least one subject is selected
+        if (mapping.subjects.length === 0) {
+            showStatus('<span style="color:#ff4444;">❌ Error: Please select at least one subject column.</span>', 'error');
+            return;
+        }
+
         console.log('📊 Sync Configuration:');
         console.log('  Roll No Column:', mapping.roll);
         console.log('  Name Column:', mapping.name);
+        console.log('  DOB Column:', mapping.dob || 'Not mapped (optional)');
         console.log('  Subject Columns:', mapping.subjects);
-        console.log('  Metadata Ignored: CLASS, SECTION, etc.');
+        console.log('  ⚠️ Grade, Status, Percentage will be CALCULATED in JavaScript');
+        console.log('  ⚠️ Metadata (CLASS, SECTION, etc.) ignored');
 
         // UI State: Loading
         syncButton.disabled = true;
@@ -704,17 +747,26 @@ const ResultsManagement = (() => {
                 // Get status (Pass/Fail)
                 const resStatus = row[mapping.status] || (totalMarks > 0 ? 'Pass' : 'Absent');
 
+                // Calculate computed values (JS-based)
+                const maxMarksPerSubject = 100;
+                const totalMaxMarks = mapping.subjects.length * maxMarksPerSubject;
+                const percentage = calculatePercentage(totalMarks, totalMaxMarks);
+                const grade = calculateGrade(percentage);
+                const status = calculateStatus(subjects, 33);
+
                 return {
                     rollNo: row[mapping.roll] || '',
                     name: row[mapping.name] || '',
                     dob: mapping.dob ? row[mapping.dob] : '',
                     examId: examId,
                     exam: examName,
-                    subjects: subjects, // Subject-wise marks object
+                    subjects: subjects,
                     totalMarks: totalMarks,
-                    grade: calculateGrade(totalMarks),
-                    status: resStatus,
-                    rank: null // Rank will be calculated on render
+                    maxMarks: totalMaxMarks,   // New field
+                    percentage: percentage,    // New field
+                    grade: grade,
+                    status: status,
+                    rank: null
                 };
             }).filter(r => r.rollNo && r.name); // Only include rows with valid identity
 
