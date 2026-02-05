@@ -297,33 +297,114 @@ const ResultsManagement = (() => {
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     /**
-     * AUTO-MAPPING HELPERS
+     * ========================================
+     * COLUMN CLASSIFICATION ENGINE
+     * ========================================
+     * Implements strict 3-category classification:
+     * 1. IDENTITY: Roll No, Student Name (required)
+     * 2. METADATA: CLASS, SECTION, etc. (ignored)
+     * 3. SUBJECTS: All other columns with marks
      */
-    const normalizeHeader = (h) => h ? h.toLowerCase().replace(/[^a-z0-9]/g, '').trim() : '';
 
-    const patterns = {
-        roll: ['roll', 'rollno', 'rollnumber', 'register', 'regno', 'registerno', 'registernumber', 'admissionno', 'admissionnumber', 'studentid', 'idno'],
-        name: ['name', 'studentname', 'candidatename', 'fullname'],
+    // Normalize header for comparison (case-insensitive, remove symbols)
+    const normalizeHeader = (h) => {
+        if (!h) return '';
+        return h.toString()
+            .toLowerCase()
+            .replace(/['\s\-_]/g, '') // Remove quotes, spaces, hyphens, underscores
+            .trim();
+    };
+
+    // Identity field patterns (REQUIRED for student identification)
+    const IDENTITY_PATTERNS = {
+        roll: [
+            'rollno', 'roll', 'rollnumber',
+            'regno', 'registerno', 'registernumber',
+            'admissionno', 'admissionnumber',
+            'studentid', 'idno', 'id'
+        ],
+        name: [
+            'studentname', 'name', 'candidatename',
+            'fullname', 'student'
+        ],
         dob: ['dob', 'dateofbirth', 'birthdate'],
         status: ['status', 'result', 'passfail', 'resultstatus']
     };
 
+    // Metadata patterns (MUST BE IGNORED - not subject marks)
+    const METADATA_PATTERNS = [
+        'class', 'section', 'batch', 'group',
+        'division', 'stream', 'year', 'semester',
+        'total', 'grade', 'rank', 'percentage',
+        'remark', 'remarks', 'comment', 'comments',
+        'exam', 'examname', 'examtype'
+    ];
+
+    /**
+     * Classify a column header into one of three categories
+     * @param {string} header - Column header from sheet
+     * @param {string} sampleValue - Sample value from first data row
+     * @returns {object} - {type: 'identity'|'metadata'|'subject', field: string|null}
+     */
+    const classifyColumn = (header, sampleValue = '') => {
+        const normalized = normalizeHeader(header);
+
+        if (!normalized) {
+            return { type: 'unknown', field: null };
+        }
+
+        // 1. Check if it's an IDENTITY field (Roll No, Name, etc.)
+        for (const [field, patterns] of Object.entries(IDENTITY_PATTERNS)) {
+            for (const pattern of patterns) {
+                if (normalized === pattern || normalized.includes(pattern)) {
+                    return { type: 'identity', field: field };
+                }
+            }
+        }
+
+        // 2. Check if it's METADATA (must be excluded from subjects)
+        for (const pattern of METADATA_PATTERNS) {
+            if (normalized === pattern || normalized.includes(pattern)) {
+                return { type: 'metadata', field: pattern };
+            }
+        }
+
+        // 3. Otherwise, it's a SUBJECT column
+        // Additional heuristic: if sample value is numeric or reasonable length
+        const isNumeric = sampleValue && !isNaN(parseFloat(sampleValue.toString().replace('%', '')));
+        const isReasonableLength = header.length > 0 && header.length < 50;
+
+        if (isReasonableLength) {
+            return { type: 'subject', field: header }; // Preserve EXACT original name
+        }
+
+        return { type: 'unknown', field: null };
+    };
+
+    /**
+     * Find best match for a specific identity field type
+     * @param {string} header - Column header
+     * @param {string} type - Identity type (roll, name, dob, status)
+     * @returns {boolean}
+     */
     const findBestMatch = (header, type) => {
         const normalized = normalizeHeader(header);
         if (!normalized) return false;
 
-        // Exact normalized match
-        if (patterns[type].includes(normalized)) return true;
+        const patterns = IDENTITY_PATTERNS[type] || [];
+
+        // Exact match
+        if (patterns.includes(normalized)) return true;
 
         // Partial match for specific types
-        if (type === 'roll' && (normalized.includes('roll') || normalized.includes('register') || normalized.includes('regno'))) return true;
-        if (type === 'name' && (normalized.includes('student') && normalized.includes('name'))) return true;
+        if (type === 'roll' && (normalized.includes('roll') || normalized.includes('regno'))) return true;
+        if (type === 'name' && normalized.includes('name')) return true;
 
         return false;
     };
 
     /**
-     * UI Rendering
+     * UI Rendering with Subject-Wise Display
      */
     const renderTable = () => {
         const tbody = document.getElementById('results-table-body');
@@ -357,37 +438,52 @@ const ResultsManagement = (() => {
         // Sort by Total Marks (Ranking)
         const sorted = [...examData.data].sort((a, b) => (b.totalMarks || 0) - (a.totalMarks || 0));
 
-        tbody.innerHTML = sorted.map((r, index) => `
+        // Build subject-wise display
+        tbody.innerHTML = sorted.map((r, index) => {
+            // Create subject breakdown tooltip/display
+            const subjectBreakdown = r.subjects ? Object.entries(r.subjects)
+                .map(([subj, marks]) => `${subj}: ${marks}`)
+                .join(' | ') : 'N/A';
+
+            return `
             <tr>
                 <td>${r.rollNo}</td>
                 <td><b style="color:#fff;">${r.name}</b></td>
-                <td>${r.exam || '---'}</td>
+                <td title="${subjectBreakdown}">${r.exam || '---'}</td>
                 <td style="color:var(--primary-color); font-weight:bold;">${r.totalMarks || 0}</td>
                 <td><span class="status-badge" style="background:rgba(255,255,255,0.05);">${r.grade || 'N/A'}</span></td>
                 <td><span class="status-badge ${r.status === 'Pass' ? 'approved' : 'pending'}">${r.status || 'Unknown'}</span></td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
 
-        // Show sync info
+        // Show sync info with subject count
         const syncInfo = document.getElementById('results-sync-info');
         if (syncInfo) {
             const publishedBadge = examData.published
                 ? '<span class="status-badge approved">Published</span>'
                 : '<span class="status-badge pending">Unpublished</span>';
 
+            const subjectCount = sorted[0]?.subjects ? Object.keys(sorted[0].subjects).length : 0;
+
             syncInfo.innerHTML = `
                 Last synced: <b>${new Date(examData.syncedAt).toLocaleString()}</b> | 
                 ${publishedBadge} | 
-                ${sorted.length} results
+                ${sorted.length} results | 
+                ${subjectCount} subjects
             `;
+            syncInfo.style.display = 'block';
         }
     };
 
     /**
-     * Fetch Column Headers (Feature Requirement)
-     */
-    /**
-     * Fetch Column Headers & Reveal Mapping UI with Smart Auto-Detection
+     * ========================================
+     * FETCH HEADERS & AUTO-MAP COLUMNS
+     * ========================================
+     * Uses classification engine to intelligently detect:
+     * - Identity fields (Roll No, Name) → auto-map
+     * - Metadata columns (CLASS, etc.) → ignore
+     * - Subject columns → auto-select for marks
      */
     const fetchHeaders = async () => {
         const sheetId = sheetIdInput?.value?.trim();
@@ -399,7 +495,7 @@ const ResultsManagement = (() => {
         }
 
         try {
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching headers & analyzing sheet content...', 'loading');
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching headers & analyzing sheet structure...', 'loading');
 
             const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
             const response = await fetch(csvUrl);
@@ -414,69 +510,78 @@ const ResultsManagement = (() => {
 
             if (headers.length < 2) throw new Error("Could not parse headers from sheet.");
 
-            // Analyze first data row to help identify subjects
+            // Get first data row for classification hints
             const firstDataRow = lines[1] ? lines[1].split(',').map(v => v.trim().replace(/^"|"$/g, '')) : [];
 
-            // 1. Populate Mapping Dropdowns & Run Auto-Detection
-            const mappingRefs = {
-                'map-roll': 'roll',
-                'map-name': 'name',
-                'map-dob': 'dob',
-                'map-status': 'status'
-            };
+            console.log('📊 Column Classification Report:');
+            console.log('================================');
 
-            const autoMappedHeaders = new Set();
+            // Classify all columns
+            const classifications = headers.map((header, idx) => {
+                const classification = classifyColumn(header, firstDataRow[idx]);
+                console.log(`Column "${header}" → ${classification.type.toUpperCase()} ${classification.field ? `(${classification.field})` : ''}`);
+                return {
+                    header: header,
+                    index: idx,
+                    ...classification
+                };
+            });
+
+            // Extract identity fields
+            const identityFields = classifications.filter(c => c.type === 'identity');
+            const rollField = identityFields.find(c => c.field === 'roll');
+            const nameField = identityFields.find(c => c.field === 'name');
+            const dobField = identityFields.find(c => c.field === 'dob');
+            const statusField = identityFields.find(c => c.field === 'status');
+
+            // Extract subject columns (exclude identity and metadata)
+            const subjectColumns = classifications.filter(c => c.type === 'subject');
+
+            console.log('================================');
+            console.log(`✓ Identity Fields: ${identityFields.length}`);
+            console.log(`✓ Subject Columns: ${subjectColumns.length}`);
+            console.log(`✓ Metadata (ignored): ${classifications.filter(c => c.type === 'metadata').length}`);
+
+            // 1. Populate Identity Field Dropdowns with Auto-Selection
+            const mappingRefs = {
+                'map-roll': rollField,
+                'map-name': nameField,
+                'map-dob': dobField,
+                'map-status': statusField
+            };
 
             Object.keys(mappingRefs).forEach(selectId => {
                 const sel = document.getElementById(selectId);
                 if (!sel) return;
 
-                const type = mappingRefs[selectId];
+                const autoField = mappingRefs[selectId];
+
                 sel.innerHTML = '<option value="">-- Select Column --</option>' +
                     headers.map(h => `<option value="${h}">${h}</option>`).join('');
 
-                // Smart Detection
-                const match = headers.find(h => findBestMatch(h, type));
-                if (match) {
-                    sel.value = match;
-                    autoMappedHeaders.add(match);
+                // Auto-select if detected
+                if (autoField) {
+                    sel.value = autoField.header;
+                    sel.style.borderColor = '#00ff88'; // Visual feedback
                 }
             });
 
-            // 2. Identify and Group Subject Columns
+            // 2. Populate Subject Checkboxes (Auto-checked)
             const subjectContainer = document.getElementById('map-subjects-container');
             if (subjectContainer) {
-                const standardKeywords = ['roll', 'name', 'dob', 'class', 'status', 'total', 'grade', 'rank', 'remark', 'id', 'result', 'year', 'exam'];
-
-                const subjectFields = headers.filter((h, idx) => {
-                    // Skip if already auto-mapped to a standard field
-                    if (autoMappedHeaders.has(h)) return false;
-
-                    const normalized = normalizeHeader(h);
-
-                    // Skip if it looks like a standard field keyword
-                    if (standardKeywords.some(key => normalized.includes(key))) return false;
-
-                    // Heuristic: If it has data in first row that is numeric or not empty, and not standard field
-                    const dataVal = firstDataRow[idx];
-                    const isNumeric = dataVal && !isNaN(dataVal.replace('%', ''));
-
-                    return isNumeric || (dataVal && dataVal.length > 0 && dataVal.length < 15);
-                });
-
-                subjectContainer.innerHTML = subjectFields.map(h => `
-                    <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:6px; cursor:pointer; transition:all 0.2s;" class="subject-map-label">
-                        <input type="checkbox" class="map-subject-checkbox" value="${h}" checked>
-                        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${h}">${h}</span>
-                    </label>
-                `).join('');
-
-                if (subjectFields.length === 0) {
-                    subjectContainer.innerHTML = '<p style="font-size:0.8rem; color:#888; width:100%;">No subject columns identified. You can manually select them if needed.</p>';
+                if (subjectColumns.length > 0) {
+                    subjectContainer.innerHTML = subjectColumns.map(col => `
+                        <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; background:rgba(0,255,136,0.08); padding:8px 12px; border-radius:6px; cursor:pointer; transition:all 0.2s; border: 1px solid rgba(0,255,136,0.2);" class="subject-map-label">
+                            <input type="checkbox" class="map-subject-checkbox" value="${col.header}" checked>
+                            <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#fff; font-weight:500;" title="${col.header}">${col.header}</span>
+                        </label>
+                    `).join('');
+                } else {
+                    subjectContainer.innerHTML = '<p style="font-size:0.8rem; color:#ff8800; width:100%;">⚠️ No subject columns auto-detected. Please verify your sheet format.</p>';
                 }
             }
 
-            // 3. Reveal Mapping UI
+            // 3. Show Mapping UI
             const mappingUI = document.getElementById('column-mapping-ui');
             if (mappingUI) {
                 mappingUI.style.display = 'block';
@@ -484,7 +589,26 @@ const ResultsManagement = (() => {
                 mappingUI.scrollIntoView({ behavior: 'smooth' });
             }
 
-            showStatus('<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> ✓ Smart mapping complete! Please verify the selections below.', 'success');
+            // 4. Show Summary Status
+            const autoMapped = [rollField, nameField].filter(Boolean).length;
+            const statusMsg = `
+                <i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> 
+                ✓ Smart mapping complete!<br>
+                <small style="color:#888;">
+                    Auto-mapped: ${autoMapped}/2 identity fields | 
+                    Detected: ${subjectColumns.length} subjects | 
+                    Ignored: ${classifications.filter(c => c.type === 'metadata').length} metadata columns
+                </small>
+            `;
+            showStatus(statusMsg, 'success');
+
+            // Validation warning if critical fields missing
+            if (!rollField || !nameField) {
+                setTimeout(() => {
+                    showStatus('<span style="color:#ffcc00;">⚠️ Could not auto-detect Roll No or Name. Please map manually below.</span>', 'warning');
+                }, 2000);
+            }
+
         } catch (error) {
             console.error('📊 ResultsManagement FetchHeaders Error:', error);
             showStatus(`<span style="color:#ff4444;">❌ Error: ${error.message}</span>`, 'error');
@@ -492,7 +616,10 @@ const ResultsManagement = (() => {
     };
 
     /**
-     * SYNC LOGIC: Robust Handle Sync click
+     * ========================================
+     * SYNC LOGIC: Process & Store Results
+     * ========================================
+     * Validates mapping, fetches data, transforms with subject-wise marks
      */
     const handleSyncClick = async () => {
         const examId = examSelect?.value;
@@ -525,6 +652,12 @@ const ResultsManagement = (() => {
             return;
         }
 
+        console.log('📊 Sync Configuration:');
+        console.log('  Roll No Column:', mapping.roll);
+        console.log('  Name Column:', mapping.name);
+        console.log('  Subject Columns:', mapping.subjects);
+        console.log('  Metadata Ignored: CLASS, SECTION, etc.');
+
         // UI State: Loading
         syncButton.disabled = true;
         const originalBtnHtml = syncButton.innerHTML;
@@ -549,20 +682,23 @@ const ResultsManagement = (() => {
                 throw new Error('Spreadsheet appears to be empty or misformatted.');
             }
 
-            // Step 3: Transformation with Validation
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Preparing preview table...', 'loading');
+            // Step 3: Transformation with Subject-Wise Marks
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Processing subject marks...', 'loading');
             const examMeta = (window.ExamManager ? ExamManager.getAll() : []).find(e => e.id === examId);
             const examName = examMeta ? `${examMeta.name} (${examMeta.examTypeName || ''})` : 'Result';
 
             const results = rawData.map(row => {
-                const subjects = {};
+                const subjects = {}; // Store subject-wise marks with EXACT names
                 let totalMarks = 0;
 
-                // Process subject marks
-                mapping.subjects.forEach(sub => {
-                    const val = parseFloat(row[sub]) || 0;
-                    subjects[sub] = val;
-                    totalMarks += val;
+                // Process each subject column (preserving exact names from sheet)
+                mapping.subjects.forEach(subjectName => {
+                    const rawValue = row[subjectName];
+                    const marks = parseFloat(rawValue) || 0;
+
+                    // Store with EXACT subject name from sheet header
+                    subjects[subjectName] = marks;
+                    totalMarks += marks;
                 });
 
                 // Get status (Pass/Fail)
@@ -574,17 +710,21 @@ const ResultsManagement = (() => {
                     dob: mapping.dob ? row[mapping.dob] : '',
                     examId: examId,
                     exam: examName,
-                    subjects: subjects,
+                    subjects: subjects, // Subject-wise marks object
                     totalMarks: totalMarks,
                     grade: calculateGrade(totalMarks),
                     status: resStatus,
                     rank: null // Rank will be calculated on render
                 };
-            }).filter(r => r.rollNo && r.name);
+            }).filter(r => r.rollNo && r.name); // Only include rows with valid identity
 
             if (results.length === 0) {
                 throw new Error('No valid results found after processing. Check your column mappings.');
             }
+
+            console.log('📊 Processed Results Sample:', results[0]);
+            console.log(`✓ Total Students: ${results.length}`);
+            console.log(`✓ Subjects per Student: ${Object.keys(results[0].subjects).length}`);
 
             // Step 4: Storage & UI Update
             showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Saving locally...', 'loading');
