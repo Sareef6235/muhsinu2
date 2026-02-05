@@ -4,27 +4,28 @@
 
 **Repository**: `git@github.com:Sareef6235/muhsinu2.git`  
 **Branch**: `main`  
-**Latest Commit**: `93d358c`  
-**Status**: All changes pushed successfully (Refined Results Integration)
+**Latest Commit**: `70e0845`  
+**Status**: All changes pushed successfully (Harden Config Managers)
 
 ---
 
 ## 📦 What Was Pushed
 
 ### Recent Changes Committed:
-- **Refined Results Integration**:
-  - Improved dropdown population & reactive UI
-  - Step-by-step sync feedback: "Validating", "Preparing preview", etc.
-  - Unified "Preview before Publish" workflow (Admin -> Student)
+- **Hardened Configuration Managers**:
+  - NEW `schoolConfig` nested storage schema for strict school isolation
+  - Refined `AcademicYearManager` with `yearLabel` and "Current Year" singleton logic
+  - Refined `ExamTypeManager` with active filtering
+  - Fixed Dashboard UI toggles and reactive event flow
 - **Documentation**:
-  - walkthrough.md, task.md, implementation_plan.md
+  - Updated walkthrough.md, task.md, implementation_plan.md
 
 ---
 
 ## 🔗 Repository Links
 
 - **GitHub Repository**: https://github.com/Sareef6235/muhsinu2
-- **Latest Commit**: https://github.com/Sareef6235/muhsinu2/commit/93d358c
+- **Latest Commit**: https://github.com/Sareef6235/muhsinu2/commit/70e0845
 
 ---
 
@@ -67,4 +68,4 @@ git push origin main
 ---
 
 **Status**: ✅ Repository is fully synced with GitHub
-**Last Updated**: 2026-02-05 20:00 IST
+**Last Updated**: 2026-02-05 20:25 IST
