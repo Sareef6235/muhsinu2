@@ -4,26 +4,24 @@
 
 **Repository**: `git@github.com:Sareef6235/muhsinu2.git`  
 **Branch**: `main`  
-**Latest Commit**: `7bdd5c3`  
+**Latest Commit**: `5c5c9e0`  
 **Status**: ✅ Fully synced with GitHub
 
 ---
 
 ## 📦 What Was Pushed
 
-### Latest Changes (2026-02-05 23:59 IST):
+### Latest Changes (2026-02-06 00:15 IST):
+- **Fetch Reliability Fix ("Failed to Fetch")**:
+  - NEW Switched to **GViz API** (`/gviz/tq?tqx=out:csv`)
+  - robust CORS handling for "Anyone with the link" sheets
+  - detailed error messages for Private/Invalid sheets
 - **JS-Based Result Calculation**:
-  - NEW JS-based calculation for Percentage, Grade, and Status
-  - NEW Max Marks calculation (100 per subject)
-  - REMOVED Dependency on Grade/Status columns in Sheet
+  - Percentage, Grade, Status, Max Marks calculated in JS
 - **Relaxed Validation**:
-  - ONLY Roll No and Name are mandatory
-  - Optional fields (DOB, Status) do not block sync
-  - Minimal sheet support (Roll, Name, Subjects) enabled
-- **Smart Column Mapping (Previous)**:
-  - Column classification engine
-  - Auto-detection for Roll, Name, Subjects
-  - Metadata exclusion
+  - Only Roll No + Name required
+- **Smart Column Mapping**:
+  - Auto-detection + Metadata exclusion
 - **Documentation**:
   - Created walkthrough.md (implementation details)
   - Created testing_guide.md (step-by-step testing)
@@ -34,7 +32,7 @@
 ## 🔗 Repository Links
 
 - **GitHub Repository**: https://github.com/Sareef6235/muhsinu2
-- **Latest Commit**: https://github.com/Sareef6235/muhsinu2/commit/7bdd5c3
+- **Latest Commit**: https://github.com/Sareef6235/muhsinu2/commit/5c5c9e0
 
 ---
 
