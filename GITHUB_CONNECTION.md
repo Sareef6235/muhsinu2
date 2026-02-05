@@ -4,19 +4,19 @@
 
 **Repository**: `git@github.com:Sareef6235/muhsinu2.git`  
 **Branch**: `main`  
-**Latest Commit**: `70e0845`  
-**Status**: All changes pushed successfully (Harden Config Managers)
+**Latest Commit**: `40dc2fc`  
+**Status**: All changes pushed successfully (Sync Exam Selectors)
 
 ---
 
 ## 📦 What Was Pushed
 
 ### Recent Changes Committed:
-- **Hardened Configuration Managers**:
-  - NEW `schoolConfig` nested storage schema for strict school isolation
-  - Refined `AcademicYearManager` with `yearLabel` and "Current Year" singleton logic
-  - Refined `ExamTypeManager` with active filtering
-  - Fixed Dashboard UI toggles and reactive event flow
+- **Synced Exam Selectors**:
+  - NEW Universal Refresh Method: `ExamManager.refreshAllExamSelectors()`
+  - School-aware nested storage: `localStorage.exams = { [schoolId]: [...] }`
+  - Auto-select newly created exams in Results Sync dropdown
+  - Advanced formatting: `Name – Type (Year)`
 - **Documentation**:
   - Updated walkthrough.md, task.md, implementation_plan.md
 
@@ -25,7 +25,7 @@
 ## 🔗 Repository Links
 
 - **GitHub Repository**: https://github.com/Sareef6235/muhsinu2
-- **Latest Commit**: https://github.com/Sareef6235/muhsinu2/commit/70e0845
+- **Latest Commit**: https://github.com/Sareef6235/muhsinu2/commit/40dc2fc
 
 ---
 
@@ -68,4 +68,4 @@ git push origin main
 ---
 
 **Status**: ✅ Repository is fully synced with GitHub
-**Last Updated**: 2026-02-05 20:25 IST
+**Last Updated**: 2026-02-05 20:40 IST
