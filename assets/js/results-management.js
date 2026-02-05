@@ -532,14 +532,21 @@ const ResultsManagement = (() => {
         try {
             showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching headers & analyzing sheet structure...', 'loading');
 
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
+            // Use Google Visualization API for more robust CSV fetching (handles CORS better)
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
             const response = await fetch(csvUrl);
 
             if (!response.ok) {
-                throw new Error('Failed to connect to Google Sheets. Verify Sheet ID and public access.');
+                if (response.status === 404) throw new Error('Sheet not found. Check your Sheet ID.');
+                throw new Error('Failed to connect to Google Sheets. Ensure the sheet is accessible.');
             }
 
             const csvText = await response.text();
+
+            // Check if we got HTML instead of CSV (indicates authentication required/private sheet)
+            if (csvText.trim().startsWith('<!DOCTYPE html>') || csvText.includes('<html')) {
+                throw new Error('Sheet appears to be PRIVATE. Only "Anyone with the link" or "Published" sheets are supported.');
+            }
             const lines = csvText.split('\n');
             const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
 
@@ -709,14 +716,22 @@ const ResultsManagement = (() => {
         try {
             // Step 1: Network Check & Fetch
             showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching data from Google Sheets...', 'loading');
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0&cache_bust=${Date.now()}`;
+
+            // Use GViz API for robust fetching
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&tq&cache_bust=${Date.now()}`;
 
             const response = await fetch(csvUrl);
             if (!response.ok) {
+                if (response.status === 404) throw new Error('Sheet not found. Check the ID.');
                 throw new Error('Could not reach Google Sheets. Ensure the sheet is Public (Anyone with link can view).');
             }
 
             const csvText = await response.text();
+
+            // Check for HTML response (Private sheet)
+            if (csvText.includes('<html') || csvText.startsWith('<!DOCTYPE')) {
+                throw new Error('Access Denied: Sheet is private. Please change sharing to "Anyone with the link".');
+            }
 
             // Step 2: Parse CSV
             showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Parsing spreadsheet content...', 'loading');
