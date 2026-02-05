@@ -4,24 +4,26 @@
 
 **Repository**: `git@github.com:Sareef6235/muhsinu2.git`  
 **Branch**: `main`  
-**Latest Commit**: `182e8b1`  
+**Latest Commit**: `7bdd5c3`  
 **Status**: ✅ Fully synced with GitHub
 
 ---
 
 ## 📦 What Was Pushed
 
-### Latest Changes (2026-02-05 23:35 IST):
-- **Smart Column Mapping Implementation**:
-  - NEW Column classification engine (identity/metadata/subject)
-  - NEW Auto-detection for Roll No, Name, DOB, Status
-  - NEW Metadata exclusion (CLASS, SECTION, BATCH, GROUP)
-  - NEW Subject-wise marks storage with exact name preservation
-  - Enhanced `fetchHeaders()` with intelligent classification
-  - Enhanced `handleSyncClick()` with subject-wise processing
-  - Enhanced `renderTable()` with subject breakdown tooltips
-  - Comprehensive validation and error handling
-  - Detailed console logging for debugging
+### Latest Changes (2026-02-05 23:59 IST):
+- **JS-Based Result Calculation**:
+  - NEW JS-based calculation for Percentage, Grade, and Status
+  - NEW Max Marks calculation (100 per subject)
+  - REMOVED Dependency on Grade/Status columns in Sheet
+- **Relaxed Validation**:
+  - ONLY Roll No and Name are mandatory
+  - Optional fields (DOB, Status) do not block sync
+  - Minimal sheet support (Roll, Name, Subjects) enabled
+- **Smart Column Mapping (Previous)**:
+  - Column classification engine
+  - Auto-detection for Roll, Name, Subjects
+  - Metadata exclusion
 - **Documentation**:
   - Created walkthrough.md (implementation details)
   - Created testing_guide.md (step-by-step testing)
@@ -32,7 +34,7 @@
 ## 🔗 Repository Links
 
 - **GitHub Repository**: https://github.com/Sareef6235/muhsinu2
-- **Latest Commit**: https://github.com/Sareef6235/muhsinu2/commit/182e8b1
+- **Latest Commit**: https://github.com/Sareef6235/muhsinu2/commit/7bdd5c3
 
 ---
 
