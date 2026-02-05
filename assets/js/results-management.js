@@ -85,22 +85,22 @@ const ResultsManagement = (() => {
 
         if (!statusBox || !statusMessage) return;
 
-        // 1. Validation
-        if (!schoolId) {
-            statusBox.style.display = 'block';
-            statusMessage.innerHTML = '<span style="color:#ff4444;">❌ Error: No active school selected.</span>';
-            return;
-        }
-
+        // 1. Validation - Exam is required
         if (!examId) {
             statusBox.style.display = 'block';
             statusMessage.innerHTML = '<span style="color:#ff4444;">❌ Error: Please select an exam first.</span>';
             return;
         }
 
-        // 2. Start Sync Flow
+        // 2. School fallback handling (soft warning, not blocking)
+        let schoolWarning = '';
+        if (!schoolId || schoolId === 'default') {
+            schoolWarning = '<div style="color:#ffa500; margin-bottom:8px;">ℹ️ No school selected. Using Default School.</div>';
+        }
+
+        // 3. Start Sync Flow
         statusBox.style.display = 'block';
-        statusMessage.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Validating...';
+        statusMessage.innerHTML = schoolWarning + '<i class="ph-bold ph-spinner ph-spin"></i> Validating...';
 
         setTimeout(() => {
             statusMessage.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Preparing preview...';

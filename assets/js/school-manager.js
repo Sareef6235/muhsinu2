@@ -21,8 +21,44 @@ const SchoolManager = (() => {
         localStorage.setItem(storageKey, JSON.stringify(schools));
     };
 
-    // Get active school ID
-    const getActiveSchoolId = () => localStorage.getItem(activeKey);
+    /**
+     * Ensure a valid active school is always set
+     * Priority: 1) Stored active ID, 2) First available school, 3) Auto-create default
+     */
+    const ensureActiveSchool = () => {
+        let schools = loadSchools();
+
+        // If no schools exist, create a default one
+        if (schools.length === 0) {
+            const defaultSchool = {
+                id: 'default',
+                name: "Default School",
+                code: "DEFAULT",
+                address: "",
+                active: true,
+                createdAt: new Date().toISOString()
+            };
+            schools = [defaultSchool];
+            saveSchools(schools);
+        }
+
+        // Get current active ID
+        let activeId = localStorage.getItem(activeKey);
+
+        // If no active ID or invalid ID, use first school
+        if (!activeId || !schools.find(s => s.id === activeId)) {
+            activeId = schools[0].id;
+            localStorage.setItem(activeKey, activeId);
+            console.log(`🏫 SchoolManager: Auto-selected school [${activeId}]`);
+        }
+
+        return activeId;
+    };
+
+    // Get active school ID with safe fallback
+    const getActiveSchoolId = () => {
+        return ensureActiveSchool();
+    };
 
     // Set active school ID
     const setActiveSchoolId = (id) => {
@@ -70,10 +106,7 @@ const SchoolManager = (() => {
             return;
         }
 
-        const activeId = getActiveSchoolId() || schools[0].id;
-        if (!getActiveSchoolId()) {
-            setActiveSchoolId(activeId);
-        }
+        const activeId = getActiveSchoolId(); // Now guaranteed to return a valid ID
 
         grid.innerHTML = schools
             .map(school => {
