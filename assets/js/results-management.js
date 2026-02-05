@@ -145,7 +145,7 @@ const ResultsManagement = (() => {
                 const examMeta = exams.find(e => e.id === examId);
                 if (!examMeta) return null;
 
-                const yearName = years.find(y => y.id === examMeta.yearId)?.name || '';
+                const yearName = years.find(y => y.id === examMeta.yearId)?.yearLabel || '';
                 const typeName = types.find(t => t.id === examMeta.typeId)?.name || '';
 
                 return {

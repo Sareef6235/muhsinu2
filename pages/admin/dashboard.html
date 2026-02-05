@@ -754,11 +754,20 @@
                 }
 
                 .manager-section {
-                    display: none;
+                    max-height: 0;
+                    overflow: hidden;
+                    opacity: 0;
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    margin-top: 0;
+                    padding-top: 0;
+                    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+                }
+
+                .manager-section.show {
+                    max-height: 2000px;
+                    opacity: 1;
                     margin-top: 20px;
                     padding-top: 20px;
-                    border-top: 1px dashed rgba(255, 255, 255, 0.1);
-                    animation: slideDown 0.3s ease;
                 }
 
                 @keyframes slideDown {
@@ -821,8 +830,7 @@
                         <span class="step-number">1</span>
                         Global Configuration
                     </div>
-                    <button class="manager-toggle"
-                        onclick="document.querySelectorAll('.config-manager').forEach(e => e.style.display = e.style.display==='none'?'block':'none')">
+                    <button class="manager-toggle" onclick="toggleConfigManager(this)">
                         <i class="ph-bold ph-gear"></i> Manage Years & Types
                     </button>
                 </div>
@@ -1488,35 +1496,67 @@
         });
 
         // Backward compatibility support for dashboard logic
-        window.addEventListener('school-changed', () => {
+        window.addEventListener('schoolChanged', () => {
             const activePanel = document.querySelector('.panel.active');
             if (activePanel && typeof switchPanel === 'function') switchPanel(activePanel.id);
+
+            // Re-init specific managers that might need fresh state
+            if (window.AcademicYearManager) AcademicYearManager.refresh();
+            if (window.ExamTypeManager) ExamTypeManager.refresh();
+            if (window.ExamManager) ExamManager.refresh();
+
             updateStats();
         });
 
-        // Managers now handle their own dropdown population via internal event listeners
-        // We only need to ensure stats are updated when data changes globally
+        // Update stats when data changes globally
         window.addEventListener('examsUpdated', updateStats);
+        window.addEventListener('yearChanged', () => {
+            console.log('🛠️ Dashboard: Year configuration updated.');
+            populateExamFormDropdowns();
+            if (window.ExamManager) ExamManager.refresh();
+        });
+
+        window.addEventListener('examTypeChanged', () => {
+            console.log('🛠️ Dashboard: Type configuration updated.');
+            populateExamFormDropdowns();
+            if (window.ExamManager) ExamManager.refresh();
+        });
+
+        /**
+         * Reliable toggle for manager sections
+         */
+        window.toggleConfigManager = function (btn) {
+            const step = btn.closest('.premium-step');
+            const manager = step.querySelector('.manager-section');
+            if (!manager) return;
+
+            const isShowing = manager.classList.contains('show');
+            manager.classList.toggle('show');
+
+            const icon = btn.querySelector('i');
+            if (icon) {
+                icon.className = isShowing ? 'ph-bold ph-gear' : 'ph-bold ph-caret-up';
+            }
+        };
 
         /**
          * Populates all dropdowns in the Exam Add/Edit form
-         * Defensive implementation to ensure clean state and active data only.
          */
         function populateExamFormDropdowns() {
+            console.log('🛠️ Dashboard: Refreshing exam form dropdowns...');
             const yearSelect = document.getElementById('exam-academic-year');
             const typeSelect = document.getElementById('exam-type-select');
-
-            console.log('🛠️ Dashboard: Refreshing exam form dropdowns...');
 
             // 1. Populate Years
             if (yearSelect) {
                 yearSelect.innerHTML = '<option value="">-- Select Year --</option>';
                 if (window.AcademicYearManager && typeof AcademicYearManager.getActive === 'function') {
                     const activeYears = AcademicYearManager.getActive();
-                    if (activeYears && activeYears.length > 0) {
-                        yearSelect.innerHTML += activeYears.map(y => `<option value="${y.id}">${y.name}</option>`).join('');
-                    } else {
-                        console.warn('🛠️ Dashboard: No active academic years found.');
+                    if (activeYears.length > 0) {
+                        yearSelect.innerHTML += activeYears.map(y => `<option value="${y.id}">${y.yearLabel}</option>`).join('');
+
+                        const current = AcademicYearManager.getCurrent();
+                        if (current) yearSelect.value = current.id;
                     }
                 }
             }
@@ -1526,25 +1566,12 @@
                 typeSelect.innerHTML = '<option value="">-- Select Type --</option>';
                 if (window.ExamTypeManager && typeof ExamTypeManager.getActive === 'function') {
                     const activeTypes = ExamTypeManager.getActive();
-                    if (activeTypes && activeTypes.length > 0) {
+                    if (activeTypes.length > 0) {
                         typeSelect.innerHTML += activeTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
-                    } else {
-                        console.warn('🛠️ Dashboard: No active exam types found.');
                     }
                 }
             }
         }
-
-        // Global Listeners for Reactive UI
-        window.addEventListener('schoolChanged', () => {
-            console.log('🛠️ Dashboard: School changed, syncing all managers...');
-            if (typeof populateExamFormDropdowns === 'function') populateExamFormDropdowns();
-            if (window.ExamManager && ExamManager.refresh) ExamManager.refresh();
-            if (window.ResultsManagement && ResultsManagement.refresh) ResultsManagement.refresh();
-        });
-
-        window.addEventListener('yearChanged', populateExamFormDropdowns);
-        window.addEventListener('examTypeChanged', populateExamFormDropdowns);
     </script>
 
     <script>

@@ -117,7 +117,7 @@ const ExamManager = (function () {
         }
 
         tbody.innerHTML = exams.map(e => {
-            const year = years.find(y => y.id === e.yearId)?.name || 'Unknown';
+            const year = years.find(y => y.id === e.yearId)?.yearLabel || 'Unknown';
             const type = types.find(t => t.id === e.typeId)?.name || 'Unknown';
 
             return `
@@ -150,7 +150,7 @@ const ExamManager = (function () {
 
         examSelect.innerHTML = `<option value="">-- Select Exam --</option>` +
             activeExams.map(e => {
-                const yearName = years.find(y => y.id === e.yearId)?.name || '';
+                const yearName = years.find(y => y.id === e.yearId)?.yearLabel || '';
                 const typeName = types.find(t => t.id === e.typeId)?.name || '';
                 const label = `${e.name} (${typeName} - ${yearName})`;
                 return `<option value="${e.id}">${label}</option>`;

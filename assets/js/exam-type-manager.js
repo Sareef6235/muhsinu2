@@ -5,7 +5,22 @@
 const ExamTypeManager = (function () {
     'use strict';
 
-    const STORAGE_KEY = 'exam_types';
+    const CONFIG_KEY = 'schoolConfig';
+
+    function _getSchoolId() {
+        return localStorage.getItem('activeSchoolId') || 'default';
+    }
+
+    function _getConfig() {
+        let config = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+        const schoolId = _getSchoolId();
+        if (!config[schoolId]) config[schoolId] = { academicYears: [], examTypes: [] };
+        return config;
+    }
+
+    function _saveConfig(config) {
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+    }
 
     function init() {
         console.log('📝 ExamTypeManager: Initializing...');
@@ -18,20 +33,20 @@ const ExamTypeManager = (function () {
             renderTable();
             refreshDropdowns();
         });
-
-        // Backward compatibility listener
-        window.addEventListener('school-changed', () => {
-            renderTable();
-            refreshDropdowns();
-        });
     }
 
     function getAll() {
-        return StorageManager.get(STORAGE_KEY, []);
+        const schoolId = _getSchoolId();
+        const config = _getConfig();
+        return config[schoolId].examTypes || [];
     }
 
     function saveAll(types) {
-        StorageManager.set(STORAGE_KEY, types);
+        const config = _getConfig();
+        const schoolId = _getSchoolId();
+        config[schoolId].examTypes = types;
+        _saveConfig(config);
+
         window.dispatchEvent(new CustomEvent('examTypeChanged', { detail: types }));
         refreshDropdowns();
     }
@@ -40,7 +55,10 @@ const ExamTypeManager = (function () {
         const types = getAll();
         const normalized = name.trim();
 
-        if (!normalized) return alert("Exam type name is required.");
+        if (!normalized) {
+            alert("Exam type name is required (e.g. Annual).");
+            return false;
+        }
 
         if (types.find(t => t.name.toLowerCase() === normalized.toLowerCase())) {
             alert(`Type "${normalized}" already exists.`);
@@ -48,9 +66,9 @@ const ExamTypeManager = (function () {
         }
 
         const newType = {
-            id: 'et_' + Date.now(), // Unique ID
+            id: 'et_' + Date.now(),
             name: normalized,
-            active: true,
+            isActive: true,
             createdAt: new Date().toISOString()
         };
 
@@ -61,9 +79,8 @@ const ExamTypeManager = (function () {
     }
 
     function deleteType(id) {
-        const types = getAll();
         if (!confirm("Are you sure? This will remove this exam type from all future selectors.")) return;
-
+        const types = getAll();
         const updated = types.filter(t => t.id !== id);
         saveAll(updated);
         renderTable();
@@ -73,7 +90,7 @@ const ExamTypeManager = (function () {
         const types = getAll();
         const type = types.find(t => t.id === id);
         if (type) {
-            type.active = !type.active;
+            type.isActive = !type.isActive;
             saveAll(types);
             renderTable();
         }
@@ -95,10 +112,10 @@ const ExamTypeManager = (function () {
         tbody.innerHTML = types.map(t => `
             <tr>
                 <td><b style="color:#fff;">${t.name}</b></td>
-                <td><span class="status-badge ${t.active ? 'approved' : 'pending'}">${t.active ? 'Active' : 'Disabled'}</span></td>
+                <td><span class="status-badge ${t.isActive ? 'approved' : 'pending'}">${t.isActive ? 'Active' : 'Disabled'}</span></td>
                 <td style="text-align:right;">
                     <div style="display:flex; gap:5px; justify-content:flex-end;">
-                        <button class="btn btn-mini btn-secondary" onclick="ExamTypeManager.toggleActive('${t.id}')"><i class="ph-bold ph-eye${t.active ? '-slash' : ''}"></i></button>
+                        <button class="btn btn-mini btn-secondary" onclick="ExamTypeManager.toggleActive('${t.id}')"><i class="ph-bold ph-eye${t.isActive ? '-slash' : ''}"></i></button>
                         <button class="btn btn-mini btn-danger" onclick="ExamTypeManager.deleteType('${t.id}')"><i class="ph-bold ph-trash"></i></button>
                     </div>
                 </td>
@@ -108,7 +125,7 @@ const ExamTypeManager = (function () {
 
     function refreshDropdowns() {
         const typeSelects = document.querySelectorAll('#exam-type-select');
-        const activeTypes = getAll().filter(t => t.active);
+        const activeTypes = getAll().filter(t => t.isActive);
 
         const html = `<option value="">-- Select Type --</option>` +
             activeTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
@@ -116,6 +133,7 @@ const ExamTypeManager = (function () {
         typeSelects.forEach(select => {
             select.innerHTML = html;
         });
+        console.log('📝 ExamTypeManager: Dropdowns refreshed.');
     }
 
     function saveExamType() {
@@ -125,14 +143,22 @@ const ExamTypeManager = (function () {
         }
     }
 
+    function toggleAddForm() {
+        const form = document.getElementById('exam-type-add-form');
+        if (form) {
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+
     return {
         init,
         getAll,
-        getActive: () => getAll().filter(t => t.active),
+        getActive: () => getAll().filter(t => t.isActive),
         create,
         deleteType,
         toggleActive,
         saveExamType,
+        toggleAddForm,
         refresh: () => { renderTable(); refreshDropdowns(); }
     };
 })();
