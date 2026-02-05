@@ -244,14 +244,9 @@ const SchoolManager = (() => {
     };
 })();
 
-// Initialize on page load
+// Export for both module and non-module environments
 if (typeof window !== 'undefined') {
     window.SchoolManager = SchoolManager;
-    document.addEventListener("DOMContentLoaded", () => {
-        SchoolManager.init();
-    });
 }
 
-if (typeof module !== 'undefined') {
-    module.exports = SchoolManager;
-}
+export default SchoolManager;

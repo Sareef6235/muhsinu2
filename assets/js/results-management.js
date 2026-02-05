@@ -93,6 +93,7 @@ const ResultsManagement = (() => {
 
     /**
      * STORAGE LOGIC
+     * Using StorageManager which handles school-prefix isolation automatically.
      */
     const getAllResults = () => StorageManager.get(STORAGE_KEY, {});
 
@@ -103,28 +104,22 @@ const ResultsManagement = (() => {
         updateExamList();
     };
 
-    const getSchoolResults = (schoolId) => {
-        const all = getAllResults();
-        return all[schoolId] || {};
+    const getExamResults = (examId) => {
+        const results = getAllResults();
+        return results[examId] || null;
     };
 
-    const getExamResults = (schoolId, examId) => {
-        const schoolResults = getSchoolResults(schoolId);
-        return schoolResults[examId] || null;
-    };
+    const saveExamResults = (examId, data, sheetId, published = false) => {
+        const results = getAllResults();
 
-    const saveExamResults = (schoolId, examId, data, sheetId, published = false) => {
-        const all = getAllResults();
-        if (!all[schoolId]) all[schoolId] = {};
-
-        all[schoolId][examId] = {
+        results[examId] = {
             published,
             syncedAt: new Date().toISOString(),
             sheetId: sheetId || '',
             data
         };
 
-        saveAllResults(all);
+        saveAllResults(results);
         renderTable();
         updatePublishToggle();
     };
@@ -133,14 +128,13 @@ const ResultsManagement = (() => {
      * Update exam list for student portal (ResultsCMS compatibility)
      */
     const updateExamList = () => {
-        const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : 'default';
-        const schoolResults = getSchoolResults(schoolId);
+        const results = getAllResults();
         const exams = window.ExamManager ? ExamManager.getAll() : [];
         const years = window.AcademicYearManager ? AcademicYearManager.getAll() : [];
         const types = window.ExamTypeManager ? ExamTypeManager.getAll() : [];
 
-        const examList = Object.keys(schoolResults)
-            .filter(examId => schoolResults[examId].published) // Only published
+        const examList = Object.keys(results)
+            .filter(examId => results[examId].published) // Only published
             .map(examId => {
                 const examMeta = exams.find(e => e.id === examId);
                 if (!examMeta) return null;
@@ -151,7 +145,7 @@ const ResultsManagement = (() => {
                 return {
                     id: examId,
                     displayName: `${examMeta.name} (${typeName} - ${yearName})`,
-                    lastSync: schoolResults[examId].syncedAt
+                    lastSync: results[examId].syncedAt
                 };
             })
             .filter(Boolean);
@@ -170,10 +164,23 @@ const ResultsManagement = (() => {
         const hasSheet = sheetIdInput && sheetIdInput.value.trim().length > 0;
         const canSync = hasExam && hasSheet;
 
+        // Visual feedback for the button
         syncButton.disabled = !canSync;
         syncButton.style.opacity = canSync ? '1' : '0.5';
         syncButton.style.cursor = canSync ? 'pointer' : 'not-allowed';
-        syncButton.title = canSync ? 'Fetch and sync results from Google Sheet' : 'Select exam and enter Sheet ID';
+
+        // Also update fetch headers button if it exists
+        const fetchBtn = document.querySelector('button[onclick*="fetchHeaders"]');
+        if (fetchBtn) {
+            fetchBtn.disabled = !canSync;
+            fetchBtn.style.opacity = canSync ? '1' : '0.5';
+        }
+
+        if (!canSync) {
+            syncButton.title = "Select an exam and provide a valid Google Sheet ID to enable sync.";
+        } else {
+            syncButton.title = "Click to preview and sync results.";
+        }
     };
 
     const clearStatus = () => {
@@ -186,6 +193,11 @@ const ResultsManagement = (() => {
     const resetSyncState = () => {
         if (examSelect) examSelect.value = '';
         if (sheetIdInput) sheetIdInput.value = '';
+
+        // Hide mapping UI on reset
+        const mappingUI = document.getElementById('column-mapping-ui');
+        if (mappingUI) mappingUI.style.display = 'none';
+
         updateButtonState();
         clearStatus();
     };
@@ -203,8 +215,7 @@ const ResultsManagement = (() => {
         if (!publishToggle || !examSelect) return;
 
         const examId = examSelect.value;
-        const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : 'default';
-        const examData = getExamResults(schoolId, examId);
+        const examData = getExamResults(examId);
 
         if (!examData || !examData.data || examData.data.length === 0) {
             publishToggle.style.display = 'none';
@@ -227,18 +238,16 @@ const ResultsManagement = (() => {
         const examId = examSelect?.value;
         if (!examId) return;
 
-        const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : 'default';
-        const examData = getExamResults(schoolId, examId);
+        const results = getAllResults();
+        const examData = results[examId];
 
         if (!examData) return;
 
         const newState = !examData.published;
         examData.published = newState;
 
-        const all = getAllResults();
-        if (!all[schoolId]) all[schoolId] = {};
-        all[schoolId][examId] = examData;
-        saveAllResults(all);
+        results[examId] = examData;
+        saveAllResults(results);
 
         showStatus(
             `<i class="ph-bold ph-check-circle"></i> Exam ${newState ? 'published' : 'unpublished'} successfully!`,
@@ -255,12 +264,12 @@ const ResultsManagement = (() => {
         const lines = text.trim().split('\n');
         if (lines.length < 2) return [];
 
-        const headers = lines[0].split(',').map(h => h.trim());
+        const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
         const results = [];
 
         for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split(',').map(v => v.trim());
-            if (values.length < headers.length) continue; // Skip incomplete rows
+            const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+            if (values.length < headers.length) continue;
 
             const row = {};
             headers.forEach((header, idx) => {
@@ -427,8 +436,8 @@ const ResultsManagement = (() => {
             return;
         }
 
-        const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : 'default';
-        const examData = getExamResults(schoolId, examId);
+        const results = getAllResults();
+        const examData = results[examId];
 
         if (!examData || !examData.data || examData.data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#666;">No results synced yet. Enter Sheet ID and click Sync.</td></tr>';
@@ -477,30 +486,183 @@ const ResultsManagement = (() => {
     /**
      * Fetch Column Headers (Feature Requirement)
      */
+    /**
+     * Fetch Column Headers & Reveal Mapping UI
+     */
     const fetchHeaders = async () => {
         const sheetId = sheetIdInput?.value?.trim();
+        const examId = examSelect?.value;
 
-        if (!sheetId) {
-            alert("Please provide a Sheet ID.");
+        if (!sheetId || !examId) {
+            alert("Please select an exam and provide a Sheet ID first.");
             return;
         }
 
         try {
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching headers...', 'loading');
+
             const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
             const response = await fetch(csvUrl);
 
             if (!response.ok) {
-                throw new Error('Failed to fetch sheet');
+                throw new Error('Failed to connect to Google Sheets. Verify Sheet ID and public access.');
             }
 
             const csvText = await response.text();
             const firstLine = csvText.split('\n')[0];
-            const headers = firstLine.split(',').map(h => h.trim());
+            const headers = firstLine.split(',').map(h => h.trim().replace(/^"|"$/g, ''));
 
-            alert(`Headers found:\n${headers.join(', ')}`);
+            if (headers.length < 2) throw new Error("Could not parse headers from sheet.");
+
+            // Populate Mapping Selects
+            const selects = document.querySelectorAll('.map-select');
+            selects.forEach(sel => {
+                sel.innerHTML = '<option value="">-- Ignore --</option>' +
+                    headers.map(h => `<option value="${h}">${h}</option>`).join('');
+
+                // Smart Auto-Mapping
+                const id = sel.id;
+                const match = headers.find(h => {
+                    const lower = h.toLowerCase();
+                    if (id === 'map-roll') return lower.includes('roll') || lower.includes('reg') || lower.includes('id');
+                    if (id === 'map-name') return lower.includes('name') || lower.includes('student');
+                    if (id === 'map-dob') return lower.includes('dob') || lower.includes('birth');
+                    if (id === 'map-status') return lower.includes('status') || lower.includes('result');
+                    return false;
+                });
+                if (match) sel.value = match;
+            });
+
+            // Populate Subject Checkboxes
+            const subjectContainer = document.getElementById('map-subjects-container');
+            if (subjectContainer) {
+                const standard = ['roll', 'name', 'dob', 'class', 'status', 'total', 'grade', 'rank', 'remark', 'id'];
+                subjectContainer.innerHTML = headers.map(h => {
+                    const isLikelySubject = !standard.some(s => h.toLowerCase().includes(s));
+                    return `
+                        <label style="display:flex; align-items:center; gap:5px; font-size:0.75rem; background:rgba(255,255,255,0.05); padding:5px; border-radius:4px; cursor:pointer;">
+                            <input type="checkbox" class="map-subject-checkbox" value="${h}" ${isLikelySubject ? 'checked' : ''}>
+                            <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${h}">${h}</span>
+                        </label>
+                    `;
+                }).join('');
+            }
+
+            // Reveal UI
+            const mappingUI = document.getElementById('column-mapping-ui');
+            if (mappingUI) {
+                mappingUI.style.display = 'block';
+                mappingUI.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            showStatus('<i class="ph-bold ph-check-circle"></i> Headers loaded! Please verify the column mappings below.', 'success');
         } catch (error) {
-            alert(`Error: ${error.message}`);
+            console.error('Fetch Headers Error:', error);
+            showStatus(`<span style="color:#ff4444;">❌ Error: ${error.message}</span>`, 'error');
         }
+    };
+
+    /**
+     * SYNC LOGIC: Handle Sync click
+     */
+    const handleSyncClick = async () => {
+        const examId = examSelect?.value;
+        const sheetId = sheetIdInput?.value?.trim();
+        const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : 'default';
+
+        if (!schoolId || !examId || !sheetId) {
+            alert("Please select an exam and provide a Sheet ID.");
+            return;
+        }
+
+        // Get Mapping configuration
+        const mapping = {
+            roll: document.getElementById('map-roll')?.value,
+            name: document.getElementById('map-name')?.value,
+            dob: document.getElementById('map-dob')?.value,
+            status: document.getElementById('map-status')?.value,
+            subjects: Array.from(document.querySelectorAll('.map-subject-checkbox:checked')).map(cb => cb.value)
+        };
+
+        if (!mapping.roll || !mapping.name) {
+            alert("Roll No and Name columns must be mapped.");
+            return;
+        }
+
+        syncButton.disabled = true;
+        const originalBtnHtml = syncButton.innerHTML;
+        syncButton.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Syncing...';
+
+        try {
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching data...', 'loading');
+
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
+            const response = await fetch(csvUrl);
+            if (!response.ok) throw new Error('Failed to connect to Google Sheets.');
+
+            const csvText = await response.text();
+            const rawData = parseCSV(csvText);
+
+            if (!rawData.length) throw new Error('No data found in sheet.');
+
+            // Get exam metadata
+            const examMeta = (window.ExamManager ? ExamManager.getAll() : []).find(e => e.id === examId);
+            const examName = examMeta ? `${examMeta.name} (${examMeta.examTypeName})` : 'Result';
+
+            // Process Data
+            const results = rawData.map(row => {
+                const subjects = {};
+                let totalMarks = 0;
+
+                mapping.subjects.forEach(sub => {
+                    const val = parseFloat(row[sub]) || 0;
+                    subjects[sub] = val;
+                    totalMarks += val;
+                });
+
+                const resStatus = row[mapping.status] || (totalMarks > 0 ? 'Pass' : 'Absent');
+
+                return {
+                    schoolId,
+                    examId,
+                    exam: examName,
+                    rollNo: row[mapping.roll] || '',
+                    name: row[mapping.name] || '',
+                    dob: mapping.dob ? row[mapping.dob] : '',
+                    subjects: subjects,
+                    totalMarks: totalMarks,
+                    grade: calculateGrade(totalMarks),
+                    status: resStatus,
+                    rank: null // Rank calculated later during render
+                };
+            }).filter(r => r.rollNo && r.name);
+
+            // Save
+            saveExamResults(examId, results, sheetId, false);
+
+            showStatus(
+                `<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> ✓ Sync success! ${results.length} results loaded. Click "Publish" to go live.`,
+                'success'
+            );
+
+        } catch (error) {
+            console.error('Sync Error:', error);
+            showStatus(`<span style="color:#ff4444;">❌ Error: ${error.message}</span>`, 'error');
+        } finally {
+            syncButton.disabled = false;
+            syncButton.innerHTML = originalBtnHtml;
+            updateButtonState();
+        }
+    };
+
+    const calculateGrade = (total) => {
+        // Simple default grading logic
+        if (total >= 450) return 'A+';
+        if (total >= 400) return 'A';
+        if (total >= 350) return 'B+';
+        if (total >= 300) return 'B';
+        if (total >= 200) return 'C';
+        return 'D';
     };
 
     return {
