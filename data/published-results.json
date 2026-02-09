@@ -1,0 +1,21 @@
+{
+    "exams": [
+        {
+            "examId": "ex_1770632633021",
+            "examName": "2 – abc (2026-27)",
+            "results": [
+                {
+                    "roll": "1001",
+                    "name": "Ali",
+                    "total": 140
+                },
+                {
+                    "roll": "1002",
+                    "name": "Hassan",
+                    "total": 152
+                }
+            ]
+        }
+    ],
+    "generatedAt": "2026-02-09T20:30:00Z"
+}

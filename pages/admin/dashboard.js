@@ -21,21 +21,37 @@ const StaticPublisher = (() => {
             Object.keys(schoolResults).forEach(examId => {
                 const examNode = schoolResults[examId];
 
-                // Only include if marked as published
+                // Data Contract Validation: Only include if marked as published and has valid data
                 if (examNode && examNode.published && Array.isArray(examNode.data)) {
                     const meta = examsMeta.find(e => e.id === examId);
 
+                    // Mandatory Keys: Skip if ID or Name is missing
+                    const finalId = examId || examNode.id;
+                    const finalName = meta ? meta.name : (examNode.name || examNode.examName);
+
+                    if (!finalId || !finalName) {
+                        console.warn(`Skipping invalid exam entry: ID=${finalId}, Name=${finalName}`);
+                        return;
+                    }
+
                     publishedExams.push({
-                        examId: examId,
-                        examName: meta ? meta.name : (examNode.name || "Unnamed Exam"),
+                        examId: String(finalId),
+                        examName: String(finalName),
                         results: examNode.data.map(r => ({
-                            roll: String(r.rollNo || r.roll).trim(),
-                            name: r.name,
-                            total: r.totalMarks || r.total
+                            roll: String(r.rollNo || r.roll || "").trim(),
+                            name: String(r.name || "Unknown"),
+                            total: r.totalMarks || r.total || 0
                         }))
                     });
                 }
             });
+
+            // Debugging: Log table of exams being published
+            if (publishedExams.length > 0) {
+                console.log("Preparing to publish the following exams:");
+                console.table(publishedExams.map(e => ({ ID: e.examId, Name: e.examName, Students: e.results.length })));
+            }
+
 
             if (publishedExams.length === 0) {
                 alert("No exams are currently marked as 'Published'. Please sync and publish at least one exam first.");

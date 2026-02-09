@@ -7,37 +7,34 @@ console.log("JS LOADED");
 const ResultApp = {
     data: null,
     ui: {
-        examSelect: document.getElementById('examSelect'),
-        rollInput: document.getElementById('rollInput'),
-        form: document.getElementById('resultsForm'),
-        display: document.getElementById('result-display'),
-        submitBtn: document.getElementById('submitBtn'),
-        meritView: document.getElementById('merit-view'),
-        meritBody: document.getElementById('results-table-body'),
-        meritExamName: document.getElementById('merit-exam-name')
+
     },
 
     async init() {
-        try {
-            // 1. Fetch JSON (Root relative path)
-            const response = await fetch("/data/published-results.json?v=" + Date.now());
+        console.log("JS LOADED");
 
-            if (!response.ok) {
-                // Try fallback to published-exams.json if results.json not found
-                console.warn("Attempting fallback data source...");
-                const fallback = await fetch("/data/published-exams.json");
-                if (!fallback.ok) throw new Error("Results database not found.");
-                this.data = await fallback.json();
-            } else {
-                this.data = await response.json();
-            }
+        // ✅ Bind DOM AFTER page load
+        this.ui = {
+            examSelect: document.getElementById('examSelect'),
+            rollInput: document.getElementById('rollInput'),
+            form: document.getElementById('resultsForm'),
+            display: document.getElementById('result-display'),
+            submitBtn: document.getElementById('submitBtn'),
+            meritView: document.getElementById('merit-view'),
+            meritBody: document.getElementById('results-table-body'),
+            meritExamName: document.getElementById('merit-exam-name')
+        };
+
+        console.log("UI bound:", this.ui.examSelect);
+
+        try {
+            const response = await fetch("/data/published-results.json?v=" + Date.now());
+            this.data = await response.json();
 
             console.log("Published data:", this.data);
 
-            // 2. Populate Dropdown
             this.populateDropdown();
 
-            // 3. Setup Form Listener
             if (this.ui.form) {
                 this.ui.form.addEventListener('submit', (e) => {
                     e.preventDefault();
@@ -46,46 +43,65 @@ const ResultApp = {
                 });
             }
 
-            // 4. Global UI Bridge (Explicitly for onclick handlers)
-            window.UI = {
-                roll: this.ui.rollInput
-            };
-            window.showRankList = () => this.showRankList();
-            window.showSearchForm = () => this.showSearchForm();
+            window.UI = { roll: this.ui.rollInput };
 
-            // 5. Handle Incoming URL Params (Deep Linking)
             this.handleDeepLinking();
 
         } catch (error) {
             console.error("System Error:", error);
             this.handleGlobalFailure();
         }
-    },
+    }
+
 
     populateDropdown() {
         if (!this.ui.examSelect) return;
         this.ui.examSelect.innerHTML = "";
 
-        if (!this.data || !this.data.exams || this.data.exams.length === 0) {
+        // Root Cause: "undefined" options happen when JSON keys don't match JS expectations (e.g., id vs examId).
+        // Fix: Use strict fallback mapping and skip any entry that lacks mandatory identity keys.
+        if (!this.data || !this.data.exams || !Array.isArray(this.data.exams)) {
             this.ui.examSelect.innerHTML = '<option value="">No published exams available</option>';
             this.ui.examSelect.disabled = true;
             return;
         }
 
+        const validExams = [];
+        this.data.exams.forEach(exam => {
+            // Defensive Mapping (MANDATORY CONTRACT)
+            const id = exam.examId || exam.id || null;
+            const name = exam.examName || exam.name || null;
+
+            if (id && name) {
+                validExams.push({ id: String(id), name: String(name) });
+            } else {
+                console.warn("Skipping malformed exam entry (missing ID/Name):", exam);
+            }
+        });
+
+        if (validExams.length === 0) {
+            this.ui.examSelect.innerHTML = '<option value="">No valid exams found</option>';
+            this.ui.examSelect.disabled = true;
+            return;
+        }
+
+        // Add Default Option
         const defaultOpt = document.createElement('option');
         defaultOpt.value = "";
         defaultOpt.textContent = "-- Select Academic Session --";
         this.ui.examSelect.appendChild(defaultOpt);
 
-        this.data.exams.forEach(exam => {
+        // Populate validated exams
+        validExams.forEach(exam => {
             const opt = document.createElement('option');
-            opt.value = exam.examId;
-            opt.textContent = exam.examName;
+            opt.value = exam.id;
+            opt.textContent = exam.name;
             this.ui.examSelect.appendChild(opt);
         });
 
         this.ui.examSelect.disabled = false;
     },
+
 
     handleSearch() {
         const examId = this.ui.examSelect.value;
