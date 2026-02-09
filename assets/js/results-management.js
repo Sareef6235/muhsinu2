@@ -126,7 +126,6 @@ const ResultsManagement = (() => {
 
     /**
      * Update exam list for student portal (ResultsCMS compatibility)
-     * Also generates the unified 'publishedResults' for the static public portal.
      */
     const updateExamList = () => {
         const results = getAllResults();
@@ -134,48 +133,25 @@ const ResultsManagement = (() => {
         const years = window.AcademicYearManager ? AcademicYearManager.getAll() : [];
         const types = window.ExamTypeManager ? ExamTypeManager.getAll() : [];
 
-        const publicExams = [];
-        const cmsExams = [];
+        const examList = Object.keys(results)
+            .filter(examId => results[examId].published) // Only published
+            .map(examId => {
+                const examMeta = exams.find(e => e.id === examId);
+                if (!examMeta) return null;
 
-        Object.keys(results).forEach(examId => {
-            const examData = results[examId];
-            if (!examData.published) return;
+                const yearName = years.find(y => y.id === examMeta.yearId)?.yearLabel || '';
+                const typeName = types.find(t => t.id === examMeta.typeId)?.name || '';
 
-            const examMeta = exams.find(e => e.id === examId);
-            if (!examMeta) return;
+                return {
+                    id: examId,
+                    displayName: `${examMeta.name} (${typeName} - ${yearName})`,
+                    lastSync: results[examId].syncedAt
+                };
+            })
+            .filter(Boolean);
 
-            const yearName = years.find(y => y.id === examMeta.yearId)?.yearLabel || '';
-            const typeName = types.find(t => t.id === examMeta.typeId)?.name || '';
-            const displayName = `${examMeta.name} (${typeName} - ${yearName})`;
-
-            // 1. Structure for ResultsCMS (Legacy/Compatibility)
-            cmsExams.push({
-                id: examId,
-                displayName: displayName,
-                lastSync: examData.syncedAt
-            });
-
-            // 2. Full Structure for Public Static Portal (New Requirement)
-            publicExams.push({
-                examId: examId,
-                examName: displayName,
-                published: true,
-                lastPublished: examData.syncedAt,
-                subjects: examData.subjects || [],
-                results: examData.data || [] // Full results array
-            });
-        });
-
-        // Save for Legacy ResultsCMS
-        StorageManager.set('exam_results_exams', cmsExams);
-
-        // Save for PUBLIC PORTAL (Unified Global Key: publishedResults)
-        localStorage.setItem('publishedResults', JSON.stringify({
-            exams: publicExams,
-            lastUpdated: new Date().toISOString()
-        }));
-
-        console.log("Portal Sync: ", publicExams.length, "exams pushed to localStorage.");
+        // Save for ResultsCMS
+        StorageManager.set('exam_results_exams', examList);
     };
 
     /**
@@ -878,29 +854,6 @@ const ResultsManagement = (() => {
         handleSyncClick,
         fetchHeaders,
         togglePublish,
-        getPublishedData: () => {
-            const results = getAllResults();
-            const exams = window.ExamManager ? ExamManager.getAll() : [];
-            const years = window.AcademicYearManager ? AcademicYearManager.getAll() : [];
-            const types = window.ExamTypeManager ? ExamTypeManager.getAll() : [];
-
-            return Object.keys(results)
-                .filter(id => results[id].published)
-                .map(id => {
-                    const examMeta = exams.find(e => e.id === id);
-                    const yearName = years.find(y => y.id === examMeta?.yearId)?.yearLabel || '';
-                    const typeName = types.find(t => t.id === examMeta?.typeId)?.name || '';
-                    return {
-                        examId: id,
-                        examName: examMeta ? `${examMeta.name} (${typeName} - ${yearName})` : id,
-                        results: (results[id].data || []).map(r => ({
-                            roll: String(r.rollNo).trim(),
-                            name: r.name,
-                            total: r.totalMarks
-                        }))
-                    };
-                });
-        },
         refresh: () => { renderTable(); updateButtonState(); updatePublishToggle(); }
     };
 })();

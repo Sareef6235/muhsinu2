@@ -4,18 +4,20 @@
 
 **Repository**: `git@github.com:Sareef6235/muhsinu2.git`  
 **Branch**: `main`  
-**Latest Commit**: `5c5c9e0`  
+**Latest Commit**: `76de9f8`  
 **Status**: ✅ Fully synced with GitHub
 
 ---
 
 ## 📦 What Was Pushed
 
-### Latest Changes (2026-02-06 00:15 IST):
-- **Fetch Reliability Fix ("Failed to Fetch")**:
-  - NEW Switched to **GViz API** (`/gviz/tq?tqx=out:csv`)
-  - robust CORS handling for "Anyone with the link" sheets
-  - detailed error messages for Private/Invalid sheets
+### Latest Changes (2026-02-09 20:26 IST):
+- **Fix: Exam selection dropdown stuck on loading**:
+  - Corrected fetch path to `/data/published-results.json`
+  - Fixed dropdown population logic to use `examId` and `examName`
+  - Added "System unavailable" error handling for fetch failures
+  - Added "No published exams available" for empty data states
+
 - **JS-Based Result Calculation**:
   - Percentage, Grade, Status, Max Marks calculated in JS
 - **Relaxed Validation**:
