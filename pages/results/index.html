@@ -634,8 +634,53 @@
 
                 // 4. Check for offline state
                 checkSyncStatus();
+
+                // 5. Check for URL parameters to auto-fill/submit
+                checkUrlParams();
+
             } catch (err) {
                 console.error('Init Error:', err);
+            }
+        }
+
+        /**
+         * Reads URL parameters to auto-select exam and search results
+         * Supported params: ?exam=ID & roll=NUMBER & dob=YYYY-MM-DD
+         */
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const pExam = params.get('exam'); // Exam ID
+            const pRoll = params.get('roll'); // Roll Number
+            const pDob = params.get('dob');   // Date of Birth (Optional)
+
+            if (pExam) {
+                // Securely check if the exam exists in the dropdown
+                const options = Array.from(select.options);
+                const examExists = options.some(opt => opt.value === pExam);
+
+                if (examExists) {
+                    select.value = pExam;
+
+                    // If we have a roll number, pre-fill and try to search
+                    if (pRoll) {
+                        document.getElementById('rollInput').value = pRoll;
+
+                        if (pDob) {
+                            document.getElementById('dobInput').value = pDob;
+                        }
+
+                        // Auto-submit if we have minimum required fields
+                        // Use a small timeout to ensure UI state is settled
+                        setTimeout(() => {
+                            const btn = document.getElementById('submitBtn');
+                            if (btn && !btn.disabled) {
+                                btn.click();
+                            }
+                        }, 500);
+                    }
+                } else {
+                    console.warn('Requested exam ID not found or not published:', pExam);
+                }
             }
         }
 
