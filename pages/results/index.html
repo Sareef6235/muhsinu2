@@ -597,187 +597,211 @@
     <script src="../../assets/js/site-footer.js"></script>
     <script type="module">
         import ResultsCMS from '../../assets/js/results-cms.js';
-        import PrintEngine from '../../assets/js/print-engine.js'; // Updated Engine
+        import PrintEngine from '../../assets/js/print-engine.js';
         import StorageManager from '../../assets/js/storage-manager.js';
         import SchoolManager from '../../assets/js/school-manager.js';
 
-        // Expose PrintEngine for inline onclick
+        // Expose for inline onclick handlers
         window.PrintEngine = PrintEngine;
 
-        const activeSchool = SchoolManager.getActive();
-        if (activeSchool) {
-            document.title = `${activeSchool.name} | Results Portal`;
-            document.querySelector('.portal-title h1').textContent = activeSchool.name;
-            // Set dynamic theme color if available
-            if (activeSchool.themeColor) {
-                document.documentElement.style.setProperty('--primary', activeSchool.themeColor);
-            }
-        }
-
-        let resultsData = [];
+        // UI References
         const form = document.getElementById('resultsForm');
         const display = document.getElementById('result-display');
         const select = document.getElementById('examSelect');
-        const warning = document.getElementById('sync-warning');
+        const rollInput = document.getElementById('rollInput');
+        const dobInput = document.getElementById('dobInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const loader = document.getElementById('dropdown-loader');
 
-        // Robust Initialization
+        // State
+        let resultsData = [];
+
+        // --- 1. INITIALIZATION ---
         async function init() {
             try {
-                // 1. Load Local Exams Immediately
-                refreshDropdown();
+                // Initialize dependent systems
+                setupSchoolContext();
 
-                // 2. Fetch Live Results (Now just loads from cache)
+                // Show loader while fetching
+                toggleLoader(true);
+
+                // Load Data
                 resultsData = await ResultsCMS.fetchResults();
+                populateDropdown();
 
-                // 3. Refresh Dropdown with any new data
-                refreshDropdown();
+                // Validation & Auto-Selection Logic
+                // Priority: 1. URL Params -> 2. LocalStorage (Last Viewed) -> 3. Default (Latest)
+                const urlParamsHandled = handleUrlParams();
 
-                // 4. Check for offline state
+                if (!urlParamsHandled) {
+                    loadLastViewedExam();
+                }
+
+                toggleLoader(false);
                 checkSyncStatus();
-
-                // 5. Check for URL parameters to auto-fill/submit
-                checkUrlParams();
 
             } catch (err) {
                 console.error('Init Error:', err);
+                // Fallback UI
+                select.innerHTML = '<option value="">Unable to load exams</option>';
             }
         }
 
-        /**
-         * Reads URL parameters to auto-select exam and search results
-         * Supported params: ?exam=ID & roll=NUMBER & dob=YYYY-MM-DD
-         */
-        function checkUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            const pExam = params.get('exam'); // Exam ID
-            const pRoll = params.get('roll'); // Roll Number
-            const pDob = params.get('dob');   // Date of Birth (Optional)
+        function setupSchoolContext() {
+            const activeSchool = SchoolManager.getActive();
+            if (activeSchool) {
+                document.title = `${activeSchool.name} | Results Portal`;
+                // Try to find the title element safely
+                const titleEl = document.querySelector('.portal-title h1');
+                if (titleEl) titleEl.textContent = activeSchool.name;
 
-            if (pExam) {
-                // Securely check if the exam exists in the dropdown
-                const options = Array.from(select.options);
-                const examExists = options.some(opt => opt.value === pExam);
-
-                if (examExists) {
-                    select.value = pExam;
-
-                    // If we have a roll number, pre-fill and try to search
-                    if (pRoll) {
-                        document.getElementById('rollInput').value = pRoll;
-
-                        if (pDob) {
-                            document.getElementById('dobInput').value = pDob;
-                        }
-
-                        // Auto-submit if we have minimum required fields
-                        // Use a small timeout to ensure UI state is settled
-                        setTimeout(() => {
-                            const btn = document.getElementById('submitBtn');
-                            if (btn && !btn.disabled) {
-                                btn.click();
-                            }
-                        }, 500);
-                    }
-                } else {
-                    console.warn('Requested exam ID not found or not published:', pExam);
+                if (activeSchool.themeColor) {
+                    document.documentElement.style.setProperty('--primary', activeSchool.themeColor);
                 }
             }
         }
 
-        function checkSyncStatus() {
-            // Placeholder: Implement actual check if needed
+        function toggleLoader(show) {
+            if (loader) loader.style.display = show ? 'block' : 'none';
+            select.disabled = show;
         }
 
-        window.addEventListener('results-fetch-failed', () => {
-            warning.style.display = 'flex';
-            warning.style.alignItems = 'center';
-            warning.style.gap = '10px';
-        });
-
-        function refreshDropdown() {
+        // --- 2. DATA POPULATION ---
+        function populateDropdown() {
             const visibleExams = ResultsCMS.getVisibleExamList();
+
             if (visibleExams.length === 0) {
                 select.innerHTML = '<option value="">No Published Exams Available</option>';
                 select.disabled = true;
                 return;
             }
+
             select.disabled = false;
-            const currentVal = select.value;
             select.innerHTML = '<option value="">-- Select Exam Session --</option>' +
-                visibleExams.map(e => `<option value="${e.id}" ${e.id === currentVal ? 'selected' : ''}>${e.displayName}</option>`).join('');
+                visibleExams.map(e => `<option value="${e.id}">${e.displayName}</option>`).join('');
         }
 
-        window.addEventListener('exam-store-updated', refreshDropdown);
+        // --- 3. LINKING LOGIC (URL & STORAGE) ---
+        function handleUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const pExam = params.get('exam'); // ?exam=ID
+            const pRoll = params.get('roll'); // ?roll=123
+            const pDob = params.get('dob');   // ?dob=YYYY-MM-DD
 
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const originalText = btn.innerHTML;
+            if (pExam && select.querySelector(`option[value="${pExam}"]`)) {
+                // Apply URL Exam
+                select.value = pExam;
+                saveLastViewedExam(pExam); // Persist selection
 
-            // Validation
-            const examId = select.value;
-            const roll = document.getElementById('rollInput').value.trim();
-            const dob = document.getElementById('dobInput')?.value;
+                // Apply Roll & Auto-Submit
+                if (pRoll) {
+                    rollInput.value = pRoll;
+                    if (pDob && dobInput) dobInput.value = pDob;
 
-            if (!examId) {
-                renderError('Please select an exam session first.');
-                return;
+                    // Delay slightly to ensure UI is ready, then auto-submit
+                    setTimeout(() => {
+                        if (!submitBtn.disabled) submitBtn.click();
+                    }, 500);
+                }
+                return true; // Params found and handled
             }
+            return false;
+        }
 
-            if (!roll) {
-                renderError('Please enter your roll number.');
-                return;
-            }
-
-            // Check if exam is published
-            if (!ResultsCMS.isExamPublished(examId)) {
-                renderError('This exam is not yet published. Please check back later.');
-                return;
-            }
-
-            btn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Searching...';
-            btn.disabled = true;
-
-            await new Promise(r => setTimeout(r, 600));
-
-            // Search with enhanced validation
-            const result = ResultsCMS.search(null, roll, examId, dob);
-
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-
-            if (result) {
-                // Attach result to window to access from renderResult
-                window.currentResult = result;
-                renderResult(result);
+        function loadLastViewedExam() {
+            // Retrieve last selected exam from browser storage
+            const lastExamId = localStorage.getItem('mhm_results_last_exam');
+            if (lastExamId && select.querySelector(`option[value="${lastExamId}"]`)) {
+                select.value = lastExamId;
             } else {
-                // Better error messages
-                if (dob) {
-                    renderError('Invalid Roll Number or Date of Birth. Please verify your credentials.');
-                } else {
-                    renderError('Roll Number not found for this exam. Please check and try again.');
+                // Default: Select first available (latest) if nothing else
+                if (select.options.length > 1) {
+                    select.selectedIndex = 1;
                 }
             }
         }
 
+        function saveLastViewedExam(id) {
+            if (id) localStorage.setItem('mhm_results_last_exam', id);
+        }
+
+        // Listener for manual changes
+        select.addEventListener('change', (e) => saveLastViewedExam(e.target.value));
+
+
+        // --- 4. SEARCH & DISPLAY LOGIC ---
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+
+            // Gather inputs
+            const examId = select.value;
+            const roll = rollInput.value.trim();
+            const dob = dobInput ? dobInput.value : null;
+
+            // UI Validation
+            if (!examId) return renderError('Please select an exam session first.');
+            if (!roll) return renderError('Please enter your roll number.');
+
+            // Loading State (Save original text)
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Searching...';
+            submitBtn.disabled = true;
+
+            // Simulated processing delay
+            await new Promise(r => setTimeout(r, 600));
+
+            // Perform Search
+            // We pass null for data so search loads it internally or uses cached
+            const result = ResultsCMS.search(null, roll, examId, dob);
+
+            // Reset UI
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+
+            if (result) {
+                // Success: Attach to window for printing/reference
+                window.currentResult = result;
+                renderResult(result);
+                // Clear error if any
+                const existingErr = document.querySelector('.error-message');
+                if (existingErr) existingErr.remove();
+            } else {
+                // Failure
+                display.innerHTML = ''; // Clear previous results
+                if (dob) {
+                    renderError('Result not found. Please verify Roll Number AND Date of Birth.');
+                } else {
+                    renderError('Result not found checking Roll Number for this exam.');
+                }
+            }
+        }
+
+        function renderError(msg) {
+            display.innerHTML = `<div class="error-state" style="animation: fadeIn 0.3s; color: #ff3d3d; text-align: center; padding: 20px; background: rgba(255, 61, 61, 0.1); border-radius: 12px; margin-top: 20px;">
+                <i class="ph ph-warning-circle" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
+                ${msg}
+             </div>`;
+        }
+
         function renderResult(data) {
             const hasPass = String(data.status).toLowerCase().includes('pass');
+            // Check for Rank (Merit)
+            const rankBadge = data.rank ? `
+                <div class="grade-badge" style="background: rgba(255,193,7,0.1); border-color: rgba(255,193,7,0.4);">
+                    <span class="grade" style="color: #ffc107;">#${data.rank}</span>
+                    <span class="label">RANK</span>
+                </div>` : '';
 
             display.innerHTML = `
                 <div class="glass-card result-card animate-slide-up">
                     <div class="student-meta">
                         <div>
-                            <h2 style="font-size: 1.8rem; margin: 0;">${data.name}</h2>
-                            <p style="color: #888; margin: 5px 0 0;">Roll: <b>${data.rollNo}</b> | Class: ${data.class}</p>
-                            <span class="badge" style="background: rgba(255,255,255,0.05); margin-top:10px; display:inline-block; font-size:0.7rem;">${data.exam}</span>
+                            <h2 style="font-size: 1.8rem; margin: 0; color: #fff;">${data.name}</h2>
+                            <p style="color: #888; margin: 5px 0 0;">Roll: <b>${data.rollNo}</b> | Class: ${data.class || 'N/A'}</p>
+                            <span class="badge" style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px; margin-top:10px; display:inline-block; font-size:0.75rem;">${data.exam}</span>
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            ${data.rank ? `
-                                <div class="grade-badge" style="background: rgba(255,193,7,0.1); border-color: rgba(255,193,7,0.2);">
-                                    <span class="grade" style="color: #ffc107;">#${data.rank}</span>
-                                    <span class="label">RANK</span>
-                                </div>
-                            ` : ''}
+                            ${rankBadge}
                             <div class="grade-badge">
                                 <span class="grade">${data.grade || '-'}</span>
                                 <span class="label">GRADE</span>
@@ -785,7 +809,7 @@
                         </div>
                     </div>
 
-                    <h4 style="margin-bottom: 15px; color: var(--primary);">Subject-wise Marks</h4>
+                    <h4 style="margin-bottom: 15px; color: var(--primary);">Subject-wise Performance</h4>
                     <table class="marks-table">
                         <thead><tr><th>SUBJECT</th><th>MARKS</th></tr></thead>
                         <tbody>
@@ -811,7 +835,64 @@
                             <i class="ph ph-printer"></i> PRINT OFFICIAL CERTIFICATE
                         </button>
                         <button class="btn-sec" onclick="window.location.reload()">
-                            <i class="ph ph-magnifying-glass"></i> ANOTHER SEARCH
+                            <i class="ph ph-magnifying-glass"></i> NEW SEARCH
+                        </button>
+                    </div>
+                </div>
+            `;
+            // Smooth scroll to result
+            display.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // --- 5. MERIT LIST LOGIC ---
+        window.showRankList = () => {
+            const examId = select.value;
+            if (!examId) return alert("Please select an exam first to view its merit list.");
+
+            // Get results from CMS for this exam
+            const examResults = ResultsCMS.getExamResults(examId);
+
+            if (!examResults || examResults.length === 0) return alert("No results available for this exam.");
+
+            // Sort: High to Low Total Marks
+            const sorted = [...examResults].sort((a, b) => (b.totalMarks || 0) - (a.totalMarks || 0));
+
+            display.innerHTML = `
+                <div class="glass-card animate-slide-up">
+                    <div style="text-align:center; margin-bottom: 25px;">
+                        <h2 style="margin-bottom: 5px;">🏆 Merit List</h2>
+                        <h4 style="color:#888;">${select.options[select.selectedIndex].text}</h4>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table class="marks-table">
+                            <thead>
+                                <tr style="background: rgba(255,255,255,0.05);">
+                                    <th>RANK</th>
+                                    <th>NAME</th>
+                                    <th>CLASS</th>
+                                    <th>TOTAL MARKS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sorted.map((r, i) => `
+                                    <tr>
+                                        <td>
+                                            ${i < 3 ? `<i class="ph-fill ph-trophy" style="color: ${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : '#cd7f32'}"></i>` : ''} 
+                                            <b>#${i + 1}</b>
+                                        </td>
+                                        <td>${r.name}</td>
+                                        <td>${r.class || '-'}</td>
+                                        <td><b style="color: var(--primary);">${r.totalMarks}</b></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top:20px; text-align:center;">
+                        <button class="btn-sec" onclick="display.innerHTML=''">
+                            Close Merit List
                         </button>
                     </div>
                 </div>
@@ -819,50 +900,12 @@
             display.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // --- RANK LIST GENERATION ---
-        window.showRankList = () => {
-            const examId = select.value;
-            if (!examId) return alert("Select an exam first");
-
-            const filtered = resultsData.filter(r => r.examId === examId);
-            if (filtered.length === 0) return alert("No results found for this exam");
-
-            const sorted = [...filtered].sort((a, b) => (b.totalMarks || 0) - (a.totalMarks || 0));
-
-            display.innerHTML = `
-                <div class="glass-card animate-slide-up">
-                    <h2 style="text-align: center; margin-bottom: 30px;">Merit Rank List</h2>
-                    <table class="marks-table">
-                        <thead>
-                            <tr><th>RANK</th><th>NAME</th><th>CLASS</th><th>TOTAL</th></tr>
-                        </thead>
-                        <tbody>
-                            ${sorted.map((r, i) => `
-                                <tr>
-                                    <td><b>#${r.rank || (i + 1)}</b></td>
-                                    <td>${r.name}</td>
-                                    <td>${r.class}</td>
-                                    <td><b style="color: var(--primary);">${r.totalMarks}</b></td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    <button class="btn-sec" style="margin-top: 20px; width: 100%;" onclick="window.location.reload()">BACK TO SEARCH</button>
-                </div>
-            `;
+        function checkSyncStatus() {
+            const warning = document.getElementById('sync-warning');
+            if (warning) warning.style.display = 'none'; // Default hidden
         }
 
-        function renderError(msg) {
-            display.innerHTML = `
-                <div class="error-state animate-slide-up">
-                    <i class="ph ph-shield-warning" style="font-size: 2.5rem; margin-bottom:15px;"></i>
-                    <h3>Access Denied</h3>
-                    <p>${msg}</p>
-                    <button class="btn-sec" style="margin-top:20px; width:auto; padding:10px 30px;" onclick="document.getElementById('rollInput').focus()">Try Again</button>
-                </div>
-            `;
-        }
-
+        // Initialize App
         init();
     </script>
 </body>
