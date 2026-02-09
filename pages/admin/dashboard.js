@@ -58,16 +58,20 @@ const StaticPublisher = (() => {
                 return;
             }
 
-            // 3. Generate JSON
+            // 3. Generate JSON (STRICT FORMAT)
             const output = {
-                exams: publishedExams,
-                generatedAt: new Date().toISOString(),
-                schoolId: activeSchoolId
+                meta: {
+                    generatedAt: new Date().toISOString(),
+                    schoolId: activeSchoolId
+                },
+                exams: publishedExams
             };
 
             const jsonString = JSON.stringify(output, null, 2);
 
-            // 4. Trigger Download
+            // 4. Trigger Browser Download (Static Hosting Strategy)
+            // Since we can't write files directly to the server from a static site,
+            // we download the JSON for the admin to manually upload to /data/.
             const blob = new Blob([jsonString], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -86,6 +90,7 @@ const StaticPublisher = (() => {
             console.error("StaticPublisher Error:", error);
             alert("Failed to generate JSON: " + error.message);
         }
+
     };
 
     return { publish };

@@ -25,62 +25,55 @@ const ResultApp = {
             meritExamName: document.getElementById('merit-exam-name')
         };
 
-        console.log("UI bound:", this.ui.examSelect);
-
         try {
+            // 1. Fetch JSON (Cache-busted for static sites)
+            // Static sites don't have dynamic queries, so we add a timestamp
+            // to the URL to bypass browser caching of previous results.
             const response = await fetch("/data/published-results.json?v=" + Date.now());
-            this.data = await response.json();
 
-            console.log("Published data:", this.data);
+            if (!response.ok) throw new Error("Data file unreachable");
+
+            this.data = await response.json();
+            console.log("Portal Data loaded:", this.data);
 
             this.populateDropdown();
 
             if (this.ui.form) {
                 this.ui.form.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    console.log("Submit clicked");
                     this.handleSearch();
                 });
             }
 
             window.UI = { roll: this.ui.rollInput };
-
             this.handleDeepLinking();
 
         } catch (error) {
-            console.error("System Error:", error);
+            console.error("System Failure:", error);
             this.handleGlobalFailure();
         }
-    }
-
+    },
 
     populateDropdown() {
         if (!this.ui.examSelect) return;
         this.ui.examSelect.innerHTML = "";
 
-        // Root Cause: "undefined" options happen when JSON keys don't match JS expectations (e.g., id vs examId).
-        // Fix: Use strict fallback mapping and skip any entry that lacks mandatory identity keys.
-        if (!this.data || !this.data.exams || !Array.isArray(this.data.exams)) {
-            this.ui.examSelect.innerHTML = '<option value="">No published exams available</option>';
+        // Verification Rule: JSON must contain an 'exams' array
+        if (!this.data || !Array.isArray(this.data.exams)) {
+            this.ui.examSelect.innerHTML = '<option value="">System unavailable</option>';
             this.ui.examSelect.disabled = true;
             return;
         }
 
-        const validExams = [];
-        this.data.exams.forEach(exam => {
-            // Defensive Mapping (MANDATORY CONTRACT)
-            const id = exam.examId || exam.id || null;
-            const name = exam.examName || exam.name || null;
-
-            if (id && name) {
-                validExams.push({ id: String(id), name: String(name) });
-            } else {
-                console.warn("Skipping malformed exam entry (missing ID/Name):", exam);
-            }
+        // Filter: Only include exams where published is explicitly true
+        const publishedExams = this.data.exams.filter(exam => {
+            const isPublished = exam.published === true || exam.published === undefined; // Fallback for legacy
+            const hasRequired = (exam.examId || exam.id) && (exam.examName || exam.name);
+            return isPublished && hasRequired;
         });
 
-        if (validExams.length === 0) {
-            this.ui.examSelect.innerHTML = '<option value="">No valid exams found</option>';
+        if (publishedExams.length === 0) {
+            this.ui.examSelect.innerHTML = '<option value="">No published exams available</option>';
             this.ui.examSelect.disabled = true;
             return;
         }
@@ -92,15 +85,17 @@ const ResultApp = {
         this.ui.examSelect.appendChild(defaultOpt);
 
         // Populate validated exams
-        validExams.forEach(exam => {
+        publishedExams.forEach(exam => {
             const opt = document.createElement('option');
-            opt.value = exam.id;
-            opt.textContent = exam.name;
+            opt.value = exam.examId || exam.id;
+            opt.textContent = exam.examName || exam.name;
             this.ui.examSelect.appendChild(opt);
         });
 
+        // Enable dropdown only after population
         this.ui.examSelect.disabled = false;
     },
+
 
 
     handleSearch() {
