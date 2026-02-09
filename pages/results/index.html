@@ -689,7 +689,7 @@
             } catch (error) {
                 console.error("Portal Initialization Failed:", error);
                 populateDropdown([]); // Show empty state
-                renderError("System is currently offline or undergoing maintenance.");
+                renderSystemError("System is currently offline or undergoing maintenance.");
             }
         }
 
@@ -760,51 +760,40 @@
             }
         }
 
-        // --- SEARCH ENGINE ---
-        UI.form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const examId = UI.select.value;
-            const roll = UI.roll.value.trim();
+        // --- RENDER SYSTEM ---
+        function renderLoading() {
+            UI.display.style.display = "block";
+            UI.display.innerHTML = `
+                <div class="glass-card animate-slide-up" style="margin-top: 30px; text-align: center; padding: 40px;">
+                    <i class="ph ph-circle-notch animate-spin" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px; display: block;"></i>
+                    <p style="color: #888; letter-spacing: 1px;">Searching records...</p>
+                </div>
+            `;
+        }
 
-            if (!examId || !roll) return;
-
-            UI.display.innerHTML = '';
-
-            const session = window.__PUBLISHED_EXAMS__.find(s => s.id === examId);
-            if (!session) return renderError("The selected exam session is no longer available.");
-
-            const student = (session.results || []).find(r => String(r.roll).trim() === String(roll));
-
-            if (student) {
-                renderResult(student, session.name);
-            } else {
-                renderError(`Result Not Found for registration number <b>${roll}</b> in ${session.name}.`);
-            }
-        });
-
-        // --- RENDERING ---
-        function renderResult(data, examName) {
+        function renderResult(student, examName) {
+            UI.display.style.display = "block";
             UI.display.innerHTML = `
                 <div class="glass-card result-card animate-slide-up" style="margin-top: 30px;">
                     <div class="student-meta">
                         <div>
-                            <h2 style="font-size: 2.2rem; margin: 0; color: #fff;">${data.name}</h2>
-                            <p style="color: #888; margin: 8px 0 0; font-size: 1.1rem;">Registration No: <b style="color: var(--primary);">${data.roll}</b></p>
+                            <h2 style="font-size: 2.2rem; margin: 0; color: #fff;">${student.name}</h2>
+                            <p style="color: #888; margin: 8px 0 0; font-size: 1.1rem;">Registration No: <b style="color: var(--primary);">${student.roll}</b></p>
                             <span style="display:inline-block; padding:5px 12px; background:rgba(255,255,255,0.05); border-radius:8px; font-size:0.75rem; margin-top:15px; border:1px solid var(--border); color:#bbb;">${examName}</span>
                         </div>
                         <div class="grade-badge">
-                            <span class="grade">${data.grade || '--'}</span>
+                            <span class="grade">${student.grade || '--'}</span>
                             <span class="label">GRADE</span>
                         </div>
                     </div>
 
                     <div class="summary-stats" style="margin-top:40px;">
                         <div class="stat-box">
-                            <div style="font-size: 2.5rem; font-weight: 800; color: #fff;">${data.total}</div>
+                            <div style="font-size: 2.5rem; font-weight: 800; color: #fff;">${student.total}</div>
                             <div style="font-size: 0.75rem; color: #666; text-transform: uppercase;">Total Marks</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary);"># ${data.rank || '--'}</div>
+                            <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary);"># ${student.rank || '--'}</div>
                             <div style="font-size: 0.75rem; color: #666; text-transform: uppercase;">Class Rank</div>
                         </div>
                     </div>
@@ -822,16 +811,74 @@
             UI.display.scrollIntoView({ behavior: 'smooth' });
         }
 
-        function renderError(msg) {
+        function renderResultNotFound(roll, examName) {
+            UI.display.style.display = "block";
             UI.display.innerHTML = `
                 <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px; text-align: center; background: rgba(255,59,59,0.05); border-radius: 20px; border: 1px solid rgba(255,59,59,0.1);">
                     <i class="ph ph-warning-circle" style="font-size: 3.5rem; color: #ff3b3b; margin-bottom: 20px; display: block;"></i>
                     <h3 style="margin: 0 0 10px;">Result Not Found</h3>
-                    <p style="color: #bbb; line-height: 1.5; max-width: 400px; margin: 0 auto 25px;">${msg}</p>
+                    <p style="color: #bbb; line-height: 1.5; max-width: 400px; margin: 0 auto 25px;">
+                        Registration number <b style="color: #fff;">${roll}</b> was not found in <br> ${examName}.
+                    </p>
                     <button class="btn-sec" onclick="UI.roll.focus()" style="padding: 12px 25px;">Adjust Search</button>
                 </div>
             `;
         }
+
+        function renderSystemError(msg) {
+            UI.display.style.display = "block";
+            UI.display.innerHTML = `
+                <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px; text-align: center; border: 1px dashed #ff3b3b;">
+                    <i class="ph ph-bug" style="font-size: 3rem; color: #ff3b3b; margin-bottom: 20px; display: block;"></i>
+                    <p>${msg}</p>
+                </div>
+            `;
+        }
+
+        // --- SEARCH ENGINE ---
+        UI.form.addEventListener('submit', (e) => {
+            e.preventDefault(); // MANDATORY: Prevent page refresh
+
+            const examId = UI.select.value;
+            const roll = UI.roll.value.trim();
+
+            if (!examId) return alert("Please select an exam first.");
+            if (!roll) return UI.roll.focus();
+
+            // 1. Loading State
+            renderLoading();
+
+            // 2. Defensive check for data availability
+            if (!window.__PUBLISHED_EXAMS__ || window.__PUBLISHED_EXAMS__.length === 0) {
+                console.warn("Search triggered but data is missing.");
+                return renderSystemError("Please wait... synchronization in progress.");
+            }
+
+            // 3. Find Exam Session
+            const session = window.__PUBLISHED_EXAMS__.find(s => s.id === examId);
+            if (!session) {
+                console.warn(`Exam ID Mismatch: ${examId}`);
+                return renderSystemError("The selected exam is no longer available.");
+            }
+
+            // 4. Match Roll Number (Normalizing strings and trimming)
+            if (!session.results || session.results.length === 0) {
+                return renderResultNotFound(roll, session.name);
+            }
+
+            const student = session.results.find(r =>
+                String(r.roll).trim() === String(roll).trim()
+            );
+
+            // 5. Final Render
+            setTimeout(() => {
+                if (student) {
+                    renderResult(student, session.name);
+                } else {
+                    renderResultNotFound(roll, session.name);
+                }
+            }, 300); // Subtle UX delay for the loading state
+        });
 
         window.showSearchForm = () => {
             UI.form.style.display = "grid";
