@@ -160,7 +160,7 @@ const ResultsManagement = (() => {
                 examId: examId,
                 examName: displayName,
                 published: true,
-                lastSync: examData.syncedAt,
+                lastPublished: examData.syncedAt,
                 subjects: examData.subjects || [],
                 results: examData.data || [] // Full results array
             });
@@ -169,13 +169,13 @@ const ResultsManagement = (() => {
         // Save for Legacy ResultsCMS
         StorageManager.set('exam_results_exams', cmsExams);
 
-        // Save for PUBLIC PORTAL (Unified Global Key)
+        // Save for PUBLIC PORTAL (Unified Global Key: publishedResults)
         localStorage.setItem('publishedResults', JSON.stringify({
             exams: publicExams,
             lastUpdated: new Date().toISOString()
         }));
 
-        console.log("Public Results Synced:", publicExams.length, "exams published.");
+        console.log("Portal Sync: ", publicExams.length, "exams pushed to localStorage.");
     };
 
     /**

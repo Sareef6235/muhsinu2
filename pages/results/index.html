@@ -701,7 +701,7 @@
                         examId: ex.examId || ex.id,
                         examName: ex.examName || ex.name,
                         published: ex.published !== undefined ? ex.published : true,
-                        lastSync: ex.lastSync || ex.lastSynced,
+                        lastPublished: ex.lastPublished || ex.lastSync || ex.lastSynced,
                         subjects: ex.subjects || [],
                         results: ex.results || []
                     }));
@@ -765,8 +765,8 @@
             if (exam) {
                 if (UI.stats.students) UI.stats.students.textContent = exam.results.length;
                 if (UI.stats.lastSync) {
-                    const date = new Date(exam.lastSync);
-                    UI.stats.lastSync.textContent = isNaN(date.getTime()) ? (exam.lastSync || '--') : date.toLocaleDateString();
+                    const date = new Date(exam.lastPublished);
+                    UI.stats.lastSync.textContent = isNaN(date.getTime()) ? (exam.lastPublished || '--') : date.toLocaleDateString();
                 }
             } else {
                 if (UI.stats.students) UI.stats.students.textContent = '0';
