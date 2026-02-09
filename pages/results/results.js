@@ -34,7 +34,12 @@ const ResultApp = {
                 });
             }
 
-            // 4. Handle Incoming URL Params (Deep Linking)
+            // 4. Global UI Bridge (Support for HTML onclick handlers)
+            window.UI = {
+                roll: this.ui.rollInput
+            };
+
+            // 5. Handle Incoming URL Params (Deep Linking)
             this.handleDeepLinking();
 
         } catch (error) {
@@ -109,20 +114,23 @@ const ResultApp = {
         // Simulate network feel
         setTimeout(() => {
             const exam = this.data.exams.find(e => e.examId === examId);
-            if (!exam) return this.renderNotFound("Exam Session Not Found");
+            if (!exam) return this.renderNotFound("Exam Session Not Found", roll);
 
+            // String-safe comparison logic
             const student = exam.results.find(r => String(r.roll).trim() === String(roll).trim());
 
             if (student) {
                 this.renderResult(student, exam.examName);
             } else {
-                this.renderNotFound(`Registration No. ${roll} not found in ${exam.examName}`);
+                this.renderNotFound(exam.examName, roll);
             }
         }, 600);
     },
 
     renderResult(student, examName) {
         if (!this.ui.display) return;
+
+        // Explicitly show result display
         this.ui.display.style.display = "block";
 
         this.ui.display.innerHTML = `
@@ -151,16 +159,31 @@ const ResultApp = {
         this.ui.display.scrollIntoView({ behavior: 'smooth' });
     },
 
-    renderNotFound(message) {
+    renderNotFound(examName, roll) {
         if (!this.ui.display) return;
+
+        // Explicitly show result display
         this.ui.display.style.display = "block";
+
         this.ui.display.innerHTML = `
-            <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 50px;">
-                <i class="ph ph-warning-octagon" style="font-size: 3rem; color: #ff3d3d; margin-bottom: 15px; display: block;"></i>
-                <h3 style="color: #fff; margin:0 0 10px;">No Match Found</h3>
-                <p style="color: #888;">${message}</p>
-                <button class="btn-sec" style="margin-top: 20px; padding: 8px 20px;" onclick="document.getElementById('rollInput').focus()">
-                    Check Roll Number
+            <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 60px 40px; text-align: center;">
+                <i class="ph ph-warning-circle"
+                   style="font-size: 4rem; color: #ff3b3b; margin-bottom: 25px; display: block;"></i>
+
+                <h2 style="margin: 0 0 10px; color: #fff;">
+                    Wait, something's missing...
+                </h2>
+
+                <p style="color: #888; line-height: 1.6; max-width: 450px; margin: 0 auto 35px;">
+                    Registration number <b style="color: #fff;">${roll}</b>
+                    could not be verified for <br>
+                    <span style="color: var(--primary);">${examName}</span>.
+                    <br>Please ensure the roll number is correct and try again.
+                </p>
+
+                <button class="btn-sec" onclick="UI.roll.focus()"
+                        style="padding: 15px 40px; font-size: 1rem;">
+                    <i class="ph ph-pencil-simple"></i> RE-ENTER ROLL NO
                 </button>
             </div>
         `;
@@ -182,7 +205,7 @@ const ResultApp = {
             this.ui.examSelect.innerHTML = '<option value="">System unavailable</option>';
             this.ui.examSelect.disabled = true;
         }
-        this.renderNotFound("The results database is currently unreachable. Please try again later.");
+        this.renderNotFound("Database Unreachable", "System");
     }
 };
 
