@@ -4,19 +4,20 @@
 
 **Repository**: `git@github.com:Sareef6235/muhsinu2.git`  
 **Branch**: `main`  
-**Latest Commit**: `94586d0`  
+**Latest Commit**: `1c2ca45`  
 **Status**: ✅ Fully synced with GitHub
 
 ---
 
 ## 📦 What Was Pushed
 
-### Latest Changes (2026-02-09 21:57 IST):
-- **FIXED "value=undefined" Dropdown Issue**:
-  - Implemented strict **Data Contract** normalization in `dashboard.js`.
-  - Added defensive mapping and validation in `results.js`.
-  - Added `console.table` debugging for admin publishing.
-  - Verified mandatory keys (`examId`, `examName`) for all entries.
+### Latest Changes (2026-02-09 22:09 IST):
+- **Refined Static Data Flow**:
+  - Implemented **Cache-Busting** (`?v=timestamp`) for real-time results on static hosts.
+  - Standardized JSON structure with a mandatory `meta` block.
+  - Added strict client-side publishing filters in `results.js`.
+  - Optimized `StaticPublisher` in `dashboard.js` for production-grade JSON exports.
+
 
 
 
