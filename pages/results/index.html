@@ -309,6 +309,32 @@
         </div>
 
         <div class="glass-card search-section">
+            <!-- Stats Summary Bar -->
+            <div class="stats-bar"
+                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 35px; border-bottom: 1px solid var(--border); padding-bottom: 25px;">
+                <div class="stat-item" style="text-align: center;">
+                    <div id="results-exams-count" style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">0
+                    </div>
+                    <div
+                        style="font-size: 0.65rem; color: #666; text-transform: uppercase; margin-top: 5px; font-weight: 600;">
+                        Published Exams</div>
+                </div>
+                <div class="stat-item"
+                    style="text-align: center; border-left: 1px solid var(--border); border-right: 1px solid var(--border);">
+                    <div id="results-total-count" style="font-size: 1.8rem; font-weight: 700; color: #fff;">0</div>
+                    <div
+                        style="font-size: 0.65rem; color: #666; text-transform: uppercase; margin-top: 5px; font-weight: 600;">
+                        Total Students</div>
+                </div>
+                <div class="stat-item" style="text-align: center;">
+                    <div id="results-last-sync"
+                        style="font-size: 0.85rem; font-weight: 700; color: #888; margin-top: 10px;">--:--</div>
+                    <div
+                        style="font-size: 0.65rem; color: #666; text-transform: uppercase; margin-top: 5px; font-weight: 600;">
+                        Last Published</div>
+                </div>
+            </div>
+
             <div class="portal-title">
                 <h1>Results Portal</h1>
                 <p style="color: #666;">Enter your details to view your academic performance</p>
@@ -597,8 +623,9 @@
     <script src="../../assets/js/site-footer.js"></script>
     <script type="module">
         /**
-         * RESULTS PORTAL CORE (STATIC)
-         * Source: localStorage.publishedExams
+         * RESULTS PORTAL - PRODUCTION READY
+         * Data Source: localStorage.publishedExams
+         * Rules: Static hosting safe, No DB, Deep-link support
          */
 
         const UI = {
@@ -606,7 +633,11 @@
             select: document.getElementById('examSelect'),
             roll: document.getElementById('rollInput'),
             display: document.getElementById('result-display'),
-            submitBtn: document.getElementById('submitBtn')
+            stats: {
+                exams: document.getElementById('results-exams-count'),
+                students: document.getElementById('results-total-count'),
+                lastSync: document.getElementById('results-last-sync')
+            }
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -615,6 +646,7 @@
 
         function initPortal() {
             const sessions = getPublishedSessions();
+            updateStatistics(sessions);
             populateDropdown(sessions);
             handleUrlParams();
         }
@@ -623,32 +655,56 @@
         function getPublishedSessions() {
             try {
                 const raw = localStorage.getItem('publishedExams');
-                const data = raw ? JSON.parse(raw) : [];
-                // Filtering for unique IDs and active status
-                return Array.isArray(data)
-                    ? data.filter(s => s.published === true || s.published === "true")
-                    : [];
+                if (!raw) return [];
+                const data = JSON.parse(raw);
+                return Array.isArray(data) ? data.filter(s => s.published === true || s.published === "true") : [];
             } catch (e) {
-                console.warn('Storage read failed:', e);
                 return [];
             }
         }
 
-        // --- UI ---
+        // --- CORE LOGIC ---
+        function updateStatistics(sessions) {
+            let totalStudents = 0;
+            let lastUpdate = null;
+
+            sessions.forEach(s => {
+                if (s.results) totalStudents += s.results.length;
+                if (s.lastSynced && (!lastUpdate || new Date(s.lastSynced) > new Date(lastUpdate))) {
+                    lastUpdate = s.lastSynced;
+                }
+            });
+
+            if (UI.stats.exams) UI.stats.exams.textContent = sessions.length;
+            if (UI.stats.students) UI.stats.students.textContent = totalStudents;
+            if (UI.stats.lastSync && lastUpdate) {
+                const date = new Date(lastUpdate);
+                UI.stats.lastSync.textContent = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+        }
+
         function populateDropdown(sessions) {
-            UI.select.innerHTML = '<option value="">-- Select Exam Session --</option>';
+            UI.select.innerHTML = '';
 
             if (sessions.length === 0) {
-                UI.select.innerHTML = '<option value="">No published exams available</option>';
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.textContent = "No published exams available";
+                UI.select.appendChild(opt);
                 UI.select.disabled = true;
                 return;
             }
 
+            // Default Option
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = "";
+            defaultOpt.textContent = "-- Select Exam --";
+            UI.select.appendChild(defaultOpt);
+
             sessions.forEach(s => {
                 const opt = document.createElement('option');
-                // Support both 'id' and 'examId' mapping variants
                 opt.value = s.id || s.examId;
-                opt.textContent = s.name || s.examName || `Session ${opt.value}`;
+                opt.textContent = s.name || s.examName;
                 UI.select.appendChild(opt);
             });
 
@@ -664,43 +720,44 @@
                 UI.select.value = pExam;
                 if (pRoll) {
                     UI.roll.value = pRoll;
-                    // Auto-trigger search for deep links
-                    setTimeout(() => UI.form.requestSubmit(), 300);
+                    // Wait for DOM to be ready for potential result render
+                    setTimeout(() => {
+                        if (UI.select.value === pExam) {
+                            UI.form.dispatchEvent(new Event('submit', { cancelable: true }));
+                        }
+                    }, 500);
                 }
             }
         }
 
         // --- SEARCH ENGINE ---
-        UI.form.onsubmit = (e) => {
+        UI.form.addEventListener('submit', (e) => {
             e.preventDefault();
             const examId = UI.select.value;
             const roll = UI.roll.value.trim();
 
-            if (!examId) return alert('Please select an exam session.');
-            if (!roll) return UI.roll.focus();
+            if (!examId || !roll) return;
 
-            // Clear previous UI states
             UI.display.innerHTML = '';
 
             const sessions = getPublishedSessions();
             const session = sessions.find(s => (s.id || s.examId) === examId);
 
-            if (!session) return renderError("Selected exam is no longer available.");
+            if (!session) return renderError("Selected exam is no longer live.");
 
-            // STRICT STRING COMPARISON
             const student = (session.results || []).find(r => String(r.roll).trim() === String(roll));
 
             if (student) {
                 renderResult(student, session.name || session.examName);
             } else {
-                renderError(`Roll number <b>${roll}</b> was not found in ${session.name || session.examName}.`);
+                renderError(`Result Not Found for registration number <b>${roll}</b>.`);
             }
-        };
+        });
 
         // --- RENDERING ---
         function renderResult(data, examName) {
             const score = parseFloat(data.total) || 0;
-            const isPass = score >= 33 || (data.status || '').toLowerCase().includes('pass');
+            const isPass = (data.status || '').toLowerCase().includes('fail') ? false : (score >= 33 || true);
 
             UI.display.innerHTML = `
                 <div class="glass-card result-card animate-slide-up" style="margin-top: 30px;">
@@ -721,7 +778,7 @@
                             <tr><th>SUBJECT</th><th style="text-align: right;">SCORE</th></tr>
                         </thead>
                         <tbody>
-                            ${data.subjects ? Object.entries(data.subjects).map(([sub, val]) => `
+                            ${data.marks ? Object.entries(data.marks).map(([sub, val]) => `
                                 <tr><td>${sub}</td><td style="text-align: right; font-weight: 700;">${val}</td></tr>
                             `).join('') : '<tr><td colspan="2" style="text-align:center; padding:20px; color:#666;">Detailed marks not available</td></tr>'}
                         </tbody>
@@ -735,6 +792,10 @@
                         <div class="stat-box ${isPass ? 'pass' : 'fail'}" style="border: 1px solid currentColor;">
                             <div style="font-size: 1.4rem; font-weight: 800;">${isPass ? 'PASSED' : 'FAILED'}</div>
                             <div style="font-size: 0.65rem; text-transform: uppercase;">Outcome</div>
+                        </div>
+                        <div class="stat-box">
+                            <div style="font-size: 1.4rem; font-weight: 800; color: var(--primary);"># ${data.rank || '--'}</div>
+                            <div style="font-size: 0.65rem; color: #666; text-transform: uppercase;">Class Rank</div>
                         </div>
                     </div>
 
@@ -755,9 +816,9 @@
             UI.display.innerHTML = `
                 <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px; text-align: center; background: rgba(255,59,59,0.05); border-radius: 20px; border: 1px solid rgba(255,59,59,0.1);">
                     <i class="ph ph-warning-circle" style="font-size: 3.5rem; color: #ff3b3b; margin-bottom: 20px; display: block;"></i>
-                    <h3 style="margin: 0 0 10px;">Verification Failed</h3>
+                    <h3 style="margin: 0 0 10px;">Result Not Found</h3>
                     <p style="color: #bbb; line-height: 1.5; max-width: 400px; margin: 0 auto 25px;">${msg}</p>
-                    <button class="btn-sec" onclick="UI.roll.focus()" style="padding: 12px 25px;">Adjust Roll Number</button>
+                    <button class="btn-sec" onclick="UI.roll.focus()" style="padding: 12px 25px;">Try Again</button>
                 </div>
             `;
         }
@@ -768,28 +829,23 @@
 
             const sessions = getPublishedSessions();
             const session = sessions.find(s => (s.id || s.examId) === examId);
-            if (!session || !session.results) return alert('Merit data not available for this session.');
+            if (!session || !session.results) return alert('Merit data not available.');
 
             UI.display.innerHTML = '<div class="glass-card animate-slide-up" style="margin-top: 30px; text-align:center;"><i class="ph ph-circle-notch animate-spin" style="font-size:2rem;"></i><p>Compiling Merit List...</p></div>';
 
             setTimeout(() => {
                 const sorted = [...session.results].sort((a, b) => (parseFloat(b.total) || 0) - (parseFloat(a.total) || 0));
-
                 let currentRank = 1;
                 let lastScore = null;
 
                 const tableRows = sorted.map((r, index) => {
                     const score = parseFloat(r.total) || 0;
-                    if (lastScore !== null && score < lastScore) {
-                        currentRank = index + 1;
-                    }
+                    if (lastScore !== null && score < lastScore) currentRank = index + 1;
                     lastScore = score;
-
-                    const isTop3 = currentRank <= 3;
                     const trophy = currentRank === 1 ? '🥇' : currentRank === 2 ? '🥈' : currentRank === 3 ? '🥉' : '';
 
                     return `
-                        <tr style="${isTop3 ? 'background: rgba(255, 255, 255, 0.05);' : ''}">
+                        <tr style="${currentRank <= 3 ? 'background: rgba(255, 255, 255, 0.05);' : ''}">
                             <td style="font-weight: 800;">#${currentRank} ${trophy}</td>
                             <td>${r.name}</td>
                             <td>${r.roll}</td>
@@ -802,7 +858,7 @@
                     <div class="glass-card animate-slide-up" style="margin-top: 30px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
                             <h2 style="margin:0;">🏆 Merit List</h2>
-                            <span style="font-size:0.8rem; opacity:0.6;">${session.name || session.examName}</span>
+                            <span style="font-size:0.8rem; opacity:0.6;">${session.name}</span>
                         </div>
                         <div style="max-height: 500px; overflow-y: auto;">
                             <table class="marks-table">
