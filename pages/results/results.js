@@ -1,6 +1,7 @@
 /**
- * RESULTS PORTAL - Static JSON Fetcher & Renderer
- * Connects to /data/published-results.json
+ * RESULTS PORTAL - PRODUCTION ENGINE (STATIC FLOW)
+ * Data Source: /data/published-results.json
+ * Compatibility: GitHub Pages, Vercel (Pure Vanilla JS)
  */
 const ResultApp = {
     data: null,
@@ -13,137 +14,152 @@ const ResultApp = {
 
     async init() {
         try {
-            console.log("Portal: Initializing Static Flow...");
+            this.renderLoading(); // Initial state
 
-            // 1. Fetch JSON data
-            // Note: Using relative path from /pages/results/index.html
-            const res = await fetch("../../data/published-results.json?v=" + Date.now());
-            if (!res.ok) throw new Error("Results file not found or inaccessible.");
+            // 1. Fetch JSON (Relative path safe for static hosting)
+            // Using ../../data/ as current file is in /pages/results/
+            const response = await fetch("../../data/published-results.json?cache_bust=" + Date.now());
 
-            this.data = await res.json();
-            console.log("Portal: Data Loaded", this.data?.exams?.length, "exams");
-
-            // 2. Populate Dropdown
-            this.populateDropdown();
-
-            // 3. Handle Direct Link (URL Prams)
-            const params = new URLSearchParams(window.location.search);
-            const examId = params.get("exam");
-            const roll = params.get("roll");
-
-            if (examId && roll) {
-                if (this.ui.examSelect) this.ui.examSelect.value = examId;
-                if (this.ui.rollInput) this.ui.rollInput.value = roll;
-                this.search(examId, roll);
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
             }
 
-            // 4. Setup Form Listener
+            this.data = await response.json();
+
+            // 2. Populate Dropdown (Mandatory Rule: Never leave empty)
+            this.populateDropdown();
+
+            // 3. Handle URL Deep-Linking
+            this.handleDeepLinking();
+
+            // 4. Form Submission Handler
             if (this.ui.form) {
                 this.ui.form.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    this.handleSearch();
+                    this.handleSearchRedirect();
                 });
             }
 
+            // If we have data but no search yet, hide the loading but keep structure
+            if (!window.location.search) {
+                this.ui.display.style.display = "none";
+            }
+
         } catch (error) {
-            console.error("Portal Initialization Error:", error);
-            this.renderSystemError("System currently unavailable. Please check back later.");
+            console.error("Critical System Failure:", error);
+            this.renderSystemUnavailable();
         }
     },
 
     populateDropdown() {
         if (!this.ui.examSelect) return;
 
-        this.ui.examSelect.innerHTML = '<option value="">-- Select Academic Session --</option>';
-        if (this.data && this.data.exams) {
-            this.data.exams.forEach(exam => {
-                const opt = document.createElement('option');
-                opt.value = exam.examId;
-                opt.textContent = exam.examName;
-                this.ui.examSelect.appendChild(opt);
-            });
-            this.ui.examSelect.disabled = false;
-        } else {
-            this.ui.examSelect.innerHTML = '<option value="">No results published</option>';
+        // Clear "Loading..." option
+        this.ui.examSelect.innerHTML = "";
+
+        if (!this.data || !this.data.exams || this.data.exams.length === 0) {
+            const opt = document.createElement('option');
+            opt.textContent = "No Exams Published";
+            this.ui.examSelect.appendChild(opt);
             this.ui.examSelect.disabled = true;
+            return;
+        }
+
+        // Add Default Option
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = "";
+        defaultOpt.textContent = "-- Select Exam --";
+        this.ui.examSelect.appendChild(defaultOpt);
+
+        // Add Exams
+        this.data.exams.forEach(exam => {
+            const opt = document.createElement('option');
+            opt.value = exam.examId;
+            opt.textContent = exam.examName;
+            this.ui.examSelect.appendChild(opt);
+        });
+
+        this.ui.examSelect.disabled = false;
+    },
+
+    handleDeepLinking() {
+        const params = new URLSearchParams(window.location.search);
+        const examId = params.get("exam");
+        const roll = params.get("roll");
+
+        if (examId && roll) {
+            // Set UI values to match URL
+            if (this.ui.examSelect) this.ui.examSelect.value = examId;
+            if (this.ui.rollInput) this.ui.rollInput.value = roll;
+
+            this.performSearch(examId, roll);
         }
     },
 
-    handleSearch() {
+    handleSearchRedirect() {
         const examId = this.ui.examSelect.value;
         const roll = this.ui.rollInput.value.trim();
 
-        if (!examId) return alert("Please select an academic session.");
+        if (!examId) return alert("Please select an exam session.");
         if (!roll) return this.ui.rollInput.focus();
 
-        // Update URL without reload for sharing
+        // Standard requirement: Redirect to same page with params
         const url = new URL(window.location.href);
         url.searchParams.set('exam', examId);
         url.searchParams.set('roll', roll);
+
+        // Use replaceState to update URL without full page refresh for better UX
         window.history.replaceState({}, '', url);
 
-        this.search(examId, roll);
+        this.performSearch(examId, roll);
     },
 
-    search(examId, rollInput) {
-        const roll = String(rollInput).trim();
+    performSearch(examId, rawRoll) {
+        const roll = String(rawRoll).trim();
         this.renderLoading();
 
-        if (!this.data || !this.data.exams) return this.renderSystemError("Data not loaded correctly.");
+        // Safety check
+        if (!this.data || !this.data.exams) return;
 
         const exam = this.data.exams.find(e => e.examId === examId);
-        if (!exam) return this.renderError(roll, "Selected session not found.");
 
-        const student = exam.results.find(r => String(r.roll).trim() === roll);
-
-        // Small delay for UX "Searching" feel
+        // UX Delay for "Search" feel
         setTimeout(() => {
-            if (student) {
-                this.renderResult(student, exam.examName);
-            } else {
-                this.renderError(roll, exam.examName);
+            if (!exam) {
+                this.renderNotFound(roll, "Academic Session Not Found");
+                return;
             }
-        }, 400);
+
+            const student = exam.results.find(r => String(r.roll).trim() === roll);
+
+            if (student) {
+                this.renderResultFound(student, exam.examName);
+            } else {
+                this.renderNotFound(roll, exam.examName);
+            }
+        }, 500);
     },
 
-    renderLoading() {
-        if (!this.ui.display) return;
-        this.ui.display.style.display = "block";
-        this.ui.display.innerHTML = `
-            <div class="glass-card animate-slide-up" style="margin-top: 30px; text-align: center; padding: 50px;">
-                <i class="ph ph-circle-notch animate-spin" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px; display: block;"></i>
-                <p style="color: #888; letter-spacing: 2px; font-weight: 600;">SEARCHING DATABASE...</p>
-            </div>
-        `;
-    },
+    // --- VIEW RENDERING (MANDATORY DISPLAY: BLOCK) ---
 
-    renderResult(student, examName) {
-        if (!this.ui.display) return;
+    renderResultFound(student, examName) {
         this.ui.display.style.display = "block";
-
         this.ui.display.innerHTML = `
             <div class="glass-card result-card animate-slide-up" style="margin-top: 30px;">
-                <div class="student-meta" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 30px;">
-                    <div>
-                        <h2 style="font-size: 2.5rem; margin: 0; color: #fff; letter-spacing: -1px;">${student.name}</h2>
-                        <p style="color: #888; margin: 8px 0 0; font-size: 1.1rem;">Roll No: <b style="color: var(--primary);">${student.roll}</b></p>
-                        <span style="display:inline-block; padding:6px 14px; background:rgba(0,229,255,0.05); border-radius:8px; font-size:0.75rem; margin-top:20px; border:1px solid rgba(0,229,255,0.1); color:var(--primary); font-weight:600;">${examName}</span>
-                    </div>
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 25px;">
+                    <h2 style="font-size: 2rem; color: var(--primary); margin: 0;">${student.name}</h2>
+                    <p style="color: #888; margin: 5px 0 0;">Registration No: <b>${student.roll}</b></p>
+                    <p style="font-size: 0.8rem; opacity: 0.6; margin-top: 10px;">Exam: ${examName}</p>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 15px;">
+                    <div style="font-size: 4rem; font-weight: 800; color: #fff;">${student.total}</div>
+                    <div style="color: #666; text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem;">TOTAL MARKS</div>
                 </div>
 
-                <div class="summary-stats" style="margin-top:40px; display: flex; justify-content: center; text-align: center;">
-                    <div class="stat-box">
-                        <div style="font-size: 4rem; font-weight: 800; color: #fff;">${student.total}</div>
-                        <div style="font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 1px;">TOTAL SCORE</div>
-                    </div>
-                </div>
-
-                <div class="actions" style="margin-top:40px; display:flex; gap:15px;">
-                    <button class="btn btn-primary" style="flex:1; padding: 15px;" onclick="window.print()">
-                        <i class="ph ph-printer"></i> PRINT MARK SHEET
-                    </button>
-                    <button class="btn btn-secondary" style="flex:1; padding: 15px;" onclick="location.reload()">
-                        <i class="ph ph-magnifying-glass"></i> NEW SEARCH
+                <div style="margin-top: 30px; display: flex; gap: 10px;">
+                    <button class="btn btn-primary" style="flex: 1;" onclick="window.print()">
+                        <i class="ph ph-printer"></i> PRINT RESULT
                     </button>
                 </div>
             </div>
@@ -151,35 +167,44 @@ const ResultApp = {
         this.ui.display.scrollIntoView({ behavior: 'smooth' });
     },
 
-    renderError(roll, examName) {
-        if (!this.ui.display) return;
+    renderNotFound(roll, examName) {
         this.ui.display.style.display = "block";
         this.ui.display.innerHTML = `
-            <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 60px 40px; text-align: center; background: rgba(255,59,59,0.02); border: 1px dashed rgba(255,59,59,0.2); border-radius: 20px;">
-                <i class="ph ph-warning-circle" style="font-size: 4rem; color: #ff3b3b; margin-bottom: 25px; display: block;"></i>
-                <h2 style="margin: 0 0 10px; color: #fff;">Result Not Found</h2>
-                <p style="color: #888; line-height: 1.6; max-width: 450px; margin: 0 auto 35px;">
-                    Roll number <b style="color: #fff;">${roll}</b> could not be verified for <br> <span style="color: var(--primary);">${examName}</span>. 
-                    Please ensure the details are correct.
+            <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px; text-align: center;">
+                <i class="ph ph-mask-sad" style="font-size: 4rem; color: #ff3d3d; margin-bottom: 20px; display: block;"></i>
+                <h2 style="color: #fff; margin: 0 0 10px;">Result Not Found</h2>
+                <p style="color: #888; font-size: 0.95rem;">
+                   Registration No. <b>${roll}</b> could not be verified for <br>
+                   <span style="color: var(--primary)">${examName}</span>.
                 </p>
-                <button class="btn btn-secondary" onclick="document.getElementById('rollInput').focus()" style="padding: 12px 30px;">
-                    <i class="ph ph-pencil-simple"></i> RE-ENTER ROLL NO
+                <button class="btn btn-secondary" onclick="location.reload()" style="margin-top: 25px; height: 36px; padding: 0 20px;">
+                    Try Another Search
                 </button>
             </div>
         `;
-        this.ui.display.scrollIntoView({ behavior: 'smooth' });
     },
 
-    renderSystemError(msg) {
-        if (!this.ui.display) return;
+    renderLoading() {
         this.ui.display.style.display = "block";
         this.ui.display.innerHTML = `
-            <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px; text-align: center; border: 1px dashed rgba(255,255,255,0.1); background: rgba(255,255,255,0.01); border-radius: 20px;">
-                <i class="ph ph-shield-warning" style="font-size: 3rem; color: #666; margin-bottom: 20px; display: block;"></i>
-                <p style="color: #bbb; font-size: 1.1rem;">${msg}</p>
+            <div class="glass-card animate-slide-up" style="margin-top: 30px; text-align: center; padding: 40px;">
+                <div class="animate-spin" style="width: 40px; height: 40px; border: 4px solid var(--primary); border-top-color: transparent; border-radius: 50%; margin: 0 auto 20px;"></div>
+                <p style="color: #888; letter-spacing: 1px; font-weight: 600;">ACCESSING DATABASE...</p>
+            </div>
+        `;
+    },
+
+    renderSystemUnavailable() {
+        this.ui.display.style.display = "block";
+        this.ui.display.innerHTML = `
+            <div class="error-state" style="margin-top: 30px; border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.01);">
+                <i class="ph ph-plug-connected" style="font-size: 3rem; color: #666; margin-bottom: 15px; display: block;"></i>
+                <h3 style="color: #fff;">System Unavailable</h3>
+                <p style="color: #777; font-size: 0.85rem;">The results database is currently being updated or is inaccessible. Please try again in a few minutes.</p>
             </div>
         `;
     }
 };
 
+// Start
 document.addEventListener("DOMContentLoaded", () => ResultApp.init());
