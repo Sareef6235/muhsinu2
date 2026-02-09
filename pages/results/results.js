@@ -1,43 +1,46 @@
-console.log("JS LOADED");
-
 /**
  * RESULTS PORTAL - STATIC SYNC ENGINE
  * Data Source: /data/published-results.json
+ * 
+ * WHY THIS WORKS IN STATIC SITES:
+ * 1. CACHE-BUSTING: We add '?v=timestamp' to the URL to bypass browser caching.
+ * 2. NO BACKEND: We fetch a static JSON file that the admin manually uploads.
+ * 3. DEFENSIVE CODING: We validate the JSON structure before rendering to prevent portal crashes.
  */
 const ResultApp = {
     data: null,
-    ui: {
+    ui: {},
 
-    },
-
+    /**
+     * 1. INITIALIZE PORTAL
+     * Binds UI elements and triggers data fetch.
+     */
     async init() {
-        console.log("JS LOADED");
+        console.log("Portal Initializing...");
 
-        // ✅ Bind DOM AFTER page load
+        // Bind DOM elements after page load
         this.ui = {
             examSelect: document.getElementById('examSelect'),
             rollInput: document.getElementById('rollInput'),
             form: document.getElementById('resultsForm'),
             display: document.getElementById('result-display'),
-            submitBtn: document.getElementById('submitBtn'),
             meritView: document.getElementById('merit-view'),
             meritBody: document.getElementById('results-table-body'),
             meritExamName: document.getElementById('merit-exam-name')
         };
 
         try {
-            // 1. Fetch JSON (Cache-busted for static sites)
-            // Static sites don't have dynamic queries, so we add a timestamp
-            // to the URL to bypass browser caching of previous results.
+            // Fetch the static results file (Cache-busted)
             const response = await fetch("/data/published-results.json?v=" + Date.now());
 
-            if (!response.ok) throw new Error("Data file unreachable");
+            if (!response.ok) throw new Error("Database file missing or unreachable.");
 
             this.data = await response.json();
-            console.log("Portal Data loaded:", this.data);
+            console.log("Data loaded successfully:", this.data);
 
             this.populateDropdown();
 
+            // Set up form submission handler
             if (this.ui.form) {
                 this.ui.form.addEventListener('submit', (e) => {
                     e.preventDefault();
@@ -45,35 +48,41 @@ const ResultApp = {
                 });
             }
 
+            // Global bridge for Error UI feedback
             window.UI = { roll: this.ui.rollInput };
+
             this.handleDeepLinking();
 
         } catch (error) {
-            console.error("System Failure:", error);
+            console.error("Critical System Failure:", error);
             this.handleGlobalFailure();
         }
     },
 
+    /**
+     * 2. POPULATE DROPDOWN (DEFENSIVE)
+     * Strictly filters published exams and prevents 'undefined' options forever.
+     */
     populateDropdown() {
         if (!this.ui.examSelect) return;
         this.ui.examSelect.innerHTML = "";
 
-        // Verification Rule: JSON must contain an 'exams' array
+        // Verification Rule: 'exams' must be a valid array
         if (!this.data || !Array.isArray(this.data.exams)) {
-            this.ui.examSelect.innerHTML = '<option value="">System unavailable</option>';
+            this.ui.examSelect.innerHTML = '<option value="">No published exams available</option>';
             this.ui.examSelect.disabled = true;
             return;
         }
 
-        // Filter: Only include exams where published is explicitly true
-        const publishedExams = this.data.exams.filter(exam => {
-            const isPublished = exam.published === true || exam.published === undefined; // Fallback for legacy
-            const hasRequired = (exam.examId || exam.id) && (exam.examName || exam.name);
-            return isPublished && hasRequired;
+        // Filter: Only include exams marked as published and containing valid metadata
+        const activeExams = this.data.exams.filter(exam => {
+            const hasId = !!(exam.examId || exam.id);
+            const hasName = !!(exam.examName || exam.name);
+            return exam.published === true && hasId && hasName;
         });
 
-        if (publishedExams.length === 0) {
-            this.ui.examSelect.innerHTML = '<option value="">No published exams available</option>';
+        if (activeExams.length === 0) {
+            this.ui.examSelect.innerHTML = '<option value="">No published exams currently available</option>';
             this.ui.examSelect.disabled = true;
             return;
         }
@@ -84,48 +93,34 @@ const ResultApp = {
         defaultOpt.textContent = "-- Select Academic Session --";
         this.ui.examSelect.appendChild(defaultOpt);
 
-        // Populate validated exams
-        publishedExams.forEach(exam => {
+        // Populate with validated data
+        activeExams.forEach(exam => {
             const opt = document.createElement('option');
-            opt.value = exam.examId || exam.id;
+            opt.value = exam.examId || exam.id; // Correct key priority
             opt.textContent = exam.examName || exam.name;
             this.ui.examSelect.appendChild(opt);
         });
 
-        // Enable dropdown only after population
         this.ui.examSelect.disabled = false;
     },
 
-
-
+    /**
+     * 3. SEARCH & RENDER LOGIC
+     */
     handleSearch() {
         const examId = this.ui.examSelect.value;
         const roll = this.ui.rollInput.value.trim();
 
-        console.log("Selected exam:", examId);
-        console.log("Roll entered:", roll);
-
-        if (!examId) return alert("Please select an exam session.");
+        if (!examId) return alert("Please select an academic session.");
         if (!roll) return this.ui.rollInput.focus();
 
+        // Update URL for bookmarkability
         const url = new URL(window.location.href);
         url.searchParams.set('exam', examId);
         url.searchParams.set('roll', roll);
-
         window.history.pushState({}, '', url);
+
         this.performSearch(examId, roll);
-    },
-
-    handleDeepLinking() {
-        const params = new URLSearchParams(window.location.search);
-        const examId = params.get("exam");
-        const roll = params.get("roll");
-
-        if (examId && roll) {
-            if (this.ui.examSelect) this.ui.examSelect.value = examId;
-            if (this.ui.rollInput) this.ui.rollInput.value = roll;
-            this.performSearch(examId, roll);
-        }
     },
 
     performSearch(examId, roll) {
@@ -133,24 +128,25 @@ const ResultApp = {
 
         this.renderLoading();
 
+        // Simulation delay for better UX feel
         setTimeout(() => {
-            const exam = this.data.exams.find(e => e.examId === examId);
-            console.log("Exam found:", exam);
-
+            const exam = this.data.exams.find(e => (e.examId || e.id) === examId);
             if (!exam) return this.renderNotFound("Exam Session Not Found", roll);
 
-            const foundResult = exam.results.find(r => String(r.roll).trim() === String(roll).trim());
-            console.log("Matching result:", foundResult);
+            // Strict string comparison for roll numbers (trimmed)
+            const student = exam.results.find(r => String(r.roll).trim() === String(roll).trim());
 
-            if (foundResult) {
-                this.renderResult(foundResult, exam.examName);
+            if (student) {
+                this.renderResult(student, exam.examName);
             } else {
-                console.log("Rendering error UI");
                 this.renderNotFound(exam.examName, roll);
             }
-        }, 600);
+        }, 500);
     },
 
+    /**
+     * UI RENDERING COMPONENTS
+     */
     renderResult(student, examName) {
         if (!this.ui.display) return;
         this.ui.display.style.display = "block";
@@ -172,7 +168,7 @@ const ResultApp = {
                     <button class="btn-check" style="flex: 1; padding: 14px;" onclick="window.print()">
                         <i class="ph ph-printer"></i> PRINT MARK SHEET
                     </button>
-                    <button class="btn-sec" style="flex: 1;" onclick="window.showSearchForm()">
+                    <button class="btn-sec" style="flex: 1;" onclick="ResultApp.showSearchForm()">
                         <i class="ph ph-arrow-counter-clockwise"></i> NEW SEARCH
                     </button>
                 </div>
@@ -192,7 +188,7 @@ const ResultApp = {
                     Registration number <b style="color: #fff;">${roll}</b> could not be verified for <br>
                     <span style="color: var(--primary);">${examName}</span>.
                 </p>
-                <button class="btn-sec" onclick="UI.roll.focus()" style="padding: 15px 40px; font-size: 1rem;">
+                <button class="btn-sec" onclick="ResultApp.ui.rollInput.focus()" style="padding: 15px 40px; font-size: 1rem;">
                     <i class="ph ph-pencil-simple"></i> RE-ENTER ROLL NO
                 </button>
             </div>
@@ -210,33 +206,10 @@ const ResultApp = {
         `;
     },
 
-    showRankList() {
-        const examId = this.ui.examSelect.value;
-        if (!examId) return alert("Select an exam to view merit list.");
-
-        const exam = this.data.exams.find(e => e.examId === examId);
-        if (!exam) return alert("Exam data not found.");
-
-        this.ui.form.style.display = "none";
-        document.querySelector('.portal-title').style.display = "none";
-        this.ui.meritView.style.display = "block";
-        this.ui.meritExamName.textContent = exam.examName;
-
-        const sorted = [...exam.results].sort((a, b) => b.total - a.total);
-        this.ui.meritBody.innerHTML = sorted.map((r, i) => `
-            <tr>
-                <td>#${i + 1}</td>
-                <td>${r.roll}</td>
-                <td>${r.name}</td>
-                <td style="text-align: right; color: var(--primary); font-weight: 800;">${r.total}</td>
-            </tr>
-        `).join('');
-    },
-
     showSearchForm() {
         this.ui.form.style.display = "grid";
-        document.querySelector('.portal-title').style.display = "block";
-        this.ui.meritView.style.display = "none";
+        document.querySelector('.portal-title') && (document.querySelector('.portal-title').style.display = "block");
+        this.ui.meritView && (this.ui.meritView.style.display = "none");
         if (this.ui.display) {
             this.ui.display.innerHTML = "";
             this.ui.display.style.display = "none";
@@ -248,8 +221,23 @@ const ResultApp = {
             this.ui.examSelect.innerHTML = '<option value="">System unavailable</option>';
             this.ui.examSelect.disabled = true;
         }
-        this.renderNotFound("Database Unreachable", "System");
+    },
+
+    handleDeepLinking() {
+        const params = new URLSearchParams(window.location.search);
+        const examId = params.get("exam");
+        const roll = params.get("roll");
+
+        if (examId && roll) {
+            if (this.ui.examSelect) this.ui.examSelect.value = examId;
+            if (this.ui.rollInput) this.ui.rollInput.value = roll;
+            this.performSearch(examId, roll);
+        }
     }
 };
 
+// Start the engine
 document.addEventListener("DOMContentLoaded", () => ResultApp.init());
+
+// Expose shared methods
+window.showSearchForm = () => ResultApp.showSearchForm();
