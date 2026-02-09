@@ -833,6 +833,30 @@ const ResultsManagement = (() => {
             showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Saving locally...', 'loading');
             saveExamResults(examId, results, sheetId, false);
 
+            // =====================================================
+            // BRIDGE PATTERN: Populate ResultsBridge
+            // =====================================================
+            // WHY: Creates an in-memory bridge between sync and publish.
+            // This allows the publish button to access the EXACT data
+            // that was just synced without re-fetching from localStorage.
+            window.ResultsBridge = {
+                generated: {
+                    examId: examId,
+                    examName: examName,
+                    session: examMeta?.academicYear || new Date().getFullYear(),
+                    results: results.map(r => ({
+                        roll: String(r.rollNo).trim(),
+                        name: r.name,
+                        subjects: r.subjects,
+                        total: r.totalMarks
+                    }))
+                },
+                published: false,
+                syncedAt: new Date().toISOString()
+            };
+
+            console.log('🔗 ResultsBridge populated:', window.ResultsBridge);
+
             showStatus(
                 `<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> ✓ Sync success! ${results.length} results loaded. Click "Publish" to go live.`,
                 'success'

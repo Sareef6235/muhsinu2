@@ -151,6 +151,35 @@ const ResultApp = {
         if (!this.ui.display) return;
         this.ui.display.style.display = "block";
 
+        // Build subject-wise marks table if subjects exist
+        let subjectsHTML = '';
+        if (student.subjects && typeof student.subjects === 'object') {
+            const subjectEntries = Object.entries(student.subjects);
+            if (subjectEntries.length > 0) {
+                subjectsHTML = `
+                    <div style="margin-top: 30px;">
+                        <h3 style="font-size: 1.2rem; color: #fff; margin-bottom: 15px; text-align: center;">Subject-wise Performance</h3>
+                        <table style="width: 100%; border-collapse: collapse; background: rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden;">
+                            <thead>
+                                <tr style="background: rgba(0, 229, 255, 0.1);">
+                                    <th style="padding: 12px; text-align: left; color: #888; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Subject</th>
+                                    <th style="padding: 12px; text-align: right; color: #888; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Marks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${subjectEntries.map(([subject, marks]) => `
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                        <td style="padding: 15px 12px; color: #fff; font-weight: 500;">${subject}</td>
+                                        <td style="padding: 15px 12px; text-align: right; color: var(--primary); font-weight: 700; font-size: 1.1rem;">${marks}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+        }
+
         this.ui.display.innerHTML = `
             <div class="glass-card result-card animate-slide-up" style="margin-top: 30px;">
                 <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 25px;">
@@ -163,6 +192,8 @@ const ResultApp = {
                     <div style="font-size: 4.5rem; font-weight: 800; color: #fff; line-height: 1;">${student.total}</div>
                     <div style="color: var(--primary); text-transform: uppercase; letter-spacing: 3px; font-size: 0.75rem; margin-top: 10px; font-weight: 700;">TOTAL MARKS</div>
                 </div>
+
+                ${subjectsHTML}
 
                 <div style="margin-top: 30px; display: flex; gap: 15px;">
                     <button class="btn-check" style="flex: 1; padding: 14px;" onclick="window.print()">

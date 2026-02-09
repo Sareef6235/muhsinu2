@@ -112,39 +112,48 @@ const StaticPublisher = (() => {
 
     /**
      * =====================================================
-     * 3. BUILD STRICT JSON STRUCTURE
+     * 3. BUILD STRICT JSON STRUCTURE (FROM BRIDGE)
      * =====================================================
-     * Generates the exact contract format expected by the frontend.
+     * Generates the exact contract format from the ResultsBridge.
      * 
-     * WHY: Frontend dropdown relies on this exact structure.
-     * Any deviation causes "undefined" options or crashes.
+     * WHY: The bridge pattern ensures we publish EXACTLY what was
+     * synced, avoiding stale data from localStorage.
      */
     const buildPublishedJSON = () => {
-        const { examId, examName, examData } = getSelectedExamData();
-
-        // Normalize all students (filter out null results)
-        const normalizedResults = examData.data
-            .map(normalizeStudent)
-            .filter(student => student !== null);
-
-        if (normalizedResults.length === 0) {
-            throw new Error('No valid student records found. All rows were filtered out.');
+        // Check if ResultsBridge exists and has generated data
+        if (!window.ResultsBridge || !window.ResultsBridge.generated) {
+            throw new Error('No preview data available. Please sync data first by clicking "PREVIEW & SYNC".');
         }
 
-        // Build strict contract
-        return {
+        const bridge = window.ResultsBridge.generated;
+
+        // Validate required fields
+        if (!bridge.examId || !bridge.examName) {
+            throw new Error('Invalid bridge data: missing examId or examName');
+        }
+
+        if (!Array.isArray(bridge.results) || bridge.results.length === 0) {
+            throw new Error('No student results found in bridge. Please sync first.');
+        }
+
+        // Build strict contract (using bridge data directly)
+        const payload = {
             meta: {
-                generatedAt: new Date().toISOString()
+                generatedAt: new Date().toISOString(),
+                published: true
             },
             exams: [
                 {
-                    examId: String(examId),          // STRICT: must be string
-                    examName: String(examName),       // STRICT: must be string
-                    published: true,                  // STRICT: must be boolean
-                    results: normalizedResults        // STRICT: must be array of normalized objects
+                    examId: String(bridge.examId),
+                    examName: String(bridge.examName),
+                    published: true,
+                    results: bridge.results // Already normalized by sync flow
                 }
             ]
         };
+
+        console.log('📤 Built payload from ResultsBridge:', payload);
+        return payload;
     };
 
     /**
@@ -191,7 +200,7 @@ const StaticPublisher = (() => {
         try {
             console.log('📤 StaticPublisher: Starting publish process...');
 
-            // Step 1: Collect and validate data
+            // Step 1: Build JSON from ResultsBridge
             const jsonData = buildPublishedJSON();
 
             // Step 2: Log preview (for debugging)
@@ -202,7 +211,20 @@ const StaticPublisher = (() => {
             // Step 3: Trigger download
             downloadJSON(jsonData);
 
-            // Step 4: Show success message with deployment instructions
+            // Step 4: Mark bridge as published
+            if (window.ResultsBridge) {
+                window.ResultsBridge.published = true;
+            }
+
+            // Step 5: Update UI status
+            const statusMessage = document.getElementById('results-sync-message');
+            if (statusMessage) {
+                statusMessage.innerHTML =
+                    '<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> ' +
+                    '✓ published-results.json generated. Replace /data/ file and deploy to go live.';
+            }
+
+            // Step 6: Show success message with deployment instructions
             alert(
                 '✅ SUCCESS!\n\n' +
                 'File "published-results.json" has been generated.\n\n' +
@@ -221,8 +243,8 @@ const StaticPublisher = (() => {
                 '❌ PUBLISH FAILED\n\n' +
                 'Reason: ' + error.message + '\n\n' +
                 'Please ensure:\n' +
-                '1. An exam is selected\n' +
-                '2. Data has been synced\n' +
+                '1. You have clicked "PREVIEW & SYNC" first\n' +
+                '2. Data has been successfully synced\n' +
                 '3. At least one student record exists'
             );
         }
