@@ -206,14 +206,29 @@ const ResultApp = {
         `;
     },
 
-    showSearchForm() {
-        this.ui.form.style.display = "grid";
-        document.querySelector('.portal-title') && (document.querySelector('.portal-title').style.display = "block");
-        this.ui.meritView && (this.ui.meritView.style.display = "none");
-        if (this.ui.display) {
-            this.ui.display.innerHTML = "";
-            this.ui.display.style.display = "none";
-        }
+    showRankList() {
+        if (!this.data || !this.data.exams) return;
+        const examId = this.ui.examSelect.value;
+        if (!examId) return alert("Select an exam to view merit list.");
+
+        const exam = this.data.exams.find(e => (e.examId || e.id) === examId);
+        if (!exam) return alert("Exam data not found.");
+
+        this.ui.form.style.display = "none";
+        document.querySelector('.portal-title') && (document.querySelector('.portal-title').style.display = "none");
+        this.ui.meritView.style.display = "block";
+        this.ui.meritExamName.textContent = exam.examName;
+
+        // Sort by total marks descending
+        const sorted = [...exam.results].sort((a, b) => b.total - a.total);
+        this.ui.meritBody.innerHTML = sorted.map((r, i) => `
+            <tr>
+                <td>#${i + 1}</td>
+                <td>${r.roll}</td>
+                <td>${r.name}</td>
+                <td style="text-align: right; color: var(--primary); font-weight: 800;">${r.total}</td>
+            </tr>
+        `).join('');
     },
 
     handleGlobalFailure() {
@@ -239,5 +254,7 @@ const ResultApp = {
 // Start the engine
 document.addEventListener("DOMContentLoaded", () => ResultApp.init());
 
-// Expose shared methods
+// Expose to window for HTML onclick handlers
+window.ResultApp = ResultApp;
 window.showSearchForm = () => ResultApp.showSearchForm();
+window.showRankList = () => ResultApp.showRankList();
