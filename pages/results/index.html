@@ -340,6 +340,34 @@
                 <p style="color: #666;">Enter your details to view your academic performance</p>
             </div>
 
+            <!-- Merit List View (Hidden by Default) -->
+            <div id="merit-view" style="display: none;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
+                    <h2 style="margin:0;">🏆 Merit List <span id="merit-exam-name"
+                            style="font-size:0.8rem; opacity:0.6; display:block; margin-top:5px; font-weight:normal;"></span>
+                    </h2>
+                    <button class="btn-sec" onclick="showSearchForm()" style="width: auto; padding: 10px 20px;">
+                        <i class="ph ph-arrow-left"></i> Back to Search
+                    </button>
+                </div>
+                <div style="max-height: 600px; overflow-y: auto;">
+                    <table class="marks-table">
+                        <thead>
+                            <tr>
+                                <th>RANK</th>
+                                <th>ROLL NO</th>
+                                <th>STUDENT NAME</th>
+                                <th style="text-align: right;">TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body">
+                            <!-- Rows populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <form id="resultsForm" class="search-grid">
                 <div class="input-group">
                     <label>Exam Session</label>
@@ -805,14 +833,35 @@
             `;
         }
 
+        window.showSearchForm = () => {
+            UI.form.style.display = "grid";
+            const meritView = document.getElementById("merit-view");
+            if (meritView) meritView.style.display = "none";
+            UI.display.innerHTML = "";
+            document.querySelector('.portal-title').style.display = "block";
+        };
+
         window.showRankList = () => {
             const examId = UI.select.value;
-            if (!examId) return alert('Select an exam session first.');
+            if (!examId) return alert('Please select an exam session first.');
 
             const session = window.__PUBLISHED_EXAMS__.find(s => s.id === examId);
-            if (!session || !session.results) return alert('Merit data not available.');
+            if (!session || !session.results || session.results.length === 0) {
+                return alert('No results available for this exam yet.');
+            }
 
-            UI.display.innerHTML = '<div class="glass-card animate-slide-up" style="margin-top: 30px; text-align:center;"><i class="ph ph-circle-notch animate-spin" style="font-size:2rem;"></i><p>Compiling Merit List...</p></div>';
+            // UI Toggling
+            UI.form.style.display = "none";
+            document.querySelector('.portal-title').style.display = "none";
+            UI.display.innerHTML = "";
+
+            const meritView = document.getElementById("merit-view");
+            const meritBody = document.getElementById("results-table-body");
+            const meritExamName = document.getElementById("merit-exam-name");
+
+            meritView.style.display = "block";
+            meritExamName.textContent = session.name;
+            meritBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;"><i class="ph ph-circle-notch animate-spin" style="font-size:2rem; display:block; margin:0 auto 10px;"></i>Compiling Ranking...</td></tr>';
 
             setTimeout(() => {
                 // Sorting strictly by total marks DESC
@@ -821,40 +870,25 @@
                 let currentRank = 1;
                 let lastScore = null;
 
-                const tableRows = sorted.map((r, index) => {
+                const tableContent = sorted.map((r, index) => {
                     const score = parseFloat(r.total) || 0;
                     if (lastScore !== null && score < lastScore) currentRank = index + 1;
                     lastScore = score;
+
                     const trophy = currentRank === 1 ? '🥇' : currentRank === 2 ? '🥈' : currentRank === 3 ? '🥉' : '';
 
                     return `
                         <tr style="${currentRank <= 3 ? 'background: rgba(255, 255, 255, 0.05);' : ''}">
                             <td style="font-weight: 800;">#${currentRank} ${trophy}</td>
-                            <td>${r.name}</td>
                             <td>${r.roll}</td>
+                            <td style="font-weight: 600;">${r.name}</td>
                             <td style="text-align: right; color: var(--primary); font-weight: 800;">${r.total}</td>
                         </tr>
                     `;
                 }).join('');
 
-                UI.display.innerHTML = `
-                    <div class="glass-card animate-slide-up" style="margin-top: 30px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
-                            <h2 style="margin:0;">🏆 Merit List</h2>
-                            <span style="font-size:0.8rem; opacity:0.6;">${session.name}</span>
-                        </div>
-                        <div style="max-height: 500px; overflow-y: auto;">
-                            <table class="marks-table">
-                                <thead>
-                                    <tr><th>RANK</th><th>NAME</th><th>ROLL</th><th style="text-align: right;">TOTAL</th></tr>
-                                </thead>
-                                <tbody>${tableRows}</tbody>
-                            </table>
-                        </div>
-                        <button class="btn-sec" onclick="UI.display.innerHTML=''" style="width: 100%; margin-top: 30px;">Close Merit View</button>
-                    </div>
-                `;
-                UI.display.scrollIntoView({ behavior: 'smooth' });
+                meritBody.innerHTML = tableContent;
+                meritView.scrollIntoView({ behavior: 'smooth' });
             }, 400);
         };
     </script>
