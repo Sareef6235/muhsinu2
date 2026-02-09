@@ -620,15 +620,23 @@
             handleDeepLinking();
         }
 
+        const FALLBACK_EXAMS = [
+            { examId: "ex_1770311914659", examName: "10 – dfth (2026-27)", published: true },
+            { examId: "ex_1770313877186", examName: "2 – dfth (2026-27)", published: true }
+        ];
+
         // --- DATA LAYER ---
         function getExams() {
             try {
                 const data = localStorage.getItem('publishedExams');
-                const exams = data ? JSON.parse(data) : [];
-                return exams.filter(e => e.published === true);
+                let exams = data ? JSON.parse(data) : [];
+                exams = exams.filter(e => e.published === true);
+
+                // Return fallback if no published exams found in storage
+                return exams.length > 0 ? exams : FALLBACK_EXAMS;
             } catch (err) {
-                console.error('Data Load Error:', err);
-                return [];
+                console.warn('Storage read error, using fallback:', err);
+                return FALLBACK_EXAMS;
             }
         }
 
@@ -637,7 +645,7 @@
             UI.select.innerHTML = '';
 
             if (!exams || exams.length === 0) {
-                UI.select.innerHTML = '<option value="">No published exams available</option>';
+                UI.select.innerHTML = '<option value="">No sessions available</option>';
                 UI.select.disabled = true;
                 return;
             }
