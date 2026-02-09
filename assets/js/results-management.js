@@ -878,6 +878,29 @@ const ResultsManagement = (() => {
         handleSyncClick,
         fetchHeaders,
         togglePublish,
+        getPublishedData: () => {
+            const results = getAllResults();
+            const exams = window.ExamManager ? ExamManager.getAll() : [];
+            const years = window.AcademicYearManager ? AcademicYearManager.getAll() : [];
+            const types = window.ExamTypeManager ? ExamTypeManager.getAll() : [];
+
+            return Object.keys(results)
+                .filter(id => results[id].published)
+                .map(id => {
+                    const examMeta = exams.find(e => e.id === id);
+                    const yearName = years.find(y => y.id === examMeta?.yearId)?.yearLabel || '';
+                    const typeName = types.find(t => t.id === examMeta?.typeId)?.name || '';
+                    return {
+                        examId: id,
+                        examName: examMeta ? `${examMeta.name} (${typeName} - ${yearName})` : id,
+                        results: (results[id].data || []).map(r => ({
+                            roll: String(r.rollNo).trim(),
+                            name: r.name,
+                            total: r.totalMarks
+                        }))
+                    };
+                });
+        },
         refresh: () => { renderTable(); updateButtonState(); updatePublishToggle(); }
     };
 })();

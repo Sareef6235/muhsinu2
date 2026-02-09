@@ -825,6 +825,10 @@
                         results from Google Sheets.</p>
                 </div>
                 <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-sm btn-primary" onclick="ResultsPublisher.publish()"
+                        title="Generate and download published-results.json">
+                        <i class="ph-bold ph-paper-plane-tilt"></i> Publish Results
+                    </button>
                     <button class="btn btn-sm btn-subtle" onclick="switchPanel('dashboard')"
                         title="Back to Main Dashboard">
                         <i class="ph-bold ph-layout"></i> Dashboard
@@ -1632,6 +1636,8 @@
         // Expose to window for onclick handlers
         window.SchoolManager = SchoolManager;
     </script>
+    <!-- Results Portal Sync Logic -->
+    <script src="dashboard.js"></script>
 </body>
 
 </html>
