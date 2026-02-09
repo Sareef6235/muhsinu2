@@ -232,6 +232,34 @@ const ResultsManagement = (() => {
         publishToggle.className = isPublished
             ? 'btn btn-sm btn-danger'
             : 'btn btn-sm btn-primary';
+
+        // Add Copy Link button if published
+        if (isPublished) {
+            // Remove existing if any to avoid duplicates
+            const existing = publishToggle.parentNode.querySelector('.btn-copy-link');
+            if (existing) existing.remove();
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'btn btn-sm btn-subtle btn-copy-link';
+            copyBtn.style.marginTop = '8px';
+            copyBtn.innerHTML = '<i class="ph-bold ph-copy"></i> Copy Public Link';
+            copyBtn.title = "Copy direct link to this exam's result portal";
+            copyBtn.onclick = () => {
+                const url = new URL('../../pages/results/index.html', window.location.href);
+                url.searchParams.set('exam', examId);
+
+                navigator.clipboard.writeText(url.href).then(() => {
+                    const original = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="ph-bold ph-check"></i> Copied!';
+                    setTimeout(() => copyBtn.innerHTML = original, 2000);
+                });
+            };
+            publishToggle.parentNode.appendChild(copyBtn);
+        } else {
+            // Remove if showing while unpublished
+            const existing = publishToggle.parentNode.querySelector('.btn-copy-link');
+            if (existing) existing.remove();
+        }
     };
 
     const togglePublish = () => {
@@ -488,6 +516,14 @@ const ResultsManagement = (() => {
                 <td style="color:var(--primary-color); font-weight:bold;">${r.totalMarks || 0}</td>
                 <td><span class="status-badge" style="background:rgba(255,255,255,0.05);">${r.grade || 'N/A'}</span></td>
                 <td><span class="status-badge ${r.status === 'Pass' ? 'approved' : 'pending'}">${r.status || 'Unknown'}</span></td>
+                <td>
+                    <a href="../../pages/results/index.html?exam=${examId}&roll=${r.rollNo}" 
+                       target="_blank" 
+                       class="btn btn-mini btn-subtle" 
+                       title="View on Public Portal">
+                       <i class="ph-bold ph-arrow-square-out"></i> View
+                    </a>
+                </td>
             </tr>
         `;
         }).join('');
