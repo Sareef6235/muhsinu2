@@ -645,9 +645,9 @@
     <script src="../../assets/js/site-footer.js"></script>
     <script type="module">
         /**
-         * RESULTS PORTAL - PRODUCTION READY (STATIC JSON)
-         * Data Source: /data/published-exams.json
-         * Constraints: Vanilla JS, No Backend, Static hosting safe.
+         * RESULTS PORTAL - SENIOR ARCHITECTURE (STATIC)
+         * Data Source: LocalStorage (Primary) / JSON (Fallback)
+         * Constraints: Pure Vanilla JS, Zero Frameworks, Production Scale.
          */
 
         const UI = {
@@ -655,6 +655,9 @@
             select: document.getElementById('examSelect'),
             roll: document.getElementById('rollInput'),
             display: document.getElementById('result-display'),
+            meritView: document.getElementById('merit-view'),
+            meritBody: document.getElementById('results-table-body'),
+            meritExamName: document.getElementById('merit-exam-name'),
             stats: {
                 exams: document.getElementById('results-exams-count'),
                 students: document.getElementById('results-total-count'),
@@ -662,78 +665,97 @@
             }
         };
 
-        // Cache for fetched data
-        window.__PUBLISHED_EXAMS__ = [];
+        // Global state
+        window.__GLOBAL_RESULTS_CACHE__ = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            initPortal();
+            initResultsPage();
         });
 
-        async function initPortal() {
+        // --- 1. INITIALIZATION ---
+        async function initResultsPage() {
             try {
-                // Fetch from static JSON file
-                const response = await fetch("../../data/published-exams.json");
-                if (!response.ok) throw new Error("JSON data source missing");
+                // Primary: LocalStorage
+                const localData = localStorage.getItem("publishedResults");
+                let data = null;
 
-                const data = await response.json();
-                window.__PUBLISHED_EXAMS__ = data.exams || [];
+                if (localData) {
+                    try {
+                        data = JSON.parse(localData);
+                        console.log("Data loaded from LocalStorage");
+                    } catch (e) { console.error("Bad LocalStorage data"); }
+                }
 
-                // 1. Update overall active exams count
-                if (UI.stats.exams) UI.stats.exams.textContent = window.__PUBLISHED_EXAMS__.length;
+                if (!data) {
+                    // Fallback: Static JSON file
+                    console.log("Fetching JSON fallback...");
+                    const response = await fetch("../../data/published-exams.json");
+                    if (response.ok) {
+                        data = await response.json();
+                        console.log("Data loaded from JSON fallback");
+                    }
+                }
 
-                // 2. Populate dropdown
-                populateDropdown(window.__PUBLISHED_EXAMS__);
+                if (data && data.exams) {
+                    // Normalize keys for internal use
+                    window.__GLOBAL_RESULTS_CACHE__ = data.exams.map(ex => ({
+                        examId: ex.examId || ex.id,
+                        examName: ex.examName || ex.name,
+                        published: ex.published !== undefined ? ex.published : true,
+                        lastSync: ex.lastSync || ex.lastSynced,
+                        subjects: ex.subjects || [],
+                        results: ex.results || []
+                    }));
+                }
 
-                // 3. Handle deep linking
-                handleUrlParams();
+                updateGlobalStats();
+                populateExamDropdown();
+                handleDeepLinking();
             } catch (error) {
-                console.error("Portal Initialization Failed:", error);
-                populateDropdown([]); // Show empty state
-                renderSystemError("System is currently offline or undergoing maintenance.");
+                console.error("Initialization Critical Failure:", error);
+                renderSystemError("Unable to establish data connection. Please try again later.");
             }
         }
 
-        // --- CORE LOGIC ---
-        function populateDropdown(sessions) {
-            UI.select.innerHTML = '';
+        function updateGlobalStats() {
+            const publishedExams = window.__GLOBAL_RESULTS_CACHE__.filter(e => e.published);
+            if (UI.stats.exams) UI.stats.exams.textContent = publishedExams.length;
+        }
 
-            if (sessions.length === 0) {
-                const opt = document.createElement('option');
-                opt.value = "";
-                opt.textContent = "No published exams available";
-                UI.select.appendChild(opt);
+        function populateExamDropdown() {
+            UI.select.innerHTML = '';
+            const published = window.__GLOBAL_RESULTS_CACHE__.filter(e => e.published);
+
+            if (published.length === 0) {
+                UI.select.innerHTML = '<option value="">No published exams available</option>';
                 UI.select.disabled = true;
                 return;
             }
 
-            // Default Select Option
             const defaultOpt = document.createElement('option');
             defaultOpt.value = "";
-            defaultOpt.textContent = "-- Select Exam --";
+            defaultOpt.textContent = "-- Select Academic Session --";
             UI.select.appendChild(defaultOpt);
 
-            sessions.forEach(s => {
+            published.forEach(ex => {
                 const opt = document.createElement('option');
-                opt.value = s.id;
-                opt.textContent = s.name;
+                opt.value = ex.examId;
+                opt.textContent = ex.examName;
                 UI.select.appendChild(opt);
             });
 
             UI.select.disabled = false;
         }
 
-        // Auto-update specific exam stats on selection
         UI.select.addEventListener('change', () => {
             const examId = UI.select.value;
-            const session = window.__PUBLISHED_EXAMS__.find(s => s.id === examId);
+            const exam = window.__GLOBAL_RESULTS_CACHE__.find(e => e.examId === examId);
 
-            if (session) {
-                if (UI.stats.students) UI.stats.students.textContent = session.results ? session.results.length : 0;
+            if (exam) {
+                if (UI.stats.students) UI.stats.students.textContent = exam.results.length;
                 if (UI.stats.lastSync) {
-                    const date = new Date(session.lastSynced);
-                    UI.stats.lastSync.textContent = isNaN(date.getTime()) ?
-                        (session.lastSynced || '--') :
-                        date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+                    const date = new Date(exam.lastSync);
+                    UI.stats.lastSync.textContent = isNaN(date.getTime()) ? (exam.lastSync || '--') : date.toLocaleDateString();
                 }
             } else {
                 if (UI.stats.students) UI.stats.students.textContent = '0';
@@ -741,203 +763,203 @@
             }
         });
 
-        function handleUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            const pExam = params.get('exam');
-            const pRoll = params.get('roll');
+        // --- 2. SEARCH HANDLER ---
+        window.handleResultSearch = (e) => {
+            if (e) e.preventDefault();
 
-            if (pExam) {
-                UI.select.value = pExam;
-                UI.select.dispatchEvent(new Event('change')); // Trigger stats update
-                if (pRoll) {
-                    UI.roll.value = pRoll;
-                    setTimeout(() => {
-                        if (UI.select.value === pExam) {
-                            UI.form.dispatchEvent(new Event('submit', { cancelable: true }));
-                        }
-                    }, 500);
+            const examId = UI.select.value;
+            const roll = UI.roll.value.trim();
+
+            if (!examId) return alert("Please select an academic session.");
+            if (!roll) return UI.roll.focus();
+
+            renderLoading();
+
+            const exam = window.__GLOBAL_RESULTS_CACHE__.find(e => e.examId === examId);
+            if (!exam) return renderSystemError("Selected exam data is no longer available.");
+
+            const student = exam.results.find(r => String(r.roll).trim() === roll);
+
+            setTimeout(() => {
+                if (student) {
+                    renderResult(student, exam.examName);
+                } else {
+                    renderResultNotFound(roll, exam.examName);
                 }
-            }
-        }
+            }, 400);
+        };
 
-        // --- RENDER SYSTEM ---
+        UI.form.addEventListener('submit', (e) => handleResultSearch(e));
+
+        // --- 3. RENDERING ENGINE ---
         function renderLoading() {
             UI.display.style.display = "block";
             UI.display.innerHTML = `
-                <div class="glass-card animate-slide-up" style="margin-top: 30px; text-align: center; padding: 40px;">
+                <div class="glass-card animate-slide-up" style="margin-top: 30px; text-align: center; padding: 50px;">
                     <i class="ph ph-circle-notch animate-spin" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px; display: block;"></i>
-                    <p style="color: #888; letter-spacing: 1px;">Searching records...</p>
+                    <p style="color: #888; letter-spacing: 2px; font-weight: 600;">RETRIEVING RECORD...</p>
                 </div>
             `;
         }
 
-        function renderResult(student, examName) {
+        window.renderResult = (student, examName) => {
             UI.display.style.display = "block";
+
+            const hasMarks = student.marks && Object.keys(student.marks).length > 0;
+            let marksHtml = '';
+
+            if (hasMarks) {
+                marksHtml = `
+                    <div style="max-height: 400px; overflow-y: auto; margin-top: 30px; border: 1px solid var(--border); border-radius: 12px; padding: 10px;">
+                        <table class="marks-table" style="margin: 0;">
+                            <thead>
+                                <tr><th>SUBJECT</th><th style="text-align:right;">MARKS</th></tr>
+                            </thead>
+                            <tbody>
+                                ${Object.entries(student.marks).map(([sub, mark]) => `
+                                    <tr>
+                                        <td style="font-size: 0.9rem;">${sub}</td>
+                                        <td style="text-align:right; font-weight:700;">${mark}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
             UI.display.innerHTML = `
                 <div class="glass-card result-card animate-slide-up" style="margin-top: 30px;">
                     <div class="student-meta">
                         <div>
-                            <h2 style="font-size: 2.2rem; margin: 0; color: #fff;">${student.name}</h2>
-                            <p style="color: #888; margin: 8px 0 0; font-size: 1.1rem;">Registration No: <b style="color: var(--primary);">${student.roll}</b></p>
-                            <span style="display:inline-block; padding:5px 12px; background:rgba(255,255,255,0.05); border-radius:8px; font-size:0.75rem; margin-top:15px; border:1px solid var(--border); color:#bbb;">${examName}</span>
+                            <h2 style="font-size: 2.5rem; margin: 0; color: #fff; letter-spacing: -1px;">${student.name}</h2>
+                            <p style="color: #888; margin: 8px 0 0; font-size: 1.1rem;">Roll No: <b style="color: var(--primary);">${student.roll}</b></p>
+                            <span style="display:inline-block; padding:6px 14px; background:rgba(0,229,255,0.05); border-radius:8px; font-size:0.75rem; margin-top:20px; border:1px solid rgba(0,229,255,0.1); color:var(--primary); font-weight:600;">${examName}</span>
                         </div>
-                        <div class="grade-badge">
-                            <span class="grade">${student.grade || '--'}</span>
+                        <div class="grade-badge" style="background: linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(255,0,122,0.1) 100%);">
+                            <span class="grade">${student.grade || 'A'}</span>
                             <span class="label">GRADE</span>
                         </div>
                     </div>
 
-                    <div class="summary-stats" style="margin-top:40px;">
+                    ${marksHtml}
+
+                    <div class="summary-stats" style="margin-top:40px; border-top: 1px solid var(--border); padding-top: 30px;">
                         <div class="stat-box">
-                            <div style="font-size: 2.5rem; font-weight: 800; color: #fff;">${student.total}</div>
-                            <div style="font-size: 0.75rem; color: #666; text-transform: uppercase;">Total Marks</div>
+                            <div style="font-size: 3rem; font-weight: 800; color: #fff;">${student.total}</div>
+                            <div style="font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 1px;">AGGREGATE TOTAL</div>
                         </div>
                         <div class="stat-box">
-                            <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary);"># ${student.rank || '--'}</div>
-                            <div style="font-size: 0.75rem; color: #666; text-transform: uppercase;">Class Rank</div>
+                            <div style="font-size: 2rem; font-weight: 800; color: var(--primary);"># ${student.rank || '--'}</div>
+                            <div style="font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 1px;">MERIT POSITION</div>
                         </div>
                     </div>
 
-                    <div class="actions" style="margin-top:40px; display:flex; gap:15px; border-top: 1px solid var(--border); padding-top: 30px;">
+                    <div class="actions" style="margin-top:40px; display:flex; gap:15px;">
                         <button class="btn-check" style="flex:2;" onclick="window.print()">
-                            <i class="ph ph-printer"></i> PRINT RESULT
+                            <i class="ph ph-printer"></i> PRINT MARK SHEET
                         </button>
-                        <button class="btn-sec" style="flex:1;" onclick="location.reload()">
+                        <button class="btn-sec" style="flex:1;" onclick="window.showSearchForm()">
                             <i class="ph ph-magnifying-glass"></i> NEW SEARCH
                         </button>
                     </div>
                 </div>
             `;
             UI.display.scrollIntoView({ behavior: 'smooth' });
-        }
+        };
 
-        function renderResultNotFound(roll, examName) {
+        window.renderResultNotFound = (roll, examName) => {
             UI.display.style.display = "block";
             UI.display.innerHTML = `
-                <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px; text-align: center; background: rgba(255,59,59,0.05); border-radius: 20px; border: 1px solid rgba(255,59,59,0.1);">
-                    <i class="ph ph-warning-circle" style="font-size: 3.5rem; color: #ff3b3b; margin-bottom: 20px; display: block;"></i>
-                    <h3 style="margin: 0 0 10px;">Result Not Found</h3>
-                    <p style="color: #bbb; line-height: 1.5; max-width: 400px; margin: 0 auto 25px;">
-                        Registration number <b style="color: #fff;">${roll}</b> was not found in <br> ${examName}.
+                <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 60px 40px; text-align: center;">
+                    <i class="ph ph-warning-circle" style="font-size: 4rem; color: #ff3b3b; margin-bottom: 25px; display: block;"></i>
+                    <h2 style="margin: 0 0 10px; color: #fff;">Wait, something's missing...</h2>
+                    <p style="color: #888; line-height: 1.6; max-width: 450px; margin: 0 auto 35px;">
+                        Registration number <b style="color: #fff;">${roll}</b> could not be verified for <br> <span style="color: var(--primary);">${examName}</span>. 
+                        Please ensure the roll number is correct and try again.
                     </p>
-                    <button class="btn-sec" onclick="UI.roll.focus()" style="padding: 12px 25px;">Adjust Search</button>
+                    <button class="btn-sec" onclick="UI.roll.focus()" style="padding: 15px 40px; font-size: 1rem;">
+                        <i class="ph ph-pencil-simple"></i> RE-ENTER ROLL NO
+                    </button>
                 </div>
             `;
-        }
+            UI.display.scrollIntoView({ behavior: 'smooth' });
+        };
 
         function renderSystemError(msg) {
             UI.display.style.display = "block";
             UI.display.innerHTML = `
-                <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px; text-align: center; border: 1px dashed #ff3b3b;">
-                    <i class="ph ph-bug" style="font-size: 3rem; color: #ff3b3b; margin-bottom: 20px; display: block;"></i>
-                    <p>${msg}</p>
+                <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px; text-align: center; border: 1px dashed rgba(255,59,59,0.3); background: rgba(255,59,59,0.02);">
+                    <i class="ph ph-shield-warning" style="font-size: 3rem; color: #ff3b3b; margin-bottom: 20px; display: block;"></i>
+                    <p style="color: #bbb; font-size: 1.1rem;">${msg}</p>
                 </div>
             `;
         }
 
-        // --- SEARCH ENGINE ---
-        UI.form.addEventListener('submit', (e) => {
-            e.preventDefault(); // MANDATORY: Prevent page refresh
-
-            const examId = UI.select.value;
-            const roll = UI.roll.value.trim();
-
-            if (!examId) return alert("Please select an exam first.");
-            if (!roll) return UI.roll.focus();
-
-            // 1. Loading State
-            renderLoading();
-
-            // 2. Defensive check for data availability
-            if (!window.__PUBLISHED_EXAMS__ || window.__PUBLISHED_EXAMS__.length === 0) {
-                console.warn("Search triggered but data is missing.");
-                return renderSystemError("Please wait... synchronization in progress.");
-            }
-
-            // 3. Find Exam Session
-            const session = window.__PUBLISHED_EXAMS__.find(s => s.id === examId);
-            if (!session) {
-                console.warn(`Exam ID Mismatch: ${examId}`);
-                return renderSystemError("The selected exam is no longer available.");
-            }
-
-            // 4. Match Roll Number (Normalizing strings and trimming)
-            if (!session.results || session.results.length === 0) {
-                return renderResultNotFound(roll, session.name);
-            }
-
-            const student = session.results.find(r =>
-                String(r.roll).trim() === String(roll).trim()
-            );
-
-            // 5. Final Render
-            setTimeout(() => {
-                if (student) {
-                    renderResult(student, session.name);
-                } else {
-                    renderResultNotFound(roll, session.name);
-                }
-            }, 300); // Subtle UX delay for the loading state
-        });
-
-        window.showSearchForm = () => {
-            UI.form.style.display = "grid";
-            const meritView = document.getElementById("merit-view");
-            if (meritView) meritView.style.display = "none";
-            UI.display.innerHTML = "";
-            document.querySelector('.portal-title').style.display = "block";
-        };
-
+        // --- 4. MERIT LIST & TOGGLE ---
         window.showRankList = () => {
             const examId = UI.select.value;
-            if (!examId) return alert('Please select an exam session first.');
+            if (!examId) return alert("Select an academic session to view merit list.");
 
-            const session = window.__PUBLISHED_EXAMS__.find(s => s.id === examId);
-            if (!session || !session.results || session.results.length === 0) {
-                return alert('No results available for this exam yet.');
-            }
+            const exam = window.__GLOBAL_RESULTS_CACHE__.find(e => e.examId === examId);
+            if (!exam || !exam.published) return alert("This exam is not published yet.");
+            if (!exam.results || exam.results.length === 0) return alert("No results published for this session.");
 
-            // UI Toggling
+            // UI State
             UI.form.style.display = "none";
             document.querySelector('.portal-title').style.display = "none";
             UI.display.innerHTML = "";
+            UI.meritView.style.display = "block";
+            UI.meritExamName.textContent = exam.examName;
 
-            const meritView = document.getElementById("merit-view");
-            const meritBody = document.getElementById("results-table-body");
-            const meritExamName = document.getElementById("merit-exam-name");
+            // Sorting & Ranking
+            const sorted = [...exam.results].sort((a, b) => (parseFloat(b.total) || 0) - (parseFloat(a.total) || 0));
 
-            meritView.style.display = "block";
-            meritExamName.textContent = session.name;
-            meritBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;"><i class="ph ph-circle-notch animate-spin" style="font-size:2rem; display:block; margin:0 auto 10px;"></i>Compiling Ranking...</td></tr>';
+            let lastScore = null;
+            let currentRank = 1;
 
-            setTimeout(() => {
-                // Sorting strictly by total marks DESC
-                const sorted = [...session.results].sort((a, b) => (parseFloat(b.total) || 0) - (parseFloat(a.total) || 0));
+            UI.meritBody.innerHTML = sorted.map((r, index) => {
+                const score = parseFloat(r.total) || 0;
+                if (lastScore !== null && score < lastScore) currentRank = index + 1;
+                lastScore = score;
 
-                let currentRank = 1;
-                let lastScore = null;
+                const trophy = currentRank === 1 ? '🥇' : currentRank === 2 ? '🥈' : currentRank === 3 ? '🥉' : '';
 
-                const tableContent = sorted.map((r, index) => {
-                    const score = parseFloat(r.total) || 0;
-                    if (lastScore !== null && score < lastScore) currentRank = index + 1;
-                    lastScore = score;
+                return `
+                    <tr style="${currentRank <= 3 ? 'background: rgba(255, 255, 255, 0.05);' : ''}">
+                        <td style="font-weight: 800; color: ${currentRank <= 3 ? 'var(--primary)' : 'inherit'};">#${currentRank} ${trophy}</td>
+                        <td style="font-family: monospace; letter-spacing: 1px;">${r.roll}</td>
+                        <td style="font-weight: 600;">${r.name}</td>
+                        <td style="text-align: right; color: var(--primary); font-weight: 800; font-size: 1.2rem;">${r.total}</td>
+                    </tr>
+                `;
+            }).join('');
 
-                    const trophy = currentRank === 1 ? '🥇' : currentRank === 2 ? '🥈' : currentRank === 3 ? '🥉' : '';
-
-                    return `
-                        <tr style="${currentRank <= 3 ? 'background: rgba(255, 255, 255, 0.05);' : ''}">
-                            <td style="font-weight: 800;">#${currentRank} ${trophy}</td>
-                            <td>${r.roll}</td>
-                            <td style="font-weight: 600;">${r.name}</td>
-                            <td style="text-align: right; color: var(--primary); font-weight: 800;">${r.total}</td>
-                        </tr>
-                    `;
-                }).join('');
-
-                meritBody.innerHTML = tableContent;
-                meritView.scrollIntoView({ behavior: 'smooth' });
-            }, 400);
+            UI.meritView.scrollIntoView({ behavior: 'smooth' });
         };
+
+        window.showSearchForm = () => {
+            UI.form.style.display = "grid";
+            document.querySelector('.portal-title').style.display = "block";
+            UI.meritView.style.display = "none";
+            UI.display.innerHTML = "";
+            UI.display.style.display = "none";
+        };
+
+        function handleDeepLinking() {
+            const params = new URLSearchParams(window.location.search);
+            const pExam = params.get('exam');
+            const pRoll = params.get('roll');
+
+            if (pExam) {
+                UI.select.value = pExam;
+                UI.select.dispatchEvent(new Event('change'));
+                if (pRoll) {
+                    UI.roll.value = pRoll;
+                    setTimeout(() => handleResultSearch(), 600);
+                }
+            }
+        }
     </script>
 
 </body>
