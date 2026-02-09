@@ -601,8 +601,11 @@
         import StorageManager from '../../assets/js/storage-manager.js';
         import SchoolManager from '../../assets/js/school-manager.js';
 
-        // Expose for inline onclick handlers
-        window.PrintEngine = PrintEngine;
+        // STATIC FALLBACK DATA
+        const STATIC_EXAMS = [
+            { id: "ex_1770311914659", name: "10 – dfth (2026-27)" },
+            { id: "ex_1770313877186", name: "2 – dfth (2026-27)" }
+        ];
 
         // UI References
         const form = document.getElementById('resultsForm');
@@ -611,39 +614,71 @@
         const rollInput = document.getElementById('rollInput');
         const dobInput = document.getElementById('dobInput');
         const submitBtn = document.getElementById('submitBtn');
-        const loader = document.getElementById('dropdown-loader');
 
-        // State
-        let resultsData = [];
+        // Initial State
+        window.PrintEngine = PrintEngine;
 
-        // --- 1. INITIALIZATION ---
-        async function init() {
+        // 1. POPULATE EXAMS (ON LOAD)
+        document.addEventListener('DOMContentLoaded', () => {
+            initPortal();
+        });
+
+        async function initPortal() {
+            setupSchoolContext();
+            populateExamDropdown();
+            checkUrlParams();
+        }
+
+        function populateExamDropdown() {
+            // Clear and insert default
+            select.innerHTML = '<option value="">-- Select Exam --</option>';
+
+            let examProfiles = [];
             try {
-                // Initialize dependent systems
-                setupSchoolContext();
-
-                // Show loader while fetching
-                toggleLoader(true);
-
-                // Load Data
-                resultsData = await ResultsCMS.fetchResults();
-                populateDropdown();
-
-                // Validation & Auto-Selection Logic
-                // Priority: 1. URL Params -> 2. LocalStorage (Last Viewed) -> 3. Default (Latest)
-                const urlParamsHandled = handleUrlParams();
-
-                if (!urlParamsHandled) {
-                    loadLastViewedExam();
+                // Try to load from localStorage.examProfiles as priority
+                const localData = localStorage.getItem('examProfiles');
+                if (localData) {
+                    examProfiles = JSON.parse(localData);
+                } else {
+                    // Secondary source or fallback to Static
+                    const secondaryData = StorageManager.get('exam_results_exams', null);
+                    examProfiles = secondaryData || STATIC_EXAMS;
                 }
+            } catch (e) {
+                console.warn('Failed to parse examProfiles, using fallback.');
+                examProfiles = STATIC_EXAMS;
+            }
 
-                toggleLoader(false);
-                checkSyncStatus();
+            // Populate the dropdown
+            examProfiles.forEach(exam => {
+                const opt = document.createElement('option');
+                opt.value = exam.id;
+                opt.textContent = exam.name || exam.displayName;
+                select.appendChild(opt);
+            });
 
-            } catch (err) {
-                console.error('Init Error:', err);
-                // Fallback UI
-                select.innerHTML = '<option value="">Unable to load exams</option>';
+            select.disabled = false;
+        }
+
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const pExam = params.get('exam');
+            const pRoll = params.get('roll');
+            const pDob = params.get('dob');
+
+            if (pExam) {
+                select.value = pExam;
+                select.dispatchEvent(new Event('change'));
+
+                if (pRoll) {
+                    rollInput.value = pRoll;
+                    if (pDob && dobInput) dobInput.value = pDob;
+
+                    // Auto-submit after UI settles
+                    setTimeout(() => {
+                        if (submitBtn && !submitBtn.disabled) submitBtn.click();
+                    }, 500);
+                }
             }
         }
 
@@ -651,141 +686,48 @@
             const activeSchool = SchoolManager.getActive();
             if (activeSchool) {
                 document.title = `${activeSchool.name} | Results Portal`;
-                // Try to find the title element safely
                 const titleEl = document.querySelector('.portal-title h1');
                 if (titleEl) titleEl.textContent = activeSchool.name;
-
                 if (activeSchool.themeColor) {
                     document.documentElement.style.setProperty('--primary', activeSchool.themeColor);
                 }
             }
         }
 
-        function toggleLoader(show) {
-            if (loader) loader.style.display = show ? 'block' : 'none';
-            select.disabled = show;
-        }
-
-        // --- 2. DATA POPULATION ---
-        function populateDropdown() {
-            const visibleExams = ResultsCMS.getVisibleExamList();
-
-            if (visibleExams.length === 0) {
-                select.innerHTML = '<option value="">No Published Exams Available</option>';
-                select.disabled = true;
-                return;
-            }
-
-            select.disabled = false;
-            select.innerHTML = '<option value="">-- Select Exam Session --</option>' +
-                visibleExams.map(e => `<option value="${e.id}">${e.displayName}</option>`).join('');
-        }
-
-        // --- 3. LINKING LOGIC (URL & STORAGE) ---
-        function handleUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            const pExam = params.get('exam'); // ?exam=ID
-            const pRoll = params.get('roll'); // ?roll=123
-            const pDob = params.get('dob');   // ?dob=YYYY-MM-DD
-
-            if (pExam && select.querySelector(`option[value="${pExam}"]`)) {
-                // Apply URL Exam
-                select.value = pExam;
-                saveLastViewedExam(pExam); // Persist selection
-
-                // Apply Roll & Auto-Submit
-                if (pRoll) {
-                    rollInput.value = pRoll;
-                    if (pDob && dobInput) dobInput.value = pDob;
-
-                    // Delay slightly to ensure UI is ready, then auto-submit
-                    setTimeout(() => {
-                        if (!submitBtn.disabled) submitBtn.click();
-                    }, 500);
-                }
-                return true; // Params found and handled
-            }
-            return false;
-        }
-
-        function loadLastViewedExam() {
-            // Retrieve last selected exam from browser storage
-            const lastExamId = localStorage.getItem('mhm_results_last_exam');
-            if (lastExamId && select.querySelector(`option[value="${lastExamId}"]`)) {
-                select.value = lastExamId;
-            } else {
-                // Default: Select first available (latest) if nothing else
-                if (select.options.length > 1) {
-                    select.selectedIndex = 1;
-                }
-            }
-        }
-
-        function saveLastViewedExam(id) {
-            if (id) localStorage.setItem('mhm_results_last_exam', id);
-        }
-
-        // Listener for manual changes
-        select.addEventListener('change', (e) => saveLastViewedExam(e.target.value));
-
-
-        // --- 4. SEARCH & DISPLAY LOGIC ---
+        // SEARCH & RESULT RENDERING
         form.onsubmit = async (e) => {
             e.preventDefault();
-
-            // Gather inputs
             const examId = select.value;
             const roll = rollInput.value.trim();
             const dob = dobInput ? dobInput.value : null;
 
-            // UI Validation
-            if (!examId) return renderError('Please select an exam session first.');
-            if (!roll) return renderError('Please enter your roll number.');
+            if (!examId || !roll) return;
 
-            // Loading State (Save original text)
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Searching...';
             submitBtn.disabled = true;
 
-            // Simulated processing delay
-            await new Promise(r => setTimeout(r, 600));
-
-            // Perform Search
-            // We pass null for data so search loads it internally or uses cached
+            // Use ResultsCMS to search local data (No API calls)
             const result = ResultsCMS.search(null, roll, examId, dob);
 
-            // Reset UI
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
 
             if (result) {
-                // Success: Attach to window for printing/reference
                 window.currentResult = result;
                 renderResult(result);
-                // Clear error if any
-                const existingErr = document.querySelector('.error-message');
-                if (existingErr) existingErr.remove();
             } else {
-                // Failure
-                display.innerHTML = ''; // Clear previous results
-                if (dob) {
-                    renderError('Result not found. Please verify Roll Number AND Date of Birth.');
-                } else {
-                    renderError('Result not found checking Roll Number for this exam.');
-                }
+                display.innerHTML = `
+                    <div class="error-state" style="margin-top:20px;">
+                        <i class="ph ph-magnifying-glass" style="font-size:2rem; color:#666;"></i>
+                        <p>Result not found for Roll <b>${roll}</b>.</p>
+                        <small>Please check your Roll Number and Exam Selection.</small>
+                    </div>`;
             }
-        }
-
-        function renderError(msg) {
-            display.innerHTML = `<div class="error-state" style="animation: fadeIn 0.3s; color: #ff3d3d; text-align: center; padding: 20px; background: rgba(255, 61, 61, 0.1); border-radius: 12px; margin-top: 20px;">
-                <i class="ph ph-warning-circle" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
-                ${msg}
-             </div>`;
-        }
+        };
 
         function renderResult(data) {
             const hasPass = String(data.status).toLowerCase().includes('pass');
-            // Check for Rank (Merit)
             const rankBadge = data.rank ? `
                 <div class="grade-badge" style="background: rgba(255,193,7,0.1); border-color: rgba(255,193,7,0.4);">
                     <span class="grade" style="color: #ffc107;">#${data.rank}</span>
@@ -793,12 +735,11 @@
                 </div>` : '';
 
             display.innerHTML = `
-                <div class="glass-card result-card animate-slide-up">
+                <div class="glass-card result-card animate-slide-up" style="margin-top:30px;">
                     <div class="student-meta">
                         <div>
                             <h2 style="font-size: 1.8rem; margin: 0; color: #fff;">${data.name}</h2>
                             <p style="color: #888; margin: 5px 0 0;">Roll: <b>${data.rollNo}</b> | Class: ${data.class || 'N/A'}</p>
-                            <span class="badge" style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px; margin-top:10px; display:inline-block; font-size:0.75rem;">${data.exam}</span>
                         </div>
                         <div style="display: flex; gap: 10px;">
                             ${rankBadge}
@@ -809,7 +750,6 @@
                         </div>
                     </div>
 
-                    <h4 style="margin-bottom: 15px; color: var(--primary);">Subject-wise Performance</h4>
                     <table class="marks-table">
                         <thead><tr><th>SUBJECT</th><th>MARKS</th></tr></thead>
                         <tbody>
@@ -822,17 +762,17 @@
                     <div class="summary-stats">
                         <div class="stat-box">
                             <div style="font-size: 1.5rem; font-weight: 800;">${data.totalMarks || '-'}</div>
-                            <div style="font-size: 0.6rem; color: #888; text-transform: uppercase;">Total Marks</div>
+                            <div style="font-size: 0.6rem; color: #888;">TOTAL MARKS</div>
                         </div>
                         <div class="stat-box ${hasPass ? 'pass' : 'fail'}" style="border: 1px solid currentColor;">
                             <div style="font-size: 1.1rem; font-weight: 800;">${(data.status || 'N/A').toUpperCase()}</div>
-                            <div style="font-size: 0.6rem; text-transform: uppercase;">RESULT STATUS</div>
+                            <div style="font-size: 0.6rem;">STATUS</div>
                         </div>
                     </div>
 
                     <div class="actions">
                         <button class="btn-check" onclick="PrintEngine.print(window.currentResult)">
-                            <i class="ph ph-printer"></i> PRINT OFFICIAL CERTIFICATE
+                            <i class="ph ph-printer"></i> PRINT CERTIFICATE
                         </button>
                         <button class="btn-sec" onclick="window.location.reload()">
                             <i class="ph ph-magnifying-glass"></i> NEW SEARCH
@@ -840,73 +780,37 @@
                     </div>
                 </div>
             `;
-            // Smooth scroll to result
-            display.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        // --- 5. MERIT LIST LOGIC ---
-        window.showRankList = () => {
-            const examId = select.value;
-            if (!examId) return alert("Please select an exam first to view its merit list.");
-
-            // Get results from CMS for this exam
-            const examResults = ResultsCMS.getExamResults(examId);
-
-            if (!examResults || examResults.length === 0) return alert("No results available for this exam.");
-
-            // Sort: High to Low Total Marks
-            const sorted = [...examResults].sort((a, b) => (b.totalMarks || 0) - (a.totalMarks || 0));
-
-            display.innerHTML = `
-                <div class="glass-card animate-slide-up">
-                    <div style="text-align:center; margin-bottom: 25px;">
-                        <h2 style="margin-bottom: 5px;">🏆 Merit List</h2>
-                        <h4 style="color:#888;">${select.options[select.selectedIndex].text}</h4>
-                    </div>
-                    
-                    <div style="overflow-x: auto;">
-                        <table class="marks-table">
-                            <thead>
-                                <tr style="background: rgba(255,255,255,0.05);">
-                                    <th>RANK</th>
-                                    <th>NAME</th>
-                                    <th>CLASS</th>
-                                    <th>TOTAL MARKS</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${sorted.map((r, i) => `
-                                    <tr>
-                                        <td>
-                                            ${i < 3 ? `<i class="ph-fill ph-trophy" style="color: ${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : '#cd7f32'}"></i>` : ''} 
-                                            <b>#${i + 1}</b>
-                                        </td>
-                                        <td>${r.name}</td>
-                                        <td>${r.class || '-'}</td>
-                                        <td><b style="color: var(--primary);">${r.totalMarks}</b></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div style="margin-top:20px; text-align:center;">
-                        <button class="btn-sec" onclick="display.innerHTML=''">
-                            Close Merit List
-                        </button>
-                    </div>
-                </div>
-            `;
             display.scrollIntoView({ behavior: 'smooth' });
         }
 
-        function checkSyncStatus() {
-            const warning = document.getElementById('sync-warning');
-            if (warning) warning.style.display = 'none'; // Default hidden
-        }
+        window.showRankList = () => {
+            const examId = select.value;
+            if (!examId) return alert("Select an exam first.");
+            const results = ResultsCMS.getExamResults(examId);
+            if (!results || results.length === 0) return alert("No merit list data available.");
 
-        // Initialize App
-        init();
+            const sorted = [...results].sort((a, b) => (b.totalMarks || 0) - (a.totalMarks || 0));
+
+            display.innerHTML = `
+                <div class="glass-card animate-slide-up" style="margin-top:30px;">
+                    <h2 style="text-align:center; margin-bottom:20px;">🏆 Merit List</h2>
+                    <table class="marks-table">
+                        <thead><tr><th>RANK</th><th>NAME</th><th>TOTAL</th></tr></thead>
+                        <tbody>
+                            ${sorted.map((r, i) => `
+                                <tr>
+                                    <td><b>#${i + 1}</b></td>
+                                    <td>${r.name}</td>
+                                    <td><b style="color:var(--primary);">${r.totalMarks}</b></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <button class="btn-sec" onclick="display.innerHTML=''" style="width:100%; margin-top:15px;">Close</button>
+                </div>
+            `;
+            display.scrollIntoView({ behavior: 'smooth' });
+        };
     </script>
 </body>
 
