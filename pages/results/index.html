@@ -308,31 +308,6 @@
             <span>System is currently offline. Showing cached results from <span id="sync-time">...</span></span>
         </div>
 
-        <div class="stats-banner glass-card"
-            style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 25px; text-align: center; border-radius: 20px;">
-            <div>
-                <div id="results-total-count" style="font-size: 1.8rem; font-weight: 800; color: var(--primary);">0
-                </div>
-                <div
-                    style="font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">
-                    Total Results</div>
-            </div>
-            <div>
-                <div id="results-exams-count" style="font-size: 1.8rem; font-weight: 800; color: var(--primary);">0
-                </div>
-                <div
-                    style="font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">
-                    Active Exams</div>
-            </div>
-            <div>
-                <div id="results-last-sync"
-                    style="font-size: 0.75rem; font-weight: 700; color: #888; margin-top: 10px;">Never</div>
-                <div
-                    style="font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">
-                    Last Published</div>
-            </div>
-        </div>
-
         <div class="glass-card search-section">
             <div class="portal-title">
                 <h1>Results Portal</h1>
@@ -631,22 +606,15 @@
             select: document.getElementById('examSelect'),
             roll: document.getElementById('rollInput'),
             display: document.getElementById('result-display'),
-            submitBtn: document.getElementById('submitBtn'),
-            stats: {
-                total: document.getElementById('results-total-count'),
-                exams: document.getElementById('results-exams-count'),
-                lastSync: document.getElementById('results-last-sync')
-            }
+            submitBtn: document.getElementById('submitBtn')
         };
 
-        // Initialization
         document.addEventListener('DOMContentLoaded', () => {
             initPortal();
         });
 
         function initPortal() {
             const sessions = getPublishedSessions();
-            updateStats(sessions);
             populateDropdown(sessions);
             handleUrlParams();
         }
@@ -656,37 +624,19 @@
             try {
                 const raw = localStorage.getItem('publishedExams');
                 const data = raw ? JSON.parse(raw) : [];
-                return Array.isArray(data) ? data.filter(s => s.published === true) : [];
+                // Filtering for unique IDs and active status
+                return Array.isArray(data)
+                    ? data.filter(s => s.published === true || s.published === "true")
+                    : [];
             } catch (e) {
-                console.error('Storage parse error:', e);
+                console.warn('Storage read failed:', e);
                 return [];
             }
         }
 
-        // --- UI UPDATES ---
-        function updateStats(sessions) {
-            if (!UI.stats.total) return;
-
-            let totalResults = 0;
-            let newestDate = null;
-
-            sessions.forEach(s => {
-                totalResults += (s.results || []).length;
-                if (s.lastSynced) {
-                    const d = new Date(s.lastSynced);
-                    if (!newestDate || d > newestDate) newestDate = d;
-                }
-            });
-
-            UI.stats.total.textContent = totalResults.toLocaleString();
-            UI.stats.exams.textContent = sessions.length;
-            UI.stats.lastSync.textContent = newestDate
-                ? newestDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-                : 'N/A';
-        }
-
+        // --- UI ---
         function populateDropdown(sessions) {
-            UI.select.innerHTML = '';
+            UI.select.innerHTML = '<option value="">-- Select Exam Session --</option>';
 
             if (sessions.length === 0) {
                 UI.select.innerHTML = '<option value="">No published exams available</option>';
@@ -694,15 +644,11 @@
                 return;
             }
 
-            const placeholder = document.createElement('option');
-            placeholder.value = "";
-            placeholder.textContent = "-- Select Exam Session --";
-            UI.select.appendChild(placeholder);
-
             sessions.forEach(s => {
                 const opt = document.createElement('option');
-                opt.value = s.id;
-                opt.textContent = s.name || `Session ${s.id}`;
+                // Support both 'id' and 'examId' mapping variants
+                opt.value = s.id || s.examId;
+                opt.textContent = s.name || s.examName || `Session ${opt.value}`;
                 UI.select.appendChild(opt);
             });
 
@@ -718,44 +664,50 @@
                 UI.select.value = pExam;
                 if (pRoll) {
                     UI.roll.value = pRoll;
+                    // Auto-trigger search for deep links
+                    setTimeout(() => UI.form.requestSubmit(), 300);
                 }
             }
         }
 
-        // --- SEARCH EXECUTION ---
+        // --- SEARCH ENGINE ---
         UI.form.onsubmit = (e) => {
             e.preventDefault();
             const examId = UI.select.value;
             const roll = UI.roll.value.trim();
 
-            if (!examId || !roll) return;
+            if (!examId) return alert('Please select an exam session.');
+            if (!roll) return UI.roll.focus();
+
+            // Clear previous UI states
+            UI.display.innerHTML = '';
 
             const sessions = getPublishedSessions();
-            const session = sessions.find(s => s.id === examId);
+            const session = sessions.find(s => (s.id || s.examId) === examId);
 
-            if (!session) return renderError("Session no longer available.");
+            if (!session) return renderError("Selected exam is no longer available.");
 
-            const result = (session.results || []).find(r => String(r.roll) === roll);
+            // STRICT STRING COMPARISON
+            const student = (session.results || []).find(r => String(r.roll).trim() === String(roll));
 
-            if (result) {
-                renderResult(result, session.name);
+            if (student) {
+                renderResult(student, session.name || session.examName);
             } else {
-                renderError(`Result not found for Roll <b>${roll}</b> in ${session.name}.`);
+                renderError(`Roll number <b>${roll}</b> was not found in ${session.name || session.examName}.`);
             }
         };
 
         // --- RENDERING ---
         function renderResult(data, examName) {
-            const isPass = parseFloat(data.total) >= 33 || (data.status || '').toLowerCase().includes('pass');
-            const statusClass = isPass ? 'pass' : 'fail';
-            const statusText = isPass ? 'PASSED' : 'FAILED';
+            const score = parseFloat(data.total) || 0;
+            const isPass = score >= 33 || (data.status || '').toLowerCase().includes('pass');
 
             UI.display.innerHTML = `
                 <div class="glass-card result-card animate-slide-up" style="margin-top: 30px;">
                     <div class="student-meta">
                         <div>
                             <h2 style="font-size: 2.2rem; margin: 0; color: #fff;">${data.name}</h2>
-                            <p style="color: #888; margin: 8px 0 0; font-size: 1.1rem;">Roll ID: <b style="color: var(--primary);">${data.roll}</b></p>
+                            <p style="color: #888; margin: 8px 0 0; font-size: 1.1rem;">Registration No: <b style="color: var(--primary);">${data.roll}</b></p>
                             <span style="display:inline-block; padding:5px 12px; background:rgba(255,255,255,0.05); border-radius:8px; font-size:0.75rem; margin-top:15px; border:1px solid var(--border); color:#bbb;">${examName}</span>
                         </div>
                         <div class="grade-badge">
@@ -764,23 +716,34 @@
                         </div>
                     </div>
 
+                    <table class="marks-table" style="margin-top: 30px;">
+                        <thead>
+                            <tr><th>SUBJECT</th><th style="text-align: right;">SCORE</th></tr>
+                        </thead>
+                        <tbody>
+                            ${data.subjects ? Object.entries(data.subjects).map(([sub, val]) => `
+                                <tr><td>${sub}</td><td style="text-align: right; font-weight: 700;">${val}</td></tr>
+                            `).join('') : '<tr><td colspan="2" style="text-align:center; padding:20px; color:#666;">Detailed marks not available</td></tr>'}
+                        </tbody>
+                    </table>
+
                     <div class="summary-stats" style="margin-top:40px;">
                         <div class="stat-box">
                             <div style="font-size: 2rem; font-weight: 800; color: #fff;">${data.total}</div>
                             <div style="font-size: 0.65rem; color: #666; text-transform: uppercase;">Total Marks</div>
                         </div>
-                        <div class="stat-box ${statusClass}" style="border: 1px solid currentColor;">
-                            <div style="font-size: 1.4rem; font-weight: 800;">${statusText}</div>
-                            <div style="font-size: 0.65rem; text-transform: uppercase;">Result Status</div>
+                        <div class="stat-box ${isPass ? 'pass' : 'fail'}" style="border: 1px solid currentColor;">
+                            <div style="font-size: 1.4rem; font-weight: 800;">${isPass ? 'PASSED' : 'FAILED'}</div>
+                            <div style="font-size: 0.65rem; text-transform: uppercase;">Outcome</div>
                         </div>
                     </div>
 
-                    <div class="actions" style="margin-top:40px; display:flex; gap:15px;">
+                    <div class="actions" style="margin-top:40px; display:flex; gap:15px; border-top: 1px solid var(--border); padding-top: 30px;">
                         <button class="btn-check" style="flex:2;" onclick="window.print()">
-                            <i class="ph ph-printer"></i> Print Record
+                            <i class="ph ph-printer"></i> PRINT RESULT
                         </button>
                         <button class="btn-sec" style="flex:1;" onclick="location.reload()">
-                            <i class="ph ph-magnifying-glass"></i> New Search
+                            <i class="ph ph-magnifying-glass"></i> NEW SEARCH
                         </button>
                     </div>
                 </div>
@@ -790,15 +753,72 @@
 
         function renderError(msg) {
             UI.display.innerHTML = `
-                <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px;">
-                    <i class="ph ph-magnifying-glass" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
-                    <p style="font-size: 1.1rem; color: #ff3d3d;">${msg}</p>
-                    <button class="btn-sec" onclick="UI.roll.focus()" style="margin-top:20px; padding: 10px 20px;">Try Different Roll</button>
+                <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px; text-align: center; background: rgba(255,59,59,0.05); border-radius: 20px; border: 1px solid rgba(255,59,59,0.1);">
+                    <i class="ph ph-warning-circle" style="font-size: 3.5rem; color: #ff3b3b; margin-bottom: 20px; display: block;"></i>
+                    <h3 style="margin: 0 0 10px;">Verification Failed</h3>
+                    <p style="color: #bbb; line-height: 1.5; max-width: 400px; margin: 0 auto 25px;">${msg}</p>
+                    <button class="btn-sec" onclick="UI.roll.focus()" style="padding: 12px 25px;">Adjust Roll Number</button>
                 </div>
             `;
         }
-    </script>
 
+        window.showRankList = () => {
+            const examId = UI.select.value;
+            if (!examId) return alert('Select an exam session first.');
+
+            const sessions = getPublishedSessions();
+            const session = sessions.find(s => (s.id || s.examId) === examId);
+            if (!session || !session.results) return alert('Merit data not available for this session.');
+
+            UI.display.innerHTML = '<div class="glass-card animate-slide-up" style="margin-top: 30px; text-align:center;"><i class="ph ph-circle-notch animate-spin" style="font-size:2rem;"></i><p>Compiling Merit List...</p></div>';
+
+            setTimeout(() => {
+                const sorted = [...session.results].sort((a, b) => (parseFloat(b.total) || 0) - (parseFloat(a.total) || 0));
+
+                let currentRank = 1;
+                let lastScore = null;
+
+                const tableRows = sorted.map((r, index) => {
+                    const score = parseFloat(r.total) || 0;
+                    if (lastScore !== null && score < lastScore) {
+                        currentRank = index + 1;
+                    }
+                    lastScore = score;
+
+                    const isTop3 = currentRank <= 3;
+                    const trophy = currentRank === 1 ? '🥇' : currentRank === 2 ? '🥈' : currentRank === 3 ? '🥉' : '';
+
+                    return `
+                        <tr style="${isTop3 ? 'background: rgba(255, 255, 255, 0.05);' : ''}">
+                            <td style="font-weight: 800;">#${currentRank} ${trophy}</td>
+                            <td>${r.name}</td>
+                            <td>${r.roll}</td>
+                            <td style="text-align: right; color: var(--primary); font-weight: 800;">${r.total}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                UI.display.innerHTML = `
+                    <div class="glass-card animate-slide-up" style="margin-top: 30px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
+                            <h2 style="margin:0;">🏆 Merit List</h2>
+                            <span style="font-size:0.8rem; opacity:0.6;">${session.name || session.examName}</span>
+                        </div>
+                        <div style="max-height: 500px; overflow-y: auto;">
+                            <table class="marks-table">
+                                <thead>
+                                    <tr><th>RANK</th><th>NAME</th><th>ROLL</th><th style="text-align: right;">TOTAL</th></tr>
+                                </thead>
+                                <tbody>${tableRows}</tbody>
+                            </table>
+                        </div>
+                        <button class="btn-sec" onclick="UI.display.innerHTML=''" style="width: 100%; margin-top: 30px;">Close Merit View</button>
+                    </div>
+                `;
+                UI.display.scrollIntoView({ behavior: 'smooth' });
+            }, 400);
+        };
+    </script>
 </body>
 
 </html>
