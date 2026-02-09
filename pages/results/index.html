@@ -675,24 +675,23 @@
         // --- 1. INITIALIZATION ---
         async function initResultsPage() {
             try {
-                // Primary: LocalStorage
+                // Primary: LocalStorage (Auto-sync from Admin)
                 const localData = localStorage.getItem("publishedResults");
                 let data = null;
 
                 if (localData) {
                     try {
                         data = JSON.parse(localData);
-                        console.log("Data loaded from LocalStorage");
-                    } catch (e) { console.error("Bad LocalStorage data"); }
+                        console.log("Portal: Data loaded from LocalStorage (Sync)");
+                    } catch (e) { console.error("Portal: Bad LocalStorage data"); }
                 }
 
                 if (!data) {
-                    // Fallback: Static JSON file
-                    console.log("Fetching JSON fallback...");
+                    // Fallback: Static JSON file (Offline/Initial state)
                     const response = await fetch("../../data/published-exams.json");
                     if (response.ok) {
                         data = await response.json();
-                        console.log("Data loaded from JSON fallback");
+                        console.log("Portal: Data loaded from JSON fallback");
                     }
                 }
 
@@ -747,10 +746,22 @@
             UI.select.disabled = false;
         }
 
+        // Dropdown Sync with URL
         UI.select.addEventListener('change', () => {
             const examId = UI.select.value;
-            const exam = window.__GLOBAL_RESULTS_CACHE__.find(e => e.examId === examId);
 
+            // 1. Sync URL param ?exam=ID without reload
+            const url = new URL(window.location.href);
+            if (examId) url.searchParams.set('exam', examId);
+            else url.searchParams.delete('exam');
+            window.history.replaceState({}, '', url);
+
+            // 2. Clear previous result
+            UI.display.innerHTML = "";
+            UI.display.style.display = "none";
+
+            // 3. Update UI Stats
+            const exam = window.__GLOBAL_RESULTS_CACHE__.find(e => e.examId === examId);
             if (exam) {
                 if (UI.stats.students) UI.stats.students.textContent = exam.results.length;
                 if (UI.stats.lastSync) {
@@ -768,16 +779,25 @@
             if (e) e.preventDefault();
 
             const examId = UI.select.value;
-            const roll = UI.roll.value.trim();
+            const rawRoll = UI.roll.value.trim();
 
             if (!examId) return alert("Please select an academic session.");
-            if (!roll) return UI.roll.focus();
+            if (!rawRoll) return UI.roll.focus();
+
+            // Normalize Roll Number
+            const roll = String(rawRoll).trim();
+
+            // Update URL with roll param
+            const url = new URL(window.location.href);
+            url.searchParams.set('roll', roll);
+            window.history.replaceState({}, '', url);
 
             renderLoading();
 
             const exam = window.__GLOBAL_RESULTS_CACHE__.find(e => e.examId === examId);
             if (!exam) return renderSystemError("Selected exam data is no longer available.");
 
+            // Strict matching
             const student = exam.results.find(r => String(r.roll).trim() === roll);
 
             setTimeout(() => {
@@ -793,18 +813,16 @@
 
         // --- 3. RENDERING ENGINE ---
         function renderLoading() {
-            UI.display.style.display = "block";
             UI.display.innerHTML = `
                 <div class="glass-card animate-slide-up" style="margin-top: 30px; text-align: center; padding: 50px;">
                     <i class="ph ph-circle-notch animate-spin" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px; display: block;"></i>
                     <p style="color: #888; letter-spacing: 2px; font-weight: 600;">RETRIEVING RECORD...</p>
                 </div>
             `;
+            UI.display.style.display = "block";
         }
 
         window.renderResult = (student, examName) => {
-            UI.display.style.display = "block";
-
             const hasMarks = student.marks && Object.keys(student.marks).length > 0;
             let marksHtml = '';
 
@@ -828,6 +846,7 @@
                 `;
             }
 
+            // CRITICAL: result-display MUST be updated via JS ONLY
             UI.display.innerHTML = `
                 <div class="glass-card result-card animate-slide-up" style="margin-top: 30px;">
                     <div class="student-meta">
@@ -865,35 +884,35 @@
                     </div>
                 </div>
             `;
+            UI.display.style.display = "block";
             UI.display.scrollIntoView({ behavior: 'smooth' });
         };
 
         window.renderResultNotFound = (roll, examName) => {
-            UI.display.style.display = "block";
             UI.display.innerHTML = `
                 <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 60px 40px; text-align: center;">
                     <i class="ph ph-warning-circle" style="font-size: 4rem; color: #ff3b3b; margin-bottom: 25px; display: block;"></i>
-                    <h2 style="margin: 0 0 10px; color: #fff;">Wait, something's missing...</h2>
+                    <h2 style="margin: 0 0 10px; color: #fff;">Result Not Found</h2>
                     <p style="color: #888; line-height: 1.6; max-width: 450px; margin: 0 auto 35px;">
                         Registration number <b style="color: #fff;">${roll}</b> could not be verified for <br> <span style="color: var(--primary);">${examName}</span>. 
-                        Please ensure the roll number is correct and try again.
                     </p>
                     <button class="btn-sec" onclick="UI.roll.focus()" style="padding: 15px 40px; font-size: 1rem;">
                         <i class="ph ph-pencil-simple"></i> RE-ENTER ROLL NO
                     </button>
                 </div>
             `;
+            UI.display.style.display = "block";
             UI.display.scrollIntoView({ behavior: 'smooth' });
         };
 
         function renderSystemError(msg) {
-            UI.display.style.display = "block";
             UI.display.innerHTML = `
                 <div class="error-state animate-slide-up" style="margin-top: 30px; padding: 40px; text-align: center; border: 1px dashed rgba(255,59,59,0.3); background: rgba(255,59,59,0.02);">
                     <i class="ph ph-shield-warning" style="font-size: 3rem; color: #ff3b3b; margin-bottom: 20px; display: block;"></i>
                     <p style="color: #bbb; font-size: 1.1rem;">${msg}</p>
                 </div>
             `;
+            UI.display.style.display = "block";
         }
 
         // --- 4. MERIT LIST & TOGGLE ---
@@ -909,6 +928,7 @@
             UI.form.style.display = "none";
             document.querySelector('.portal-title').style.display = "none";
             UI.display.innerHTML = "";
+            UI.display.style.display = "none";
             UI.meritView.style.display = "block";
             UI.meritExamName.textContent = exam.examName;
 
@@ -956,7 +976,8 @@
                 UI.select.dispatchEvent(new Event('change'));
                 if (pRoll) {
                     UI.roll.value = pRoll;
-                    setTimeout(() => handleResultSearch(), 600);
+                    // Strict: if roll exists under chosen exam -> auto search
+                    setTimeout(() => handleResultSearch(), 300);
                 }
             }
         }

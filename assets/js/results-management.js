@@ -126,6 +126,7 @@ const ResultsManagement = (() => {
 
     /**
      * Update exam list for student portal (ResultsCMS compatibility)
+     * Also generates the unified 'publishedResults' for the static public portal.
      */
     const updateExamList = () => {
         const results = getAllResults();
@@ -133,25 +134,48 @@ const ResultsManagement = (() => {
         const years = window.AcademicYearManager ? AcademicYearManager.getAll() : [];
         const types = window.ExamTypeManager ? ExamTypeManager.getAll() : [];
 
-        const examList = Object.keys(results)
-            .filter(examId => results[examId].published) // Only published
-            .map(examId => {
-                const examMeta = exams.find(e => e.id === examId);
-                if (!examMeta) return null;
+        const publicExams = [];
+        const cmsExams = [];
 
-                const yearName = years.find(y => y.id === examMeta.yearId)?.yearLabel || '';
-                const typeName = types.find(t => t.id === examMeta.typeId)?.name || '';
+        Object.keys(results).forEach(examId => {
+            const examData = results[examId];
+            if (!examData.published) return;
 
-                return {
-                    id: examId,
-                    displayName: `${examMeta.name} (${typeName} - ${yearName})`,
-                    lastSync: results[examId].syncedAt
-                };
-            })
-            .filter(Boolean);
+            const examMeta = exams.find(e => e.id === examId);
+            if (!examMeta) return;
 
-        // Save for ResultsCMS
-        StorageManager.set('exam_results_exams', examList);
+            const yearName = years.find(y => y.id === examMeta.yearId)?.yearLabel || '';
+            const typeName = types.find(t => t.id === examMeta.typeId)?.name || '';
+            const displayName = `${examMeta.name} (${typeName} - ${yearName})`;
+
+            // 1. Structure for ResultsCMS (Legacy/Compatibility)
+            cmsExams.push({
+                id: examId,
+                displayName: displayName,
+                lastSync: examData.syncedAt
+            });
+
+            // 2. Full Structure for Public Static Portal (New Requirement)
+            publicExams.push({
+                examId: examId,
+                examName: displayName,
+                published: true,
+                lastSync: examData.syncedAt,
+                subjects: examData.subjects || [],
+                results: examData.data || [] // Full results array
+            });
+        });
+
+        // Save for Legacy ResultsCMS
+        StorageManager.set('exam_results_exams', cmsExams);
+
+        // Save for PUBLIC PORTAL (Unified Global Key)
+        localStorage.setItem('publishedResults', JSON.stringify({
+            exams: publicExams,
+            lastUpdated: new Date().toISOString()
+        }));
+
+        console.log("Public Results Synced:", publicExams.length, "exams published.");
     };
 
     /**
