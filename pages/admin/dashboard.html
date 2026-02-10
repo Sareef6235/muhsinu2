@@ -1651,7 +1651,7 @@
                 </div>
 
                 <div
-                    style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--glass-border); display: flex; gap: 10px;">
+                    style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--glass-border); display: flex; gap: 10px; flex-wrap: wrap;">
                     <button class="btn btn-sm btn-primary"
                         onclick="window.open('https://github.com/Sareef6235/muhsinu2/actions', '_blank')">
                         <i class="ph ph-arrow-square-out"></i> View Actions Pipeline
@@ -1660,6 +1660,49 @@
                         onclick="window.open('https://github.com/Sareef6235/muhsinu2', '_blank')">
                         <i class="ph ph-github-logo"></i> Open Repository
                     </button>
+                    <button class="btn btn-sm btn-secondary" style="border-color: var(--primary-color);"
+                        onclick="const el = document.getElementById('github-file-editor-section'); el.style.display = el.style.display === 'none' ? 'block' : 'none';">
+                        <i class="ph ph-pencil"></i> Quick Edit Files
+                    </button>
+                </div>
+
+                <!-- GitHub File Editor Section -->
+                <div id="github-file-editor-section"
+                    style="display: none; margin-top: 25px; animation: slideDown 0.3s ease;">
+                    <h4 style="margin-bottom: 15px; color: var(--primary-color);">Direct File Editing</h4>
+                    <div
+                        style="background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border); padding: 5px;">
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li
+                                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span><i class="ph ph-file-json"></i> data/schools.json</span>
+                                <button class="btn btn-sm btn-secondary"
+                                    onclick="DeploymentManager.editOnGitHub('data/schools.json')">
+                                    <i class="ph ph-pencil"></i> Edit
+                                </button>
+                            </li>
+                            <li
+                                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span><i class="ph ph-file-json"></i> data/published-results.json</span>
+                                <button class="btn btn-sm btn-secondary"
+                                    onclick="DeploymentManager.editOnGitHub('data/published-results.json')">
+                                    <i class="ph ph-pencil"></i> Edit
+                                </button>
+                            </li>
+                            <li
+                                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span><i class="ph ph-file-html"></i> pages/admin/dashboard.html</span>
+                                <button class="btn btn-sm btn-secondary"
+                                    onclick="DeploymentManager.editOnGitHub('pages/admin/dashboard.html')">
+                                    <i class="ph ph-pencil"></i> Edit
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.8rem; color: #888;">
+                        <i class="ph ph-info"></i> Clicking Edit opens the GitHub web editor. Changes will require a
+                        manual commit in the GitHub UI.
+                    </p>
                 </div>
             </div>
         </div>
@@ -2591,63 +2634,72 @@
            JSON-Safe School Manager 
            ============================== */
         const SchoolManager = (function () {
-            let DATA = { activeSchool: null, schools: [] };
+            const STORAGE_KEY = 'mhm_v2_schools_data';
+            let DATA = { schools: [], activeSchool: null };
 
-            // 1. LOAD FROM JSON SOURCE OF TRUTH
-            async function load() {
-                try {
-                    console.log('📡 SchoolManager: Fetching schools.json...');
-                    const res = await fetch('../../data/schools.json?v=' + Date.now());
-                    if (!res.ok) throw new Error("Could not load schools.json");
+            function load() {
+                console.log('📡 SchoolManager: Initializing with persistence...');
 
-                    DATA = await res.json();
-                    console.log('✅ Schools loaded:', DATA.schools.length);
-
-                    renderSelector();
-
-                    // Restore active school state
-                    if (DATA.activeSchool) {
-                        switchSchool(DATA.activeSchool);
+                // 1. Try local cache first
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    try {
+                        DATA = JSON.parse(saved);
+                        finalizeLoad();
+                        return;
+                    } catch (e) {
+                        console.error("Cache corrupted:", e);
                     }
-                } catch (err) {
-                    console.error("❌ School Load Error:", err);
-                    // Fallback placeholder
-                    DATA.schools = [{ id: 'school1', name: 'Global Excellence Academy', address: '123 Main St', principal: 'Dr. Smith', session: '2025-2026' }];
-                    renderSelector();
-                    if (DATA.schools.length > 0) switchSchool(DATA.schools[0].id);
+                }
+
+                // 2. Fallback to data file
+                fetch('../../data/schools.json?v=' + Date.now())
+                    .then(res => res.json())
+                    .then(json => {
+                        DATA = json;
+                        saveToCache();
+                        finalizeLoad();
+                    })
+                    .catch(err => {
+                        console.warn("No schools.json found, starting fresh.");
+                        finalizeLoad();
+                    });
+            }
+
+            function finalizeLoad() {
+                renderList();
+                renderSelector();
+
+                if (!DATA.activeSchool && DATA.schools.length > 0) {
+                    DATA.activeSchool = DATA.schools[0].id;
+                }
+
+                if (DATA.activeSchool) {
+                    switchSchool(DATA.activeSchool);
                 }
             }
 
-            function renderSelector() {
-                const selector = document.getElementById('active-school-selector');
-                if (!selector) return;
-
-                selector.innerHTML = '';
-                DATA.schools.forEach(school => {
-                    const option = document.createElement('option');
-                    option.value = school.id;
-                    option.textContent = school.name;
-                    if (school.id === DATA.activeSchool) option.selected = true;
-                    selector.appendChild(option);
-                });
+            function saveToCache() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
             }
 
-            function switchSchool(schoolId) {
-                const school = DATA.schools.find(s => s.id === schoolId);
+            function switchSchool(id) {
+                const school = DATA.schools.find(s => s.id === id);
                 if (!school) return;
 
-                DATA.activeSchool = schoolId;
-                window.ACTIVE_SCHOOL_ID = schoolId;
+                DATA.activeSchool = id;
+                saveToCache();
 
-                // Sync UI: Sidebar Logo
+                const selector = document.getElementById('active-school-selector');
+                if (selector) selector.value = id;
+
+                localStorage.setItem('activeSchoolId', id);
+
+                // Sidebar Logo Sync
                 const logoEl = document.querySelector('.sidebar-logo');
                 if (logoEl) logoEl.innerHTML = `<i class="ph-bold ph-shield-check"></i> ADMIN - ${school.name}`;
 
-                // Sync UI: Selector
-                const selector = document.getElementById('active-school-selector');
-                if (selector) selector.value = schoolId;
-
-                // Sync UI: Profile Grid
+                // Profile Grid Sync
                 const schoolsGrid = document.getElementById('schools-grid');
                 if (schoolsGrid) {
                     schoolsGrid.innerHTML = `
@@ -2676,21 +2728,15 @@
                     `;
                 }
 
-                window.dispatchEvent(new CustomEvent('schoolChanged', { detail: { schoolId: schoolId, name: school.name } }));
+                window.dispatchEvent(new CustomEvent('schoolChanged', { detail: { schoolId: id, name: school.name } }));
             }
 
-            // --- EDITOR LOGIC ---
-            function openEditor() {
-                const modal = document.getElementById('school-editor');
-                if (modal) {
-                    modal.style.display = 'flex';
-                    renderList();
-                }
-            }
+            function renderSelector() {
+                const selector = document.getElementById('active-school-selector');
+                if (!selector) return;
 
-            function closeEditor() {
-                const modal = document.getElementById('school-editor');
-                if (modal) modal.style.display = 'none';
+                selector.innerHTML = DATA.schools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+                if (DATA.activeSchool) selector.value = DATA.activeSchool;
             }
 
             function renderList() {
@@ -2701,16 +2747,17 @@
                     ? DATA.schools.map(s => `
                         <li style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <span style="font-weight: 500;">${s.name}</span>
-                            <button class="btn btn-mini btn-danger" onclick="SchoolManager.removeSchool('${s.id}')">
-                                <i class="ph ph-trash"></i>
-                            </button>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-mini btn-secondary" onclick="SchoolManager.switchSchool('${s.id}')" title="Set Active"><i class="ph ph-check"></i></button>
+                                <button class="btn btn-mini btn-danger" onclick="SchoolManager.removeSchool('${s.id}')"><i class="ph ph-trash"></i></button>
+                            </div>
                         </li>
                     `).join('')
                     : '<div style="padding: 20px; color: #666; text-align: center;">No schools found.</div>';
             }
 
             function addSchool() {
-                const input = document.getElementById('school-name-input');
+                const input = document.getElementById('newSchoolName');
                 const name = input ? input.value.trim() : '';
                 if (!name) return alert('Please enter a school name.');
 
@@ -2727,9 +2774,11 @@
                 DATA.activeSchool = newId;
 
                 input.value = '';
+                saveToCache();
                 renderList();
                 renderSelector();
                 switchSchool(newId);
+                hideAddForm();
             }
 
             function removeSchool(id) {
@@ -2739,6 +2788,7 @@
                     DATA.activeSchool = DATA.schools.length > 0 ? DATA.schools[0].id : null;
                 }
 
+                saveToCache();
                 renderList();
                 renderSelector();
                 if (DATA.activeSchool) {
@@ -2771,10 +2821,9 @@
                         const imported = JSON.parse(e.target.result);
                         if (!imported.schools || !Array.isArray(imported.schools)) throw new Error("Invalid format");
                         DATA = imported;
-                        renderList();
-                        renderSelector();
-                        if (DATA.activeSchool) switchSchool(DATA.activeSchool);
-                        alert('Schools loaded successfully from file!');
+                        saveToCache();
+                        finalizeLoad();
+                        alert('Schools restored from JSON!');
                     } catch (err) {
                         alert("Error loading JSON: " + err.message);
                     }
@@ -2782,7 +2831,12 @@
                 reader.readAsText(file);
             }
 
-            return { load, switchSchool, openEditor, closeEditor, addSchool, removeSchool, downloadJSON, uploadJSON };
+            function openEditor() { switchPanel('schools'); }
+            function closeEditor() { switchPanel('overview'); }
+            function showAddForm() { document.getElementById('add-school-modal').style.display = 'flex'; }
+            function hideAddForm() { document.getElementById('add-school-modal').style.display = 'none'; }
+
+            return { load, switchSchool, openEditor, closeEditor, addSchool, removeSchool, downloadJSON, uploadJSON, showAddForm, hideAddForm };
         })();
         /* ==============================
            GitHub Deployment Manager 
@@ -2850,7 +2904,12 @@
                 }
             }
 
-            return { init };
+            function editOnGitHub(filePath) {
+                const baseUrl = "https://github.com/Sareef6235/muhsinu2/edit/main/";
+                window.open(baseUrl + filePath, "_blank");
+            }
+
+            return { init, editOnGitHub };
         })();
 
         // Panel Sync Logic
