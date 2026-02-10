@@ -2774,6 +2774,62 @@
 
             return { load, switchSchool, openEditor, closeEditor, addSchoolFromInput, removeSchool, downloadJSON, uploadJSON, editProfile, saveProfile, cancelProfile };
         })();
+
+        /* ===============================
+           RESULTS MANAGEMENT MODULE
+        ================================ */
+        window.ResultsManagement = {
+            syncing: false,
+
+            handleSyncClick() {
+                if (this.syncing) return;
+
+                this.syncing = true;
+
+                const btn = document.getElementById("btn-sync-results");
+                const examsEl = document.getElementById("results-exams-count");
+                const studentsEl = document.getElementById("results-total-count");
+                const lastSyncEl = document.getElementById("results-last-sync");
+
+                if (!btn) {
+                    console.error("Sync button not found");
+                    return;
+                }
+
+                // 🔄 UI: Syncing state
+                btn.innerHTML = `<i class="ph-bold ph-spinner-gap ph-spin"></i> SYNCING...`;
+                btn.style.opacity = "0.7";
+                btn.style.cursor = "not-allowed";
+
+                // 🧠 Simulated preview + sync (STATIC SITE SAFE)
+                setTimeout(() => {
+
+                    // Example dynamic data (replace later with real JSON count)
+                    const publishedExams = Math.floor(Math.random() * 5) + 1;
+                    const totalStudents = Math.floor(Math.random() * 500) + 50;
+                    const now = new Date();
+
+                    if (examsEl) examsEl.textContent = publishedExams;
+                    if (studentsEl) studentsEl.textContent = totalStudents;
+                    if (lastSyncEl) {
+                        lastSyncEl.textContent =
+                            now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+
+                    // ✅ Restore button
+                    btn.innerHTML = `<i class="ph-bold ph-arrows-clockwise"></i> PREVIEW & SYNC`;
+                    btn.style.opacity = "1";
+                    btn.style.cursor = "pointer";
+
+                    this.syncing = false;
+
+                    // Optional feedback
+                    console.log("Results synced successfully");
+
+                }, 1200); // smooth professional delay
+            }
+        };
+
         /* ==============================
            GitHub Deployment Manager 
            ============================== */
