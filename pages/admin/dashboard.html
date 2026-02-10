@@ -1124,9 +1124,16 @@
                     <div>
                         <div class="form-group">
                             <label class="form-label">1. Target Exam</label>
-                            <select id="results-exam-select" class="form-input" style="padding: 12px; font-size: 1rem;">
-                                <!-- Populated by JS -->
-                            </select>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select id="results-exam-select" class="form-input"
+                                    style="flex: 1; padding: 12px; font-size: 1rem;">
+                                    <option value="">-- Select Exam Profile --</option>
+                                </select>
+                                <button class="btn btn-sm btn-secondary" onclick="ExamManager.openEditor()"
+                                    title="Add / Manage Exams">
+                                    <i class="ph-bold ph-pencil-simple"></i> Manage
+                                </button>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -1423,12 +1430,80 @@
                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3>School Profiles</h3>
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-sm btn-primary" onclick="SchoolManager.toggleAddForm()">
-                        <i class="ph-bold ph-plus"></i> Add New School
+                    <button class="btn btn-sm btn-primary" onclick="SchoolManager.openEditor()">
+                        <i class="ph-bold ph-plus"></i> Add / Manage Schools
                     </button>
-                    <button class="btn btn-sm btn-danger" onclick="SchoolManager.removeActiveSchool()">
-                        <i class="ph-bold ph-trash"></i> Remove School
-                    </button>
+                </div>
+            </div>
+
+            <!-- School Editor Modal -->
+            <div id="school-editor" class="modal-overlay" style="display: none;">
+                <div class="glass-card" style="max-width: 500px; width: 90%; padding: 30px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <h4 style="color: var(--primary-color); margin: 0;">School Manager</h4>
+                        <button class="btn btn-mini" onclick="SchoolManager.closeEditor()"
+                            style="background: rgba(255,255,255,0.05);">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <div style="display: flex; gap: 10px;">
+                            <input id="school-name-input" class="form-input" placeholder="Enter school name..."
+                                style="flex: 1;">
+                            <button class="btn btn-primary" onclick="SchoolManager.addSchool()">
+                                <i class="ph ph-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; max-height: 250px; overflow-y: auto; margin-bottom: 25px;">
+                        <ul id="school-list" style="list-style: none; padding: 0; margin: 0;">
+                            <!-- Filled by JS -->
+                        </ul>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--glass-border); padding-top: 25px;">
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <button class="btn btn-md btn-secondary"
+                                style="width: 100%; border-color: var(--primary-color);"
+                                onclick="SchoolManager.downloadJSON()">
+                                <i class="ph ph-download-simple"></i> Download updated schools.json
+                            </button>
+                            <div
+                                style="display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(0, 243, 255, 0.05); border-radius: 8px; border: 1px dashed var(--primary-color);">
+                                <input type="file" id="school-json-upload" accept=".json" style="display: none;"
+                                    onchange="SchoolManager.uploadJSON(this)">
+                                <label for="school-json-upload"
+                                    style="cursor: pointer; color: var(--primary-color); font-size: 0.9rem; font-weight: 500; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                    <i class="ph ph-upload-simple"></i> Restore/Upload schools.json
+                                </label>
+                            </div>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 0.75rem; color: #888; line-height: 1.4;">
+                            <i class="ph ph-info"></i> <b>How to save:</b> Add/remove schools, click <b>Download</b>,
+                            replace the file in your repository, and push to GitHub.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add School Modal (Inline) -->
+            <div id="add-school-modal" class="modal-overlay" style="display: none;">
+                <div class="glass-card" style="max-width: 400px; padding: 25px;">
+                    <h4 style="margin-bottom: 20px; color: var(--primary-color);">Add New School</h4>
+                    <div class="form-group">
+                        <label class="form-label">School Name</label>
+                        <input type="text" id="newSchoolName" class="form-input" placeholder="Enter school name...">
+                    </div>
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <button class="btn btn-primary" style="flex: 1;" onclick="SchoolManager.addSchool()">Add
+                            School</button>
+                        <button class="btn btn-secondary" style="flex: 1;"
+                            onclick="SchoolManager.hideAddForm()">Cancel</button>
+                    </div>
                 </div>
             </div>
 
@@ -1495,11 +1570,11 @@
                         <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
                             <i class="ph-bold ph-github-logo"></i> GitHub Connection
                         </h3>
-                        <p style="color: #888; margin-top: 5px;">Linked to: <code
+                        <p style="color: #888; margin-top: 5px;">Linked to: <code id="git-repo-name"
                                 style="color: var(--primary-color);">Sareef6235/muhsinu2</code></p>
                     </div>
-                    <div class="git-status-badge">
-                        <i class="ph-bold ph-check-circle"></i> Connected & Up to Date
+                    <div class="git-status-badge" id="git-status-badge">
+                        <i class="ph-bold ph-check-circle"></i> Connected
                     </div>
                 </div>
 
@@ -1509,7 +1584,7 @@
                         style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
                         <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;">
                             Branch</p>
-                        <p style="font-weight: 600;"><i class="ph ph-git-branch"></i> main</p>
+                        <p style="font-weight: 600;" id="git-branch-name"><i class="ph ph-git-branch"></i> main</p>
                     </div>
                     <div
                         style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
@@ -1521,8 +1596,25 @@
                     <div
                         style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
                         <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;">Last
-                            Published</p>
-                        <p style="font-weight: 600;" id="last-deploy-time">Just now</p>
+                            Commit Date</p>
+                        <p style="font-weight: 600;" id="last-deploy-time">Fetching...</p>
+                    </div>
+                </div>
+
+                <div
+                    style="margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 10px;">Latest
+                        Commit Information</p>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div id="git-author-avatar"
+                            style="width: 40px; height: 40px; background: #333; border-radius: 50%; overflow: hidden;">
+                        </div>
+                        <div>
+                            <p style="font-weight: 600; margin-bottom: 2px;" id="git-last-commit">"Update dashboard
+                                logic"</p>
+                            <p style="font-size: 0.85rem; color: #888;">by <span id="git-last-author"
+                                    style="color: var(--primary-color);">Sareef6235</span></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1743,6 +1835,55 @@
             style="max-height: 80vh; max-width: 90%; border-radius: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
         <button onclick="document.getElementById('img-modal').style.display='none'"
             style="margin-top: 20px; padding: 10px 30px; background: #333; color: #fff; border: none; border-radius: 50px; cursor: pointer;">Close</button>
+    </div>
+
+    <!-- Exam Manager Editor Modal -->
+    <div id="exam-editor-modal" class="modal-overlay" style="display: none;">
+        <div class="glass-card" style="max-width: 500px; width: 95%; padding: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <i class="ph-bold ph-exam" style="color: var(--primary-color);"></i> Exam Manager
+                </h3>
+                <button onclick="ExamManager.closeEditor()" class="btn btn-mini btn-subtle"><i
+                        class="ph-bold ph-x"></i></button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Add New Exam Profile</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="exam-manager-name-input" placeholder="e.g. Annual Exam 2026"
+                        class="form-input" style="flex: 1;">
+                    <button class="btn btn-sm btn-primary" onclick="ExamManager.addExam()">Add</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <label class="form-label">Existing Exams</label>
+                <div id="exam-list-container"
+                    style="max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border); padding: 10px;">
+                    <ul id="exam-list" style="margin: 0; padding: 0; list-style: none;">
+                        <li style="color: #666; text-align: center; padding: 20px;">No exams found.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div
+                style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--glass-border); display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn btn-md btn-secondary" onclick="ExamManager.downloadJSON()" style="width: 100%;">
+                    <i class="ph-bold ph-download-simple"></i> Download
+                </button>
+                <div style="position: relative; overflow: hidden; display: inline-block; width: 100%;">
+                    <button class="btn btn-md btn-secondary" style="width: 100%;">
+                        <i class="ph-bold ph-upload-simple"></i> Upload
+                    </button>
+                    <input type="file" accept=".json" onchange="ExamManager.uploadJSON(this)"
+                        style="position: absolute; font-size: 100px; right: 0; top: 0; opacity: 0; cursor: pointer;">
+                </div>
+            </div>
+
+            <button class="btn btn-md btn-subtle" onclick="ExamManager.closeEditor()"
+                style="width: 100%; margin-top: 15px;">Close Editor</button>
+        </div>
     </div>
 
     <!-- Scripts -->
@@ -2134,8 +2275,180 @@
     <script src="../../assets/js/storage-manager.js"></script>
     <script src="../../assets/js/academic-year-manager.js"></script>
     <script src="../../assets/js/exam-type-manager.js"></script>
-    <script src="../../assets/js/exam-manager.js"></script>
+    <!-- <script src="../../assets/js/exam-manager.js"></script> -->
     <script src="../../assets/js/results-management.js"></script>
+
+    <script>
+        /**
+         * Dynamic ExamManager Replacement
+         * Supports in-memory management with localStorage persistence and JSON I/O
+         */
+        window.ExamManager = (() => {
+            const STORAGE_KEY = 'mhm_v2_exams_data';
+            let DATA = { exams: [] };
+
+            function load() {
+                // 1. Try LocalStorage first (for persistence across refreshes)
+                const cached = localStorage.getItem(STORAGE_KEY);
+                if (cached) {
+                    try {
+                        DATA = JSON.parse(cached);
+                        console.log('✅ ExamManager: Loaded from LocalStorage');
+                        renderSelect();
+                        return;
+                    } catch (e) { console.error('Error parsing cached exams:', e); }
+                }
+
+                // 2. Fallback to server file
+                fetch('/data/exams.json')
+                    .then(res => res.json())
+                    .then(json => {
+                        DATA = json;
+                        saveToCache();
+                        renderSelect();
+                    })
+                    .catch(() => {
+                        console.warn('No exams.json found on server, starting fresh.');
+                        renderSelect();
+                    });
+            }
+
+            function saveToCache() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
+                window.dispatchEvent(new CustomEvent('examsUpdated', { detail: DATA.exams }));
+            }
+
+            function renderSelect() {
+                const sel = document.getElementById('results-exam-select');
+                if (!sel) return;
+
+                sel.innerHTML = '<option value="">-- Select Exam Profile --</option>';
+                DATA.exams.forEach(ex => {
+                    const o = document.createElement('option');
+                    o.value = ex.id;
+                    o.textContent = ex.name;
+                    sel.appendChild(o);
+                });
+
+                // Compatibility for other modules
+                if (typeof refreshAllExamSelectors === 'function') {
+                    // We don't want recursion, but we might want to update other selectors if they exist
+                }
+            }
+
+            function openEditor() {
+                document.getElementById('exam-editor-modal').style.display = 'flex';
+                renderList();
+            }
+
+            function closeEditor() {
+                document.getElementById('exam-editor-modal').style.display = 'none';
+            }
+
+            function renderList() {
+                const ul = document.getElementById('exam-list');
+                if (!ul) return;
+
+                if (DATA.exams.length === 0) {
+                    ul.innerHTML = '<li style="color: #666; text-align: center; padding: 20px;">No exams found.</li>';
+                    return;
+                }
+
+                ul.innerHTML = '';
+                DATA.exams.forEach(ex => {
+                    const li = document.createElement('li');
+                    li.style.display = 'flex';
+                    li.style.justifyContent = 'space-between';
+                    li.style.alignItems = 'center';
+                    li.style.padding = '10px 15px';
+                    li.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                    li.innerHTML = `
+                        <span style="font-weight: 500;">${ex.name}</span>
+                        <button class="btn btn-mini btn-danger" onclick="ExamManager.removeExam('${ex.id}')">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    `;
+                    ul.appendChild(li);
+                });
+            }
+
+            function addExam() {
+                const nameInput = document.getElementById('exam-manager-name-input');
+                const name = nameInput.value.trim();
+                if (!name) return alert('Enter exam name');
+
+                const id = 'ex_' + Date.now();
+                DATA.exams.push({ id, name, isActive: true });
+
+                saveToCache();
+                renderSelect();
+                renderList();
+                nameInput.value = '';
+            }
+
+            function removeExam(id) {
+                if (!confirm("Are you sure you want to remove this exam profile?")) return;
+                DATA.exams = DATA.exams.filter(e => e.id !== id);
+                saveToCache();
+                renderSelect();
+                renderList();
+            }
+
+            function downloadJSON() {
+                const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'exams.json';
+                a.click();
+            }
+
+            function uploadJSON(input) {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        if (json && Array.isArray(json.exams)) {
+                            DATA = json;
+                            saveToCache();
+                            renderSelect();
+                            renderList();
+                            alert('exams.json loaded successfully');
+                        } else {
+                            alert('Invalid JSON format. Expected { exams: [] }');
+                        }
+                    } catch (err) {
+                        alert('Error parsing JSON file.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // Compatibility/External Interface
+            return {
+                init: load,
+                load,
+                openEditor,
+                closeEditor,
+                addExam,
+                removeExam,
+                downloadJSON,
+                uploadJSON,
+                getAll: () => DATA.exams,
+                getActive: () => DATA.exams.filter(e => e.isActive),
+                refresh: renderSelect,
+                // Compatibility for legacy dashboard buttons
+                toggleAddForm: openEditor,
+                saveExam: addExam
+            };
+        })();
+
+        // Re-bind init
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof ExamManager !== 'undefined' && ExamManager.init) ExamManager.init();
+        });
+    </script>
 
     <!-- Static Publisher for GitHub Pages Deployment -->
     <script src="dashboard.js"></script>
@@ -2298,9 +2611,10 @@
                     }
                 } catch (err) {
                     console.error("❌ School Load Error:", err);
-                    // Fallback placeholder if file missing
-                    DATA.schools = [{ id: 'school1', name: 'Global Excellence Academy' }];
+                    // Fallback placeholder
+                    DATA.schools = [{ id: 'school1', name: 'Global Excellence Academy', address: '123 Main St', principal: 'Dr. Smith', session: '2025-2026' }];
                     renderSelector();
+                    if (DATA.schools.length > 0) switchSchool(DATA.schools[0].id);
                 }
             }
 
@@ -2309,13 +2623,6 @@
                 if (!selector) return;
 
                 selector.innerHTML = '';
-                const placeholder = document.createElement('option');
-                placeholder.value = 'default';
-                placeholder.disabled = true;
-                placeholder.selected = !DATA.activeSchool;
-                placeholder.textContent = 'Select School';
-                selector.appendChild(placeholder);
-
                 DATA.schools.forEach(school => {
                     const option = document.createElement('option');
                     option.value = school.id;
@@ -2332,45 +2639,218 @@
                 DATA.activeSchool = schoolId;
                 window.ACTIVE_SCHOOL_ID = schoolId;
 
-                // UI Updates
+                // Sync UI: Sidebar Logo
                 const logoEl = document.querySelector('.sidebar-logo');
-                if (logoEl) logoEl.innerHTML = `<i class="ph-bold ph-shield-check"></i> ${school.name}`;
+                if (logoEl) logoEl.innerHTML = `<i class="ph-bold ph-shield-check"></i> ADMIN - ${school.name}`;
 
+                // Sync UI: Selector
+                const selector = document.getElementById('active-school-selector');
+                if (selector) selector.value = schoolId;
+
+                // Sync UI: Profile Grid
                 const schoolsGrid = document.getElementById('schools-grid');
                 if (schoolsGrid) {
                     schoolsGrid.innerHTML = `
                         <div class="glass-card" style="padding: 30px; animation: fadeIn 0.4s ease;">
-                            <h3 style="color: var(--primary-color); margin-bottom: 20px;">${school.name}</h3>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                                <h3 style="color: var(--primary-color); margin: 0;">${school.name}</h3>
+                                <div style="font-size: 0.75rem; color: #888; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 50px;">
+                                    ID: ${school.id}
+                                </div>
+                            </div>
                             <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
                                 <div>
                                     <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Address</div>
-                                    <p style="font-size: 1.1rem; font-weight: 500;">${school.address || 'Static Address'}</p>
+                                    <p style="font-size: 1.1rem; font-weight: 500;">${school.address || 'Not set'}</p>
                                 </div>
                                 <div>
                                     <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Principal</div>
-                                    <p style="font-size: 1.1rem; font-weight: 500;">${school.principal || 'Static Principal'}</p>
+                                    <p style="font-size: 1.1rem; font-weight: 500;">${school.principal || 'Not set'}</p>
+                                </div>
+                                <div>
+                                    <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Active Session</div>
+                                    <p style="font-size: 1.1rem; font-weight: 500; color: var(--primary-color);">${school.session || '2025-2026'}</p>
                                 </div>
                             </div>
                         </div>
                     `;
                 }
 
-                // Dispatch Global Event
-                window.dispatchEvent(new CustomEvent('schoolChanged', {
-                    detail: { schoolId: schoolId, name: school.name }
-                }));
+                window.dispatchEvent(new CustomEvent('schoolChanged', { detail: { schoolId: schoolId, name: school.name } }));
             }
 
-            // Persistence Shims (Static site limitation: no POST)
-            function toggleAddForm() {
-                alert("STATIC SITE: To add a school, update 'data/schools.json' and push to GitHub.");
+            // --- EDITOR LOGIC ---
+            function openEditor() {
+                const modal = document.getElementById('school-editor');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    renderList();
+                }
             }
 
-            function removeActiveSchool() {
-                alert("STATIC SITE: To remove a school, update 'data/schools.json' and push to GitHub.");
+            function closeEditor() {
+                const modal = document.getElementById('school-editor');
+                if (modal) modal.style.display = 'none';
             }
 
-            return { load, switchSchool, toggleAddForm, removeActiveSchool };
+            function renderList() {
+                const ul = document.getElementById('school-list');
+                if (!ul) return;
+
+                ul.innerHTML = DATA.schools.length
+                    ? DATA.schools.map(s => `
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <span style="font-weight: 500;">${s.name}</span>
+                            <button class="btn btn-mini btn-danger" onclick="SchoolManager.removeSchool('${s.id}')">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </li>
+                    `).join('')
+                    : '<div style="padding: 20px; color: #666; text-align: center;">No schools found.</div>';
+            }
+
+            function addSchool() {
+                const input = document.getElementById('school-name-input');
+                const name = input ? input.value.trim() : '';
+                if (!name) return alert('Please enter a school name.');
+
+                const newId = 'school_' + Date.now();
+                const newSchool = {
+                    id: newId,
+                    name: name,
+                    address: 'Enter address...',
+                    principal: 'Enter principal name...',
+                    session: '2025-2026'
+                };
+
+                DATA.schools.push(newSchool);
+                DATA.activeSchool = newId;
+
+                input.value = '';
+                renderList();
+                renderSelector();
+                switchSchool(newId);
+            }
+
+            function removeSchool(id) {
+                if (!confirm("Are you sure you want to remove this school?")) return;
+                DATA.schools = DATA.schools.filter(s => s.id !== id);
+                if (DATA.activeSchool === id) {
+                    DATA.activeSchool = DATA.schools.length > 0 ? DATA.schools[0].id : null;
+                }
+
+                renderList();
+                renderSelector();
+                if (DATA.activeSchool) {
+                    switchSchool(DATA.activeSchool);
+                } else {
+                    location.reload();
+                }
+            }
+
+            function downloadJSON() {
+                const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'schools.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert("Updated schools.json downloaded! Replace data/schools.json in your repo to save permanently.");
+            }
+
+            function uploadJSON(input) {
+                const file = input.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = e => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        if (!imported.schools || !Array.isArray(imported.schools)) throw new Error("Invalid format");
+                        DATA = imported;
+                        renderList();
+                        renderSelector();
+                        if (DATA.activeSchool) switchSchool(DATA.activeSchool);
+                        alert('Schools loaded successfully from file!');
+                    } catch (err) {
+                        alert("Error loading JSON: " + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            return { load, switchSchool, openEditor, closeEditor, addSchool, removeSchool, downloadJSON, uploadJSON };
+        })();
+        /* ==============================
+           GitHub Deployment Manager 
+           ============================== */
+        const DeploymentManager = (function () {
+            const REPO = "Sareef6235/muhsinu2";
+            const API_URL = `https://api.github.com/repos/${REPO}`;
+
+            async function init() {
+                console.log('📡 DeploymentManager: Initializing live status...');
+                try {
+                    await Promise.all([
+                        fetchRepoInfo(),
+                        fetchLatestCommit()
+                    ]);
+                } catch (err) {
+                    console.warn("⚠️ GitHub API Error:", err);
+                    document.getElementById('git-status-badge').innerHTML = '<i class="ph ph-warning-circle"></i> API Offline';
+                    document.getElementById('git-status-badge').style.color = '#ff4757';
+                    document.getElementById('git-status-badge').style.background = 'rgba(255, 71, 87, 0.1)';
+                }
+            }
+
+            async function fetchRepoInfo() {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("Repo fetch failed");
+                const data = await res.json();
+
+                const repoNameEl = document.getElementById('git-repo-name');
+                if (repoNameEl) repoNameEl.textContent = data.full_name;
+
+                const branchEl = document.getElementById('git-branch-name');
+                if (branchEl) branchEl.innerHTML = `<i class="ph ph-git-branch"></i> ${data.default_branch}`;
+            }
+
+            async function fetchLatestCommit() {
+                const res = await fetch(`${API_URL}/commits/main`);
+                if (!res.ok) throw new Error("Commit fetch failed");
+                const data = await res.json();
+
+                // 1. Commit Message
+                const commitEl = document.getElementById('git-last-commit');
+                if (commitEl) commitEl.textContent = `"${data.commit.message.split('\n')[0]}"`;
+
+                // 2. Author info
+                const authorEl = document.getElementById('git-last-author');
+                if (authorEl) authorEl.textContent = data.commit.author.name;
+
+                const avatarEl = document.getElementById('git-author-avatar');
+                if (avatarEl && data.author) {
+                    avatarEl.innerHTML = `<img src="${data.author.avatar_url}" style="width:100%; height:100%; object-fit:cover;">`;
+                }
+
+                // 3. Date
+                const dateEl = document.getElementById('last-deploy-time');
+                if (dateEl) {
+                    const commitDate = new Date(data.commit.author.date);
+                    dateEl.textContent = commitDate.toLocaleString();
+                }
+
+                // 4. Status Update
+                const badge = document.getElementById('git-status-badge');
+                if (badge) {
+                    badge.innerHTML = '<i class="ph-bold ph-check-circle"></i> Connected & Syncing';
+                }
+            }
+
+            return { init };
         })();
 
         // Panel Sync Logic
@@ -2398,7 +2878,10 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', SchoolManager.load);
+        document.addEventListener('DOMContentLoaded', () => {
+            SchoolManager.load();
+            DeploymentManager.init();
+        });
     </script>
 </body>
 
