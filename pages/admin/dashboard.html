@@ -12,6 +12,10 @@
     <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Pro Exam Cert Deps -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="../../assets/js/pro-exam.js"></script>
     <style>
         :root {
             --primary-color: #00f3ff;
@@ -191,23 +195,15 @@
         /* Panels */
         .panel {
             display: none;
-            animation: fadeIn 0.4s easeOut;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all .25s ease;
         }
 
         .panel.active {
             display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Data Table */
@@ -473,6 +469,14 @@
             <div class="nav-item" onclick="switchPanel('schools', this)">
                 <i class="ph ph-buildings"></i> School Profiles
             </div>
+            <div class="nav-item" onclick="switchPanel('pro-exam', this)">
+                <i class="ph-bold ph-student"></i> Pro Exam
+            </div>
+
+            <div class="nav-item" onclick="window.location.href='pro-exam.html'">
+                <i class="ph-bold ph-desktop"></i> Pro Console
+            </div>
+
         </nav>
 
         <div style="padding: 20px;">
@@ -675,51 +679,150 @@
 
         <!-- 6. NEWS MANAGEMENT PANEL -->
         <div id="news" class="panel">
-            <div class="panel-header"
-                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3>News & Notice Board</h3>
-                <button class="btn btn-sm btn-primary" onclick="showNewsEditor()">
-                    <i class="ph-bold ph-plus"></i> Add New
-                </button>
+            <style>
+                .news-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 25px;
+                }
+
+                .news-card {
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 16px;
+                    padding: 20px;
+                }
+
+                .news-editor-view {
+                    display: none;
+                    margin-top: 20px;
+                    background: rgba(0, 0, 0, 0.2);
+                    padding: 25px;
+                    border-radius: 16px;
+                    border: 1px solid var(--glass-border);
+                }
+
+                .editor-actions {
+                    margin-top: 25px;
+                    display: flex;
+                    gap: 15px;
+                }
+
+                .lang-group {
+                    margin-top: 15px;
+                    padding: 15px;
+                    background: rgba(255, 255, 255, 0.02);
+                    border-radius: 12px;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                }
+
+                .lang-label {
+                    font-size: 0.75rem;
+                    text-transform: uppercase;
+                    color: var(--primary-color);
+                    margin-bottom: 10px;
+                    display: block;
+                    letter-spacing: 1px;
+                }
+            </style>
+
+            <div class="news-header">
+                <div>
+                    <h3 style="margin: 0;">📰 News & Notice Board</h3>
+                    <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">Manage multilingual announcements via
+                        JSON.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div style="position: relative;">
+                        <input type="file" id="news-json-upload" accept=".json" style="display: none;"
+                            onchange="NewsCMS.loadJSON(this)">
+                        <button class="btn btn-sm btn-secondary"
+                            onclick="document.getElementById('news-json-upload').click()">
+                            <i class="ph-bold ph-upload-simple"></i> Load JSON
+                        </button>
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="NewsCMS.showEditor()">
+                        <i class="ph-bold ph-plus"></i> Add News
+                    </button>
+                </div>
             </div>
-            <div id="news-list-view">
+
+            <!-- News List View -->
+            <div id="news-list-view" class="news-card">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>Title</th>
+                            <th>Title (EN)</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="news-table-body"></tbody>
+                    <tbody id="news-table-body">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 40px; color: #666;">
+                                <i class="ph ph-file-dashed"
+                                    style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                                Upload a <b>news.json</b> file to start managing content.
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
-            <!-- Legacy Exam Form Removed -->
-            <div id="news-editor-view" style="display: none;">
-                <h4 style="margin-bottom: 20px; color: var(--primary-color);">Editor</h4>
-                <input type="hidden" id="news-id">
-                <div class="form-group">
-                    <label class="form-label">Title</label>
-                    <input type="text" id="news-title" class="form-input" placeholder="Enter news title...">
+
+            <!-- News Editor View -->
+            <div id="news-editor-view" class="news-editor-view">
+                <h4 style="margin-top: 0; color: var(--primary-color);">✍ News Editor</h4>
+                <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Multilingual support: Fill the
+                    respective
+                    language blocks.</p>
+
+                <input type="hidden" id="news-edit-id">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" id="news-date" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select id="news-status" class="form-input">
+                            <option value="Published">Published</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Urgent">Urgent</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Short Description</label>
-                    <input type="text" id="news-short" class="form-input" placeholder="Brief summary...">
+
+                <!-- Multilingual Title Sections -->
+                <div class="lang-group">
+                    <span class="lang-label">English (en)</span>
+                    <input type="text" id="news-title-en" class="form-input" placeholder="English Title">
+                    <textarea id="news-content-en" class="form-input" style="margin-top: 10px; min-height: 100px;"
+                        placeholder="English Content"></textarea>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Full Content (HTML Supported)</label>
-                    <textarea id="news-content" class="form-input" style="height: 200px;"
-                        placeholder="Write full article..."></textarea>
+
+                <div class="lang-group">
+                    <span class="lang-label">Malayalam (ml)</span>
+                    <input type="text" id="news-title-ml" class="form-input" placeholder="Malayalam Title">
+                    <textarea id="news-content-ml" class="form-input" style="margin-top: 10px; min-height: 100px;"
+                        placeholder="Malayalam Content"></textarea>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Featured Image</label>
-                    <input type="file" id="news-image" accept="image/*" class="form-input">
-                    <div id="news-img-preview" style="margin-top: 10px; max-width: 200px;"></div>
+
+                <div class="lang-group">
+                    <span class="lang-label">Arabic (ar)</span>
+                    <input type="text" id="news-title-ar" class="form-input" placeholder="Arabic Title">
+                    <textarea id="news-content-ar" class="form-input" style="margin-top: 10px; min-height: 100px;"
+                        placeholder="Arabic Content"></textarea>
                 </div>
-                <div style="display: flex; gap: 15px;">
-                    <button class="btn btn-sm btn-primary" onclick="saveNewsItem()">Publish / Update</button>
-                    <button class="btn btn-sm btn-secondary" onclick="hideNewsEditor()">Cancel</button>
+
+                <div class="editor-actions">
+                    <button class="btn btn-sm btn-primary" onclick="NewsCMS.saveItem()">
+                        <i class="ph-bold ph-check"></i> Save to Memory
+                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="NewsCMS.hideEditor()">Cancel</button>
                 </div>
             </div>
         </div>
@@ -1243,38 +1346,132 @@
             </div>
 
             <div class="school-list-grid" id="schools-grid">
-                <!-- JS populated -->
-                <div style="text-align: center; width: 100%; padding: 40px; color: #666;">
-                    Loading schools...
+                <!-- Data is injected by Selecting a school from the sidebar dropdown -->
+                <div
+                    style="text-align: center; width: 100%; padding: 40px; color: #666; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px dashed #333;">
+                    <i class="ph ph-buildings" style="font-size: 3rem; display: block; margin-bottom: 10px;"></i>
+                    <p>Select a school from the sidebar to view its profile.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. PRO EXAM PANEL -->
+        <div id="pro-exam" class="panel">
+            <div class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Pro Exam Controller</h3>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-sm btn-secondary" onclick="ProExam.refresh()">
+                        <i class="ph-bold ph-arrows-clockwise"></i> Refresh
+                    </button>
                 </div>
             </div>
 
-            <!-- Add School Modal -->
-            <div id="school-add-modal" class="modal-overlay" style="display: none;">
-                <div class="glass-card" style="max-width: 500px; width: 90%; padding: 30px; position:relative;">
-                    <button onclick="SchoolManager.toggleAddForm()"
-                        style="position: absolute; top: 15px; right: 15px; background:none; border:none; color:#fff; cursor:pointer;">
-                        <i class="ph-bold ph-x"></i>
-                    </button>
-                    <h3 style="margin-bottom: 20px;">Add School Profile</h3>
+            <!-- TAB NAVIGATION -->
+            <div class="pro-tabs"
+                style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
+                <button class="btn btn-sm btn-subtle active" onclick="ProExam.tab('dashboard', this)">Dashboard</button>
+                <button class="btn btn-sm btn-subtle" onclick="ProExam.tab('upload', this)">Upload Results</button>
+                <button class="btn btn-sm btn-subtle" onclick="ProExam.tab('certificate', this)">Certificate</button>
+                <button class="btn btn-sm btn-subtle" onclick="ProExam.tab('signature', this)">Signature</button>
+                <button class="btn btn-sm btn-subtle" onclick="ProExam.tab('analytics', this)">Analytics</button>
+            </div>
 
-                    <div class="form-group">
-                        <label class="form-label">School Name</label>
-                        <input type="text" id="school-name-input" class="form-input" placeholder="e.g. Metric Campus">
+            <!-- TAB CONTENT -->
+            <div id="pro-tab-dashboard" class="pro-tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="pe-total">0</div>
+                        <div class="stat-label">Total Students</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">School Code</label>
-                        <input type="text" id="school-code-input" class="form-input" placeholder="e.g. MHMV-M">
+                    <div class="stat-card">
+                        <div class="stat-value" id="pe-pass" style="color: #2ed573;">0%</div>
+                        <div class="stat-label">Pass Percentage</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Address / Location</label>
-                        <input type="text" id="school-address-input" class="form-input" placeholder="City, State">
-                    </div>
+                </div>
+            </div>
 
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px;"
-                        onclick="SchoolManager.saveSchool(this)">
-                        Save Profile
-                    </button>
+            <div id="pro-tab-upload" class="pro-tab-content" style="display:none;">
+                <div
+                    style="background: var(--glass-bg); padding: 25px; border-radius: 16px; border: 1px solid var(--glass-border);">
+                    <h4 style="margin-top:0;">Upload `published-results.json`</h4>
+                    <input type="file" accept=".json" class="form-input" onchange="ProExam.handleUpload(this)">
+                    <p id="pe-upload-status" style="margin-top: 10px; color: #888;"></p>
+                </div>
+                <h4 style="margin-top: 30px;">Data Preview</h4>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Roll</th>
+                                <th>Name</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pe-preview-tbody">
+                            <tr>
+                                <td colspan="4" style="text-align:center;">No Data</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="pro-tab-certificate" class="pro-tab-content" style="display:none;">
+                <div
+                    style="background: var(--glass-bg); padding: 25px; border-radius: 16px; border: 1px solid var(--glass-border); max-width: 600px;">
+                    <div class="form-group">
+                        <label class="form-label">Institution Name</label>
+                        <input type="text" id="pe-school" class="form-input" value="Global Excellence Academy">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Certificate Title</label>
+                        <input type="text" id="pe-title" class="form-input" value="Official Statement of Marks">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Academic Session</label>
+                        <input type="text" id="pe-session" class="form-input" value="2025-2026">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Language</label>
+                        <select id="pe-lang" class="form-input">
+                            <option value="en">English</option>
+                            <option value="mal">Malayalam</option>
+                            <option value="ar">Arabic</option>
+                            <option value="ta">Tamil</option>
+                            <option value="kn">Kannada</option>
+                            <option value="te">Telugu</option>
+                            <option value="ur">Urdu</option>
+                            <option value="hi">Hindi</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="ProExam.saveConfig()">Update Configuration</button>
+                </div>
+            </div>
+
+            <div id="pro-tab-signature" class="pro-tab-content" style="display:none;">
+                <div
+                    style="background: var(--glass-bg); padding: 25px; border-radius: 16px; border: 1px solid var(--glass-border); max-width: 500px;">
+                    <h4 style="margin-top:0;">Principal Signature</h4>
+                    <input type="file" accept="image/*" class="form-input" onchange="ProExam.handleSignature(this)">
+                    <div style="margin-top: 20px; text-align: center;">
+                        <img id="pe-sig-preview" src=""
+                            style="max-height: 80px; border: 1px dashed #555; padding: 10px; display:none;">
+                    </div>
+                </div>
+            </div>
+
+            <div id="pro-tab-analytics" class="pro-tab-content" style="display:none;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="pe-top">0</div>
+                        <div class="stat-label">Top Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pe-avg">0</div>
+                        <div class="stat-label">Average Score</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1540,65 +1737,68 @@
         // --- Managers are now linked externally at the bottom of the page ---
 
         function switchPanel(panelId, el) {
-            const targetPanel = document.getElementById(panelId);
-            if (!targetPanel) {
-                console.error(`Panel with ID "${panelId}" not found.`);
-                return;
-            }
+            // Remove active from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
 
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            targetPanel.classList.add('active');
+            // Add active to clicked nav
+            if (el) el.classList.add('active');
 
-            // Update title
-            const titleMap = {
-                'overview': 'Dashboard',
-                'dashboard': 'Dashboard', // ID Mapping fallback
-                'fee': 'Fee Verification',
-                'creative': 'Creative Submissions',
-                'bookings': 'Tuition Bookings',
-                'subjects': 'Tuition Subjects',
-                'news': 'News CMS',
-                'results': 'Results Management',
-                'analytics': 'Performance Analytics'
-            };
-            const titleEl = document.getElementById('panel-title');
-            if (titleEl) titleEl.textContent = titleMap[panelId] || 'Admin Dashboard';
+            // Hide all panels
+            document.querySelectorAll('.panel').forEach(panel => {
+                panel.classList.remove('active');
+                panel.style.display = 'none';
+            });
 
-            if (el) {
-                // FIXED: Only target sidebar nav items, not all .nav-item elements (which includes edit/delete buttons)
-                document.querySelectorAll('.sidebar nav .nav-item').forEach(n => n.classList.remove('active'));
+            // Show selected panel
+            const targetElement = document.getElementById(panelId);
+            if (targetElement) {
+                targetElement.style.display = 'block';
+                // Small delay to trigger CSS transition
+                setTimeout(() => targetElement.classList.add('active'), 10);
 
-                // Only add active class if the clicked element is actually a nav item in the sidebar
-                if (el.classList.contains('nav-item') && el.closest('.sidebar')) {
-                    el.classList.add('active');
+                // Update title mapping
+                const titleMap = {
+                    'overview': 'Dashboard',
+                    'fee': 'Fee Verification',
+                    'creative': 'Creative Submissions',
+                    'bookings': 'Tuition Bookings',
+                    'subjects': 'Tuition Subjects',
+                    'news': 'News & Updates',
+                    'results': 'Results Management',
+                    'analytics': 'Performance Analytics',
+                    'schools': 'School Profiles',
+                    'pro-exam': 'Pro Exam Controller'
+                };
+                const titleEl = document.getElementById('panel-title');
+                if (titleEl) titleEl.textContent = titleMap[panelId] || 'Admin Dashboard';
+
+                // Sidebar mobile toggle
+                if (window.innerWidth <= 992 && typeof toggleSidebar === 'function') toggleSidebar();
+
+                // Specific panel initializations
+                try {
+                    if (panelId === 'fee' && typeof renderFeeTable === 'function') renderFeeTable();
+                    if (panelId === 'creative' && typeof renderCreativeTable === 'function') renderCreativeTable();
+                    if (panelId === 'news' && typeof renderNewsTable === 'function') renderNewsTable();
+                    if (panelId === 'bookings' && typeof renderBookingsTable === 'function') renderBookingsTable();
+                    if (panelId === 'subjects' && typeof renderSubjectsTable === 'function') renderSubjectsTable();
+
+                    if (panelId === 'results') {
+                        if (window.AcademicYearManager) AcademicYearManager.init();
+                        if (window.ExamTypeManager) ExamTypeManager.init();
+                        if (window.ExamManager) ExamManager.init();
+                        if (window.ResultsManagement) ResultsManagement.init();
+                        if (typeof populateExamFormDropdowns === 'function') populateExamFormDropdowns();
+                    }
+
+                    if (panelId === 'pro-exam' && window.ProExam) ProExam.init();
+                } catch (err) {
+                    console.error("Panel Init Error:", err);
                 }
-            }
-            if (window.innerWidth <= 992 && typeof toggleSidebar === 'function') toggleSidebar();
-
-            // Refresh panel data safely
-            try {
-                if (panelId === 'fee' && typeof renderFeeTable === 'function') renderFeeTable();
-                if (panelId === 'creative' && typeof renderCreativeTable === 'function') renderCreativeTable();
-                if (panelId === 'news' && typeof renderNewsTable === 'function') renderNewsTable();
-                if (panelId === 'bookings' && typeof renderBookingsTable === 'function') renderBookingsTable();
-                if (panelId === 'subjects' && typeof renderSubjectsTable === 'function') renderSubjectsTable();
-                if (panelId === 'schools' && typeof SchoolManager !== 'undefined') SchoolManager.renderManagementGrid();
-
-                if (panelId === 'results') {
-                    try { if (window.AcademicYearManager && typeof AcademicYearManager.init === 'function') AcademicYearManager.init(); } catch (e) { console.error("AYM Init Fail", e); }
-                    try { if (window.ExamTypeManager && typeof ExamTypeManager.init === 'function') ExamTypeManager.init(); } catch (e) { console.error("ETM Init Fail", e); }
-                    try { if (window.ExamManager && typeof ExamManager.init === 'function') ExamManager.init(); } catch (e) { console.error("EM Init Fail", e); }
-                    try { if (window.ResultsManagement && typeof ResultsManagement.init === 'function') ResultsManagement.init(); } catch (e) { console.error("RM Init Fail", e); }
-
-                    // FIXED: Populate dropdowns when panel opens
-                    populateExamFormDropdowns();
-                }
-
-                if (panelId === 'analytics') {
-                    if (window.AnalyticsEngine && typeof AnalyticsEngine.syncDropdown === 'function') AnalyticsEngine.syncDropdown();
-                }
-            } catch (err) {
-                console.error("Critical Panel Init Error:", err);
+            } else {
+                console.warn('Panel not found:', panelId);
             }
         }
 
@@ -1707,6 +1907,11 @@
         updateStats();
     </script>
 
+    <script>
+        // Initialize dashboard stats
+        if (typeof updateStats === 'function') updateStats();
+    </script>
+
     <!-- Results System Extension Modules -->
     <script src="../../assets/js/storage-manager.js"></script>
     <script src="../../assets/js/academic-year-manager.js"></script>
@@ -1718,16 +1923,225 @@
     <script src="dashboard.js"></script>
 
     <script src="../../assets/js/analytics-engine.js"></script>
-    <script type="module">
-        import SchoolManager from '../../assets/js/school-manager.js';
+    <script>
+        /* ==============================
+           News CMS (JSON Memory-only)
+           ============================== */
+        const NewsCMS = (function () {
+            let newsData = [];
 
-        // Wait for DOM to be ready
-        window.addEventListener('DOMContentLoaded', () => {
-            SchoolManager.init();
-        });
+            function loadJSON(input) {
+                const file = input.files[0];
+                if (!file) return;
 
-        // Expose to window for onclick handlers
-        window.SchoolManager = SchoolManager;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    try {
+                        newsData = JSON.parse(e.target.result);
+                        renderTable();
+                        console.log("✅ News JSON Loaded:", newsData);
+                    } catch (err) {
+                        alert("Error parsing News JSON. Please check file format.");
+                        console.error(err);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            function renderTable() {
+                const tbody = document.getElementById('news-table-body');
+                if (!tbody) return;
+
+                if (newsData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color: #666;">No news items.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = newsData.map((n, idx) => `
+                    <tr>
+                        <td>${n.date}</td>
+                        <td style="font-weight: 500;">${n.title.en}</td>
+                        <td><span class="status-badge ${n.status.toLowerCase()}">${n.status}</span></td>
+                        <td>
+                            <button class="btn btn-mini btn-secondary" onclick="NewsCMS.editItem(${idx})"><i class="ph ph-pencil"></i></button>
+                            <button class="btn btn-mini btn-danger" onclick="NewsCMS.deleteItem(${idx})"><i class="ph ph-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            function showEditor(idx = null) {
+                document.getElementById('news-list-view').style.display = 'none';
+                document.getElementById('news-editor-view').style.display = 'block';
+
+                if (idx !== null) {
+                    const item = newsData[idx];
+                    document.getElementById('news-edit-id').value = idx;
+                    document.getElementById('news-date').value = item.date;
+                    document.getElementById('news-status').value = item.status;
+                    document.getElementById('news-title-en').value = item.title.en;
+                    document.getElementById('news-content-en').value = item.content.en;
+                    document.getElementById('news-title-ml').value = item.title.ml || '';
+                    document.getElementById('news-content-ml').value = item.content.ml || '';
+                    document.getElementById('news-title-ar').value = item.title.ar || '';
+                    document.getElementById('news-content-ar').value = item.content.ar || '';
+                } else {
+                    document.getElementById('news-edit-id').value = '';
+                    document.getElementById('news-date').value = new Date().toISOString().split('T')[0];
+                    document.getElementById('news-status').value = 'Published';
+                    document.getElementById('news-title-en').value = '';
+                    document.getElementById('news-content-en').value = '';
+                    document.getElementById('news-title-ml').value = '';
+                    document.getElementById('news-content-ml').value = '';
+                    document.getElementById('news-title-ar').value = '';
+                    document.getElementById('news-content-ar').value = '';
+                }
+            }
+
+            function hideEditor() {
+                document.getElementById('news-editor-view').style.display = 'none';
+                document.getElementById('news-list-view').style.display = 'block';
+            }
+
+            function saveItem() {
+                const idx = document.getElementById('news-edit-id').value;
+                const newItem = {
+                    id: idx !== '' ? newsData[idx].id : Date.now(),
+                    date: document.getElementById('news-date').value,
+                    status: document.getElementById('news-status').value,
+                    title: {
+                        en: document.getElementById('news-title-en').value,
+                        ml: document.getElementById('news-title-ml').value,
+                        ar: document.getElementById('news-title-ar').value
+                    },
+                    content: {
+                        en: document.getElementById('news-content-en').value,
+                        ml: document.getElementById('news-content-ml').value,
+                        ar: document.getElementById('news-content-ar').value
+                    }
+                };
+
+                if (idx !== '') {
+                    newsData[idx] = newItem;
+                } else {
+                    newsData.push(newItem);
+                }
+
+                hideEditor();
+                renderTable();
+                console.log("Memory updated. To persist, export the data (Optional: Add export button)");
+            }
+
+            function deleteItem(idx) {
+                if (confirm("Delete this news item?")) {
+                    newsData.splice(idx, 1);
+                    renderTable();
+                }
+            }
+
+            return {
+                loadJSON,
+                renderTable,
+                showEditor,
+                hideEditor,
+                saveItem,
+                editItem: showEditor,
+                deleteItem
+            };
+        })();
+
+        /* ==============================
+           School Manager & Profiles Sync
+           ============================== */
+        const SchoolManager = (function () {
+            // Memory-only school list (No backend, no localStorage)
+            // Edit this array to add/remove schools.
+            const schools = [
+                { id: 'school1', name: 'Global Excellence Academy', address: '123 Main St', principal: 'Dr. Smith', session: '2025-2026' },
+                { id: 'school2', name: 'Future Leaders School', address: '456 Park Ave', principal: 'Ms. Johnson', session: '2025-2026' },
+                { id: 'school3', name: 'Sunrise International', address: '789 Sunrise Blvd', principal: 'Mr. Ali', session: '2025-2026' }
+            ];
+
+            // Populate the dropdown selector
+            function populateDropdown() {
+                const selector = document.getElementById('active-school-selector');
+                if (!selector) return;
+
+                selector.innerHTML = ''; // Clear existing options
+                const placeholder = document.createElement('option');
+                placeholder.value = 'default';
+                placeholder.disabled = true;
+                placeholder.selected = true;
+                placeholder.textContent = 'Select School';
+                selector.appendChild(placeholder);
+
+                schools.forEach(school => {
+                    const option = document.createElement('option');
+                    option.value = school.id;
+                    option.textContent = school.name;
+                    selector.appendChild(option);
+                });
+            }
+
+            // Called on dropdown change to synchronize profiles
+            function switchSchool(schoolId) {
+                const school = schools.find(s => s.id === schoolId);
+                if (!school) return;
+
+                console.log('Switched to school:', school.name);
+
+                // Update "School Profiles" panel dynamically
+                // We use the existing schools-grid ID for consistency
+                const schoolsGrid = document.getElementById('schools-grid');
+                if (schoolsGrid) {
+                    schoolsGrid.innerHTML = `
+                        <div class="glass-card" style="padding: 30px; animation: fadeIn 0.4s ease;">
+                            <h3 style="color: var(--primary-color); margin-bottom: 20px;">${school.name}</h3>
+                            <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                                <div>
+                                    <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Address</div>
+                                    <p style="font-size: 1.1rem; font-weight: 500;">${school.address}</p>
+                                </div>
+                                <div>
+                                    <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Principal</div>
+                                    <p style="font-size: 1.1rem; font-weight: 500;">${school.principal}</p>
+                                </div>
+                                <div>
+                                    <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Academic Session</div>
+                                    <p style="font-size: 1.1rem; font-weight: 500;">${school.session}</p>
+                                </div>
+                            </div>
+                            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--glass-border); color: #888; font-size: 0.85rem;">
+                                <i class="ph-bold ph-info"></i> Note: This data is stored in memory and resets on page reload.
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Dispatch event for other modules (Results, Analytics, etc.)
+                window.dispatchEvent(new CustomEvent('schoolChanged', { detail: { id: schoolId, name: school.name } }));
+
+                // Automatically switch to the School Profiles panel if it's not active
+                const panelNav = document.querySelector(`.nav-item[onclick*="'schools'"]`);
+                if (panelNav && !panelNav.classList.contains('active')) {
+                    if (typeof switchPanel === 'function') {
+                        switchPanel('schools', panelNav);
+                    }
+                }
+            }
+
+            // Initialize dropdown on page load
+            document.addEventListener('DOMContentLoaded', populateDropdown);
+
+            // Return public interface (maintaining compatibility with existing dashboard refs)
+            return {
+                switchSchool,
+                populateDropdown,
+                init: populateDropdown,
+                toggleAddForm: () => alert("Direct management is disabled. Please modify the JS array in the code to add/remove schools."),
+                renderManagementGrid: () => populateDropdown()
+            };
+        })();
     </script>
 </body>
 
