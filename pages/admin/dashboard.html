@@ -1086,6 +1086,92 @@
                         <div id="results-sync-info"
                             style="margin-top: 15px; font-size: 0.75rem; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; color: #888; display: none;">
                         </div>
+
+                        <!-- NEW: Upload Published Results Section -->
+                        <div style="margin-top: 25px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+                            <h5 style="color: #fff; margin-bottom: 10px; font-size: 0.9rem;">Upload Published Results
+                            </h5>
+
+                            <!-- Hidden File Input -->
+                            <input type="file" id="published-results-upload" accept=".json" style="display: none;"
+                                onchange="handlePublishedResultsUpload(this)">
+
+                            <!-- Custom Button -->
+                            <button class="btn btn-sm btn-subtle"
+                                onclick="document.getElementById('published-results-upload').click()"
+                                style="width: 100%; border: 1px dashed #555; color: #ccc;">
+                                <i class="ph-bold ph-upload-simple"></i> Select JSON File
+                            </button>
+
+                            <!-- Status Text -->
+                            <div id="published-results-status"
+                                style="margin-top: 10px; font-size: 0.8rem; color: #888; text-align: center;">
+                                No file uploaded
+                            </div>
+                        </div>
+
+                        <script>
+                            // --- GLOBAL STORE (Memory Bridge) ---
+                            window.PublishedResultsStore = {
+                                data: null,
+                                updatedAt: null
+                            };
+
+                            // --- FILE UPLOAD LOGIC ---
+                            window.handlePublishedResultsUpload = function (input) {
+                                const file = input.files[0];
+                                const statusEl = document.getElementById('published-results-status');
+
+                                // Reset status
+                                statusEl.textContent = "Processing...";
+                                statusEl.style.color = "#888";
+
+                                if (!file) {
+                                    statusEl.textContent = "No file uploaded";
+                                    return;
+                                }
+
+                                // 1. Validate Filename
+                                if (file.name !== "published-results.json") {
+                                    statusEl.innerHTML = "<i class='ph-bold ph-warning'></i> Error: Must be 'published-results.json'";
+                                    statusEl.style.color = "#ff4444";
+                                    console.error("Invalid filename:", file.name);
+                                    input.value = ''; // Reset input
+                                    return;
+                                }
+
+                                const reader = new FileReader();
+
+                                reader.onload = function (e) {
+                                    try {
+                                        // 2. Parse JSON
+                                        const json = JSON.parse(e.target.result);
+
+                                        // 3. Save to Global Store
+                                        window.PublishedResultsStore.data = json;
+                                        window.PublishedResultsStore.updatedAt = new Date().toISOString();
+
+                                        statusEl.innerHTML = "<i class='ph-bold ph-check-circle'></i> File loaded successfully";
+                                        statusEl.style.color = "#2ed573";
+
+                                        console.log("✅ PublishedResultsStore Updated:", window.PublishedResultsStore);
+
+                                    } catch (err) {
+                                        statusEl.innerHTML = "<i class='ph-bold ph-warning'></i> Error: Invalid JSON content";
+                                        statusEl.style.color = "#ff4444";
+                                        console.error("JSON Parse Error:", err);
+                                    }
+                                };
+
+                                reader.onerror = function () {
+                                    statusEl.textContent = "Error reading file";
+                                    statusEl.style.color = "#ff4444";
+                                    console.error("FileReader Error");
+                                };
+
+                                reader.readAsText(file);
+                            };
+                        </script>
                     </div>
                 </div>
             </div>
