@@ -1,0 +1,26 @@
+{
+    "activeSchool": "school1",
+    "schools": [
+        {
+            "id": "school1",
+            "name": "Global Excellence Academy",
+            "address": "123 Main St",
+            "principal": "Dr. Smith",
+            "session": "2025-2026"
+        },
+        {
+            "id": "school2",
+            "name": "Future Leaders School",
+            "address": "456 Park Ave",
+            "principal": "Ms. Johnson",
+            "session": "2025-2026"
+        },
+        {
+            "id": "school3",
+            "name": "Sunrise International",
+            "address": "789 Sunrise Blvd",
+            "principal": "Mr. Ali",
+            "session": "2025-2026"
+        }
+    ]
+}
