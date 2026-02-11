@@ -3061,18 +3061,17 @@
         });
     </script>
     <script>
-        /* SAFE INIT - INJECTED FIX */
+        /* SAFE INIT - INJECTED FIX (PUBLIC CSV MODE) */
         window.ResultsManagement = window.ResultsManagement || {};
         window.StaticPublisher = window.StaticPublisher || {};
 
-        /* GLOBAL STATE */
         ResultsManagement.state = {
             synced: false,
             syncing: false
         };
 
         /* =========================
-           PREVIEW & SYNC
+           PREVIEW & SYNC (PUBLIC CSV)
         ========================= */
         ResultsManagement.handleSyncClick = async function () {
 
@@ -3098,36 +3097,42 @@
 
             btn.innerHTML = "<i class='ph-bold ph-spinner-gap ph-spin'></i> Syncing...";
             btn.style.pointerEvents = "none";
-
-            statusBox.innerHTML = "Connecting to Google Sheet...";
-            statusBox.style.display = "block"; // Ensure visible
+            statusBox.innerHTML = "Fetching public sheet...";
+            statusBox.style.display = "block";
 
             try {
 
-                const API_KEY = "YOUR_GOOGLE_API_KEY"; // replace
-                const range = "Sheet1!A2:Z"; // data rows
+                /* PUBLIC CSV EXPORT URL (NO API KEY) */
+                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
 
-                // Real Fetch
-                const res = await fetch(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${API_KEY}`
-                );
+                const response = await fetch(url);
 
-                if (!res.ok) throw new Error("Sheet connection failed (Check API Key / Sheet ID)");
+                if (!response.ok) {
+                    throw new Error("Sheet not public or invalid Sheet ID");
+                }
 
-                const data = await res.json();
-                const rows = data.values || [];
+                const csvText = await response.text();
 
-                const studentCount = rows.length;
+                if (!csvText || csvText.length < 10) {
+                    throw new Error("Empty sheet data");
+                }
+
+                const rows = csvText.trim().split("\n").map(r => r.split(","));
+
+                if (rows.length <= 1) {
+                    throw new Error("No student data found");
+                }
+
+                const studentCount = rows.length - 1; // exclude header
                 const examCount = 1;
 
-                // Update stats
                 document.getElementById("results-exams-count").textContent = examCount;
                 document.getElementById("results-total-count").textContent = studentCount;
                 document.getElementById("results-last-sync").textContent =
                     new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
                 statusBox.innerHTML =
-                    "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync successful!";
+                    "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync successful (Public Mode)";
 
                 this.state.synced = true;
 
@@ -3148,20 +3153,15 @@
         };
 
 
-        /* =========================
-           STATIC PUBLISH
-        ========================= */
+        /* STATIC PUBLISH CONTROL */
         StaticPublisher.publish = function () {
 
-            if (!ResultsManagement.state || !ResultsManagement.state.synced) {
+            if (!ResultsManagement.state.synced) {
                 alert("Please complete Sync before publishing.");
                 return;
             }
 
             alert("Static Site Published Successfully ✅");
-
-            // optional: reset sync requirement
-            // ResultsManagement.state.synced = false;
         };
     </script>
 </body>
