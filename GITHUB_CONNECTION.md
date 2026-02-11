@@ -4,7 +4,7 @@
 
 **Repository**: `git@github.com:Sareef6235/muhsinu2.git`  
 **Branch**: `main`  
-**Latest Commit**: `e83eab6`  
+**Latest Commit**: `b452ede`  
 **Status**: ✅ Fully synced with GitHub
 
 ---
@@ -17,10 +17,11 @@
   - Standardized JSON structure with a mandatory `meta` block.
   - Added strict client-side publishing filters in `results.js`.
   - Optimized `StaticPublisher` in `dashboard.js` for production-grade JSON exports.
-- **Sync Button Fix (Simulation Mode)**:
-  - Injected safe simulation script into `dashboard.html`.
-  - Overridden `handleSyncClick`, `fetchHeaders`, `togglePublish`, `openEditor`, `publish`.
-  - Ensures all UI states (spinner, toggle, alerts) work without backend.
+- **Live Google Sheets Sync**:
+  - Replaced simulated header fetching with **Live Google Sheets API v4**.
+  - Added `populateMappingUI` for dynamic column generation.
+  - Added `YOUR_GOOGLE_API_KEY` placeholder for user configuration.
+  - Retained simulation mode for other features (Sync, Publish).
 
 
 
