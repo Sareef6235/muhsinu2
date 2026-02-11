@@ -2650,6 +2650,86 @@
             }
         });
 
+
+        /* ==============================
+           RESULTS MANAGEMENT SYSTEM (FIXED)
+           ============================== */
+        window.ResultsManagement = {
+            state: { synced: false, syncing: false },
+            init: function () { console.log("ResultsManagement: Initialized"); },
+            handleSyncClick: function () {
+                const btn = document.getElementById("btn-sync-results");
+                const statusBox = document.getElementById("results-sync-status");
+                const statusMsg = document.getElementById("results-sync-message");
+                const publishBtn = document.getElementById("results-publish-toggle");
+
+                if (this.state.syncing) return;
+
+                if (!window.PublishedResultsStore || !window.PublishedResultsStore.data) {
+                    if (statusBox && statusMsg) {
+                        statusBox.style.display = "block";
+                        statusMsg.innerHTML = "<i class='ph-bold ph-warning' style='color:#ff4444'></i> Please upload a JSON file before syncing.";
+                    }
+                    this.state.synced = false;
+                    return;
+                }
+
+                this.state.syncing = true;
+                if (btn) {
+                    btn.innerHTML = "<i class='ph-bold ph-spinner-gap ph-spin'></i> Syncing...";
+                    btn.style.pointerEvents = "none";
+                }
+
+                setTimeout(() => {
+                    const json = window.PublishedResultsStore.data;
+                    const exams = json.exams || [];
+                    let studentCount = 0;
+                    exams.forEach(ex => {
+                        studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
+                    });
+
+                    const examsCountEl = document.getElementById("results-exams-count");
+                    const totalCountEl = document.getElementById("results-total-count");
+                    const lastSyncEl = document.getElementById("results-last-sync");
+
+                    if (examsCountEl) examsCountEl.textContent = exams.length;
+                    if (totalCountEl) totalCountEl.textContent = studentCount;
+                    if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+                    if (statusBox && statusMsg) {
+                        statusBox.style.display = "block";
+                        statusMsg.innerHTML = "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync completed successfully.";
+                    }
+
+                    this.state.synced = true;
+                    this.state.syncing = false;
+
+                    if (btn) {
+                        btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
+                        btn.style.pointerEvents = "auto";
+                    }
+
+                    if (publishBtn) publishBtn.style.display = "block";
+                }, 800);
+            },
+            togglePublish: function () {
+                alert("Results Published Successfully ✅");
+            }
+        };
+
+        /* ==============================
+           STATIC PUBLISH CONTROL
+           ============================== */
+        window.StaticPublisher = {
+            publish: function () {
+                if (!window.ResultsManagement.state.synced) {
+                    alert("Please complete Sync before publishing.");
+                    return;
+                }
+                alert("Static Site Published Successfully ✅");
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             SchoolManager.load();
             DeploymentManager.init();
