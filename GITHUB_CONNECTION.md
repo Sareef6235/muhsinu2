@@ -17,11 +17,11 @@
   - Standardized JSON structure with a mandatory `meta` block.
   - Added strict client-side publishing filters in `results.js`.
   - Optimized `StaticPublisher` in `dashboard.js` for production-grade JSON exports.
-- **Live Google Sheets Sync**:
-  - Replaced simulated header fetching with **Live Google Sheets API v4**.
-  - Added `populateMappingUI` for dynamic column generation.
-  - Added `YOUR_GOOGLE_API_KEY` placeholder for user configuration.
-  - Retained simulation mode for other features (Sync, Publish).
+- **Fetch Headers Fix**:
+  - Implemented strict `fetchHeaders` logic with `async/await`.
+  - Added `populateHeaders` helper function.
+  - Fixed map-select dropdowns and subject container population.
+  - Uses `YOUR_GOOGLE_API_KEY` placeholder.
 
 
 
