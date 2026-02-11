@@ -15,6 +15,7 @@
     <!-- Pro Exam Cert Deps -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="../../assets/js/pro-exam.js"></script>
     <style>
         :root {
@@ -412,60 +413,199 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        /* --- ADMIN LOGIN SYSTEM --- */
-        .login-input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            padding: 15px;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 1.1rem;
-            text-align: center;
-            letter-spacing: 5px;
-            margin-bottom: 20px;
-            outline: none;
-            transition: 0.3s;
+        /* --- CREATIVE STUDIO UI --- */
+        .studio-container {
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            gap: 20px;
+            height: calc(100vh - 250px);
+            min-height: 600px;
         }
 
-        .login-input:focus {
-            border-color: var(--primary-color);
+        .studio-sidebar {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .canvas-viewport {
+            background: #000;
+            border-radius: 20px;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            position: relative;
+            border: 1px solid var(--glass-border);
+        }
+
+        #design-canvas {
+            background: #111;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+
+        .canvas-element {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            padding: 10px;
+            border: 1px solid transparent;
+            transition: border 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: pre-wrap;
+        }
+
+        .canvas-element:hover {
+            border: 1px dashed var(--primary-color);
+        }
+
+        .canvas-element.selected {
+            border: 2px solid var(--primary-color);
             background: rgba(0, 243, 255, 0.05);
         }
 
-        .btn-login {
-            width: 100%;
-            padding: 15px;
+        .element-controls {
+            position: absolute;
+            top: -35px;
+            right: 0;
+            display: none;
+            gap: 5px;
             background: var(--primary-color);
-            border: none;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .canvas-element.selected .element-controls {
+            display: flex;
+        }
+
+        .studio-tool-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 12px;
             border-radius: 12px;
-            color: #000;
-            font-weight: 700;
-            font-size: 1rem;
             cursor: pointer;
-            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            transition: 0.2s;
         }
 
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);
+        .studio-tool-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
         }
 
-        @keyframes animate-fade-up {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+        .prop-group {
+            margin-bottom: 20px;
+        }
+
+        .prop-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--primary-color);
+            border: 2px solid #000;
+            bottom: -6px;
+            right: -6px;
+            cursor: nwse-resize;
+            border-radius: 50%;
+        }
+
+        @media (max-width: 1200px) {
+            .studio-container {
+                grid-template-columns: 1fr;
+                height: auto;
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .studio-sidebar {
+                height: 300px;
+            }
+
+            .canvas-viewport {
+                height: 500px;
             }
         }
+    </style>
 
-        .animate-fade-up {
-            animation: animate-fade-up 0.4s ease forwards;
-        }
+    /* --- ADMIN LOGIN SYSTEM --- */
+    .login-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    padding: 15px;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1.1rem;
+    text-align: center;
+    letter-spacing: 5px;
+    margin-bottom: 20px;
+    outline: none;
+    transition: 0.3s;
+    }
+
+    .login-input:focus {
+    border-color: var(--primary-color);
+    background: rgba(0, 243, 255, 0.05);
+    }
+
+    .btn-login {
+    width: 100%;
+    padding: 15px;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    }
+
+    .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);
+    }
+
+    @keyframes animate-fade-up {
+    from {
+    opacity: 0;
+    transform: translateY(20px);
+    }
+
+    to {
+    opacity: 1;
+    transform: translateY(0);
+    }
+    }
+
+    .animate-fade-up {
+    animation: animate-fade-up 0.4s ease forwards;
+    }
     </style>
 </head>
 
@@ -641,21 +781,157 @@
             </div>
         </div>
 
-        <!-- 3. CREATIVE APPROVAL PANEL -->
+        <!-- 3. CREATIVE STUDIO PANEL -->
         <div id="creative" class="panel">
             <div class="panel-header"
-                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3>Creative Submissions</h3>
-                <div style="display: flex; gap: 15px;">
-                    <select class="form-input" style="width: 200px;" onchange="renderCreativeTable(this.value)">
-                        <option value="all">All Items</option>
-                        <option value="pending">Pending Only</option>
-                    </select>
+                style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin:0; color: var(--primary-color);">Creative Studio</h3>
+                    <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">Pro Design Engine for School Content</p>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <div id="canvas-size-indicator"
+                        style="font-size: 0.8rem; color: #888; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 50px; border: 1px solid var(--glass-border); display: flex; align-items: center;">
+                        1080 x 1080 (Instagram Post)
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="CreativeStudio.exportPNG()">
+                        <i class="ph-bold ph-download-simple"></i> Export PNG
+                    </button>
                 </div>
             </div>
-            <div class="grid" id="creative-grid"
-                style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; display: grid;">
-                <!-- Filled by JS -->
+
+            <div class="studio-container">
+                <!-- Left Sidebar: Tools -->
+                <div class="studio-sidebar">
+                    <div class="prop-group">
+                        <span class="prop-label">Add Elements</span>
+                        <div style="display: grid; gap: 10px;">
+                            <button class="studio-tool-btn" onclick="CreativeStudio.addText()">
+                                <i class="ph-bold ph-text-aa"></i> Add Text
+                            </button>
+                            <button class="studio-tool-btn"
+                                onclick="document.getElementById('studio-logo-upload').click()">
+                                <i class="ph-bold ph-image"></i> Add Logo
+                            </button>
+                            <input type="file" id="studio-logo-upload" hidden accept="image/*"
+                                onchange="CreativeStudio.handleLogoUpload(this)">
+                        </div>
+                    </div>
+
+                    <div class="prop-group">
+                        <span class="prop-label">Background</span>
+                        <div style="display: grid; gap: 10px;">
+                            <input type="color" id="studio-bg-color" class="form-input"
+                                style="height: 40px; padding: 2px;" onchange="CreativeStudio.updateBgColor(this.value)">
+                            <button class="studio-tool-btn"
+                                onclick="document.getElementById('studio-bg-upload').click()">
+                                <i class="ph-bold ph-picture-in-picture"></i> Upload BG Image
+                            </button>
+                            <input type="file" id="studio-bg-upload" hidden accept="image/*"
+                                onchange="CreativeStudio.handleBgUpload(this)">
+                        </div>
+                    </div>
+
+                    <div class="prop-group">
+                        <span class="prop-label">Presets & Templates</span>
+                        <select id="studio-preset-select" class="form-input"
+                            onchange="CreativeStudio.setPreset(this.value)">
+                            <option value="post">Instagram Post (1:1)</option>
+                            <option value="story">Instagram Story (9:16)</option>
+                            <option value="banner">Web Banner (3:1)</option>
+                            <option value="a4">A4 Document (Print)</option>
+                        </select>
+                        <button class="studio-tool-btn" style="margin-top:10px;"
+                            onclick="CreativeStudio.applyTemplate('admission')">
+                            <i class="ph-bold ph-template"></i> Admission Poster
+                        </button>
+                    </div>
+
+                    <div class="prop-group">
+                        <span class="prop-label">AI Headline Generator</span>
+                        <button class="studio-tool-btn" onclick="CreativeStudio.generateAIHeadline()">
+                            <i class="ph-bold ph-sparkle" style="color: var(--primary-color);"></i> Magic Headline
+                        </button>
+                    </div>
+
+                    <div style="margin-top:auto; display: grid; gap: 10px;">
+                        <button class="btn btn-sm btn-secondary" style="width:100%;"
+                            onclick="CreativeStudio.saveDraft()">
+                            <i class="ph-bold ph-floppy-disk"></i> Save Draft
+                        </button>
+                        <button class="btn btn-sm btn-danger" style="width:100%;"
+                            onclick="CreativeStudio.resetCanvas()">
+                            <i class="ph-bold ph-trash"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Center: Canvas Viewport -->
+                <div class="canvas-viewport" id="canvas-viewport">
+                    <div id="design-canvas" style="width: 500px; height: 500px;">
+                        <!-- Draggable elements go here -->
+                    </div>
+                </div>
+
+                <!-- Right Sidebar: Properties -->
+                <div class="studio-sidebar" id="properties-panel">
+                    <div id="no-selection-msg" style="text-align: center; color: #444; margin-top: 100px;">
+                        <i class="ph ph-cursor-click" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                        Select an element to edit properties
+                    </div>
+
+                    <div id="text-properties" style="display: none;">
+                        <h4 style="margin: 0 0 20px 0; color: var(--primary-color);">Text Options</h4>
+                        <div class="prop-group">
+                            <span class="prop-label">Content</span>
+                            <textarea id="prop-text-content" class="form-input" style="min-height: 80px;"
+                                oninput="CreativeStudio.updateSelected('content', this.value)"></textarea>
+                        </div>
+                        <div class="prop-group">
+                            <span class="prop-label">Font Size</span>
+                            <input type="range" id="prop-text-size" min="12" max="200" value="40" style="width: 100%;"
+                                oninput="CreativeStudio.updateSelected('fontSize', this.value)">
+                        </div>
+                        <div class="prop-group">
+                            <span class="prop-label">Color</span>
+                            <input type="color" id="prop-text-color" class="form-input"
+                                style="height: 40px; padding: 2px;"
+                                onchange="CreativeStudio.updateSelected('color', this.value)">
+                        </div>
+                        <div class="prop-group">
+                            <span class="prop-label">Alignment</span>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
+                                <button class="btn btn-mini btn-secondary"
+                                    onclick="CreativeStudio.updateSelected('textAlign', 'left')"><i
+                                        class="ph ph-text-align-left"></i></button>
+                                <button class="btn btn-mini btn-secondary"
+                                    onclick="CreativeStudio.updateSelected('textAlign', 'center')"><i
+                                        class="ph ph-text-align-center"></i></button>
+                                <button class="btn btn-mini btn-secondary"
+                                    onclick="CreativeStudio.updateSelected('textAlign', 'right')"><i
+                                        class="ph ph-text-align-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="image-properties" style="display: none;">
+                        <h4 style="margin: 0 0 20px 0; color: var(--primary-color);">Image Options</h4>
+                        <div class="prop-group">
+                            <span class="prop-label">Opacity</span>
+                            <input type="range" id="prop-img-opacity" min="0" max="1" step="0.1" value="1"
+                                style="width: 100%;" oninput="CreativeStudio.updateSelected('opacity', this.value)">
+                        </div>
+                        <div class="prop-group">
+                            <span class="prop-label">Bring to front / Send back</span>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <button class="btn btn-sm btn-secondary"
+                                    onclick="CreativeStudio.moveLayer('up')">Forward</button>
+                                <button class="btn btn-sm btn-secondary"
+                                    onclick="CreativeStudio.moveLayer('down')">Backward</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2145,11 +2421,10 @@
 
                 // Specific panel initializations
                 try {
-                    if (panelId === 'fee' && typeof renderFeeTable === 'function') renderFeeTable();
-                    if (panelId === 'creative' && typeof renderCreativeTable === 'function') renderCreativeTable();
                     if (panelId === 'news' && typeof renderNewsTable === 'function') renderNewsTable();
                     if (panelId === 'bookings' && typeof renderBookingsTable === 'function') renderBookingsTable();
                     if (panelId === 'subjects' && typeof renderSubjectsTable === 'function') renderSubjectsTable();
+                    if (panelId === 'creative' && window.CreativeStudio) CreativeStudio.init();
 
                     if (panelId === 'results') {
                         if (window.AcademicYearManager) AcademicYearManager.init();
@@ -2797,6 +3072,355 @@
             SchoolManager.load();
             DeploymentManager.init();
         });
+    </script>
+    <script>
+        /* ==============================
+           CREATIVE STUDIO ENGINE
+           ============================== */
+        window.CreativeStudio = {
+            state: {
+                layers: [],
+                background: { type: 'color', value: '#111111', image: null },
+                size: { width: 1080, height: 1080, label: 'Instagram Post', key: 'post' },
+                selectedId: null,
+                isDragging: false,
+                initialized: false
+            },
+
+            presets: {
+                post: { w: 1080, h: 1080, label: 'Instagram Post' },
+                story: { w: 1080, h: 1920, label: 'Instagram Story' },
+                banner: { w: 1920, h: 600, label: 'Web Banner' },
+                a4: { w: 2480, h: 3508, label: 'A4 Document' }
+            },
+
+            init() {
+                if (this.state.initialized) return;
+                console.log("🎨 CreativeStudio: Initializing...");
+                this.loadDraft();
+                this.setupDragEvents();
+                this.state.initialized = true;
+                this.render();
+
+                // Keep draft updated
+                setInterval(() => this.saveDraft(), 5000);
+            },
+
+            render() {
+                const canvas = document.getElementById('design-canvas');
+                if (!canvas) return;
+
+                // 1. Update Canvas Size
+                const viewport = document.getElementById('canvas-viewport');
+                const vWidth = viewport.clientWidth - 80;
+                const vHeight = viewport.clientHeight - 80;
+                const scale = Math.min(vWidth / this.state.size.width, vHeight / this.state.size.height, 1);
+
+                canvas.style.width = this.state.size.width + 'px';
+                canvas.style.height = this.state.size.height + 'px';
+                canvas.style.transform = `scale(${scale})`;
+                canvas.style.background = this.state.background.type === 'color' ? this.state.background.value : 'none';
+
+                if (this.state.background.image) {
+                    canvas.style.backgroundImage = `url(${this.state.background.image})`;
+                    canvas.style.backgroundSize = 'cover';
+                    canvas.style.backgroundPosition = 'center';
+                } else {
+                    canvas.style.backgroundImage = 'none';
+                }
+
+                // 2. Render Layers
+                canvas.innerHTML = '';
+                this.state.layers.forEach(layer => {
+                    const el = document.createElement('div');
+                    el.className = `canvas-element ${this.state.selectedId === layer.id ? 'selected' : ''}`;
+                    el.id = `layer-${layer.id}`;
+                    el.style.left = layer.x + 'px';
+                    el.style.top = layer.y + 'px';
+                    el.style.zIndex = layer.zIndex;
+                    el.style.color = layer.color || '#fff';
+                    el.style.fontSize = (layer.fontSize || 40) + 'px';
+                    el.style.textAlign = layer.textAlign || 'center';
+                    el.style.opacity = layer.opacity !== undefined ? layer.opacity : 1;
+
+                    if (layer.type === 'text') {
+                        el.innerText = layer.content;
+                    } else if (layer.type === 'image') {
+                        const img = document.createElement('img');
+                        img.src = layer.content;
+                        img.style.width = layer.width + 'px';
+                        img.style.pointerEvents = 'none';
+                        el.appendChild(img);
+                    }
+
+                    // Handles
+                    if (this.state.selectedId === layer.id) {
+                        const controls = document.createElement('div');
+                        controls.className = 'element-controls';
+                        controls.innerHTML = `
+                            <button onclick="CreativeStudio.moveLayer('up')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-arrow-up"></i></button>
+                            <button onclick="CreativeStudio.deleteElement('${layer.id}')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-trash"></i></button>
+                        `;
+                        el.appendChild(controls);
+
+                        if (layer.type === 'image') {
+                            const resize = document.createElement('div');
+                            resize.className = 'resize-handle';
+                            resize.onmousedown = (e) => this.startResize(e, layer.id);
+                            el.appendChild(resize);
+                        }
+                    }
+
+                    el.onmousedown = (e) => {
+                        if (e.target.className.includes('resize-handle')) return;
+                        this.selectElement(layer.id);
+                        this.startDrag(e, layer.id);
+                    };
+
+                    canvas.appendChild(el);
+                });
+
+                this.updatePropertiesPanel();
+            },
+
+            addText() {
+                const id = 'text_' + Date.now();
+                this.state.layers.push({
+                    id, type: 'text', content: 'Double click to edit',
+                    x: 50, y: 50, zIndex: this.state.layers.length + 1,
+                    fontSize: 40, color: '#ffffff', textAlign: 'center'
+                });
+                this.state.selectedId = id;
+                this.render();
+            },
+
+            handleLogoUpload(input) {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const id = 'img_' + Date.now();
+                    this.state.layers.push({
+                        id, type: 'image', content: e.target.result,
+                        x: 100, y: 100, width: 200, zIndex: this.state.layers.length + 1
+                    });
+                    this.state.selectedId = id;
+                    this.render();
+                };
+                reader.readAsDataURL(file);
+            },
+
+            handleBgUpload(input) {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.state.background.image = e.target.result;
+                    this.render();
+                };
+                reader.readAsDataURL(file);
+            },
+
+            updateBgColor(val) {
+                this.state.background.type = 'color';
+                this.state.background.value = val;
+                this.render();
+            },
+
+            setPreset(key) {
+                const preset = this.presets[key];
+                if (!preset) return;
+                this.state.size = { ...preset, key };
+                document.getElementById('canvas-size-indicator').innerText = `${preset.w} x ${preset.h} (${preset.label})`;
+                this.render();
+            },
+
+            selectElement(id) {
+                this.state.selectedId = id;
+                this.render();
+            },
+
+            updateSelected(prop, val) {
+                const layer = this.state.layers.find(l => l.id === this.state.selectedId);
+                if (layer) {
+                    layer[prop] = prop === 'fontSize' || prop === 'width' ? parseInt(val) : val;
+                    this.render();
+                }
+            },
+
+            deleteElement(id) {
+                this.state.layers = this.state.layers.filter(l => l.id !== id);
+                this.state.selectedId = null;
+                this.render();
+            },
+
+            moveLayer(dir) {
+                const idx = this.state.layers.findIndex(l => l.id === this.state.selectedId);
+                if (idx === -1) return;
+                if (dir === 'up' && idx < this.state.layers.length - 1) {
+                    [this.state.layers[idx], this.state.layers[idx + 1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
+                } else if (dir === 'down' && idx > 0) {
+                    [this.state.layers[idx], this.state.layers[idx - 1]] = [this.state.layers[idx - 1], this.state.layers[idx]];
+                }
+                this.render();
+            },
+
+            updatePropertiesPanel() {
+                const layer = this.state.layers.find(l => l.id === this.state.selectedId);
+                const noSel = document.getElementById('no-selection-msg');
+                const textProps = document.getElementById('text-properties');
+                const imgProps = document.getElementById('image-properties');
+
+                if (!layer) {
+                    noSel.style.display = 'block';
+                    textProps.style.display = 'none';
+                    imgProps.style.display = 'none';
+                    return;
+                }
+
+                noSel.style.display = 'none';
+                if (layer.type === 'text') {
+                    textProps.style.display = 'block';
+                    imgProps.style.display = 'none';
+                    document.getElementById('prop-text-content').value = layer.content;
+                    document.getElementById('prop-text-size').value = layer.fontSize;
+                    document.getElementById('prop-text-color').value = layer.color;
+                } else {
+                    textProps.style.display = 'none';
+                    imgProps.style.display = 'block';
+                    document.getElementById('prop-img-opacity').value = layer.opacity || 1;
+                }
+            },
+
+            // --- Interaction Logic ---
+            setupDragEvents() {
+                window.onmousemove = (e) => {
+                    if (this.state.draggingId) {
+                        const layer = this.state.layers.find(l => l.id === this.state.draggingId);
+                        const canvas = document.getElementById('design-canvas');
+                        const rect = canvas.getBoundingClientRect();
+                        const scale = canvas.offsetWidth / this.state.size.width;
+
+                        layer.x = (e.clientX - rect.left) / scale - this.state.dragOffset.x;
+                        layer.y = (e.clientY - rect.top) / scale - this.state.dragOffset.y;
+
+                        const el = document.getElementById(`layer-${layer.id}`);
+                        el.style.left = layer.x + 'px';
+                        el.style.top = layer.y + 'px';
+                    }
+                    if (this.state.resizingId) {
+                        const layer = this.state.layers.find(l => l.id === this.state.resizingId);
+                        const canvas = document.getElementById('design-canvas');
+                        const scale = canvas.offsetWidth / this.state.size.width;
+                        layer.width += (e.movementX / scale);
+                        this.render();
+                    }
+                };
+                window.onmouseup = () => {
+                    this.state.draggingId = null;
+                    this.state.resizingId = null;
+                };
+            },
+
+            startDrag(e, id) {
+                const layer = this.state.layers.find(l => l.id === id);
+                const canvas = document.getElementById('design-canvas');
+                const rect = canvas.getBoundingClientRect();
+                const scale = canvas.offsetWidth / this.state.size.width;
+
+                this.state.draggingId = id;
+                this.state.dragOffset = {
+                    x: (e.clientX - rect.left) / scale - layer.x,
+                    y: (e.clientY - rect.top) / scale - layer.y
+                };
+            },
+
+            startResize(e, id) {
+                e.stopPropagation();
+                this.state.resizingId = id;
+            },
+
+            // --- Features ---
+            generateAIHeadline() {
+                const headlines = [
+                    "Empowering Future Leaders Today",
+                    "Admissions Open: Journey to Excellence",
+                    "Celebrate Our Annual Achievement Night",
+                    "New Semester, New Opportunities",
+                    "Excellence in Education Since 1995"
+                ];
+                const text = headlines[Math.floor(Math.random() * headlines.length)];
+                const layer = this.state.layers.find(l => l.id === this.state.selectedId && l.type === 'text');
+                if (layer) {
+                    layer.content = text;
+                } else {
+                    this.addText();
+                    this.state.layers[this.state.layers.length - 1].content = text;
+                }
+                this.render();
+            },
+
+            applyTemplate(type) {
+                this.resetCanvas();
+                if (type === 'admission') {
+                    this.state.background.value = '#0a2e5c';
+                    this.state.layers.push(
+                        { id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign: 'center' },
+                        { id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35, color: '#fff', textAlign: 'center' },
+                        { id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color: '#ffcc00', textAlign: 'center' }
+                    );
+                }
+                this.render();
+            },
+
+            exportPNG() {
+                const canvas = document.getElementById('design-canvas');
+                this.state.selectedId = null;
+                this.render();
+
+                setTimeout(() => {
+                    html2canvas(canvas, {
+                        scale: 2, // High res
+                        backgroundColor: null,
+                        useCORS: true
+                    }).then(canvasExport => {
+                        const link = document.createElement('a');
+                        const date = new Date().toISOString().split('T')[0];
+                        link.download = `creative-studio-${date}.png`;
+                        link.href = canvasExport.toDataURL("image/png");
+                        link.click();
+                        alert("Design Exported Successfully! 🚀");
+                    });
+                }, 100);
+            },
+
+            saveDraft() {
+                const data = {
+                    layers: this.state.layers,
+                    background: this.state.background,
+                    size: this.state.size
+                };
+                localStorage.setItem('creative_studio_draft', JSON.stringify(data));
+            },
+
+            loadDraft() {
+                const saved = localStorage.getItem('creative_studio_draft');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    this.state.layers = data.layers || [];
+                    this.state.background = data.background || { type: 'color', value: '#111111' };
+                    this.state.size = data.size || this.presets.post;
+                }
+            },
+
+            resetCanvas() {
+                if (!confirm("Clear design and start fresh?")) return;
+                this.state.layers = [];
+                this.state.background = { type: 'color', value: '#111111', image: null };
+                this.state.selectedId = null;
+                this.render();
+            }
+        };
     </script>
 
     <!-- Admin Access Modal -->
