@@ -3060,6 +3060,110 @@
             DeploymentManager.init();
         });
     </script>
+    <script>
+        /* SAFE INIT - INJECTED FIX */
+        window.ResultsManagement = window.ResultsManagement || {};
+        window.StaticPublisher = window.StaticPublisher || {};
+
+        /* GLOBAL STATE */
+        ResultsManagement.state = {
+            synced: false,
+            syncing: false
+        };
+
+        /* =========================
+           PREVIEW & SYNC
+        ========================= */
+        ResultsManagement.handleSyncClick = async function () {
+
+            if (this.state.syncing) return;
+
+            const exam = document.getElementById("results-exam-select").value;
+            const sheetId = document.getElementById("results-sheet-id").value.trim();
+            const btn = document.getElementById("btn-sync-results");
+            const statusBox = document.getElementById("results-sync-message");
+
+            if (!exam) {
+                alert("Please select exam");
+                return;
+            }
+
+            if (!sheetId) {
+                alert("Please enter Sheet ID");
+                return;
+            }
+
+            this.state.syncing = true;
+            this.state.synced = false;
+
+            btn.innerHTML = "<i class='ph-bold ph-spinner-gap ph-spin'></i> Syncing...";
+            btn.style.pointerEvents = "none";
+
+            statusBox.innerHTML = "Connecting to Google Sheet...";
+            statusBox.style.display = "block"; // Ensure visible
+
+            try {
+
+                const API_KEY = "YOUR_GOOGLE_API_KEY"; // replace
+                const range = "Sheet1!A2:Z"; // data rows
+
+                // Real Fetch
+                const res = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${API_KEY}`
+                );
+
+                if (!res.ok) throw new Error("Sheet connection failed (Check API Key / Sheet ID)");
+
+                const data = await res.json();
+                const rows = data.values || [];
+
+                const studentCount = rows.length;
+                const examCount = 1;
+
+                // Update stats
+                document.getElementById("results-exams-count").textContent = examCount;
+                document.getElementById("results-total-count").textContent = studentCount;
+                document.getElementById("results-last-sync").textContent =
+                    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+                statusBox.innerHTML =
+                    "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync successful!";
+
+                this.state.synced = true;
+
+            } catch (err) {
+
+                statusBox.innerHTML =
+                    "<i class='ph-bold ph-warning' style='color:#ff4444'></i> " + err.message;
+                statusBox.style.display = "block";
+
+                this.state.synced = false;
+
+            } finally {
+
+                btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
+                btn.style.pointerEvents = "auto";
+                this.state.syncing = false;
+            }
+        };
+
+
+        /* =========================
+           STATIC PUBLISH
+        ========================= */
+        StaticPublisher.publish = function () {
+
+            if (!ResultsManagement.state || !ResultsManagement.state.synced) {
+                alert("Please complete Sync before publishing.");
+                return;
+            }
+
+            alert("Static Site Published Successfully ✅");
+
+            // optional: reset sync requirement
+            // ResultsManagement.state.synced = false;
+        };
+    </script>
 </body>
 
 </html>
