@@ -3061,156 +3061,218 @@
         });
     </script>
     <script>
-    (function(){
+        (function () {
 
-    /* ===============================
-       SAFE GLOBAL INITIALIZATION
-    ================================ */
-    window.ResultsManagement = window.ResultsManagement || {};
-    window.ExamManager = window.ExamManager || {};
-    window.StaticPublisher = window.StaticPublisher || {};
-    window.PublishedResultsStore = window.PublishedResultsStore || {};
+            /* ===============================
+               SAFE GLOBAL INITIALIZATION
+            ================================ */
+            window.ResultsManagement = window.ResultsManagement || {};
+            window.ExamManager = window.ExamManager || {};
+            window.StaticPublisher = window.StaticPublisher || {};
+            window.PublishedResultsStore = window.PublishedResultsStore || {};
 
-    /* ===============================
-       1️⃣ SYNC BUTTON FIX
-    ================================ */
-    ResultsManagement.syncing = false;
-
-    ResultsManagement.handleSyncClick = function(){
-
-        if(this.syncing) return;
-
-        const examSelect = document.getElementById("results-exam-select");
-        if(!examSelect || !examSelect.value){
-            alert("Please select an exam profile");
-            return;
-        }
-
-        const btn = document.getElementById("btn-sync-results");
-        const statusBox = document.getElementById("results-sync-message");
-
-        this.syncing = true;
-        btn.innerHTML = "<i class='ph-bold ph-spinner-gap ph-spin'></i> Syncing...";
-        btn.style.pointerEvents = "none";
-
-        setTimeout(()=>{
-
-            const examCount = 1;
-            const studentCount = Math.floor(Math.random()*300)+50;
-            const now = new Date();
-
-            const examsEl = document.getElementById("results-exams-count");
-            if(examsEl) examsEl.textContent = examCount;
-            
-            const totalEl = document.getElementById("results-total-count"); 
-            if(totalEl) totalEl.textContent = studentCount;
-
-            const timeEl = document.getElementById("results-last-sync");
-            if(timeEl) timeEl.textContent = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-
-            if(statusBox){
-                statusBox.innerHTML =
-                    "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Preview Complete. Ready to Publish.";
-            }
-
-            const pubToggle = document.getElementById("results-publish-toggle");
-            if(pubToggle) pubToggle.style.display = "block";
-
-            btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
-            btn.style.pointerEvents = "auto";
+            /* ===============================
+               1️⃣ SYNC BUTTON FIX
+            ================================ */
             ResultsManagement.syncing = false;
 
-        },1200);
-    };
+            ResultsManagement.handleSyncClick = function () {
+
+                if (this.syncing) return;
+
+                const examSelect = document.getElementById("results-exam-select");
+                if (!examSelect || !examSelect.value) {
+                    alert("Please select an exam profile");
+                    return;
+                }
+
+                const btn = document.getElementById("btn-sync-results");
+                const statusBox = document.getElementById("results-sync-message");
+
+                this.syncing = true;
+                btn.innerHTML = "<i class='ph-bold ph-spinner-gap ph-spin'></i> Syncing...";
+                btn.style.pointerEvents = "none";
+
+                setTimeout(() => {
+
+                    const examCount = 1;
+                    const studentCount = Math.floor(Math.random() * 300) + 50;
+                    const now = new Date();
+
+                    const examsEl = document.getElementById("results-exams-count");
+                    if (examsEl) examsEl.textContent = examCount;
+
+                    const totalEl = document.getElementById("results-total-count");
+                    if (totalEl) totalEl.textContent = studentCount;
+
+                    const timeEl = document.getElementById("results-last-sync");
+                    if (timeEl) timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    if (statusBox) {
+                        statusBox.innerHTML =
+                            "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Preview Complete. Ready to Publish.";
+                    }
+
+                    const pubToggle = document.getElementById("results-publish-toggle");
+                    if (pubToggle) pubToggle.style.display = "block";
+
+                    btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
+                    btn.style.pointerEvents = "auto";
+                    ResultsManagement.syncing = false;
+
+                }, 1200);
+            };
 
 
-    /* ===============================
-       2️⃣ FETCH HEADERS SIMULATION
-    ================================ */
-    ResultsManagement.fetchHeaders = function(){
+            /* ===============================
+               2️⃣ FETCH HEADERS (LIVE GOOGLE SHEETS)
+            ================================ */
+            ResultsManagement.fetchHeaders = async function () {
 
-        const sheetIdEl = document.getElementById("results-sheet-id");
-        if(!sheetIdEl) return; 
+                const sheetIdEl = document.getElementById("results-sheet-id");
+                if (!sheetIdEl) return;
 
-        const sheetId = sheetIdEl.value.trim();
-        if(!sheetId){
-            alert("Enter Google Sheet ID");
-            return;
-        }
+                const sheetId = sheetIdEl.value.trim();
+                if (!sheetId) {
+                    alert("Please enter Google Sheet ID");
+                    return;
+                }
 
-        const mapUI = document.getElementById("column-mapping-ui");
-        if(mapUI){
-            mapUI.style.display = "block";
-        }
+                const API_KEY = "YOUR_GOOGLE_API_KEY"; // 🔴 Replace this
+                const range = "Sheet1!1:1"; // first row (headers)
 
-        const msg = document.getElementById("results-sync-message");
-        if(msg){
-            msg.innerHTML =
-                "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Headers fetched successfully.";
-        }
-    };
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${API_KEY}`;
+
+                const statusBox = document.getElementById("results-sync-message");
+
+                try {
+                    if (statusBox) statusBox.innerHTML = "Connecting to Google Sheets...";
+
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error("Invalid Sheet ID or API issue");
+
+                    const data = await res.json();
+                    const headers = data.values[0];
+
+                    if (!headers || headers.length === 0) {
+                        throw new Error("No headers found");
+                    }
+
+                    populateMappingUI(headers);
+
+                    if (statusBox) statusBox.innerHTML =
+                        "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Headers loaded from Google Sheet";
+
+                } catch (err) {
+                    if (statusBox) statusBox.innerHTML =
+                        "<i class='ph-bold ph-warning' style='color:#ff4444'></i> Error: " + err.message;
+                }
+            };
+
+            function populateMappingUI(headers) {
+
+                const selects = document.querySelectorAll(".map-select");
+                const subjectContainer = document.getElementById("map-subjects-container");
+
+                // Clear existing
+                selects.forEach(sel => {
+                    sel.innerHTML = '<option value="">-- Select Column --</option>';
+                });
+
+                if (subjectContainer) subjectContainer.innerHTML = "";
+
+                headers.forEach(header => {
+
+                    const clean = header.trim();
+
+                    // Populate dropdowns
+                    selects.forEach(sel => {
+                        const opt = document.createElement("option");
+                        opt.value = clean;
+                        opt.textContent = clean;
+                        sel.appendChild(opt);
+                    });
+
+                    // Populate subject checkboxes
+                    if (subjectContainer) {
+                        const label = document.createElement("label");
+                        label.style.cssText =
+                            "display:flex;align-items:center;gap:8px;font-size:0.8rem;background:rgba(0,255,136,0.08);padding:8px 12px;border-radius:6px;border:1px solid rgba(0,255,136,0.2);margin-bottom:5px;";
+
+                        label.innerHTML = `
+                    <input type="checkbox" class="map-subject-checkbox" value="${clean}">
+                    <span style="color:#fff;font-weight:500;">${clean}</span>
+                `;
+
+                        subjectContainer.appendChild(label);
+                    }
+                });
+
+                const mapUI = document.getElementById("column-mapping-ui");
+                if (mapUI) mapUI.style.display = "block";
+            }
 
 
-    /* ===============================
-       3️⃣ PUBLISH TOGGLE
-    ================================ */
-    ResultsManagement.published = false;
+            /* ===============================
+               3️⃣ PUBLISH TOGGLE
+            ================================ */
+            ResultsManagement.published = false;
 
-    ResultsManagement.togglePublish = function(){
+            ResultsManagement.togglePublish = function () {
 
-        const btn = document.getElementById("results-publish-toggle");
-        if(!btn) return;
+                const btn = document.getElementById("results-publish-toggle");
+                if (!btn) return;
 
-        this.published = !this.published;
+                this.published = !this.published;
 
-        if(this.published){
-            btn.innerHTML = "<i class='ph-bold ph-eye-slash'></i> Unpublish";
-            btn.classList.remove("btn-primary");
-            btn.classList.add("btn-danger");
-        }else{
-            btn.innerHTML = "<i class='ph-bold ph-eye'></i> Publish";
-            btn.classList.remove("btn-danger");
-            btn.classList.add("btn-primary");
-        }
-    };
-
-
-    /* ===============================
-       4️⃣ EXAM MANAGER (SAFE MODAL)
-    ================================ */
-    ExamManager.openEditor = function(){
-        alert("Exam Manager UI not implemented yet.\nYou can connect this to your Exam CRUD module.");
-    };
+                if (this.published) {
+                    btn.innerHTML = "<i class='ph-bold ph-eye-slash'></i> Unpublish";
+                    btn.classList.remove("btn-primary");
+                    btn.classList.add("btn-danger");
+                } else {
+                    btn.innerHTML = "<i class='ph-bold ph-eye'></i> Publish";
+                    btn.classList.remove("btn-danger");
+                    btn.classList.add("btn-primary");
+                }
+            };
 
 
-    /* ===============================
-       5️⃣ STATIC PUBLISHER
-    ================================ */
-    StaticPublisher.publish = function(){
-
-        if(!ResultsManagement.published){
-            alert("Please Publish results first.");
-            return;
-        }
-
-        alert("Static Publish Completed (Simulation Mode)");
-    };
+            /* ===============================
+               4️⃣ EXAM MANAGER (SAFE MODAL)
+            ================================ */
+            ExamManager.openEditor = function () {
+                alert("Exam Manager UI not implemented yet.\nYou can connect this to your Exam CRUD module.");
+            };
 
 
-    /* ===============================
-       6️⃣ SAFETY FALLBACKS
-    ================================ */
-    window.showSearchForm = window.showSearchForm || function(){
-        const search = document.getElementById("search-form");
-        const result = document.getElementById("result-view");
-        if(search) search.style.display="block";
-        if(result) result.style.display="none";
-    };
+            /* ===============================
+               5️⃣ STATIC PUBLISHER
+            ================================ */
+            StaticPublisher.publish = function () {
 
-    window.ResultApp = window.ResultApp || {};
-    window.ResultApp.showSearchForm = window.showSearchForm;
+                if (!ResultsManagement.published) {
+                    alert("Please Publish results first.");
+                    return;
+                }
 
-    })();
+                alert("Static Publish Completed (Simulation Mode)");
+            };
+
+
+            /* ===============================
+               6️⃣ SAFETY FALLBACKS
+            ================================ */
+            window.showSearchForm = window.showSearchForm || function () {
+                const search = document.getElementById("search-form");
+                const result = document.getElementById("result-view");
+                if (search) search.style.display = "block";
+                if (result) result.style.display = "none";
+            };
+
+            window.ResultApp = window.ResultApp || {};
+            window.ResultApp.showSearchForm = window.showSearchForm;
+
+        })();
     </script>
 </body>
 
