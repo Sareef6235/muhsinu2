@@ -4,19 +4,23 @@
 
 **Repository**: `git@github.com:Sareef6235/muhsinu2.git`  
 **Branch**: `main`  
-**Latest Commit**: `1c2ca45`  
+**Latest Commit**: `e83eab6`  
 **Status**: ✅ Fully synced with GitHub
 
 ---
 
 ## 📦 What Was Pushed
 
-### Latest Changes (2026-02-09 22:09 IST):
+### Latest Changes (2026-02-11 10:07 IST):
 - **Refined Static Data Flow**:
   - Implemented **Cache-Busting** (`?v=timestamp`) for real-time results on static hosts.
   - Standardized JSON structure with a mandatory `meta` block.
   - Added strict client-side publishing filters in `results.js`.
   - Optimized `StaticPublisher` in `dashboard.js` for production-grade JSON exports.
+- **Sync Button Fix (Simulation Mode)**:
+  - Injected safe simulation script into `dashboard.html`.
+  - Overridden `handleSyncClick`, `fetchHeaders`, `togglePublish`, `openEditor`, `publish`.
+  - Ensures all UI states (spinner, toggle, alerts) work without backend.
 
 
 
