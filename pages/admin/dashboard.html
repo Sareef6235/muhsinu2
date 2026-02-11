@@ -3043,128 +3043,95 @@
                 state: {
                 synced: false,
             syncing: false
-    },
+                },
 
             handleSyncClick: function () {
-        const btn = document.getElementById("btn-sync-results");
+                    const btn = document.getElementById("btn-sync-results");
             const statusBox = document.getElementById("results-sync-status");
             const statusMsg = document.getElementById("results-sync-message");
-
-
+            const publishBtn = document.getElementById("results-publish-toggle");
 
             if (!btn) {
                 console.error("Sync button not found");
             return;
-        }
+                    }
 
             if (this.state.syncing) return;
 
             this.state.syncing = true;
-
             btn.innerHTML = "<i class='ph-bold ph-spinner-gap ph-spin'></i> Syncing...";
             btn.style.pointerEvents = "none";
 
             if (statusBox) statusBox.style.display = "block";
             if (statusMsg) {
-                statusMsg.innerHTML =
-                "<i class='ph-bold ph-info'></i> Processing...";
-        }
+                statusMsg.innerHTML = "<i class='ph-bold ph-info'></i> Processing...";
+                    }
 
+                    // Combined Sync Logic (Aware of PublishedResultsStore)
+                    setTimeout(() => {
+                        const json = window.PublishedResultsStore ? window.PublishedResultsStore.data : null;
 
-        // Simulated Sync (Replace with real fetch if needed)
-        setTimeout(() => {
+            if (json) {
+                            const exams = json.exams || [];
+            let studentCount = 0;
+                            exams.forEach(ex => {
+                studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
+                            });
 
-            // Example stats update
-            const examsEl = document.getElementById("results-exams-count");
-            const studentsEl = document.getElementById("results-total-count");
+            const examsCountEl = document.getElementById("results-exams-count");
+            const totalCountEl = document.getElementById("results-total-count");
             const lastSyncEl = document.getElementById("results-last-sync");
 
-            if (examsEl) examsEl.textContent = "1";
-            if (studentsEl) studentsEl.textContent = "120";
-            if (lastSyncEl)
-            lastSyncEl.textContent =
-            new Date().toLocaleTimeString([], {
-                hour: "2-digit",
-            minute: "2-digit"
-                    });
+            if (examsCountEl) examsCountEl.textContent = exams.length;
+            if (totalCountEl) totalCountEl.textContent = studentCount;
+            if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleTimeString([], {hour: "2-digit", minute: "2-digit" });
+                        }
 
             if (statusMsg) {
-                statusMsg.innerHTML =
-                "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync completed successfully.";
-            }
+                statusMsg.innerHTML = "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync completed successfully.";
+                        }
 
             this.state.synced = true;
             this.state.syncing = false;
 
-            btn.innerHTML =
-            "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
+            btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
             btn.style.pointerEvents = "auto";
 
-        }, 1200);
-    }
-};
+            if (publishBtn) publishBtn.style.display = "block";
+                    }, 1200);
+                },
+
+            togglePublish: function () {
+                alert("Results Published Successfully ✅");
+                }
+            };
+
+            /* ==============================
+               STATIC PUBLISH CONTROL
+               ============================== */
+            window.StaticPublisher = {
+                publish: function () {
+                    if (!window.ResultsManagement.state.synced) {
+                alert("Please complete Sync before publishing.");
+            return;
+                    }
+            alert("Static Site Published Successfully ✅");
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                if (window.SchoolManager) SchoolManager.load();
+            if (window.DeploymentManager) DeploymentManager.init();
+            });
     </script>
 
 
-    setTimeout(() => {
-    const json = window.PublishedResultsStore.data;
-    const exams = json.exams || [];
-    let studentCount = 0;
-    exams.forEach(ex => {
-    studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
-    });
 
-    const examsCountEl = document.getElementById("results-exams-count");
-    const totalCountEl = document.getElementById("results-total-count");
-    const lastSyncEl = document.getElementById("results-last-sync");
-
-    if (examsCountEl) examsCountEl.textContent = exams.length;
-    if (totalCountEl) totalCountEl.textContent = studentCount;
-    if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-    if (statusBox && statusMsg) {
-    statusBox.style.display = "block";
-    statusMsg.innerHTML = "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync completed successfully.";
-    }
-
-    this.state.synced = true;
-    this.state.syncing = false;
-
-    if (btn) {
-    btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
-    btn.style.pointerEvents = "auto";
-    }
-
-    if (publishBtn) publishBtn.style.display = "block";
-    }, 800);
-    },
-    togglePublish: function () {
-    alert("Results Published Successfully ✅");
-    }
-    };
 
     /* ==============================
-    STATIC PUBLISH CONTROL
+    CREATIVE STUDIO ENGINE
     ============================== */
-    window.StaticPublisher = {
-    publish: function () {
-    if (!window.ResultsManagement.state.synced) {
-    alert("Please complete Sync before publishing.");
-    return;
-    }
-    alert("Static Site Published Successfully ✅");
-    }
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-    SchoolManager.load();
-    DeploymentManager.init();
-    });
-    </script>
     <script>
-            /* ==============================
-               CREATIVE STUDIO ENGINE
-               ============================== */
             window.CreativeStudio = {
                 state: {
                 layers: [],
