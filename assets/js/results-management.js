@@ -698,44 +698,55 @@ const ResultsManagement = (() => {
      * Validates mapping, fetches data, transforms with subject-wise marks
      */
     const handleSyncClick = () => {
+        // Prevent multiple clicks
         if (syncing) return;
 
-        syncing = true;
         const btn = document.getElementById("btn-sync-results");
+        if (!btn) {
+            console.warn("Sync button not found");
+            return;
+        }
+
+        syncing = true;
+
         const examsEl = document.getElementById("results-exams-count");
         const studentsEl = document.getElementById("results-total-count");
         const lastSyncEl = document.getElementById("results-last-sync");
 
-        if (!btn) {
-            console.error("Sync button not found");
-            syncing = false;
-            return;
-        }
+        // Save original text to restore later
+        const originalHTML = btn.innerHTML;
 
-        // 🔄 UI: Syncing state
-        const originalText = btn.innerHTML;
-        btn.innerHTML = `<i class="ph-bold ph-spinner-gap ph-spin"></i> SYNCING...`;
+        // 🔄 Loading State
+        btn.innerHTML =
+            '<i class="ph-bold ph-spinner-gap ph-spin"></i> SYNCING...';
         btn.style.opacity = "0.7";
-        btn.style.cursor = "not-allowed";
+        btn.style.pointerEvents = "none";
 
-        // 🧠 Simulated preview + sync (STATIC SITE SAFE)
+        // Simulated Sync (Static Mode)
         setTimeout(() => {
-            // Example dynamic data (replace later with real JSON count)
-            const publishedExams = Math.floor(Math.random() * 5) + 1;
-            const totalStudents = Math.floor(Math.random() * 500) + 50;
-            const now = new Date();
+            try {
+                const examCount = Math.floor(Math.random() * 5) + 1;
+                const studentCount = Math.floor(Math.random() * 500) + 100;
+                const now = new Date();
 
-            if (examsEl) examsEl.textContent = publishedExams;
-            if (studentsEl) studentsEl.textContent = totalStudents;
-            if (lastSyncEl) {
-                lastSyncEl.textContent =
-                    now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                if (examsEl) examsEl.textContent = examCount;
+                if (studentsEl) studentsEl.textContent = studentCount;
+
+                if (lastSyncEl) {
+                    lastSyncEl.textContent =
+                        now.toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                }
+            } catch (e) {
+                console.error("Sync error:", e);
             }
 
-            // ✅ Restore button
-            btn.innerHTML = `<i class="ph-bold ph-arrows-clockwise"></i> PREVIEW & SYNC`;
+            // ✅ Restore Button
+            btn.innerHTML = originalHTML;
             btn.style.opacity = "1";
-            btn.style.cursor = "pointer";
+            btn.style.pointerEvents = "auto";
 
             syncing = false;
 
@@ -747,10 +758,11 @@ const ResultsManagement = (() => {
                 showStatus('<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> Sync Successful (Simulated)', 'success');
             }
 
-        }, 1200); // smooth professional delay
+        }, 1200);
     };
 
     return {
+        __initialized: true,
         init,
         getAllResults,
         handleSyncClick,
