@@ -1219,6 +1219,38 @@
                             </div>
                         </div>
 
+                        <!-- NEW: JSON Validation Section -->
+                        <div class="glass-card"
+                            style="margin-top: 25px; padding: 20px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h5
+                                    style="color: #fff; margin: 0; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                                    <i class="ph-bold ph-check-circle" style="color: var(--primary-color);"></i>
+                                    JSON Validation
+                                </h5>
+                            </div>
+
+                            <div id="results-sync-status"
+                                style="margin-bottom: 15px; font-size: 0.85rem; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; border-left: 3px solid rgba(255,255,255,0.1);">
+                                <div id="results-sync-message" style="display: flex; align-items: center; gap: 8px;">
+                                    <i class="ph-bold ph-info" style="color:#888"></i>
+                                    <span>Waiting for JSON validation...</span>
+                                </div>
+                            </div>
+
+                            <button id="myButton" class="btn btn-md btn-primary"
+                                style="width: 100%; box-shadow: 0 4px 20px rgba(0, 229, 255, 0.15);" disabled
+                                onclick="fetchData()">
+                                <i class="ph-bold ph-check-square"></i> Validate JSON
+                            </button>
+
+                            <div style="margin-top: 12px; font-size: 0.75rem; color: #666; text-align: center;">
+                                Validates: <code
+                                    style="color: var(--primary-color); background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">/data/published-results.json</code>
+                            </div>
+                        </div>
+
                         <!-- NEW: Upload Published Results Section -->
                         <div class="upload-box" id="results-upload-box"
                             style="margin-top: 25px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px; transition: 0.3s; border-radius: 12px;">
@@ -3103,28 +3135,21 @@
             try {
 
                 /* PUBLIC CSV EXPORT URL (NO API KEY) */
-                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
+                ```
+                const url = `https://opensheet.elk.sh/${sheetId}/Sheet1`;
+                ```
 
+```javascript
                 const response = await fetch(url);
+                const data = await response.json();
 
-                if (!response.ok) {
-                    throw new Error("Sheet not public or invalid Sheet ID");
+                if (!data || data.length === 0) {
+                    throw new Error("No data found");
                 }
 
-                const csvText = await response.text();
-
-                if (!csvText || csvText.length < 10) {
-                    throw new Error("Empty sheet data");
-                }
-
-                const rows = csvText.trim().split("\n").map(r => r.split(","));
-
-                if (rows.length <= 1) {
-                    throw new Error("No student data found");
-                }
-
-                const studentCount = rows.length - 1; // exclude header
+                const studentCount = data.length;
                 const examCount = 1;
+                ```
 
                 document.getElementById("results-exams-count").textContent = examCount;
                 document.getElementById("results-total-count").textContent = studentCount;
@@ -3163,6 +3188,76 @@
 
             alert("Static Site Published Successfully ✅");
         };
+
+        /* ==============================
+           JSON VALIDATION FUNCTION
+        ============================== */
+        async function fetchData() {
+            const statusEl = document.getElementById('results-sync-message');
+            const statusBox = document.getElementById('results-sync-status');
+            const btn = document.getElementById('myButton');
+
+            if (!statusEl || !btn) {
+                console.error('❌ fetchData: Required UI elements not found');
+                return;
+            }
+
+            try {
+                // Update UI to loading state
+                statusEl.innerHTML = '<i class="ph-bold ph-spinner-gap ph-spin" style="color:#888"></i> <span>Validating JSON...</span>';
+                statusBox.style.display = 'block';
+                statusBox.style.borderLeftColor = 'rgba(255,255,255,0.1)';
+                btn.disabled = true;
+
+                // Fetch the JSON file with cache-busting
+                const response = await fetch('/data/published-results.json?v=' + Date.now());
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('JSON file not found - please publish results first');
+                    } else {
+                        throw new Error(`HTTP error! status: ${ response.status } `);
+                    }
+                }
+
+                const data = await response.json();
+                console.log('✅ JSON fetched successfully:', data);
+
+                // Validate data structure
+                if (!data) {
+                    throw new Error('Invalid JSON structure - data is null or undefined');
+                }
+
+                if (typeof data === 'object' && Object.keys(data).length === 0) {
+                    throw new Error('No published results found - JSON is empty');
+                }
+
+                // Success: Hide status and enable button
+                statusBox.style.display = 'none';
+                btn.disabled = false;
+
+                console.log('✅ JSON Validation: PASSED');
+                console.log('📊 Data summary:', {
+                    type: Array.isArray(data) ? 'array' : 'object',
+                    keys: Array.isArray(data) ? `${ data.length } items` : Object.keys(data).join(', ')
+                });
+
+            } catch (error) {
+                console.error('❌ Failed to fetch JSON:', error);
+                
+                // Show error message with appropriate styling
+                statusEl.innerHTML = 
+                    `< i class="ph-bold ph-warning" style = "color:#ff4444" ></i > <span style="color:#ff4444">${error.message}</span>`;
+                statusBox.style.display = 'block';
+                statusBox.style.borderLeftColor = '#ff4444';
+                btn.disabled = true;
+
+                console.log('❌ JSON Validation: FAILED');
+            }
+        }
+
+        // Auto-fetch when page loads
+        window.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </body>
 
