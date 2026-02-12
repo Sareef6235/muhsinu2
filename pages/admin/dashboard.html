@@ -1566,182 +1566,178 @@
                         </div>
 
                         <!-- NEW: Upload Published Results Section -->
-                        <div class="upload-box" id="results-upload-box"
-                            style="margin-top: 25px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px; transition: 0.3s; border-radius: 12px;">
-                            <h5 style="color: #fff; margin-bottom: 12px; font-size: 0.9rem;">Verify & Preview Published
-                                File</h5>
-
-                            <input type="file" id="published-results-upload" accept=".json" style="display: none;"
-                                onchange="handlePublishedResultsUpload(this)">
-
-                            <div class="upload-actions" style="display: flex; gap: 10px;">
-                                <button class="btn btn-sm btn-subtle"
-                                    onclick="document.getElementById('published-results-upload').click()"
-                                    style="flex: 1; border: 1px dashed #555; color: #ccc;">
-                                    <i class="ph-bold ph-upload-simple"></i> Select JSON
-                                </button>
-                                <button class="btn btn-sm btn-danger" onclick="clearPublishedResults()"
-                                    style="width: 45px;">
-                                    <i class="ph-bold ph-trash"></i>
-                                </button>
-                            </div>
-
+                        <div class="upload-section" id="results-upload-box"
+                            style="margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; text-align: center; transition: 0.3s;">
+                            <label for="published-results-upload" class="btn btn-sm btn-subtle"
+                                style="display: inline-flex; width: auto; cursor: pointer; border: 1px dashed #555; color: #ccc;">
+                                <i class="ph ph-upload-simple"></i> Upload Results JSON
+                            </label>
+                            <input type="file" id="published-results-upload" accept=".json" style="display: none;">
                             <div id="published-results-status"
-                                style="margin-top: 10px; font-size: 0.8rem; color: #888; text-align: center;">
-                                No file uploaded
+                                style="margin-top: 10px; font-size: 0.8rem; color: #888;">
+                                No results file loaded.
                             </div>
-
-                            <!-- Search/Detail View Placeholders for Preview Flow -->
-                            <div id="search-form" style="margin-top: 20px; display: none;"></div>
-                            <div id="result-view" style="margin-top: 20px; display: none;"></div>
                         </div>
 
-                        <style>
-                            .upload-box.dragover {
-                                background: rgba(0, 243, 255, 0.05);
-                                border: 1px solid var(--primary-color);
-                            }
-                        </style>
+                        <!-- Search/Detail View Placeholders for Preview Flow -->
+                        <div id="search-form" style="margin-top: 20px; display: none;"></div>
+                        <div id="result-view" style="margin-top: 20px; display: none;"></div>
+                    </div>
 
-                        <script>
-                            // --- GLOBAL STORE ---
-                            window.PublishedResultsStore = {
-                                data: null,
-                                updatedAt: null
-                            };
+                    <style>
+                        .upload-section.dragover {
+                            background: rgba(0, 243, 255, 0.05) !important;
+                            border: 1px dashed var(--primary-color) !important;
+                        }
+                    </style>
 
-                            // DRAG & DROP SUPPORT
-                            (function () {
-                                const box = document.getElementById('results-upload-box');
-                                if (!box) return;
+                    <script>
+                        // --- GLOBAL STORE ---
+                        window.PublishedResultsStore = {
+                            data: null,
+                            updatedAt: null
+                        };
 
-                                ['dragenter', 'dragover'].forEach(e => {
-                                    box.addEventListener(e, ev => {
-                                        ev.preventDefault();
-                                        box.classList.add('dragover');
-                                        const statusEl = document.getElementById('published-results-status');
-                                        if (statusEl) statusEl.textContent = "Drop file to upload";
-                                    });
+                        // DRAG & DROP SUPPORT
+                        (function () {
+                            const box = document.getElementById('results-upload-box');
+                            if (!box) return;
+
+                            ['dragenter', 'dragover'].forEach(e => {
+                                box.addEventListener(e, ev => {
+                                    ev.preventDefault();
+                                    box.classList.add('dragover');
+                                    const statusEl = document.getElementById('published-results-status');
+                                    if (statusEl) statusEl.textContent = "Drop file to upload";
                                 });
+                            });
 
-                                ['dragleave', 'drop'].forEach(e => {
-                                    box.addEventListener(e, ev => {
-                                        ev.preventDefault();
-                                        box.classList.remove('dragover');
-                                        if (e === 'drop') {
-                                            const file = ev.dataTransfer.files[0];
-                                            if (file) {
-                                                const input = document.getElementById('published-results-upload');
-                                                const container = new DataTransfer();
-                                                container.items.add(file);
-                                                input.files = container.files;
-                                                window.handlePublishedResultsUpload(input);
-                                            }
+                            ['dragleave', 'drop'].forEach(e => {
+                                box.addEventListener(e, ev => {
+                                    ev.preventDefault();
+                                    box.classList.remove('dragover');
+                                    if (e === 'drop') {
+                                        const file = ev.dataTransfer.files[0];
+                                        if (file) {
+                                            const input = document.getElementById('published-results-upload');
+                                            const container = new DataTransfer();
+                                            container.items.add(file);
+                                            input.files = container.files;
+                                            window.handlePublishedResultsUpload(input);
                                         }
-                                    });
-                                });
-                            })();
-
-                            // FILE UPLOAD & STATS LOGIC
-                            window.handlePublishedResultsUpload = function (input) {
-                                const file = input.files[0];
-                                const statusEl = document.getElementById('published-results-status');
-
-                                if (!file) return;
-
-                                const reader = new FileReader();
-                                reader.onload = function (e) {
-                                    try {
-                                        const json = JSON.parse(e.target.result);
-                                        window.updateResultsStats(json, file.name);
-                                        window.PublishedResultsStore.data = json;
-                                        window.PublishedResultsStore.updatedAt = new Date().toISOString();
-                                    } catch (err) {
-                                        statusEl.innerHTML = "<i class='ph-bold ph-warning'></i> Error: Invalid JSON";
-                                        statusEl.style.color = "#ff4444";
                                     }
-                                };
-                                reader.readAsText(file);
-                            };
-
-                            window.updateResultsStats = function (json, fileName = null) {
-                                const statusEl = document.getElementById('published-results-status');
-                                const exams = json.exams || [];
-                                let studentCount = 0;
-                                exams.forEach(ex => {
-                                    studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
                                 });
+                            });
 
-                                document.getElementById('results-exams-count').textContent = exams.length;
-                                document.getElementById('results-total-count').textContent = studentCount;
-                                document.getElementById('results-last-sync').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            // Manual input change listener
+                            const input = document.getElementById('published-results-upload');
+                            if (input) {
+                                input.addEventListener('change', function () {
+                                    window.handlePublishedResultsUpload(this);
+                                });
+                            }
+                        })();
 
-                                if (fileName) {
-                                    statusEl.innerHTML = "<i class='ph-bold ph-check-circle'></i> Loaded: " + fileName;
-                                    statusEl.style.color = "#2ed573";
+                        // FILE UPLOAD & STATS LOGIC
+                        window.handlePublishedResultsUpload = function (input) {
+                            const file = input.files[0];
+                            const statusEl = document.getElementById('published-results-status');
+
+                            if (!file) return;
+
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                try {
+                                    const json = JSON.parse(e.target.result);
+                                    window.updateResultsStats(json, file.name);
+                                    window.PublishedResultsStore.data = json;
+                                    window.PublishedResultsStore.updatedAt = new Date().toISOString();
+                                } catch (err) {
+                                    statusEl.innerHTML = "<i class='ph-bold ph-warning'></i> Error: Invalid JSON";
+                                    statusEl.style.color = "#ff4444";
                                 }
                             };
+                            reader.readAsText(file);
+                        };
 
-                            window.clearPublishedResults = function () {
-                                window.PublishedResultsStore.data = null;
-                                document.getElementById('published-results-upload').value = '';
-                                document.getElementById('published-results-status').textContent = 'No file uploaded';
-                                document.getElementById('published-results-status').style.color = '#888';
+                        window.updateResultsStats = function (json, fileName = null) {
+                            const statusEl = document.getElementById('published-results-status');
+                            const exams = json.exams || [];
+                            let studentCount = 0;
+                            exams.forEach(ex => {
+                                studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
+                            });
 
-                                // Reset stats
-                                document.getElementById('results-exams-count').textContent = '0';
-                                document.getElementById('results-total-count').textContent = '0';
-                                document.getElementById('results-last-sync').textContent = '--:--';
-                            };
+                            document.getElementById('results-exams-count').textContent = exams.length;
+                            document.getElementById('results-total-count').textContent = studentCount;
+                            document.getElementById('results-last-sync').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                            // RESULT APP SHIM (Navigation support)
-                            window.ResultApp = window.ResultApp || {};
-
-                            function showSearchForm() {
-                                console.log("ResultApp: Showing search form");
-                                if (document.getElementById('search-form')) document.getElementById('search-form').style.display = 'block';
-                                if (document.getElementById('result-view')) document.getElementById('result-view').style.display = 'none';
-
-                                // Also reset the table view if needed
-                                const tbody = document.getElementById('results-table-body');
-                                if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#666;">Ready to sync.</td></tr>';
+                            if (fileName) {
+                                statusEl.innerHTML = "<i class='ph-bold ph-check-circle'></i> Loaded: " + fileName;
+                                statusEl.style.color = "#2ed573";
                             }
+                        };
 
-                            window.showSearchForm = showSearchForm;
-                            window.ResultApp.showSearchForm = showSearchForm;
-                        </script>
-                    </div>
+                        window.clearPublishedResults = function () {
+                            window.PublishedResultsStore.data = null;
+                            document.getElementById('published-results-upload').value = '';
+                            document.getElementById('published-results-status').textContent = 'No file uploaded';
+                            document.getElementById('published-results-status').style.color = '#888';
+
+                            // Reset stats
+                            document.getElementById('results-exams-count').textContent = '0';
+                            document.getElementById('results-total-count').textContent = '0';
+                            document.getElementById('results-last-sync').textContent = '--:--';
+                        };
+
+                        // RESULT APP SHIM (Navigation support)
+                        window.ResultApp = window.ResultApp || {};
+
+                        function showSearchForm() {
+                            console.log("ResultApp: Showing search form");
+                            if (document.getElementById('search-form')) document.getElementById('search-form').style.display = 'block';
+                            if (document.getElementById('result-view')) document.getElementById('result-view').style.display = 'none';
+
+                            // Also reset the table view if needed
+                            const tbody = document.getElementById('results-table-body');
+                            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#666;">Ready to sync.</td></tr>';
+                        }
+
+                        window.showSearchForm = showSearchForm;
+                        window.ResultApp.showSearchForm = showSearchForm;
+                    </script>
                 </div>
             </div>
+        </div>
 
-            <!-- PREVIEW / RESULTS TABLE -->
-            <div style="margin-top: 30px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h4 style="margin: 0; color: #fff;">Synced Data Preview</h4>
-                    <div id="results-sync-info-header" style="font-size: 0.8rem; color: #888;"></div>
-                </div>
-                <div style="overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Roll No</th>
-                                <th>Name</th>
-                                <th>Exam</th>
-                                <th>Total</th>
-                                <th>Grade</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="results-table-body">
-                            <tr>
-                                <td colspan="6" style="text-align:center; padding: 30px; color: #666;">Ready to sync.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- PREVIEW / RESULTS TABLE -->
+        <div style="margin-top: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h4 style="margin: 0; color: #fff;">Synced Data Preview</h4>
+                <div id="results-sync-info-header" style="font-size: 0.8rem; color: #888;"></div>
             </div>
+            <div style="overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Roll No</th>
+                            <th>Name</th>
+                            <th>Exam</th>
+                            <th>Total</th>
+                            <th>Grade</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding: 30px; color: #666;">Ready to sync.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         </div>
 
         <!-- 8. ANALYTICS PANEL -->
