@@ -14,6 +14,7 @@
     <!-- Global Navigation & Footer -->
     <link rel="stylesheet" href="assets/css/global-navigation.css">
     <link rel="stylesheet" href="assets/css/global-footer.css">
+    <link rel="stylesheet" href="assets/css/menu-styles.css">
 
     <!-- Critical Scripts (Optimized) -->
     <script src="assets/js/utils/performance.js" defer></script>
@@ -45,8 +46,8 @@
     <!-- Global Navigation -->
     <div id="global-nav"></div>
 
-    <header id="main-header">
-        <!-- Navigation injected via site-nav.js -->
+    <header id="dynamic-header">
+        <!-- Navigation injected via MenuBuilder -->
     </header>
 
     <main>
@@ -518,7 +519,12 @@
 
     </main>
 
-    <script src="assets/js/site-nav.js"></script>
+    <script src="assets/js/menu-builder.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            MenuBuilder.init();
+        });
+    </script>
     <script src="assets/js/script.js"></script>
 
 

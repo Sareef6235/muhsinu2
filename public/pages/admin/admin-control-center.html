@@ -11,6 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/platform-styles.css">
+    <link rel="stylesheet" href="../../assets/css/menu-styles.css">
     <style>
         :root {
             --sidebar-width: 280px;
@@ -155,6 +156,7 @@
     <script src="../../assets/js/page-builder.js"></script>
     <script src="../../assets/js/site-engine.js"></script>
     <script src="../../assets/js/site-settings.js"></script>
+    <script src="../../assets/js/menu-builder.js"></script>
 
     <script>
         window.AdminControlCenter = {
@@ -165,7 +167,8 @@
                 { id: 'dashverify', label: 'Dashboard Verification', icon: 'bi-check-square-fill' },
                 { id: 'settingsverify', label: 'Settings Verification', icon: 'bi-gear-wide-connected' },
                 { id: 'merit', label: 'Merit Logic Tester', icon: 'bi-calculator-fill' },
-                { id: 'json', label: 'JSON Viewer / Export', icon: 'bi-code-slash' }
+                { id: 'json', label: 'JSON Viewer / Export', icon: 'bi-code-slash' },
+                { id: 'menumanager', label: 'Menu Manager', icon: 'bi-list-ul' }
             ],
 
             init() {
@@ -251,6 +254,7 @@
                         case 'settingsverify': this.renderSettingsVerification(); break;
                         case 'merit': this.renderMeritLogic(); break;
                         case 'json': this.renderJSONViewer(); break;
+                        case 'menumanager': this.renderMenuManager(); break;
                         case 'diagnostics': this.renderDiagnostics(); break;
                     }
 
@@ -638,6 +642,189 @@
                         </div>
                     </div>
                 `;
+            },
+
+            renderMenuManager() {
+                const data = MenuBuilder.getMenu();
+                document.getElementById('admin-content').innerHTML = `
+                    <div class="glass-panel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h5 class="fw-bold mb-1">Navigation Menu Manager</h5>
+                                <p class="text-secondary small mb-0">Drag to reorder, click to edit. Supports 2-level dropdowns.</p>
+                            </div>
+                            <button class="btn btn-primary rounded-pill px-4" onclick="AdminControlCenter.addMenuItem()">
+                                <i class="bi bi-plus-lg me-2"></i> Add Item
+                            </button>
+                        </div>
+
+                        <div id="menu-builder-list" class="list-group rounded-4 overflow-hidden border-0 bg-light p-3">
+                            ${data.menu.map((item, index) => this.buildMenuAdminItem(item, index)).join('')}
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top">
+                            <button class="btn btn-dark rounded-pill px-4 me-2" onclick="AdminControlCenter.saveMenu()">
+                                <i class="bi bi-save2-fill me-2"></i> Save Navigation State
+                            </button>
+                            <button class="btn btn-outline-danger rounded-pill px-4" onclick="AdminControlCenter.resetMenu()">
+                                <i class="bi bi-arrow-counterclockwise"></i> Reset Default
+                            </button>
+                        </div>
+
+                        <!-- Mini Live Preview -->
+                        <div class="mt-5">
+                            <h6 class="fw-bold mb-3 text-uppercase small text-secondary">Live Header Preview (Draft)</h6>
+                            <header id="admin-header-preview" class="border rounded-4 overflow-hidden shadow-sm"></header>
+                        </div>
+                    </div>
+                `;
+                this.initDragAndDrop();
+                MenuBuilder.renderMenu('admin-header-preview', data.menu);
+            },
+
+            buildMenuAdminItem(item, index) {
+                const childHtml = item.children ? item.children.map((child, cIndex) => `
+                    <div class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 mt-2 ms-5 rounded-4 bg-white shadow-sm" draggable="true" data-parent="${index}" data-index="${cIndex}">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-grip-vertical me-3 text-secondary-emphasis opacity-50"></i>
+                            <div>
+                                <span class="fw-bold">${MenuBuilder.sanitize(child.label)}</span>
+                                <span class="text-secondary small ms-2">${child.link}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-light rounded-circle" onclick="AdminControlCenter.editMenuItem(${index}, ${cIndex})"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-light text-danger rounded-circle" onclick="AdminControlCenter.deleteMenuItem(${index}, ${cIndex})"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('') : '';
+
+                return `
+                    <div class="menu-item-group mb-3" data-index="${index}">
+                        <div class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 rounded-4 bg-white shadow-sm" draggable="true" data-index="${index}">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-grip-vertical me-3 text-secondary fs-4"></i>
+                                <div>
+                                    <div class="fw-bold d-flex align-items-center gap-2">
+                                        ${MenuBuilder.sanitize(item.label)}
+                                        ${item.enabled ? '' : '<span class="badge bg-secondary-subtle text-secondary fw-normal">Disabled</span>'}
+                                    </div>
+                                    <div class="text-secondary small">${item.link}</div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-light rounded-pill px-3" onclick="AdminControlCenter.addMenuItem(${index})"><i class="bi bi-plus me-1"></i> Child</button>
+                                <button class="btn btn-sm btn-light rounded-circle" onclick="AdminControlCenter.editMenuItem(${index})"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm btn-light text-danger rounded-circle" onclick="AdminControlCenter.deleteMenuItem(${index})"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                        ${childHtml}
+                    </div>
+                `;
+            },
+
+            initDragAndDrop() {
+                const list = document.getElementById('menu-builder-list');
+                let draggedItem = null;
+
+                list.addEventListener('dragstart', (e) => {
+                    draggedItem = e.target.closest('[draggable="true"]');
+                    e.target.style.opacity = '0.5';
+                });
+
+                list.addEventListener('dragend', (e) => {
+                    e.target.style.opacity = '1';
+                });
+
+                list.addEventListener('dragover', (e) => e.preventDefault());
+
+                list.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const target = e.target.closest('[draggable="true"]');
+                    if (!target || target === draggedItem) return;
+
+                    const data = MenuBuilder.getMenu();
+                    const pIdx = draggedItem.dataset.parent;
+                    const cIdx = draggedItem.dataset.index;
+                    const tPIdx = target.dataset.parent;
+                    const tCIdx = target.dataset.index;
+
+                    if (pIdx === undefined && tPIdx === undefined) {
+                        // Parent shifting
+                        const item = data.menu.splice(cIdx, 1)[0];
+                        data.menu.splice(tCIdx, 0, item);
+                    } else if (pIdx !== undefined && tPIdx !== undefined && pIdx === tPIdx) {
+                        // Child shifting within same parent
+                        const item = data.menu[pIdx].children.splice(cIdx, 1)[0];
+                        data.menu[pIdx].children.splice(tCIdx, 0, item);
+                    }
+
+                    MenuBuilder.save(data.menu);
+                    this.renderMenuManager();
+                });
+            },
+
+            addMenuItem(parentIdx = null) {
+                const label = prompt('Menu Label:');
+                if (!label) return;
+                const link = prompt('Link (URL or #anchor):', '#');
+
+                const data = MenuBuilder.getMenu();
+                const newItem = { label, link, enabled: true, children: [] };
+
+                if (parentIdx === null) {
+                    data.menu.push(newItem);
+                } else {
+                    if (!data.menu[parentIdx].children) data.menu[parentIdx].children = [];
+                    data.menu[parentIdx].children.push({ label, link, enabled: true });
+                }
+
+                MenuBuilder.save(data.menu);
+                this.renderMenuManager();
+            },
+
+            editMenuItem(pIdx, cIdx = null) {
+                const data = MenuBuilder.getMenu();
+                const item = cIdx === null ? data.menu[pIdx] : data.menu[pIdx].children[cIdx];
+
+                const label = prompt('Edit Label:', item.label);
+                if (label === null) return;
+                const link = prompt('Edit Link:', item.link);
+                if (link === null) return;
+                const enabled = confirm('Is this item enabled?');
+
+                item.label = label;
+                item.link = link;
+                item.enabled = enabled;
+
+                MenuBuilder.save(data.menu);
+                this.renderMenuManager();
+            },
+
+            deleteMenuItem(pIdx, cIdx = null) {
+                if (!confirm('Are you sure you want to delete this menu item?')) return;
+                const data = MenuBuilder.getMenu();
+
+                if (cIdx === null) {
+                    data.menu.splice(pIdx, 1);
+                } else {
+                    data.menu[pIdx].children.splice(cIdx, 1);
+                }
+
+                MenuBuilder.save(data.menu);
+                this.renderMenuManager();
+            },
+
+            saveMenu() {
+                const data = MenuBuilder.getMenu();
+                MenuBuilder.save(data.menu);
+                alert('Navigation State Saved Successfully!');
+            },
+
+            resetMenu() {
+                if (!confirm('This will wipe all custom navigation settings. Continue?')) return;
+                localStorage.removeItem(MenuBuilder.storageKey);
+                this.renderMenuManager();
             }
         };
 
