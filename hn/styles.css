@@ -209,7 +209,7 @@ ul {
         display: block;
     }
 
-    border-bottom: 1px solid var(--glass-border);
+   
 }
 
 .nav-links.active {
@@ -227,7 +227,7 @@ ul {
 .mobile-menu-btn.active .bar:nth-child(3) {
     transform: translateY(-8px) rotate(-45deg);
 }
-}
+
 
 /* Hero Section */
 #hero {

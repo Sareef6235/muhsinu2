@@ -28,7 +28,7 @@
 
         body {
             background: #050505;
-            color: #fff;
+            color: #eee;
             font-family: 'Outfit', sans-serif;
             margin: 0;
             overflow-x: hidden;
@@ -688,7 +688,7 @@
                 <i class="ph-bold ph-hard-drives" style="color: #00f3ff;"></i> Server
             </div>
 
-            <div class="nav-item" onclick="switchPanel('site-settings', this)">
+            <div class="nav-item" onclick="switchPanel('header', this)">
                 <i class="ph-bold ph-gear" style="color: #ff9f43;"></i> Site Settings
             </div>
 
@@ -1811,205 +1811,178 @@
                         </ul>
                     </div>
 
-                    <div style="border-top: 1px solid var(--glass-border); padding-top: 25px;">
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <button class="btn btn-md btn-secondary"
-                                style="width: 100%; border-color: var(--primary-color);"
-                                onclick="SchoolManager.downloadJSON()">
-                                <i class="ph ph-download-simple"></i> Download updated schools.json
+                    <div
+                        style="border-top: 1px solid var(--glass-border); padding-top: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-md btn-secondary" onclick="SchoolManager.downloadJSON()"
+                            style="width: 100%;">
+                            <i class="ph ph-download-simple"></i> Download
+                        </button>
+                        <div style="position: relative; overflow: hidden; display: inline-block; width: 100%;">
+                            <button class="btn btn-md btn-secondary" style="width: 100%;">
+                                <i class="ph ph-upload-simple"></i> Upload
                             </button>
-                            <div
-                                style="display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(0, 243, 255, 0.05); border-radius: 8px; border: 1px dashed var(--primary-color);">
-                                <input type="file" id="school-json-upload" accept=".json" style="display: none;"
-                                    onchange="SchoolManager.uploadJSON(this)">
-                                <label for="school-json-upload"
-                                    style="cursor: pointer; color: var(--primary-color); font-size: 0.9rem; font-weight: 500; margin: 0; display: flex; align-items: center; gap: 8px;">
-                                    <i class="ph ph-upload-simple"></i> Restore/Upload schools.json
-                                </label>
-                            </div>
+                            <input type="file" accept=".json" onchange="SchoolManager.uploadJSON(this)"
+                                style="position: absolute; font-size: 100px; right: 0; top: 0; opacity: 0; cursor: pointer;">
                         </div>
-                        <p style="margin-top: 15px; font-size: 0.75rem; color: #888; line-height: 1.4;">
-                            <i class="ph ph-info"></i> <b>How to save:</b> Add/remove schools, click <b>Download</b>,
-                            replace the file in your repository, and push to GitHub.
-                        </p>
                     </div>
                 </div>
             </div>
+            <label for="school-json-upload"
+                style="cursor: pointer; color: var(--primary-color); font-size: 0.9rem; font-weight: 500; margin: 0; display: flex; align-items: center; gap: 8px;">
+                <i class="ph ph-upload-simple"></i> Restore/Upload schools.json
+            </label>
+        </div>
+        </div>
+        <p style="margin-top: 15px; font-size: 0.75rem; color: #888; line-height: 1.4;">
+            <i class="ph ph-info"></i> <b>How to save:</b> Add/remove schools, click <b>Download</b>,
+            replace the file in your repository, and push to GitHub.
+        </p>
+        </div>
+        </div>
+        </div>
 
-            <!-- Add School Modal (Inline) -->
-            <div id="add-school-modal" class="modal-overlay" style="display: none;">
-                <div class="glass-card" style="max-width: 400px; padding: 25px;">
-                    <h4 style="margin-bottom: 20px; color: var(--primary-color);">Add New School</h4>
-                    <div class="form-group">
-                        <label class="form-label">School Name</label>
-                        <input type="text" id="newSchoolName" class="form-input" placeholder="Enter school name...">
-                    </div>
-                    <div style="display: flex; gap: 15px; margin-top: 20px;">
-                        <button class="btn btn-primary" style="flex: 1;" onclick="SchoolManager.addSchool()">Add
-                            School</button>
-                        <button class="btn btn-secondary" style="flex: 1;"
-                            onclick="SchoolManager.hideAddForm()">Cancel</button>
-                    </div>
+        <!-- Add School Modal (Inline) -->
+        <div id="add-school-modal" class="modal-overlay" style="display: none;">
+            <div class="glass-card" style="max-width: 400px; padding: 25px;">
+                <h4 style="margin-bottom: 20px; color: var(--primary-color);">Add New School</h4>
+                <div class="form-group">
+                    <label class="form-label">School Name</label>
+                    <input type="text" id="newSchoolName" class="form-input" placeholder="Enter school name...">
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button class="btn btn-primary" style="flex: 1;" onclick="SchoolManager.addSchool()">Add
+                        School</button>
+                    <button class="btn btn-secondary" style="flex: 1;"
+                        onclick="SchoolManager.hideAddForm()">Cancel</button>
                 </div>
             </div>
+        </div>
 
-            <div class="school-list-grid" id="schools-grid">
-                <!-- Data is injected by Selecting a school from the sidebar dropdown -->
-                <div
-                    style="text-align: center; width: 100%; padding: 40px; color: #666; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px dashed #333;">
-                    <i class="ph ph-buildings" style="font-size: 3rem; display: block; margin-bottom: 10px;"></i>
-                    <p>Select a school from the sidebar to view its profile.</p>
-                </div>
+        <div class="school-list-grid" id="schools-grid">
+            <!-- Data is injected by Selecting a school from the sidebar dropdown -->
+            <div
+                style="text-align: center; width: 100%; padding: 40px; color: #666; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px dashed #333;">
+                <i class="ph ph-buildings" style="font-size: 3rem; display: block; margin-bottom: 10px;"></i>
+                <p>Select a school from the sidebar to view its profile.</p>
             </div>
+        </div>
         </div>
 
         <!-- 10. GITHUB DEPLOYMENT PANEL -->
         <div id="deployment" class="panel">
-            <style>
-                .deploy-card {
-                    background: rgba(255, 255, 255, 0.03);
-                    border: 1px solid var(--glass-border);
-                    border-radius: 20px;
-                    padding: 30px;
-                    margin-bottom: 25px;
-                }
-
-                .git-status-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 6px 15px;
-                    border-radius: 50px;
-                    font-size: 0.85rem;
-                    background: rgba(46, 213, 115, 0.1);
-                    color: #2ed573;
-                    border: 1px solid rgba(46, 213, 115, 0.2);
-                }
-
-                .deploy-step {
-                    display: flex;
-                    gap: 15px;
-                    margin-bottom: 20px;
-                    align-items: flex-start;
-                }
-
-                .step-dot {
-                    width: 24px;
-                    height: 24px;
-                    background: var(--primary-color);
-                    color: #000;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: 800;
-                    font-size: 0.8rem;
-                    flex-shrink: 0;
-                    margin-top: 2px;
-                }
-            </style>
-
-            <div class="deploy-card">
-                <div
-                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
-                    <div>
-                        <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
-                            <i class="ph-bold ph-github-logo"></i> GitHub Connection
-                        </h3>
-                        <p style="color: #888; margin-top: 5px;">Linked to: <code id="git-repo-name"
-                                style="color: var(--primary-color);">Sareef6235/muhsinu2</code></p>
-                    </div>
-                    <div class="git-status-badge" id="git-status-badge">
-                        <i class="ph-bold ph-check-circle"></i> Connected
-                    </div>
-                </div>
-
-                <div
-                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px;">
-                    <div
-                        style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;">
-                            Branch</p>
-                        <p style="font-weight: 600;" id="git-branch-name"><i class="ph ph-git-branch"></i> main</p>
-                    </div>
-                    <div
-                        style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;">
-                            Deployment Status</p>
-                        <p style="font-weight: 600; color: #2ed573;"><i class="ph ph-rocket-launch"></i> Active (Pages)
-                        </p>
-                    </div>
-                    <div
-                        style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;">Last
-                            Commit Date</p>
-                        <p style="font-weight: 600;" id="last-deploy-time">Fetching...</p>
-                    </div>
-                </div>
-
-                <div
-                    style="margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                    <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 10px;">Latest
-                        Commit Information</p>
-                    <div style="display: flex; gap: 15px; align-items: center;">
-                        <div id="git-author-avatar"
-                            style="width: 40px; height: 40px; background: #333; border-radius: 50%; overflow: hidden;">
-                        </div>
-                        <div>
-                            <p style="font-weight: 600; margin-bottom: 2px;" id="git-last-commit">"Update dashboard
-                                logic"</p>
-                            <p style="font-size: 0.85rem; color: #888;">by <span id="git-last-author"
-                                    style="color: var(--primary-color);">Sareef6235</span></p>
-                        </div>
+            <div class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3 style="margin: 0;"><i class="ph-bold ph-cloud-arrow-up"></i> Deployment Manager</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-sm btn-secondary" onclick="DeploymentManager.downloadConnections()">
+                        <i class="ph ph-download-simple"></i> Export
+                    </button>
+                    <div style="position: relative; overflow: hidden; display: inline-block;">
+                        <button class="btn btn-sm btn-secondary">
+                            <i class="ph ph-upload-simple"></i> Import
+                        </button>
+                        <input type="file" accept=".json" onchange="DeploymentManager.uploadConnections(this)"
+                            style="position: absolute; font-size: 100px; right: 0; top: 0; opacity: 0; cursor: pointer;">
                     </div>
                 </div>
             </div>
 
-            <h3 style="margin-bottom: 20px;">Deployment Workflow</h3>
-            <div class="deploy-card">
-                <div class="deploy-step">
-                    <div class="step-dot">1</div>
-                    <div>
-                        <p style="font-weight: 600; margin-bottom: 5px;">Publish Data</p>
-                        <p style="color: #888; font-size: 0.9rem;">Go to the <b>Results Management</b> panel and click
-                            "PUBLISH FOR STATIC SITE" to generate the latest results JSON.</p>
-                    </div>
-                </div>
-                <div class="deploy-step">
-                    <div class="step-dot">2</div>
-                    <div>
-                        <p style="font-weight: 600; margin-bottom: 5px;">Commit Changes</p>
-                        <p style="color: #888; font-size: 0.9rem;">The JSON file is saved locally. Use your Git client
-                            or terminal to commit the changes.</p>
-                        <code
-                            style="display: block; background: #000; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; border: 1px solid #333;">git add . ; git commit -m "update results"</code>
-                    </div>
-                </div>
-                <div class="deploy-step">
-                    <div class="step-dot">3</div>
-                    <div>
-                        <p style="font-weight: 600; margin-bottom: 5px;">Push to GitHub</p>
-                        <p style="color: #888; font-size: 0.9rem;">Push the commit to the <code>main</code> branch.
-                            GitHub Actions will automatically rebuild and deploy your site.</p>
-                        <code
-                            style="display: block; background: #000; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; border: 1px solid #333;">git push origin main</code>
-                    </div>
-                </div>
+            <div class="glass-card" style="padding: 25px; margin-bottom: 30px;">
+                <h4 style="margin-bottom: 20px; color: var(--primary-color);">Repository Connections</h4>
 
                 <div
-                    style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--glass-border); display: flex; gap: 10px;">
-                    <button class="btn btn-sm btn-primary"
-                        onclick="window.open('https://github.com/Sareef6235/muhsinu2/actions', '_blank')">
-                        <i class="ph ph-arrow-square-out"></i> View Actions Pipeline
+                    style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 25px; overflow: hidden;">
+                    <ul id="repo-list"
+                        style="list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto;">
+                        <!-- Injected by JS -->
+                    </ul>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px;">
+                    <input id="repo-name-input" class="form-input"
+                        placeholder="Owner/Repository (e.g. Sareef6235/muhsinu2)">
+                    <input id="repo-branch-input" class="form-input" placeholder="Branch (default: main)">
+                    <button class="btn btn-primary" onclick="DeploymentManager.addRepo()">
+                        <i class="ph ph-plus"></i> Add Repository
                     </button>
-                    <button class="btn btn-sm btn-secondary"
-                        onclick="window.open('https://github.com/Sareef6235/muhsinu2', '_blank')">
-                        <i class="ph ph-github-logo"></i> Open Repository
-                    </button>
+                </div>
+            </div>
+
+            <div id="active-repo-status" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Live Status: <span id="status-repo-name"
+                        style="color: var(--primary-color);">Repo</span></h3>
+                <div class="deploy-card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+                        <div>
+                            <p style="color: #888; margin: 0;">Selected Branch: <code id="git-branch-name"
+                                    style="color: var(--primary-color);">main</code></p>
+                        </div>
+                        <div class="git-status-badge" id="git-status-badge">
+                            <i class="ph-bold ph-check-circle"></i> Connected
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div
+                            style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;">
+                                Deployment Status</p>
+                            <p style="font-weight: 600; color: #2ed573;"><i class="ph ph-rocket-launch"></i> Active
+                                (Pages)</p>
+                        </div>
+                        <div
+                            style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;">
+                                Last Commit Date</p>
+                            <p style="font-weight: 600;" id="last-deploy-time">Fetching...</p>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 10px;">
+                            Latest Commit Information</p>
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div id="git-author-avatar"
+                                style="width: 40px; height: 40px; background: #333; border-radius: 50%; overflow: hidden;">
+                            </div>
+                            <div>
+                                <p style="font-weight: 600; margin-bottom: 2px;" id="git-last-commit">Fetching...</p>
+                                <p style="font-size: 0.85rem; color: #888;">by <span id="git-last-author"
+                                        style="color: var(--primary-color);">...</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 25px; display: flex; gap: 10px;">
+                        <button class="btn btn-sm btn-secondary" id="btn-view-actions"
+                            onclick="window.open('#', '_blank')">
+                            <i class="ph ph-arrow-square-out"></i> Actions
+                        </button>
+                        <button class="btn btn-sm btn-secondary" id="btn-view-repo"
+                            onclick="window.open('#', '_blank')">
+                            <i class="ph ph-github-logo"></i> Repository
+                        </button>
+                        <button class="btn btn-sm btn-secondary" style="border-color: var(--primary-color);"
+                            onclick="DeploymentManager.toggleQuickEdit()">
+                            <i class="ph ph-pencil"></i> Quick Edit
+                        </button>
+                    </div>
+
+                    <div id="github-file-editor-section"
+                        style="display: none; margin-top: 25px; animation: slideDown 0.3s ease;">
+                        <h4 style="margin-bottom: 15px; color: var(--primary-color);">Direct File Editing</h4>
+                        <div
+                            style="background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border); padding: 5px;">
+                            <ul id="quick-edit-list" style="list-style: none; padding: 0; margin: 0;">
+                                <!-- Filled by JS -->
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
         <!-- 10. PRO EXAM PANEL -->
         <div id="pro-exam" class="panel">
             <div class="panel-header"
@@ -2164,268 +2137,86 @@
                 </div>
             </div>
             <!-- 12. SITE SETTINGS PANEL -->
-            <div id="site-settings" class="panel">
+            <div id="header" class="panel">
                 <div class="panel-header"
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3>Site Settings</h3>
+                    <h3><i class="ph-bold ph-gear"></i> Site Settings</h3>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="SiteEditor.reset()"><i
-                                class="ph-bold ph-arrow-counter-clockwise"></i> Reset</button>
-                        <button class="btn btn-primary" onclick="SiteEditor.save()"><i
-                                class="ph-bold ph-floppy-disk"></i>
-                            Save Changes</button>
+                        <button class="btn btn-secondary" onclick="SiteSettings.resetAll()">
+                            <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset All
+                        </button>
+                        <button class="btn btn-primary" onclick="SiteSettings.save(); alert('Settings saved!');">
+                            <i class="ph-bold ph-floppy-disk"></i> Save Changes
+                        </button>
                     </div>
                 </div>
 
-                <div class="settings-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
-                    <!-- Left: Configuration -->
-                    <div class="settings-config">
-                        <!-- Tab Navigation -->
-                        <div class="tab-scroller"
-                            style="margin-bottom: 20px; overflow-x: auto; white-space: nowrap; display: flex; gap: 10px; padding: 5px;">
-                            <button class="btn btn-mini tab-btn active" onclick="SiteEditor.switchTab('header', this)"
-                                style="border-radius: 50px; padding: 10px 20px;">Header</button>
-                            <button class="btn btn-mini tab-btn" onclick="SiteEditor.switchTab('menu', this)"
-                                style="border-radius: 50px; padding: 10px 20px;">Navigation</button>
-                            <button class="btn btn-mini tab-btn" onclick="SiteEditor.switchTab('footer', this)"
-                                style="border-radius: 50px; padding: 10px 20px;">Footer</button>
+                <!-- Tab Navigation -->
+                <div class="tab-scroller"
+                    style="margin-bottom: 25px; overflow-x: auto; white-space: nowrap; display: flex; gap: 10px; padding: 5px;">
+                    <button class="btn btn-mini tab-btn active" onclick="switchSettingsTab('header', this)"
+                        style="border-radius: 50px; padding: 10px 20px;">
+                        <i class="ph-bold ph-browser"></i> Header Settings
+                    </button>
+                    <button class="btn btn-mini tab-btn" onclick="switchSettingsTab('footer', this)"
+                        style="border-radius: 50px; padding: 10px 20px;">
+                        <i class="ph-bold ph-layout"></i> Footer Settings
+                    </button>
+                    <button class="btn btn-mini tab-btn" onclick="switchSettingsTab('advanced', this)"
+                        style="border-radius: 50px; padding: 10px 20px;">
+                        <i class="ph-bold ph-gear-six"></i> Advanced
+                    </button>
+                </div>
+
+                <!-- Header Settings Tab -->
+                <div id="header-settings-content" class="settings-tab-content">
+                    <!-- Dynamically rendered by SiteSettings.renderHeaderEditor() -->
+                </div>
+
+                <!-- Footer Settings Tab -->
+                <div id="footer-settings-content" class="settings-tab-content" style="display: none;">
+                    <!-- Dynamically rendered by SiteSettings.renderFooterEditor() -->
+                </div>
+
+                <!-- Advanced Tab -->
+                <div id="advanced-settings-content" class="settings-tab-content" style="display: none;">
+                    <div style="display: grid; gap: 25px; max-width: 800px;">
+                        <!-- Theme Toggle -->
+                        <div class="glass-card" style="padding: 20px;">
+                            <h4 style="margin-top: 0;"><i class="ph-bold ph-moon-stars"></i> Theme</h4>
+                            <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Switch between light and
+                                dark mode for the site.</p>
+                            <button class="btn btn-secondary" onclick="SiteSettings.toggleTheme()" style="width: 100%;">
+                                <i class="ph-bold ph-sun"></i> Toggle Theme Mode
+                            </button>
                         </div>
 
-                        <!-- Header Tab -->
-                        <div id="ss-tab-header" class="ss-tab-content">
-                            <div class="glass-card" style="padding: 20px; margin-bottom: 20px;">
-                                <h4 style="margin-top: 0; margin-bottom: 15px;"><i class="ph-bold ph-layout"></i> Header
-                                    Basics</h4>
-                                <div class="form-group" style="margin-bottom: 15px;">
-                                    <label
-                                        style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Site
-                                        Title</label>
-                                    <input type="text" id="ss-site-title" class="form-input"
-                                        oninput="SiteEditor.updatePreview()" placeholder="Enter Site Title">
-                                </div>
-                                <div class="form-group" style="margin-bottom: 15px;">
-                                    <label
-                                        style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Tagline</label>
-                                    <input type="text" id="ss-site-tagline" class="form-input"
-                                        oninput="SiteEditor.updatePreview()" placeholder="Enter Tagline">
-                                </div>
-                                <div class="form-group">
-                                    <label
-                                        style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Site
-                                        Logo</label>
-                                    <input type="file" id="ss-site-logo" class="form-input" accept="image/*"
-                                        onchange="SiteEditor.handleLogoUpload(this)">
-                                </div>
+                        <!-- Export/Import -->
+                        <div class="glass-card" style="padding: 20px;">
+                            <h4 style="margin-top: 0;"><i class="ph-bold ph-download-simple"></i> Backup & Restore</h4>
+                            <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Export your settings as JSON
+                                or import from a backup file.</p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <button class="btn btn-primary" onclick="SiteSettings.exportSettings()">
+                                    <i class="ph-bold ph-export"></i> Export Settings
+                                </button>
+                                <button class="btn btn-secondary"
+                                    onclick="document.getElementById('import-file-input').click()">
+                                    <i class="ph-bold ph-upload-simple"></i> Import Settings
+                                </button>
                             </div>
-
-                            <div class="glass-card" style="padding: 20px;">
-                                <h4 style="margin-top: 0; margin-bottom: 15px;"><i class="ph-bold ph-palette"></i> Style
-                                    & Behavior</h4>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                    <div class="form-group">
-                                        <label
-                                            style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Background</label>
-                                        <input type="color" id="ss-header-bg" class="form-input"
-                                            style="height: 45px; padding: 5px;" oninput="SiteEditor.updatePreview()">
-                                    </div>
-                                    <div class="form-group">
-                                        <label
-                                            style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Text
-                                            Color</label>
-                                        <input type="color" id="ss-header-text" class="form-input"
-                                            style="height: 45px; padding: 5px;" oninput="SiteEditor.updatePreview()">
-                                    </div>
-                                </div>
-                                <div style="margin-top: 15px; display: flex; gap: 20px;">
-                                    <label
-                                        style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #eee; font-size: 0.9rem;">
-                                        <input type="checkbox" id="ss-header-sticky"
-                                            onchange="SiteEditor.updatePreview()"> Sticky Header
-                                    </label>
-                                    <label
-                                        style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #eee; font-size: 0.9rem;">
-                                        <input type="checkbox" id="ss-header-showlogo" checked
-                                            onchange="SiteEditor.updatePreview()"> Show Logo
-                                    </label>
-                                </div>
-                            </div>
+                            <input type="file" id="import-file-input" accept=".json" style="display: none;"
+                                onchange="if(this.files[0]) SiteSettings.importSettings(this.files[0]); this.value='';">
                         </div>
 
-                        <!-- Menu Tab -->
-                        <div id="ss-tab-menu" class="ss-tab-content" style="display: none;">
-                            <div class="glass-card" style="padding: 20px;">
-                                <div
-                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                    <h4 style="margin: 0;"><i class="ph-bold ph-list"></i> Menu Items</h4>
-                                    <button class="btn btn-mini" onclick="SiteEditor.addMenuItem()"><i
-                                            class="ph-bold ph-plus"></i> Add Item</button>
-                                </div>
-                                <div id="ss-menu-list" style="display: flex; flex-direction: column; gap: 10px;">
-                                    <!-- Menu Items Rendered Here -->
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="ss-tab-footer" class="ss-tab-content" style="display: none;">
-                            <div class="glass-card" style="padding: 20px; margin-bottom: 20px;">
-                                <h4 style="margin-top: 0; margin-bottom: 15px;"><i class="ph-bold ph-info"></i> Footer
-                                    Details</h4>
-                                <div class="form-group" style="margin-bottom: 15px;">
-                                    <label
-                                        style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Description</label>
-                                    <textarea id="ss-footer-desc" class="form-input" rows="2"
-                                        oninput="SiteEditor.updatePreview()"
-                                        placeholder="Short site description..."></textarea>
-                                </div>
-                                <div class="form-group" style="margin-bottom: 15px;">
-                                    <label
-                                        style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Address</label>
-                                    <textarea id="ss-footer-address" class="form-input" rows="2"
-                                        oninput="SiteEditor.updatePreview()"
-                                        placeholder="Building No, Street, City"></textarea>
-                                </div>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                    <div class="form-group">
-                                        <label
-                                            style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Phone</label>
-                                        <input type="text" id="ss-footer-phone" class="form-input"
-                                            oninput="SiteEditor.updatePreview()" placeholder="+1234567890">
-                                    </div>
-                                    <div class="form-group">
-                                        <label
-                                            style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Email</label>
-                                        <input type="email" id="ss-footer-email" class="form-input"
-                                            oninput="SiteEditor.updatePreview()" placeholder="info@example.com">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="glass-card" style="padding: 20px;">
-                                <h4 style="margin-top: 0; margin-bottom: 15px;"><i class="ph-bold ph-share-network"></i>
-                                    Social & Style</h4>
-                                <div class="form-group"
-                                    style="margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                                    <div>
-                                        <label
-                                            style="display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 5px;">Facebook</label>
-                                        <input type="text" id="ss-social-fb" class="form-input"
-                                            oninput="SiteEditor.updatePreview()" placeholder="#">
-                                    </div>
-                                    <div>
-                                        <label
-                                            style="display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 5px;">Instagram</label>
-                                        <input type="text" id="ss-social-ig" class="form-input"
-                                            oninput="SiteEditor.updatePreview()" placeholder="#">
-                                    </div>
-                                    <div>
-                                        <label
-                                            style="display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 5px;">YouTube</label>
-                                        <input type="text" id="ss-social-yt" class="form-input"
-                                            oninput="SiteEditor.updatePreview()" placeholder="#">
-                                    </div>
-                                </div>
-                                <div class="form-group" style="margin-bottom: 15px;">
-                                    <label
-                                        style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Copyright
-                                        Text</label>
-                                    <input type="text" id="ss-footer-copy" class="form-input"
-                                        oninput="SiteEditor.updatePreview()"
-                                        placeholder="&copy; 2026 Admin Panel. All Rights Reserved.">
-                                </div>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                    <div class="form-group">
-                                        <label
-                                            style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Footer
-                                            BG</label>
-                                        <input type="color" id="ss-footer-bg" class="form-input"
-                                            style="height: 45px; padding: 5px;" oninput="SiteEditor.updatePreview()">
-                                    </div>
-                                    <div class="form-group">
-                                        <label
-                                            style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Footer
-                                            Text</label>
-                                        <input type="color" id="ss-footer-text" class="form-input"
-                                            style="height: 45px; padding: 5px;" oninput="SiteEditor.updatePreview()">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right: Live Preview -->
-                    <div class="settings-preview">
-                        <div class="glass-card"
-                            style="padding: 0; position: sticky; top: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.5);">
-                            <div
-                                style="padding: 10px 15px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px;">
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56;"></div>
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e;"></div>
-                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #27c93f;"></div>
-                                <span style="font-size: 0.75rem; color: #888; margin-left: auto;">Live Preview</span>
-                            </div>
-
-                            <div id="ss-preview-container"
-                                style="background: #f4f4f4; min-height: 500px; padding: 0; display: flex; flex-direction: column;">
-                                <!-- Header Preview -->
-                                <div id="p-header"
-                                    style="padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #fff; color: #333; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s ease;">
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <img id="p-logo" src="../../assets/img/logo.png"
-                                            style="height: 35px; border-radius: 4px;">
-                                        <div>
-                                            <div id="p-title"
-                                                style="font-weight: 700; font-size: 1.1rem; line-height: 1;">Site Title
-                                            </div>
-                                            <div id="p-tagline"
-                                                style="font-size: 0.75rem; opacity: 0.8; margin-top: 2px;">Site Tagline
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <nav id="p-nav"
-                                        style="display: flex; gap: 20px; font-size: 0.9rem; font-weight: 500;">
-                                        <span>Home</span>
-                                        <span>About</span>
-                                        <span>Contact</span>
-                                    </nav>
-                                </div>
-
-                                <!-- Content Placeholder -->
-                                <div
-                                    style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; color: #aaa; text-align: center; background: #fff;">
-                                    <div>
-                                        <i class="ph ph-desktop"
-                                            style="font-size: 3rem; margin-bottom: 10px; display: block; opacity: 0.3;"></i>
-                                        <p style="font-size: 0.9rem;">Page Content Area</p>
-                                    </div>
-                                </div>
-
-                                <!-- Footer Preview -->
-                                <div id="p-footer"
-                                    style="padding: 30px; background: #222; color: #fff; transition: all 0.3s ease; font-size: 0.85rem;">
-                                    <div
-                                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                                        <div>
-                                            <div style="font-weight: 700; margin-bottom: 10px;">Contact Us</div>
-                                            <div id="p-address" style="opacity: 0.8; margin-bottom: 5px;">123 Street
-                                                View, City</div>
-                                            <div id="p-contact" style="opacity: 0.8;">+1234567890 | info@site.com</div>
-                                        </div>
-                                        <div style="text-align: right;">
-                                            <div style="font-weight: 700; margin-bottom: 10px;">Follow Us</div>
-                                            <div
-                                                style="display: flex; gap: 15px; justify-content: flex-end; font-size: 1.2rem;">
-                                                <i class="ph ph-facebook-logo"></i>
-                                                <i class="ph ph-instagram-logo"></i>
-                                                <i class="ph ph-youtube-logo"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="p-copy"
-                                        style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align: center; opacity: 0.6; font-size: 0.75rem;">
-                                        &copy; 2026 Admin Panel. All Rights Reserved.
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Reset -->
+                        <div class="glass-card" style="padding: 20px;">
+                            <h4 style="margin-top: 0;"><i class="ph-bold ph-warning"></i> Danger Zone</h4>
+                            <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Reset all settings to
+                                factory defaults. This action cannot be undone.</p>
+                            <button class="btn btn-danger" onclick="SiteSettings.resetAll()" style="width: 100%;">
+                                <i class="ph-bold ph-trash"></i> Reset to Defaults
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -2751,7 +2542,7 @@
                     }
 
                     if (panelId === 'pro-exam' && window.ProExam) ProExam.init();
-                    if (panelId === 'site-settings' && window.SiteEditor) SiteEditor.init(true);
+                    if (panelId === 'header' && window.SiteSettings) SiteSettings.openPanel();
                 } catch (err) {
                     console.error("Panel Init Error:", err);
                 }
@@ -3307,7 +3098,7 @@
         });
 
         /* ==============================
-           RESULTS MANAGEMENT SYSTEM (FIXED)
+           RESULTS MANAGEMENT & PUBLISHING
            ============================== */
         window.ResultsManagement = {
             state: {
@@ -3319,13 +3110,8 @@
                 const btn = document.getElementById("btn-sync-results");
                 const statusBox = document.getElementById("results-sync-status");
                 const statusMsg = document.getElementById("results-sync-message");
-                const publishBtn = document.getElementById("results-publish-toggle");
 
-                if (!btn) {
-                    console.error("Sync button not found");
-                    return;
-                }
-
+                if (!btn) return;
                 if (this.state.syncing) return;
 
                 this.state.syncing = true;
@@ -3333,44 +3119,34 @@
                 btn.style.pointerEvents = "none";
 
                 if (statusBox) statusBox.style.display = "block";
-                if (statusMsg) {
-                    statusMsg.innerHTML = "<i class='ph-bold ph-info'></i> Processing...";
-                }
+                if (statusMsg) statusMsg.innerHTML = "<i class='ph-bold ph-info'></i> Processing...";
 
-                // Combined Sync Logic (Aware of PublishedResultsStore)
                 setTimeout(() => {
                     const json = window.PublishedResultsStore ? window.PublishedResultsStore.data : null;
+                    const exams = (json && json.exams) || [];
+                    let studentCount = 0;
+                    exams.forEach(ex => {
+                        studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
+                    });
 
-                    if (json) {
-                        const exams = json.exams || [];
-                        let studentCount = 0;
-                        exams.forEach(ex => {
-                            studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
-                        });
+                    // Update UI Stats
+                    const examsCountEl = document.getElementById("results-exams-count");
+                    const totalCountEl = document.getElementById("results-total-count");
+                    const lastSyncEl = document.getElementById("results-last-sync");
 
-                        const examsCountEl = document.getElementById("results-exams-count");
-                        const totalCountEl = document.getElementById("results-total-count");
-                        const lastSyncEl = document.getElementById("results-last-sync");
+                    if (examsCountEl) examsCountEl.textContent = exams.length;
+                    if (totalCountEl) totalCountEl.textContent = studentCount;
+                    if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-                        if (examsCountEl) examsCountEl.textContent = exams.length;
-                        if (totalCountEl) totalCountEl.textContent = studentCount;
-                        if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-                    }
-
-                    if (statusMsg) {
-                        statusMsg.innerHTML = "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync completed successfully.";
-                    }
+                    if (statusMsg) statusMsg.innerHTML = "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync completed successfully.";
 
                     this.state.synced = true;
                     this.state.syncing = false;
 
                     btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
                     btn.style.pointerEvents = "auto";
-
-                    if (publishBtn) publishBtn.style.display = "block";
                 }, 1200);
             },
-
             togglePublish: function () {
                 alert("Results Published Successfully ✅");
             }
@@ -3393,37 +3169,32 @@
             if (window.SchoolManager) SchoolManager.load();
             if (window.DeploymentManager) DeploymentManager.init();
         });
-    </script>
 
-
-
-
-
-    <script>
-        window.CreativeStudio = {
-            state: {
+        <script>
+            window.CreativeStudio = {
+                state: {
                 layers: [],
-                background: { type: 'color', value: '#111111', image: null },
-                size: { width: 1080, height: 1080, label: 'Instagram Post', key: 'post' },
-                selectedId: null,
-                isDragging: false,
-                initialized: false
+            background: {type: 'color', value: '#111111', image: null },
+            size: {width: 1080, height: 1080, label: 'Instagram Post', key: 'post' },
+            selectedId: null,
+            isDragging: false,
+            initialized: false
             },
 
             presets: {
-                post: { w: 1080, h: 1080, label: 'Instagram Post' },
-                story: { w: 1080, h: 1920, label: 'Instagram Story' },
-                banner: { w: 1920, h: 600, label: 'Web Banner' },
-                a4: { w: 2480, h: 3508, label: 'A4 Document' }
+                post: {w: 1080, h: 1080, label: 'Instagram Post' },
+            story: {w: 1080, h: 1920, label: 'Instagram Story' },
+            banner: {w: 1920, h: 600, label: 'Web Banner' },
+            a4: {w: 2480, h: 3508, label: 'A4 Document' }
             },
 
             init() {
                 if (this.state.initialized) return;
-                console.log("🎨 CreativeStudio: Initializing...");
-                this.loadDraft();
-                this.setupDragEvents();
-                this.state.initialized = true;
-                this.render();
+            console.log("🎨 CreativeStudio: Initializing...");
+            this.loadDraft();
+            this.setupDragEvents();
+            this.state.initialized = true;
+            this.render();
 
                 // Keep draft updated
                 setInterval(() => this.saveDraft(), 5000);
@@ -3431,187 +3202,187 @@
 
             render() {
                 const canvas = document.getElementById('design-canvas');
-                if (!canvas) return;
+            if (!canvas) return;
 
-                // 1. Update Canvas Size
-                const viewport = document.getElementById('canvas-viewport');
-                const vWidth = viewport.clientWidth - 80;
-                const vHeight = viewport.clientHeight - 80;
-                const scale = Math.min(vWidth / this.state.size.width, vHeight / this.state.size.height, 1);
+            // 1. Update Canvas Size
+            const viewport = document.getElementById('canvas-viewport');
+            const vWidth = viewport.clientWidth - 80;
+            const vHeight = viewport.clientHeight - 80;
+            const scale = Math.min(vWidth / this.state.size.width, vHeight / this.state.size.height, 1);
 
-                canvas.style.width = this.state.size.width + 'px';
-                canvas.style.height = this.state.size.height + 'px';
-                canvas.style.transform = `scale(${scale})`;
-                canvas.style.background = this.state.background.type === 'color' ? this.state.background.value : 'none';
+            canvas.style.width = this.state.size.width + 'px';
+            canvas.style.height = this.state.size.height + 'px';
+            canvas.style.transform = `scale(${scale})`;
+            canvas.style.background = this.state.background.type === 'color' ? this.state.background.value : 'none';
 
-                if (this.state.background.image) {
-                    canvas.style.backgroundImage = `url(${this.state.background.image})`;
-                    canvas.style.backgroundSize = 'cover';
-                    canvas.style.backgroundPosition = 'center';
+            if (this.state.background.image) {
+                canvas.style.backgroundImage = `url(${this.state.background.image})`;
+            canvas.style.backgroundSize = 'cover';
+            canvas.style.backgroundPosition = 'center';
                 } else {
-                    canvas.style.backgroundImage = 'none';
+                canvas.style.backgroundImage = 'none';
                 }
 
-                // 2. Render Layers
-                canvas.innerHTML = '';
+            // 2. Render Layers
+            canvas.innerHTML = '';
                 this.state.layers.forEach(layer => {
                     const el = document.createElement('div');
-                    el.className = `canvas-element ${this.state.selectedId === layer.id ? 'selected' : ''}`;
-                    el.id = `layer-${layer.id}`;
-                    el.style.left = layer.x + 'px';
-                    el.style.top = layer.y + 'px';
-                    el.style.zIndex = layer.zIndex;
-                    el.style.color = layer.color || '#fff';
-                    el.style.fontSize = (layer.fontSize || 40) + 'px';
-                    el.style.textAlign = layer.textAlign || 'center';
-                    el.style.opacity = layer.opacity !== undefined ? layer.opacity : 1;
+            el.className = `canvas-element ${this.state.selectedId === layer.id ? 'selected' : ''}`;
+            el.id = `layer-${layer.id}`;
+            el.style.left = layer.x + 'px';
+            el.style.top = layer.y + 'px';
+            el.style.zIndex = layer.zIndex;
+            el.style.color = layer.color || '#fff';
+            el.style.fontSize = (layer.fontSize || 40) + 'px';
+            el.style.textAlign = layer.textAlign || 'center';
+            el.style.opacity = layer.opacity !== undefined ? layer.opacity : 1;
 
-                    if (layer.type === 'text') {
-                        el.innerText = layer.content;
+            if (layer.type === 'text') {
+                el.innerText = layer.content;
                     } else if (layer.type === 'image') {
                         const img = document.createElement('img');
-                        img.src = layer.content;
-                        img.style.width = layer.width + 'px';
-                        img.style.pointerEvents = 'none';
-                        el.appendChild(img);
+            img.src = layer.content;
+            img.style.width = layer.width + 'px';
+            img.style.pointerEvents = 'none';
+            el.appendChild(img);
                     }
 
-                    // Handles
-                    if (this.state.selectedId === layer.id) {
+            // Handles
+            if (this.state.selectedId === layer.id) {
                         const controls = document.createElement('div');
-                        controls.className = 'element-controls';
-                        controls.innerHTML = `
+            controls.className = 'element-controls';
+            controls.innerHTML = `
             <button onclick="CreativeStudio.moveLayer('up')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-arrow-up"></i></button>
             <button onclick="CreativeStudio.deleteElement('${layer.id}')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-trash"></i></button>
             `;
-                        el.appendChild(controls);
+            el.appendChild(controls);
 
-                        if (layer.type === 'image') {
+            if (layer.type === 'image') {
                             const resize = document.createElement('div');
-                            resize.className = 'resize-handle';
+            resize.className = 'resize-handle';
                             resize.onmousedown = (e) => this.startResize(e, layer.id);
-                            el.appendChild(resize);
+            el.appendChild(resize);
                         }
                     }
 
                     el.onmousedown = (e) => {
                         if (e.target.className.includes('resize-handle')) return;
-                        this.selectElement(layer.id);
-                        this.startDrag(e, layer.id);
+            this.selectElement(layer.id);
+            this.startDrag(e, layer.id);
                     };
 
-                    canvas.appendChild(el);
+            canvas.appendChild(el);
                 });
 
-                this.updatePropertiesPanel();
+            this.updatePropertiesPanel();
             },
 
             addText() {
                 const id = 'text_' + Date.now();
-                this.state.layers.push({
-                    id, type: 'text', content: 'Double click to edit',
-                    x: 50, y: 50, zIndex: this.state.layers.length + 1,
-                    fontSize: 40, color: '#ffffff', textAlign: 'center'
+            this.state.layers.push({
+                id, type: 'text', content: 'Double click to edit',
+            x: 50, y: 50, zIndex: this.state.layers.length + 1,
+            fontSize: 40, color: '#ffffff', textAlign: 'center'
                 });
-                this.state.selectedId = id;
-                this.render();
+            this.state.selectedId = id;
+            this.render();
             },
 
             handleLogoUpload(input) {
                 const file = input.files[0];
-                if (!file) return;
-                const reader = new FileReader();
+            if (!file) return;
+            const reader = new FileReader();
                 reader.onload = (e) => {
                     const id = 'img_' + Date.now();
-                    this.state.layers.push({
-                        id, type: 'image', content: e.target.result,
-                        x: 100, y: 100, width: 200, zIndex: this.state.layers.length + 1
+            this.state.layers.push({
+                id, type: 'image', content: e.target.result,
+            x: 100, y: 100, width: 200, zIndex: this.state.layers.length + 1
                     });
-                    this.state.selectedId = id;
-                    this.render();
+            this.state.selectedId = id;
+            this.render();
                 };
-                reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
             },
 
             handleBgUpload(input) {
                 const file = input.files[0];
-                if (!file) return;
-                const reader = new FileReader();
+            if (!file) return;
+            const reader = new FileReader();
                 reader.onload = (e) => {
-                    this.state.background.image = e.target.result;
-                    this.render();
+                this.state.background.image = e.target.result;
+            this.render();
                 };
-                reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
             },
 
             updateBgColor(val) {
                 this.state.background.type = 'color';
-                this.state.background.value = val;
-                this.render();
+            this.state.background.value = val;
+            this.render();
             },
 
             setPreset(key) {
                 const preset = this.presets[key];
-                if (!preset) return;
-                this.state.size = { ...preset, key };
-                document.getElementById('canvas-size-indicator').innerText = `${preset.w} x ${preset.h} (${preset.label})`;
-                this.render();
+            if (!preset) return;
+            this.state.size = {...preset, key};
+            document.getElementById('canvas-size-indicator').innerText = `${preset.w} x ${preset.h} (${preset.label})`;
+            this.render();
             },
 
             selectElement(id) {
                 this.state.selectedId = id;
-                this.render();
+            this.render();
             },
 
             updateSelected(prop, val) {
                 const layer = this.state.layers.find(l => l.id === this.state.selectedId);
-                if (layer) {
-                    layer[prop] = prop === 'fontSize' || prop === 'width' ? parseInt(val) : val;
-                    this.render();
+            if (layer) {
+                layer[prop] = prop === 'fontSize' || prop === 'width' ? parseInt(val) : val;
+            this.render();
                 }
             },
 
             deleteElement(id) {
                 this.state.layers = this.state.layers.filter(l => l.id !== id);
-                this.state.selectedId = null;
-                this.render();
+            this.state.selectedId = null;
+            this.render();
             },
 
             moveLayer(dir) {
                 const idx = this.state.layers.findIndex(l => l.id === this.state.selectedId);
-                if (idx === -1) return;
-                if (dir === 'up' && idx < this.state.layers.length - 1) {
-                    [this.state.layers[idx], this.state.layers[idx + 1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
+            if (idx === -1) return;
+            if (dir === 'up' && idx < this.state.layers.length - 1) {
+                [this.state.layers[idx], this.state.layers[idx + 1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
                 } else if (dir === 'down' && idx > 0) {
-                    [this.state.layers[idx], this.state.layers[idx - 1]] = [this.state.layers[idx - 1], this.state.layers[idx]];
+                [this.state.layers[idx], this.state.layers[idx - 1]] = [this.state.layers[idx - 1], this.state.layers[idx]];
                 }
-                this.render();
+            this.render();
             },
 
             updatePropertiesPanel() {
                 const layer = this.state.layers.find(l => l.id === this.state.selectedId);
-                const noSel = document.getElementById('no-selection-msg');
-                const textProps = document.getElementById('text-properties');
-                const imgProps = document.getElementById('image-properties');
+            const noSel = document.getElementById('no-selection-msg');
+            const textProps = document.getElementById('text-properties');
+            const imgProps = document.getElementById('image-properties');
 
-                if (!layer) {
-                    noSel.style.display = 'block';
-                    textProps.style.display = 'none';
-                    imgProps.style.display = 'none';
-                    return;
+            if (!layer) {
+                noSel.style.display = 'block';
+            textProps.style.display = 'none';
+            imgProps.style.display = 'none';
+            return;
                 }
 
-                noSel.style.display = 'none';
-                if (layer.type === 'text') {
-                    textProps.style.display = 'block';
-                    imgProps.style.display = 'none';
-                    document.getElementById('prop-text-content').value = layer.content;
-                    document.getElementById('prop-text-size').value = layer.fontSize;
-                    document.getElementById('prop-text-color').value = layer.color;
+            noSel.style.display = 'none';
+            if (layer.type === 'text') {
+                textProps.style.display = 'block';
+            imgProps.style.display = 'none';
+            document.getElementById('prop-text-content').value = layer.content;
+            document.getElementById('prop-text-size').value = layer.fontSize;
+            document.getElementById('prop-text-color').value = layer.color;
                 } else {
-                    textProps.style.display = 'none';
-                    imgProps.style.display = 'block';
-                    document.getElementById('prop-img-opacity').value = layer.opacity || 1;
+                textProps.style.display = 'none';
+            imgProps.style.display = 'block';
+            document.getElementById('prop-img-opacity').value = layer.opacity || 1;
                 }
             },
 
@@ -3640,108 +3411,108 @@
                     }
                 };
                 window.onmouseup = () => {
-                    this.state.draggingId = null;
-                    this.state.resizingId = null;
+                this.state.draggingId = null;
+            this.state.resizingId = null;
                 };
             },
 
             startDrag(e, id) {
                 const layer = this.state.layers.find(l => l.id === id);
-                const canvas = document.getElementById('design-canvas');
-                const rect = canvas.getBoundingClientRect();
-                const scale = canvas.offsetWidth / this.state.size.width;
+            const canvas = document.getElementById('design-canvas');
+            const rect = canvas.getBoundingClientRect();
+            const scale = canvas.offsetWidth / this.state.size.width;
 
-                this.state.draggingId = id;
-                this.state.dragOffset = {
-                    x: (e.clientX - rect.left) / scale - layer.x,
-                    y: (e.clientY - rect.top) / scale - layer.y
+            this.state.draggingId = id;
+            this.state.dragOffset = {
+                x: (e.clientX - rect.left) / scale - layer.x,
+            y: (e.clientY - rect.top) / scale - layer.y
                 };
             },
 
             startResize(e, id) {
                 e.stopPropagation();
-                this.state.resizingId = id;
+            this.state.resizingId = id;
             },
 
             // --- Features ---
             generateAIHeadline() {
                 const headlines = [
-                    "Empowering Future Leaders Today",
-                    "Admissions Open: Journey to Excellence",
-                    "Celebrate Our Annual Achievement Night",
-                    "New Semester, New Opportunities",
-                    "Excellence in Education Since 1995"
-                ];
-                const text = headlines[Math.floor(Math.random() * headlines.length)];
+            "Empowering Future Leaders Today",
+            "Admissions Open: Journey to Excellence",
+            "Celebrate Our Annual Achievement Night",
+            "New Semester, New Opportunities",
+            "Excellence in Education Since 1995"
+            ];
+            const text = headlines[Math.floor(Math.random() * headlines.length)];
                 const layer = this.state.layers.find(l => l.id === this.state.selectedId && l.type === 'text');
-                if (layer) {
-                    layer.content = text;
+            if (layer) {
+                layer.content = text;
                 } else {
-                    this.addText();
-                    this.state.layers[this.state.layers.length - 1].content = text;
+                this.addText();
+            this.state.layers[this.state.layers.length - 1].content = text;
                 }
-                this.render();
+            this.render();
             },
 
             applyTemplate(type) {
                 this.resetCanvas();
-                if (type === 'admission') {
-                    this.state.background.value = '#0a2e5c';
-                    this.state.layers.push(
-                        { id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign: 'center' },
-                        { id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35, color: '#fff', textAlign: 'center' },
-                        { id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color: '#ffcc00', textAlign: 'center' }
-                    );
+            if (type === 'admission') {
+                this.state.background.value = '#0a2e5c';
+            this.state.layers.push(
+            {id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign: 'center' },
+            {id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35, color: '#fff', textAlign: 'center' },
+            {id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color: '#ffcc00', textAlign: 'center' }
+            );
                 }
-                this.render();
+            this.render();
             },
 
             exportPNG() {
                 const canvas = document.getElementById('design-canvas');
-                this.state.selectedId = null;
-                this.render();
+            this.state.selectedId = null;
+            this.render();
 
                 setTimeout(() => {
-                    html2canvas(canvas, {
-                        scale: 2, // High res
-                        backgroundColor: null,
-                        useCORS: true
-                    }).then(canvasExport => {
-                        const link = document.createElement('a');
-                        const date = new Date().toISOString().split('T')[0];
-                        link.download = `creative-studio-${date}.png`;
-                        link.href = canvasExport.toDataURL("image/png");
-                        link.click();
-                        alert("Design Exported Successfully! 🚀");
-                    });
+                html2canvas(canvas, {
+                    scale: 2, // High res
+                    backgroundColor: null,
+                    useCORS: true
+                }).then(canvasExport => {
+                    const link = document.createElement('a');
+                    const date = new Date().toISOString().split('T')[0];
+                    link.download = `creative-studio-${date}.png`;
+                    link.href = canvasExport.toDataURL("image/png");
+                    link.click();
+                    alert("Design Exported Successfully! 🚀");
+                });
                 }, 100);
             },
 
             saveDraft() {
                 const data = {
-                    layers: this.state.layers,
-                    background: this.state.background,
-                    size: this.state.size
+                layers: this.state.layers,
+            background: this.state.background,
+            size: this.state.size
                 };
-                localStorage.setItem('creative_studio_draft', JSON.stringify(data));
+            localStorage.setItem('creative_studio_draft', JSON.stringify(data));
             },
 
             loadDraft() {
                 const saved = localStorage.getItem('creative_studio_draft');
-                if (saved) {
+            if (saved) {
                     const data = JSON.parse(saved);
-                    this.state.layers = data.layers || [];
-                    this.state.background = data.background || { type: 'color', value: '#111111' };
-                    this.state.size = data.size || this.presets.post;
+            this.state.layers = data.layers || [];
+            this.state.background = data.background || {type: 'color', value: '#111111' };
+            this.state.size = data.size || this.presets.post;
                 }
             },
 
             resetCanvas() {
                 if (!confirm("Clear design and start fresh?")) return;
-                this.state.layers = [];
-                this.state.background = { type: 'color', value: '#111111', image: null };
-                this.state.selectedId = null;
-                this.render();
+            this.state.layers = [];
+            this.state.background = {type: 'color', value: '#111111', image: null };
+            this.state.selectedId = null;
+            this.render();
             }
         };
     </script>
@@ -3783,16 +3554,16 @@
     </div>
 
     <script>
-        window.AdminAccess = {
-            defaultPin: "2026",
+            window.AdminAccess = {
+                defaultPin: "2026",
 
             init() {
                 if (!localStorage.getItem("admin_pin")) {
-                    localStorage.setItem("admin_pin", this.defaultPin);
+                localStorage.setItem("admin_pin", this.defaultPin);
                 }
 
-                if (localStorage.getItem("admin_logged_in") === "true") {
-                    this.showPanel();
+            if (localStorage.getItem("admin_logged_in") === "true") {
+                this.showPanel();
                 }
             },
 
@@ -3806,31 +3577,31 @@
 
             login(pin) {
                 const savedPin = localStorage.getItem("admin_pin");
-                if (pin === savedPin) {
-                    localStorage.setItem("admin_logged_in", "true");
-                    this.showPanel();
+            if (pin === savedPin) {
+                localStorage.setItem("admin_logged_in", "true");
+            this.showPanel();
                 } else {
                     const errorMsg = document.getElementById("error-msg");
-                    if (errorMsg) {
-                        errorMsg.innerText = "Incorrect PIN";
-                        errorMsg.style.display = "block";
+            if (errorMsg) {
+                errorMsg.innerText = "Incorrect PIN";
+            errorMsg.style.display = "block";
                     }
                 }
             },
 
             showPanel() {
                 document.getElementById("loginForm").style.display = "none";
-                document.getElementById("admin-panel").style.display = "block";
-                const errorMsg = document.getElementById("error-msg");
-                if (errorMsg) errorMsg.style.display = "none";
+            document.getElementById("admin-panel").style.display = "block";
+            const errorMsg = document.getElementById("error-msg");
+            if (errorMsg) errorMsg.style.display = "none";
             },
 
             logout() {
                 localStorage.removeItem("admin_logged_in");
-                document.getElementById("loginForm").style.display = "block";
-                document.getElementById("admin-panel").style.display = "none";
-                document.getElementById("change-pin-box").style.display = "none";
-                document.getElementById("admin-pin").value = "";
+            document.getElementById("loginForm").style.display = "block";
+            document.getElementById("admin-panel").style.display = "none";
+            document.getElementById("change-pin-box").style.display = "none";
+            document.getElementById("admin-pin").value = "";
             },
 
             showChangePin() {
@@ -3839,29 +3610,62 @@
 
             changePin() {
                 const newPin = document.getElementById("new-pin").value;
-                if (newPin.length !== 4) {
-                    alert("PIN must be 4 digits");
-                    return;
+            if (newPin.length !== 4) {
+                alert("PIN must be 4 digits");
+            return;
                 }
-                localStorage.setItem("admin_pin", newPin);
-                alert("PIN updated successfully");
-                document.getElementById("change-pin-box").style.display = "none";
-                document.getElementById("new-pin").value = "";
+            localStorage.setItem("admin_pin", newPin);
+            alert("PIN updated successfully");
+            document.getElementById("change-pin-box").style.display = "none";
+            document.getElementById("new-pin").value = "";
             }
         };
 
-        const loginForm = document.getElementById("loginForm");
-        if (loginForm) {
-            loginForm.addEventListener("submit", function (e) {
-                e.preventDefault();
-                AdminAccess.login(document.getElementById("admin-pin").value);
-            });
+            const loginForm = document.getElementById("loginForm");
+            if (loginForm) {
+                loginForm.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    AdminAccess.login(document.getElementById("admin-pin").value);
+                });
         }
 
         window.addEventListener("DOMContentLoaded", () => {
-            AdminAccess.init();
+                AdminAccess.init();
+
+            // Initialize Site Settings when panel is opened
+            if (window.SiteSettings) {
+                SiteSettings.renderHeaderEditor();
+            SiteSettings.renderFooterEditor();
+                }
         });
+
+            // Tab switching function for Site Settings
+            function switchSettingsTab(tabName, buttonElement) {
+                // Hide all tab contents
+                document.querySelectorAll('.settings-tab-content').forEach(tab => {
+                    tab.style.display = 'none';
+                });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            const targetTab = document.getElementById(`${tabName}-settings-content`);
+            if (targetTab) {
+                targetTab.style.display = 'block';
+            }
+
+            // Add active class to clicked button
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+        }
     </script>
+
+    <!-- Site Settings Module -->
+    <script src="../../assets/js/site-settings.js"></script>
 </body>
 
 </html>

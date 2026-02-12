@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Approved Creations - MIFTHAHUL HUDA</title>
+    <title>Creations - MIFTHAHUL HUDA MADRASA</title>
     <link rel="stylesheet" href="../../assets/css/styles.css">
     <link rel="stylesheet" href="../../assets/css/modern-nav.css">
     <link rel="stylesheet" href="../../assets/css/site-footer.css">
     <link rel="stylesheet" href="../../assets/css/site-languages.css">
-    <script src="../../assets/js/site-languages.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
@@ -17,24 +18,53 @@
 <body>
     <header id="main-header"></header>
 
-    <header class="creative-header" style="margin-top: 100px; text-align: center;">
+    <header class="creative-header">
         <h1 class="creative-title">🖼 Approved Creations</h1>
-        <p>Showcasing student talents.</p>
+        <p>Showcasing the best works from our students.</p>
     </header>
 
-    <section class="container">
-        <div class="grid" id="gallery"></div>
+    <section>
+        <div class="container">
+            <div class="grid" id="gallery"></div>
+        </div>
     </section>
 
     <footer id="main-footer"></footer>
 
-    <script src="../../assets/js/site-nav.js"></script>
-    <script src="../../assets/js/site-footer.js"></script>
     <script src="../../assets/js/script.js"></script>
-    <script type="module" src="../../assets/js/auth-nav-guard.js"></script>
+    <script src="../../assets/js/site-settings.js"></script>
     <script>
-        // Inherited logic from creations.html
+        // Load works from storage
+        const works = JSON.parse(localStorage.getItem("works") || "[]");
+        const gallery = document.getElementById("gallery");
+
+        // Filter only approved works
+        const approvedWorks = works.filter(w => w.approved);
+
+        if (approvedWorks.length === 0) {
+            gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #666;'>No approved creations yet. Check back soon!</p>";
+        } else {
+            gallery.innerHTML = "";
+            approvedWorks.forEach(w => {
+                gallery.innerHTML += `
+                <div class="card creation-card animate-fade-up">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <span style="background: rgba(0, 243, 255, 0.1); color: var(--primary-color); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: 700;">${w.type}</span>
+                        <span style="color: #555; font-size: 0.8rem;">${w.date || ''}</span>
+                    </div>
+                    <h3 style="margin-bottom: 5px; color: #fff;">${w.title}</h3>
+                    <p style="color: var(--primary-color); font-size: 0.9rem; margin-bottom: 20px;">By ${w.name} (Class ${w.cls})</p>
+                    ${w.img ? `<img src="${w.img}">` : ``}
+                    <p style="font-size: 1rem; line-height: 1.6; color: #bbb;">${w.content}</p>
+                </div>`;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SiteSettings) SiteSettings.render();
+        });
     </script>
+    <script type="module" src="../../assets/js/auth-nav-guard.js"></script>
 </body>
 
 </html>
