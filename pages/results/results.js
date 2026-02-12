@@ -355,6 +355,13 @@ window.ResultsEngine = (function () {
     function handleUpload(file) {
         if (!file) return;
 
+        // Logic Protection: Security Check
+        if (typeof AuthManager !== 'undefined' && !AuthManager.isAdmin()) {
+            showStatus("Admin privileges required to upload results.", false);
+            alert("Security Error: Unauthorized upload attempt blocked.");
+            return;
+        }
+
         if (!file.name.endsWith(".json")) {
             showStatus("Invalid file format. Upload JSON only.", false);
             return;

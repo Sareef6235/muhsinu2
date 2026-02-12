@@ -654,9 +654,23 @@
         }
     </style>
 
+    <!-- Security & Auth -->
+    <script src="../../assets/js/auth-manager.js"></script>
     <script src="../../assets/js/site-settings.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // 1. Initial UI Lock (Security Check)
+            const uploadSection = document.querySelector(".upload-section");
+            const fileInput = document.getElementById("published-results-upload");
+
+            if (typeof AuthManager !== 'undefined') {
+                if (!AuthManager.isAdmin()) {
+                    if (uploadSection) uploadSection.style.display = "none";
+                    if (fileInput) fileInput.disabled = true;
+                }
+            }
+
+            // 2. Component Initialization
             if (window.SiteSettings) SiteSettings.render();
             if (window.ResultsEngine) ResultsEngine.init();
         });
