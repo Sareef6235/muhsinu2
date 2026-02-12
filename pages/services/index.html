@@ -378,8 +378,12 @@
         </div>
     </nav>
 
-    <script src="../../assets/js/site-nav.js"></script>
-    <script src="../../assets/js/site-footer.js"></script>
+    <script src="../../assets/js/site-editor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SiteEditor) SiteEditor.init();
+        });
+    </script>
     <script src="../../assets/js/script.js"></script>
     <script>
         // Smooth scroll for hash links (Modified for relative)

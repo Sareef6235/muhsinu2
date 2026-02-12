@@ -13,22 +13,7 @@
 </head>
 
 <body>
-    <header id="main-header">
-        <nav class="container">
-            <a href="index.html" class="logo">MHMV 2026.</a>
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="creations.html" class="active">Creations</a></li>
-                <li><a href="exam_result.html">Results</a></li>
-                <li><a href="index.html#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
-            </ul>
-            <button class="mobile-menu-btn" aria-label="Toggle navigation">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-        </nav>
-    </header>
+    <header id="main-header"></header>
 
     <main class="creations-page">
         <section class="creations-hero">
@@ -342,12 +327,15 @@
         </div>
     </nav>
 
-    <footer
-        style="background: #0a0a0a; border-top: 1px solid var(--glass-border); padding: 30px 0; text-align: center; margin-top: 50px;">
-        <div class="container">
-            <p style="color: #666; font-size: 0.9rem;">© 2026 MHMV. Student Creations Portal.</p>
-        </div>
-    </footer>
+    <footer id="main-footer"></footer>
+
+    <!-- Dynamic Site Editor & Renderer -->
+    <script src="../assets/js/site-editor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SiteEditor) SiteEditor.init();
+        });
+    </script>
 </body>
 
 </html>

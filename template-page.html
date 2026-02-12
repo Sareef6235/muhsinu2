@@ -6,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Template - Header & Footer</title>
 
-    <!-- Navigation CSS -->
-    <link rel="stylesheet" href="assets/css/global-navigation.css">
-    <link rel="stylesheet" href="assets/css/global-footer.css">
+    <!-- Site Editor & Dynamic Styling -->
+    <link rel="stylesheet" href="assets/css/styles.css">
 
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -125,11 +124,8 @@
 
 <body data-page-id="template">
 
-    <!-- ============================================
-         HEADER NAVIGATION
-         Automatically injected by JavaScript
-         ============================================ -->
-    <div id="global-nav"></div>
+    <!-- Dynamic Header -->
+    <header id="main-header"></header>
 
     <!-- ============================================
          MAIN CONTENT
@@ -221,13 +217,13 @@
   &lt;div id="global-footer"&gt;&lt;/div&gt;
 &lt;/body&gt;</code></pre>
 
-                <h3 style="margin-top: 25px;">3. Include JavaScript Files</h3>
-                <p>Add these before closing <code>&lt;/body&gt;</code> tag:</p>
+                <h3 style="margin-top: 25px;">3. Include Site Editor</h3>
+                <p>Add this before closing <code>&lt;/body&gt;</code> tag:</p>
                 <pre
-                    style="background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 8px; overflow-x: auto; margin: 15px 0;"><code>&lt;script src="assets/js/global-navigation.js"&gt;&lt;/script&gt;
-&lt;script src="assets/js/navigation-config.js"&gt;&lt;/script&gt;
-&lt;script src="assets/js/global-footer.js"&gt;&lt;/script&gt;
-&lt;script src="assets/js/footer-config.js"&gt;&lt;/script&gt;</code></pre>
+                    style="background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 8px; overflow-x: auto; margin: 15px 0;"><code>&lt;script src="assets/js/site-editor.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  window.addEventListener('DOMContentLoaded', () => SiteEditor.init());
+&lt;/script&gt;</code></pre>
             </div>
 
             <!-- Configuration -->
@@ -262,19 +258,18 @@
          FOOTER
          Automatically injected by JavaScript
          ============================================ -->
-    <div id="global-footer"></div>
+    <header id="main-header"></header>
 
-    <!-- ============================================
-         SCRIPTS
-         ============================================ -->
+    <!-- Content continues... -->
+    <footer id="main-footer"></footer>
 
-    <!-- Navigation Scripts -->
-    <script src="assets/js/global-navigation.js"></script>
-    <script src="assets/js/navigation-config.js"></script>
-
-    <!-- Footer Scripts -->
-    <script src="assets/js/global-footer.js"></script>
-    <script src="assets/js/footer-config.js"></script>
+    <!-- Site Editor & Renderer -->
+    <script src="assets/js/site-editor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SiteEditor) SiteEditor.init();
+        });
+    </script>
 
 </body>
 

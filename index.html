@@ -892,15 +892,15 @@
         </a>
     </div>
 
-    <!-- Global Navigation & Footer Scripts -->
-    <script src="assets/js/global-navigation.js"></script>
-    <script src="assets/js/navigation-config.js"></script>
-    <script src="assets/js/global-footer.js"></script>
-    <script src="assets/js/footer-config.js"></script>
+    <!-- Dynamic Site Editor & Renderer -->
+    <script src="assets/js/site-editor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SiteEditor) SiteEditor.init();
+        });
+    </script>
 
     <!-- Existing Scripts -->
-    <script src="assets/js/site-nav.js" defer></script>
-    <script src="assets/js/site-footer.js" defer></script>
     <script src="assets/js/script.js" defer></script>
     <script type="module" src="assets/js/auth-nav-guard.js" defer></script>
 </body>

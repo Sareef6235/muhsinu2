@@ -703,6 +703,13 @@
     });
   </script>
 
+  <!-- Dynamic Site Editor & Renderer -->
+  <script src="../assets/js/site-editor.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.SiteEditor) SiteEditor.init();
+    });
+  </script>
 </body>
 
 </html>

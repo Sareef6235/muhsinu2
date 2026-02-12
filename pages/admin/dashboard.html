@@ -2169,9 +2169,9 @@
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h3>Site Settings</h3>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="SiteSettings.resetDefaults()"><i
+                        <button class="btn btn-secondary" onclick="SiteEditor.reset()"><i
                                 class="ph-bold ph-arrow-counter-clockwise"></i> Reset</button>
-                        <button class="btn btn-primary" onclick="SiteSettings.save()"><i
+                        <button class="btn btn-primary" onclick="SiteEditor.save()"><i
                                 class="ph-bold ph-floppy-disk"></i>
                             Save Changes</button>
                     </div>
@@ -2183,11 +2183,11 @@
                         <!-- Tab Navigation -->
                         <div class="tab-scroller"
                             style="margin-bottom: 20px; overflow-x: auto; white-space: nowrap; display: flex; gap: 10px; padding: 5px;">
-                            <button class="btn btn-mini tab-btn active" onclick="SiteSettings.switchTab('header', this)"
+                            <button class="btn btn-mini tab-btn active" onclick="SiteEditor.switchTab('header', this)"
                                 style="border-radius: 50px; padding: 10px 20px;">Header</button>
-                            <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('menu', this)"
+                            <button class="btn btn-mini tab-btn" onclick="SiteEditor.switchTab('menu', this)"
                                 style="border-radius: 50px; padding: 10px 20px;">Navigation</button>
-                            <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('footer', this)"
+                            <button class="btn btn-mini tab-btn" onclick="SiteEditor.switchTab('footer', this)"
                                 style="border-radius: 50px; padding: 10px 20px;">Footer</button>
                         </div>
 
@@ -2201,20 +2201,20 @@
                                         style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Site
                                         Title</label>
                                     <input type="text" id="ss-site-title" class="form-input"
-                                        oninput="SiteSettings.updatePreview()" placeholder="Enter Site Title">
+                                        oninput="SiteEditor.updatePreview()" placeholder="Enter Site Title">
                                 </div>
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label
                                         style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Tagline</label>
                                     <input type="text" id="ss-site-tagline" class="form-input"
-                                        oninput="SiteSettings.updatePreview()" placeholder="Enter Tagline">
+                                        oninput="SiteEditor.updatePreview()" placeholder="Enter Tagline">
                                 </div>
                                 <div class="form-group">
                                     <label
                                         style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Site
                                         Logo</label>
                                     <input type="file" id="ss-site-logo" class="form-input" accept="image/*"
-                                        onchange="SiteSettings.handleLogoUpload(this)">
+                                        onchange="SiteEditor.handleLogoUpload(this)">
                                 </div>
                             </div>
 
@@ -2226,26 +2226,26 @@
                                         <label
                                             style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Background</label>
                                         <input type="color" id="ss-header-bg" class="form-input"
-                                            style="height: 45px; padding: 5px;" oninput="SiteSettings.updatePreview()">
+                                            style="height: 45px; padding: 5px;" oninput="SiteEditor.updatePreview()">
                                     </div>
                                     <div class="form-group">
                                         <label
                                             style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Text
                                             Color</label>
                                         <input type="color" id="ss-header-text" class="form-input"
-                                            style="height: 45px; padding: 5px;" oninput="SiteSettings.updatePreview()">
+                                            style="height: 45px; padding: 5px;" oninput="SiteEditor.updatePreview()">
                                     </div>
                                 </div>
                                 <div style="margin-top: 15px; display: flex; gap: 20px;">
                                     <label
                                         style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #eee; font-size: 0.9rem;">
                                         <input type="checkbox" id="ss-header-sticky"
-                                            onchange="SiteSettings.updatePreview()"> Sticky Header
+                                            onchange="SiteEditor.updatePreview()"> Sticky Header
                                     </label>
                                     <label
                                         style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #eee; font-size: 0.9rem;">
                                         <input type="checkbox" id="ss-header-showlogo" checked
-                                            onchange="SiteSettings.updatePreview()"> Show Logo
+                                            onchange="SiteEditor.updatePreview()"> Show Logo
                                     </label>
                                 </div>
                             </div>
@@ -2257,7 +2257,7 @@
                                 <div
                                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                                     <h4 style="margin: 0;"><i class="ph-bold ph-list"></i> Menu Items</h4>
-                                    <button class="btn btn-mini" onclick="SiteSettings.addMenuItem()"><i
+                                    <button class="btn btn-mini" onclick="SiteEditor.addMenuItem()"><i
                                             class="ph-bold ph-plus"></i> Add Item</button>
                                 </div>
                                 <div id="ss-menu-list" style="display: flex; flex-direction: column; gap: 10px;">
@@ -2266,16 +2266,22 @@
                             </div>
                         </div>
 
-                        <!-- Footer Tab -->
                         <div id="ss-tab-footer" class="ss-tab-content" style="display: none;">
                             <div class="glass-card" style="padding: 20px; margin-bottom: 20px;">
-                                <h4 style="margin-top: 0; margin-bottom: 15px;"><i class="ph-bold ph-info"></i> Contact
-                                    Info</h4>
+                                <h4 style="margin-top: 0; margin-bottom: 15px;"><i class="ph-bold ph-info"></i> Footer
+                                    Details</h4>
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label
+                                        style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Description</label>
+                                    <textarea id="ss-footer-desc" class="form-input" rows="2"
+                                        oninput="SiteEditor.updatePreview()"
+                                        placeholder="Short site description..."></textarea>
+                                </div>
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label
                                         style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Address</label>
                                     <textarea id="ss-footer-address" class="form-input" rows="2"
-                                        oninput="SiteSettings.updatePreview()"
+                                        oninput="SiteEditor.updatePreview()"
                                         placeholder="Building No, Street, City"></textarea>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -2283,13 +2289,13 @@
                                         <label
                                             style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Phone</label>
                                         <input type="text" id="ss-footer-phone" class="form-input"
-                                            oninput="SiteSettings.updatePreview()" placeholder="+1234567890">
+                                            oninput="SiteEditor.updatePreview()" placeholder="+1234567890">
                                     </div>
                                     <div class="form-group">
                                         <label
                                             style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Email</label>
                                         <input type="email" id="ss-footer-email" class="form-input"
-                                            oninput="SiteSettings.updatePreview()" placeholder="info@example.com">
+                                            oninput="SiteEditor.updatePreview()" placeholder="info@example.com">
                                     </div>
                                 </div>
                             </div>
@@ -2297,12 +2303,33 @@
                             <div class="glass-card" style="padding: 20px;">
                                 <h4 style="margin-top: 0; margin-bottom: 15px;"><i class="ph-bold ph-share-network"></i>
                                     Social & Style</h4>
+                                <div class="form-group"
+                                    style="margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <label
+                                            style="display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 5px;">Facebook</label>
+                                        <input type="text" id="ss-social-fb" class="form-input"
+                                            oninput="SiteEditor.updatePreview()" placeholder="#">
+                                    </div>
+                                    <div>
+                                        <label
+                                            style="display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 5px;">Instagram</label>
+                                        <input type="text" id="ss-social-ig" class="form-input"
+                                            oninput="SiteEditor.updatePreview()" placeholder="#">
+                                    </div>
+                                    <div>
+                                        <label
+                                            style="display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 5px;">YouTube</label>
+                                        <input type="text" id="ss-social-yt" class="form-input"
+                                            oninput="SiteEditor.updatePreview()" placeholder="#">
+                                    </div>
+                                </div>
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label
                                         style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Copyright
                                         Text</label>
                                     <input type="text" id="ss-footer-copy" class="form-input"
-                                        oninput="SiteSettings.updatePreview()"
+                                        oninput="SiteEditor.updatePreview()"
                                         placeholder="&copy; 2026 Admin Panel. All Rights Reserved.">
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -2311,14 +2338,14 @@
                                             style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Footer
                                             BG</label>
                                         <input type="color" id="ss-footer-bg" class="form-input"
-                                            style="height: 45px; padding: 5px;" oninput="SiteSettings.updatePreview()">
+                                            style="height: 45px; padding: 5px;" oninput="SiteEditor.updatePreview()">
                                     </div>
                                     <div class="form-group">
                                         <label
                                             style="display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">Footer
                                             Text</label>
                                         <input type="color" id="ss-footer-text" class="form-input"
-                                            style="height: 45px; padding: 5px;" oninput="SiteSettings.updatePreview()">
+                                            style="height: 45px; padding: 5px;" oninput="SiteEditor.updatePreview()">
                                     </div>
                                 </div>
                             </div>
@@ -2724,7 +2751,7 @@
                     }
 
                     if (panelId === 'pro-exam' && window.ProExam) ProExam.init();
-                    if (panelId === 'site-settings' && window.SiteSettings) SiteSettings.init();
+                    if (panelId === 'site-settings' && window.SiteEditor) SiteEditor.init(true);
                 } catch (err) {
                     console.error("Panel Init Error:", err);
                 }
@@ -2849,7 +2876,7 @@
     <script src="../../assets/js/exam-type-manager.js"></script>
     <script src="../../assets/js/exam-manager.js"></script>
     <script src="../../assets/js/results-management.js"></script>
-    <script src="../../assets/js/site-settings.js"></script>
+    <script src="../../assets/js/site-editor.js"></script>
 
     <!-- Static Publisher for GitHub Pages Deployment -->
     <script src="dashboard.js"></script>
