@@ -340,6 +340,19 @@
                 <p style="color: #666;">Enter your details to view your academic performance</p>
             </div>
 
+            <!-- Manual Upload Section -->
+            <div class="upload-section"
+                style="margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: 16px; text-align: center;">
+                <label for="published-results-upload" class="btn-sec"
+                    style="display: inline-flex; width: auto; cursor: pointer;">
+                    <i class="ph ph-upload-simple"></i> Upload Results JSON
+                </label>
+                <input type="file" id="published-results-upload" accept=".json" style="display: none;">
+                <div id="published-results-status" style="margin-top: 10px; font-size: 0.8rem; color: #888;">
+                    No results file loaded.
+                </div>
+            </div>
+
             <!-- Merit List View (Hidden by Default) -->
             <div id="merit-view" style="display: none;">
                 <div
@@ -645,6 +658,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SiteSettings) SiteSettings.render();
+            if (window.ResultsEngine) ResultsEngine.init();
         });
     </script>
     <!-- Results Portal Logic -->

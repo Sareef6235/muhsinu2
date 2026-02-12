@@ -283,9 +283,222 @@ const ResultApp = {
 };
 
 // Start the engine
-document.addEventListener("DOMContentLoaded", () => ResultApp.init());
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.ResultApp) ResultApp.init();
+});
 
 // Expose to window for HTML onclick handlers
 window.ResultApp = ResultApp;
 window.showSearchForm = () => ResultApp.showSearchForm();
 window.showRankList = () => ResultApp.showRankList();
+
+/* =========================================
+   RESULTS ENGINE (Manual Upload System)
+========================================= */
+
+window.ResultsEngine = (function () {
+
+    let publishedData = null;
+
+    /* ---------- Utils ---------- */
+
+    function safeText(text) {
+        return String(text).replace(/[<>]/g, "");
+    }
+
+    function updateStats() {
+        if (!publishedData) return;
+
+        const exams = publishedData.exams || [];
+        const totalStudents = exams.reduce((sum, ex) => {
+            const results = ex.results || ex.students || [];
+            return sum + results.length;
+        }, 0);
+
+        const examsEl = document.getElementById("results-exams-count");
+        const totalEl = document.getElementById("results-total-count");
+        const syncEl = document.getElementById("results-last-sync");
+
+        if (examsEl) examsEl.textContent = exams.length;
+        if (totalEl) totalEl.textContent = totalStudents;
+        if (syncEl) syncEl.textContent = new Date().toLocaleTimeString();
+    }
+
+    function populateExamDropdown() {
+        const select = document.getElementById("examSelect");
+        if (!select) return;
+
+        select.innerHTML = `<option value="">-- Select Academic Session --</option>`;
+
+        publishedData.exams.forEach(exam => {
+            const opt = document.createElement("option");
+            opt.value = exam.examId || exam.id;
+            opt.textContent = safeText(exam.examName || exam.name);
+            select.appendChild(opt);
+        });
+
+        select.disabled = false;
+    }
+
+    function showStatus(message, success = true) {
+        const status = document.getElementById("published-results-status");
+        if (!status) return;
+
+        status.style.color = success ? "#2ed573" : "#ff4757";
+        status.innerHTML = success
+            ? `<i class="ph-bold ph-check-circle"></i> ${safeText(message)}`
+            : `<i class="ph-bold ph-warning-circle"></i> ${safeText(message)}`;
+    }
+
+    /* ---------- Upload Handler ---------- */
+
+    function handleUpload(file) {
+        if (!file) return;
+
+        if (!file.name.endsWith(".json")) {
+            showStatus("Invalid file format. Upload JSON only.", false);
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const data = JSON.parse(e.target.result);
+
+                // Basic schema validation
+                if (!data.exams || !Array.isArray(data.exams)) {
+                    throw new Error("Invalid results schema.");
+                }
+
+                publishedData = data;
+
+                updateStats();
+                populateExamDropdown();
+                showStatus("Loaded: " + file.name, true);
+
+            } catch (err) {
+                showStatus("JSON validation failed.", false);
+                console.error(err);
+            }
+        };
+
+        reader.readAsText(file);
+    }
+
+    /* ---------- Search Logic ---------- */
+
+    function handleSearch(e) {
+        if (e) e.preventDefault();
+
+        const examId = document.getElementById("examSelect").value;
+        const roll = document.getElementById("rollInput").value.trim();
+
+        if (!examId || !roll) return;
+
+        const exam = publishedData.exams.find(e => (e.examId || e.id) === examId);
+        if (!exam) return;
+
+        const results = exam.results || exam.students || [];
+        const student = results.find(s => String(s.roll).trim() === String(roll).trim());
+
+        if (!student) {
+            alert("Result not found.");
+            return;
+        }
+
+        // Bridge to ResultApp's renderer
+        if (window.ResultApp && typeof window.ResultApp.renderResult === 'function') {
+            window.ResultApp.renderResult(student, exam.examName || exam.name);
+        } else {
+            alert(`Name: ${student.name}\nTotal: ${student.total}`);
+        }
+    }
+
+    /* ---------- Merit List ---------- */
+
+    function showMerit() {
+        if (!publishedData) return alert("Please upload results file first.");
+
+        const examId = document.getElementById("examSelect").value;
+        if (!examId) return alert("Select exam first.");
+
+        const exam = publishedData.exams.find(e => (e.examId || e.id) === examId);
+        if (!exam) return;
+
+        const results = exam.results || exam.students || [];
+        const sorted = [...results].sort((a, b) => b.total - a.total);
+
+        const tbody = document.getElementById("results-table-body");
+        const meritView = document.getElementById("merit-view");
+        const resultsForm = document.getElementById("resultsForm");
+        const examLabel = document.getElementById("merit-exam-name");
+
+        if (!tbody || !meritView || !resultsForm) return;
+
+        tbody.innerHTML = "";
+        if (examLabel) examLabel.textContent = exam.examName || exam.name;
+
+        sorted.forEach((s, i) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>#${i + 1}</td>
+                <td>${safeText(s.roll)}</td>
+                <td>${safeText(s.name)}</td>
+                <td style="text-align:right; color: var(--primary); font-weight: 800;">${s.total}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        meritView.style.display = "block";
+        resultsForm.style.display = "none";
+
+        const title = document.querySelector('.portal-title');
+        if (title) title.style.display = "none";
+    }
+
+    function showSearch() {
+        const meritView = document.getElementById("merit-view");
+        const resultsForm = document.getElementById("resultsForm");
+        const title = document.querySelector('.portal-title');
+
+        if (meritView) meritView.style.display = "none";
+        if (resultsForm) resultsForm.style.display = "grid";
+        if (title) title.style.display = "block";
+    }
+
+    function clearData() {
+        publishedData = null;
+        const select = document.getElementById("examSelect");
+        if (select) {
+            select.innerHTML = `<option value="">-- Select Academic Session --</option>`;
+            select.disabled = true;
+        }
+        updateStats();
+        showStatus("Cleared.", false);
+    }
+
+    /* ---------- Public API ---------- */
+
+    return {
+        init: function () {
+            const fileInput = document.getElementById("published-results-upload");
+            const form = document.getElementById("resultsForm");
+
+            if (fileInput) {
+                fileInput.addEventListener("change", function () {
+                    handleUpload(this.files[0]);
+                });
+            }
+
+            if (form) {
+                form.addEventListener("submit", handleSearch);
+            }
+
+            // Expose handlers globally
+            window.showRankList = showMerit;
+            window.showSearchForm = showSearch;
+            window.clearPublishedResults = clearData;
+        }
+    };
+
+})();
