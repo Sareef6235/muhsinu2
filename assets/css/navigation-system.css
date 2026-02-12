@@ -1,0 +1,132 @@
+/**
+ * NavigationSystem.css
+ */
+
+:root {
+    --nav-height: 80px;
+    --nav-bg: rgba(10, 10, 10, 0.9);
+    --nav-glass: blur(15px);
+    --primary-color: #00f3ff;
+    --z-index-header: 1000;
+}
+
+#site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--nav-height);
+    background: var(--nav-bg);
+    backdrop-filter: var(--nav-glass);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: var(--z-index-header);
+    display: flex;
+    align-items: center;
+}
+
+.nav-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.site-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+}
+
+.site-logo .accent {
+    color: var(--primary-color);
+}
+
+.root-menu {
+    display: flex;
+    list-style: none;
+    gap: 8px;
+}
+
+.menu-link {
+    color: rgba(255, 255, 255, 0.82);
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+}
+
+.menu-item:hover .menu-link,
+.menu-item.active .menu-link {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-trigger {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+}
+
+.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(10px);
+}
+
+.hamburger-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.bar {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #fff;
+    margin: 5px 0;
+}
+
+@media (max-width: 991px) {
+    .main-nav {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 300px;
+        height: 100vh;
+        background: #0c0c0c;
+        padding-top: 100px;
+        transition: 0.5s;
+        z-index: 1000;
+    }
+
+    body.menu-open .main-nav {
+        right: 0;
+    }
+
+    .hamburger-toggle {
+        display: block;
+    }
+}

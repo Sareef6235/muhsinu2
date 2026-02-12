@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Settings Verification</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+
+        .test-box {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .pass {
+            color: green;
+        }
+
+        .fail {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Site Settings Verification</h1>
+
+    <div class="test-box">
+        <h2>1. SiteSettings Object</h2>
+        <p>Status: <span id="status-obj" class="status">Checking...</span></p>
+    </div>
+
+    <div class="test-box">
+        <h2>2. LocalStorage Persistence</h2>
+        <p>Status: <span id="status-storage" class="status">Checking...</span></p>
+    </div>
+
+    <div class="test-box">
+        <h2>3. DOM Elements Injection</h2>
+        <div id="main-header"></div>
+        <div id="main-footer"></div>
+        <p>Status: <span id="status-dom" class="status">Checking...</span></p>
+    </div>
+
+    <script src="assets/js/site-settings.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Test 1: SiteSettings Object
+            const objStatus = document.getElementById('status-obj');
+            if (window.SiteSettings && typeof SiteSettings.init === 'function') {
+                objStatus.textContent = "PASS";
+                objStatus.className = "status pass";
+            } else {
+                objStatus.textContent = "FAIL";
+                objStatus.className = "status fail";
+            }
+
+            // Test 2: LocalStorage Persistence
+            const storageStatus = document.getElementById('status-storage');
+            try {
+                // Mock saving a setting
+                const testSettings = {
+                    header: {
+                        siteTitle: "Test School",
+                        bgColor: "#ffffff"
+                    }
+                };
+                localStorage.setItem('siteSettings', JSON.stringify(testSettings));
+
+                // Reload via SiteSettings
+                SiteSettings.load();
+                if (SiteSettings._settings.header.siteTitle === "Test School") {
+                    storageStatus.textContent = "PASS";
+                    storageStatus.className = "status pass";
+                } else {
+                    storageStatus.textContent = "FAIL - Value mismatch";
+                    storageStatus.className = "status fail";
+                }
+            } catch (e) {
+                storageStatus.textContent = "FAIL - " + e.message;
+                storageStatus.className = "status fail";
+            }
+
+            // Test 3: DOM Injection
+            const domStatus = document.getElementById('status-dom');
+            try {
+                SiteSettings.render();
+                const headerContent = document.getElementById('main-header').innerHTML;
+                const footerContent = document.getElementById('main-footer').innerHTML;
+
+                if (headerContent.length > 0 && footerContent.length > 0) {
+                    domStatus.textContent = "PASS";
+                    domStatus.className = "status pass";
+                } else {
+                    domStatus.textContent = "FAIL - Content empty";
+                    domStatus.className = "status fail";
+                }
+            } catch (e) {
+                domStatus.textContent = "FAIL - " + e.message;
+                domStatus.className = "status fail";
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -48,29 +48,14 @@
             this.setMode(this.state.mode === 'light' ? 'dark' : 'light');
         },
 
-        apply(mode = this.state.mode, brand = null) {
-            const root = document.documentElement;
+        apply() {
             const body = document.body;
-
-            this.state.mode = mode;
             body.classList.remove('theme-light', 'theme-dark');
-            body.classList.add(`theme-${mode}`);
-            body.setAttribute('data-theme', mode);
-
-            // Apply Brand Colors
-            if (brand) {
-                if (brand.primaryColor) {
-                    root.style.setProperty('--primary-color', brand.primaryColor);
-                    // Generate a faint version for backgrounds
-                    root.style.setProperty('--primary-color-faint', brand.primaryColor + '15');
-                }
-                if (brand.name) {
-                    root.style.setProperty('--brand-name', `"${brand.name}"`);
-                }
-            }
+            body.classList.add(`theme-${this.state.mode}`);
+            body.setAttribute('data-theme', this.state.mode);
 
             // Dispatch event for components to react
-            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { ...this.state, brand } }));
+            window.dispatchEvent(new CustomEvent('themeChanged', { detail: this.state }));
         }
     };
 
