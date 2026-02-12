@@ -109,6 +109,22 @@
             }
         }
 
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
         :root {
             --primary: #00e5ff;
             --accent: #ff007a;
@@ -411,21 +427,32 @@
     <!-- Login Modal -->
     <div id="loginModal" class="modal-overlay" onclick="if(event.target === this) toggleLoginModal()">
         <div class="login-modal animate-fade-up">
-            <h2 style="margin-bottom: 30px; font-size: 1.8rem;">Access Control</h2>
-            <div class="input-group" style="text-align: left; margin-bottom: 25px;">
-                <label>Select Your Role</label>
-                <select id="login-role-select">
-                    <option value="student">Student / Public</option>
-                    <option value="staff">Staff Member</option>
-                    <option value="admin">Institutional Admin</option>
-                </select>
-                <p style="font-size: 0.8rem; color: #555; margin-top: 10px;">
-                    * Select 'Admin' to enable result upload features.
-                </p>
+            <h2 style="margin-bottom: 25px; font-size: 1.8rem;">Admin Access</h2>
+
+            <div id="login-error"
+                style="display: none; padding: 12px; background: rgba(255, 61, 61, 0.1); border: 1px solid rgba(255, 61, 61, 0.2); border-radius: 12px; color: #ff3d3d; font-size: 0.85rem; margin-bottom: 20px;">
+                <i class="ph ph-warning-circle"></i> <span class="error-msg"></span>
             </div>
-            <button class="btn-check" onclick="handleLoginAttempt()">
-                Confirm Identity
+
+            <div class="input-group" style="text-align: left; margin-bottom: 20px;">
+                <label>Username</label>
+                <input type="text" id="login-username" placeholder="Enter username"
+                    style="background: rgba(255,255,255,0.03);">
+            </div>
+
+            <div class="input-group" style="text-align: left; margin-bottom: 25px;">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="••••••••"
+                    style="background: rgba(255,255,255,0.03);">
+            </div>
+
+            <button class="btn-check" id="login-submit-btn" onclick="handleLoginAttempt()">
+                <i class="ph ph-lock-key"></i> Authenticate
             </button>
+
+            <p style="font-size: 0.75rem; color: #555; margin-top: 15px;">
+                Demo Credentials: admin / Admin@123
+            </p>
         </div>
     </div>
 
@@ -793,18 +820,56 @@
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        function handleLoginAttempt() {
-            const role = document.getElementById('login-role-select').value;
-            const user = {
-                id: Date.now().toString(),
-                name: role.charAt(0).toUpperCase() + role.slice(1) + " User",
-                role: role,
-                isAuthenticated: true
-            };
+        async function handleLoginAttempt() {
+            const userInp = document.getElementById('login-username');
+            const passInp = document.getElementById('login-password');
+            const errorDiv = document.getElementById('login-error');
+            const loginBtn = document.getElementById('login-submit-btn');
 
-            AuthManager.login(user);
-            toggleLoginModal();
-            updateAuthUI();
+            const username = userInp.value.trim();
+            const password = passInp.value;
+
+            if (!username || !password) {
+                showLoginError("Please enter both credentials");
+                return;
+            }
+
+            // UI State: Loading
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Authenticating...';
+            errorDiv.style.display = 'none';
+
+            try {
+                const result = await AuthManager.login(username, password);
+
+                if (result.success) {
+                    toggleLoginModal();
+                    updateAuthUI();
+                    // Clear inputs for security
+                    userInp.value = '';
+                    passInp.value = '';
+                } else {
+                    showLoginError(result.message);
+                }
+            } catch (err) {
+                showLoginError("System error during authentication");
+                console.error(err);
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="ph ph-lock-key"></i> Authenticate';
+            }
+        }
+
+        function showLoginError(msg) {
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.querySelector(".error-msg").textContent = msg;
+            errorDiv.style.display = 'block';
+
+            // Shake effect
+            const modal = document.querySelector(".login-modal");
+            modal.style.animation = 'none';
+            modal.offsetHeight; // trigger reflow
+            modal.style.animation = 'shake 0.4s ease';
         }
 
         function handleLogout() {
@@ -829,7 +894,7 @@
             if (isAdmin) {
                 badge.classList.add("admin");
                 badgeText.textContent = "Admin Mode";
-                mainBtn.innerHTML = '<i class="ph-bold ph-sign-out"></i> Logout';
+                mainBtn.innerHTML = `<i class="ph-bold ph-sign-out"></i> Logout (${AuthManager.getUser().username})`;
                 mainBtn.onclick = handleLogout;
                 mainBtn.style.background = "rgba(255,255,255,0.05)";
                 mainBtn.style.color = "#fff";
