@@ -1,0 +1,106 @@
+:root {
+    --brand-primary: #4f46e5;
+    --brand-secondary: #1e1b4b;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+[data-theme="dark"] {
+    --glass-bg: rgba(15, 23, 42, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --brand-primary: #818cf8;
+}
+
+body {
+    transition: background 0.3s ease, color 0.3s ease;
+    font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 1.5rem;
+}
+
+.sidebar-saas {
+    width: 280px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    border-right: 1px solid var(--glass-border);
+    padding: 2rem 1.5rem;
+    background: linear-gradient(180deg, var(--brand-secondary), #0f172a);
+    color: white;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+.nav-link-saas {
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.8rem 1rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+}
+
+.nav-link-saas:hover,
+.nav-link-saas.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.builder-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+.section-item {
+    cursor: move;
+    position: relative;
+    border: 2px dashed transparent;
+    transition: all 0.2s;
+}
+
+.section-item:hover {
+    border-color: var(--brand-primary);
+}
+
+.section-actions {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    display: none;
+    gap: 8px;
+}
+
+.section-item:hover .section-actions {
+    display: flex;
+}
+
+.btn-glass {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    color: white;
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
