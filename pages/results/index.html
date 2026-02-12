@@ -13,6 +13,102 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
+        /* Auth & Login UI */
+        .auth-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1002;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .auth-badge {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-badge.admin {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(0, 229, 255, 0.05);
+        }
+
+        .auth-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #888;
+        }
+
+        .auth-badge.admin .dot {
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .btn-auth {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .login-modal {
+            background: #111;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            width: 400px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
         :root {
             --primary: #00e5ff;
             --accent: #ff007a;
@@ -300,6 +396,38 @@
 <body>
 
     <header id="main-header"></header>
+
+    <!-- Auth Controls -->
+    <div class="auth-controls">
+        <div id="auth-status-badge" class="auth-badge">
+            <span class="dot"></span>
+            <span class="text">Public Mode</span>
+        </div>
+        <button id="auth-main-btn" class="btn-auth" onclick="toggleLoginModal()">
+            <i class="ph-bold ph-user"></i> Login
+        </button>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal-overlay" onclick="if(event.target === this) toggleLoginModal()">
+        <div class="login-modal animate-fade-up">
+            <h2 style="margin-bottom: 30px; font-size: 1.8rem;">Access Control</h2>
+            <div class="input-group" style="text-align: left; margin-bottom: 25px;">
+                <label>Select Your Role</label>
+                <select id="login-role-select">
+                    <option value="student">Student / Public</option>
+                    <option value="staff">Staff Member</option>
+                    <option value="admin">Institutional Admin</option>
+                </select>
+                <p style="font-size: 0.8rem; color: #555; margin-top: 10px;">
+                    * Select 'Admin' to enable result upload features.
+                </p>
+            </div>
+            <button class="btn-check" onclick="handleLoginAttempt()">
+                Confirm Identity
+            </button>
+        </div>
+    </div>
 
     <div class="portal-wrapper">
         <div id="sync-warning" class="error-state"
@@ -658,17 +786,68 @@
     <script src="../../assets/js/auth-manager.js"></script>
     <script src="../../assets/js/site-settings.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. Initial UI Lock (Security Check)
+        // --- AUTH UI LOGIC ---
+
+        function toggleLoginModal() {
+            const modal = document.getElementById('loginModal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function handleLoginAttempt() {
+            const role = document.getElementById('login-role-select').value;
+            const user = {
+                id: Date.now().toString(),
+                name: role.charAt(0).toUpperCase() + role.slice(1) + " User",
+                role: role,
+                isAuthenticated: true
+            };
+
+            AuthManager.login(user);
+            toggleLoginModal();
+            updateAuthUI();
+        }
+
+        function handleLogout() {
+            AuthManager.logout();
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
             const uploadSection = document.querySelector(".upload-section");
             const fileInput = document.getElementById("published-results-upload");
+            const badge = document.getElementById("auth-status-badge");
+            const badgeText = badge.querySelector(".text");
+            const mainBtn = document.getElementById("auth-main-btn");
 
-            if (typeof AuthManager !== 'undefined') {
-                if (!AuthManager.isAdmin()) {
-                    if (uploadSection) uploadSection.style.display = "none";
-                    if (fileInput) fileInput.disabled = true;
-                }
+            const isAdmin = AuthManager.isAdmin();
+
+            // Toggle Upload Visibility
+            if (uploadSection) uploadSection.style.display = isAdmin ? "block" : "none";
+            if (fileInput) fileInput.disabled = !isAdmin;
+
+            // Update Badge & Button
+            if (isAdmin) {
+                badge.classList.add("admin");
+                badgeText.textContent = "Admin Mode";
+                mainBtn.innerHTML = '<i class="ph-bold ph-sign-out"></i> Logout';
+                mainBtn.onclick = handleLogout;
+                mainBtn.style.background = "rgba(255,255,255,0.05)";
+                mainBtn.style.color = "#fff";
+                mainBtn.style.border = "1px solid var(--border)";
+            } else {
+                badge.classList.remove("admin");
+                badgeText.textContent = "Public Mode";
+                mainBtn.innerHTML = '<i class="ph-bold ph-user"></i> Login';
+                mainBtn.onclick = toggleLoginModal;
+                mainBtn.style.background = "var(--primary)";
+                mainBtn.style.color = "#000";
+                mainBtn.style.border = "none";
             }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial UI Sync
+            updateAuthUI();
 
             // 2. Component Initialization
             if (window.SiteSettings) SiteSettings.render();
