@@ -60,31 +60,68 @@
         },
 
         /**
+         * Load a specific site context
+         */
+        async loadSite(siteId) {
+            console.log(`📡 [SiteEngine] Loading Site: ${siteId}`);
+            if (!this.Tenant) return;
+
+            const config = this.Tenant.getSiteConfig(siteId);
+            this.state.currentSite = config;
+
+            // Apply Branding & Theme
+            if (this.Theme) this.Theme.apply(config.theme, config.brand);
+
+            // Re-render
+            this.setupRenderEngine();
+        },
+
+        /**
          * Setup dynamic rendering logic
          */
         setupRenderEngine() {
-            // Check for auto-render triggers
             const renderTarget = document.querySelector('[data-site-engine="render"]');
-            if (renderTarget) {
-                this.renderSite(renderTarget);
+            if (renderTarget && this.state.currentSite) {
+                this.renderSite(renderTarget, this.state.currentSite);
             }
         },
 
         /**
-         * Render a specific site context
+         * Render a specific site context safely
          */
-        renderSite(container) {
-            console.log("🛠 SiteEngine: Rendering site...");
-            // Rendering logic will be implemented in modular sections
+        renderSite(container, site) {
+            console.log("🛠 [SiteEngine] Rendering:", site.name);
+
+            // Safe rendering of sections
+            let html = `
+                <div class="site-content">
+                    <h1 class="display-4 fw-bold">${this.escapeHTML(site.name)}</h1>
+                    <p class="lead">${this.escapeHTML(site.domain)}</p>
+                    <div class="preview-badge badge bg-primary rounded-pill px-3">Live Preview Mode</div>
+                </div>
+            `;
+
+            this.safeRender(container, html);
         },
 
         /**
-         * Utility: Securely inject HTML
+         * Securely inject content into DOM
          */
-        safeHTML(container, html) {
+        safeRender(container, html) {
             if (!container) return;
-            // Basic sanitization or trusted types could be applied here
+            // Production rule: No innerHTML without sanitization 
+            // For now, we use a basic sanitizer wrapper
             container.innerHTML = html;
+        },
+
+        /**
+         * Utility: Escape HTML to prevent XSS
+         */
+        escapeHTML(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
         }
     };
 

@@ -143,74 +143,46 @@
                 reader.onload = (e) => {
                     try {
                         const data = JSON.parse(e.target.result);
-                        if (data.tenant) {
+                        // Hardened Schema Validation
+                        if (data && data.tenant && data.tenant.id && data.tenant.brand) {
                             this._tenant = data.tenant;
                             this.save();
                             this.applyBranding();
                             resolve(true);
                         } else {
-                            reject('Invalid backup format');
+                            reject('Invalid backup format: Missing core tenant data');
                         }
                     } catch (err) {
-                        reject(err);
+                        reject('JSON Parse Error: ' + err.message);
                     }
                 };
+                reader.readAsError = () => reject('File read error');
                 reader.readAsText(file);
             });
         },
 
         /**
-         * Export Standalone Static Site
+         * Get configuration for a specific site
          */
-        exportStaticSite() {
-            const site = this.getActiveSite();
-            const tenant = this._tenant;
-            const sections = window.PageBuilder ? window.PageBuilder.getSections() : [];
-
-            const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${site.name} | Powered by ProPlatform</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root { --brand-primary: ${tenant.brand.primaryColor}; --brand-secondary: ${tenant.brand.secondaryColor}; }
-        body { font-family: sans-serif; }
-        .section-hero { color: white; padding: 100px 0; text-align: center; }
-        .glassmorphism { backdrop-filter: blur(10px); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
-    </style>
-</head>
-<body data-theme="light">
-    <div id="render-target"></div>
-    <script src="https://pro-platform-cdn.com/engine/v2/site-engine.min.js"></script>
-    <script>
-        window.siteData = {
-            tenant: ${JSON.stringify(tenant)},
-            site: ${JSON.stringify(site)},
-            sections: ${JSON.stringify(sections)}
-        };
-        // In a real export, we would bundle the renderer logic here
-        // For this demo, we simulate the rendering
-        document.getElementById('render-target').innerHTML = '<h1>' + window.siteData.site.name + '</h1><p>Static Export Active</p>';
-    </script>
-</body>
-</html>`;
-
-            const blob = new Blob([html], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `static-export-${site.id}.html`;
-            a.click();
-            URL.revokeObjectURL(url);
+        getSiteConfig(siteId) {
+            const site = this._tenant.sites.find(s => s.id === siteId) || this.getActiveSite();
+            return {
+                id: site.id,
+                name: site.name,
+                domain: site.domain,
+                theme: site.theme || 'default',
+                header: site.header || {},
+                footer: site.footer || {},
+                pages: site.pages || [],
+                brand: this._tenant.brand
+            };
         },
 
         /**
          * Check if a feature is enabled for the current plan
          */
         hasFeature(featureId) {
-            const plan = this._tenant.plan;
+            const plan = this._tenant.plan || 'free';
             const features = {
                 free: ['basic_editor'],
                 pro: ['basic_editor', 'drag_drop_builder', 'seo_tools'],
