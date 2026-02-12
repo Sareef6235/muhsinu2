@@ -156,7 +156,7 @@
                         reject('JSON Parse Error: ' + err.message);
                     }
                 };
-                reader.readAsError = () => reject('File read error');
+                reader.onerror = () => reject('File read error');
                 reader.readAsText(file);
             });
         },
@@ -191,6 +191,28 @@
             };
 
             return (features[plan] || []).includes(featureId);
+        },
+
+        /**
+         * Set the active site for the session
+         */
+        setActiveSite(siteId) {
+            const site = this._tenant.sites.find(s => s.id === siteId);
+            if (site) {
+                this._activeSiteId = siteId;
+                localStorage.setItem('active_site_id', siteId);
+                this.applyBranding();
+            }
+        },
+
+        /**
+         * Get the active site context
+         */
+        getActiveSite() {
+            if (!this._activeSiteId) {
+                this._activeSiteId = localStorage.getItem('active_site_id') || this._tenant.sites[0].id;
+            }
+            return this._tenant.sites.find(s => s.id === this._activeSiteId) || this._tenant.sites[0];
         }
     };
 

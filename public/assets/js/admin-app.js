@@ -30,6 +30,11 @@
             isTransitioning: false
         },
 
+        toggleSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            if (sidebar) sidebar.classList.toggle('active');
+        },
+
         /**
          * Initialize the Admin Application
          */
@@ -40,6 +45,9 @@
 
             // Wait for dependencies
             await this.waitForDependencies();
+
+            // Setup Header Extras (Site Switcher)
+            this.renderHeaderExtras();
 
             // Setup Sidebar
             this.renderSidebar();
@@ -61,13 +69,51 @@
                 console.error('[AdminApp] Auth Error:', e);
             }
 
-            // Hide UI and show access denied if failed
             const layout = document.getElementById('main-layout');
             const denied = document.getElementById('access-denied-screen');
             if (layout) layout.style.display = 'none';
             if (denied) denied.style.display = 'flex';
 
             return false;
+        },
+
+        /**
+         * Render Site Switcher in Header
+         */
+        renderHeaderExtras() {
+            const sites = window.TenantManager.getSites();
+            const currentSite = window.TenantManager.getActiveSite();
+
+            const switcherHtml = `
+                <div class="d-flex align-items-center gap-3 ms-4 border-start ps-4">
+                    <span class="text-secondary small fw-bold text-uppercase">Active Site:</span>
+                    <select class="form-select form-select-sm rounded-pill border-0 shadow-sm bg-white" 
+                            style="width: 200px;" 
+                            onchange="AdminApp.switchSite(this.value)">
+                        ${sites.map(s => `<option value="${s.id}" ${s.id === currentSite.id ? 'selected' : ''}>${this.sanitize(s.name)}</option>`).join('')}
+                    </select>
+                </div>
+            `;
+
+            const header = document.querySelector('.admin-main header');
+            if (header) {
+                if (document.getElementById('header-site-switcher')) return;
+                const wrapper = document.createElement('div');
+                wrapper.id = 'header-site-switcher';
+                wrapper.className = 'd-none d-md-block';
+                wrapper.innerHTML = switcherHtml;
+                header.insertBefore(wrapper, header.querySelector('.d-flex.gap-3'));
+            }
+        },
+
+        /**
+         * Switch the active site context
+         */
+        switchSite(siteId) {
+            console.log(`🔄 [AdminApp] Switching Site to: ${siteId}`);
+            window.TenantManager.setActiveSite(siteId);
+            if (window.SiteEngine) window.SiteEngine.loadSite(siteId);
+            this.renderModuleContent(this.state.activeModule);
         },
 
         /**
@@ -93,41 +139,31 @@
             nav.innerHTML = this.modules.map(m => `
                 <a class="nav-item ${this.state.activeModule === m.id ? 'active' : ''}" 
                    id="nav-${m.id}" 
-                   onclick="AdminApp.switchModule('${m.id}')"
-                   role="button"
-                   aria-label="Navigate to ${m.label}">
+                   onclick="AdminApp.switchModule('${m.id}')">
                     <i class="bi ${m.icon}"></i> <span>${m.label}</span>
                 </a>
             `).join('');
         },
 
         /**
-         * Module Router: Switch between different dashboard sections
+         * Module Router
          */
         switchModule(id) {
             if (this.state.isTransitioning) return;
-
             const content = document.getElementById('admin-content');
             if (!content) return;
 
-            // Update State
             this.state.activeModule = id;
             this.state.isTransitioning = true;
-
-            // UI Feedback
             content.classList.add('fade-out');
-            content.classList.remove('fade-in');
 
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             const activeNav = document.getElementById('nav-' + id);
             if (activeNav) activeNav.classList.add('active');
 
-            // Update Title Area
             const module = this.modules.find(m => m.id === id) || { label: 'System Overview' };
             const titleArea = document.getElementById('page-title-area');
-            if (titleArea) {
-                titleArea.innerHTML = `<h2 class="fw-bold mb-0">${this.sanitize(module.label)}</h2>`;
-            }
+            if (titleArea) titleArea.innerHTML = `<h2 class="fw-bold mb-0">${this.sanitize(module.label)}</h2>`;
 
             setTimeout(() => {
                 this.renderModuleContent(id);
@@ -137,17 +173,12 @@
             }, 300);
         },
 
-        /**
-         * Render specific module content
-         */
         renderModuleContent(id) {
             const container = document.getElementById('admin-content');
-
             switch (id) {
                 case 'dashboard': this.renderDashboard(container); break;
                 case 'menumanager': this.renderMenuManager(container); break;
                 case 'branding': this.renderBranding(container); break;
-                case 'pagebuilder': this.renderPageBuilder(container); break;
                 case 'advanced': this.renderAdvanced(container); break;
                 case 'json': this.renderJSON(container); break;
                 case 'diagnostics': this.renderDiagnostics(container); break;
@@ -155,12 +186,9 @@
             }
         },
 
-        // --- Core Module Renderers ---
-
         async renderDashboard(container) {
             const tenant = window.TenantManager.getTenant();
             const sites = window.TenantManager.getSites();
-
             const activities = [
                 { action: 'Site Settings Updated', module: 'CMS', status: 'Success', time: 'Just Now' },
                 { action: 'Admin logic decoupled', module: 'System', status: 'Success', time: '2 mins ago' },
@@ -194,7 +222,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="glass-panel">
                     <h5 class="fw-bold mb-4">Platform Activity</h5>
                     <div class="table-responsive">
@@ -230,7 +257,6 @@
                             <label class="form-label small fw-bold">Brand Name</label>
                             <input type="text" class="form-control rounded-pill mb-3" value="${brand.name}" 
                                    onchange="AdminApp.updateBrand('name', this.value)">
-                            
                             <label class="form-label small fw-bold">Primary Color</label>
                             <input type="color" class="form-control form-control-color w-100 rounded-pill mb-3" 
                                    value="${brand.primaryColor}" 
@@ -239,71 +265,65 @@
                         <div class="col-md-6">
                             <div class="p-4 border border-dashed rounded-4 text-center">
                                 <label class="d-block mb-3 small fw-bold">Brand Logo</label>
-                                <div class="bg-light rounded-4 p-4 mb-3 d-flex align-items-center justify-content-center" style="height: 100px;">
+                                <div id="brand-logo-preview" class="bg-light rounded-4 p-4 mb-3 d-flex align-items-center justify-content-center" style="height: 100px;">
                                     ${brand.logo ? `<img src="${brand.logo}" style="max-height: 100%;">` : '<i class="bi bi-image text-secondary display-6"></i>'}
                                 </div>
-                                <button class="btn btn-sm btn-outline-primary rounded-pill px-4" onclick="AdminApp.uploadLogo()">
-                                    Upload New Logo
-                                </button>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill px-4" onclick="AdminApp.uploadLogo()">Upload New</button>
                             </div>
+                        </div>
+                    </div>
+                    <div class="mt-5 pt-4 border-top">
+                        <h6 class="fw-bold mb-3 text-uppercase small text-secondary">Live Site Preview</h6>
+                        <div class="site-preview-container border rounded-4 overflow-hidden shadow-lg bg-white" style="height: 400px; position: relative;">
+                            <div id="live-preview-target" data-site-engine="render" style="height: 100%; overflow-y: auto;"></div>
                         </div>
                     </div>
                 </div>
             `;
+            if (window.SiteEngine) window.SiteEngine.loadSite(window.TenantManager.getActiveSite().id);
         },
 
         renderMenuManager(container) {
-            // Integration with MenuBuilder
             if (window.AdminControlCenter && window.AdminControlCenter.renderMenuManager) {
                 window.AdminControlCenter.renderMenuManager();
             } else {
-                container.innerHTML = '<div class="alert alert-warning">Menu Manager module initializing...</div>';
+                container.innerHTML = '<div class="alert alert-warning">Initializing Menu Manager...</div>';
             }
         },
 
         renderJSON(container) {
-            const data = {
-                v: this.version,
-                tenant: window.TenantManager.getTenant(),
-                sites: window.TenantManager.getSites()
-            };
-
+            const data = { v: this.version, tenant: window.TenantManager.getTenant(), sites: window.TenantManager.getSites() };
             container.innerHTML = `
                 <div class="glass-panel">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="fw-bold mb-0">System Backup</h5>
-                        <button class="btn btn-dark rounded-pill px-4" onclick="TenantManager.exportBackup()">
-                            <i class="bi bi-download me-2"></i> Export JSON
-                        </button>
+                        <h5 class="fw-bold mb-0">System Backup & Restore</h5>
+                        <div class="d-flex gap-2">
+                            <input type="file" id="backup-file" class="d-none" onchange="AdminApp.handleImport(this.files[0])">
+                            <button class="btn btn-outline-primary rounded-pill px-4" onclick="document.getElementById('backup-file').click()">
+                                <i class="bi bi-cloud-upload me-2"></i> Import
+                            </button>
+                            <button class="btn btn-dark rounded-pill px-4" onclick="window.TenantManager.exportBackup()">
+                                <i class="bi bi-download me-2"></i> Export
+                            </button>
+                        </div>
                     </div>
-                    <div class="p-3 border rounded-4 bg-light mb-4 text-center">
-                        <p class="mb-0">Importing a backup will overwrite your current settings.</p>
-                        <input type="file" id="backup-file" class="d-none" onchange="AdminApp.handleImport(this.files[0])">
-                        <button class="btn btn-outline-primary rounded-pill px-4 mt-3" onclick="document.getElementById('backup-file').click()">
-                            <i class="bi bi-cloud-upload me-2"></i> Import Backup
-                        </button>
+                    <div class="alert alert-info rounded-4 border-0 bg-light p-3 mb-4">
+                        <small><i class="bi bi-info-circle me-2"></i> Exporting generates a JSON file containing all tenant and site configurations.</small>
                     </div>
                     <pre class="bg-dark text-info p-3 rounded-4 small overflow-auto" style="max-height: 300px;">${JSON.stringify(data, null, 2)}</pre>
                 </div>
             `;
         },
 
-        // --- Helper Methods ---
+        renderDiagnostics(container) {
+            container.innerHTML = '<div class="glass-panel"><h5>System Diagnostics</h5><p>All modules operational.</p></div>';
+        },
 
         updateBrand(key, value) {
             const tenant = window.TenantManager.getTenant();
             tenant.brand[key] = value;
             window.TenantManager.updateTenant(tenant);
-            console.log(`[AdminApp] Updated Brand ${key}: ${value}`);
-        },
-
-        handleImport(file) {
-            if (!file) return;
-            if (confirm('Are you sure you want to import this background? Current data will be lost.')) {
-                window.TenantManager.importBackup(file).then(() => {
-                    location.reload();
-                }).catch(err => alert('Import failed: ' + err));
-            }
+            if (window.SiteEngine) window.SiteEngine.loadSite(window.TenantManager.getActiveSite().id);
         },
 
         sanitize(str) {
@@ -311,15 +331,20 @@
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
-        }
+        },
+
+        handleImport(file) {
+            if (!file) return;
+            if (confirm('Are you sure you want to restore from this backup? Current data will be permanently overwritten.')) {
+                window.TenantManager.importBackup(file).then(() => {
+                    location.reload();
+                }).catch(err => alert('Restore failed: ' + err));
+            }
+        },
+
+        uploadLogo() { alert('Logo upload simulation...'); }
     };
 
-    // Global Exposure
     window.AdminApp = AdminApp;
-
-    // Auto-init on DOM loaded
-    document.addEventListener('DOMContentLoaded', () => {
-        AdminApp.init();
-    });
-
+    document.addEventListener('DOMContentLoaded', () => AdminApp.init());
 })();

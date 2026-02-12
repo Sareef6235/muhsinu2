@@ -7,14 +7,14 @@
     <title>MIFTHAHUL HUDA MADRASA</title>
     <meta name="description" content="Portfolio of MIFTHAHUL HUDA MADRASA. Exploring technology and sharing knowledge.">
     <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/modern-nav.css">
-    <link rel="stylesheet" href="assets/css/site-footer.css">
     <link rel="stylesheet" href="assets/css/site-languages.css">
 
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <!-- Global Navigation & Footer -->
-    <link rel="stylesheet" href="assets/css/global-navigation.css">
-    <link rel="stylesheet" href="assets/css/global-footer.css">
-    <link rel="stylesheet" href="assets/css/menu-styles.css">
+    <link rel="stylesheet" href="assets/css/navigation-system.css">
+    <link rel="stylesheet" href="assets/css/footer-system.css">
 
     <!-- Critical Scripts (Optimized) -->
     <script src="assets/js/utils/performance.js" defer></script>
@@ -43,12 +43,8 @@
 </head>
 
 <body data-page-id="home">
-    <!-- Global Navigation -->
-    <div id="global-nav"></div>
 
-    <header id="dynamic-header">
-        <!-- Navigation injected via MenuBuilder -->
-    </header>
+    <header id="site-header"></header>
 
     <main>
         <section id="hero"
@@ -517,234 +513,269 @@
                 </section>
 
 
-    </main>
+                <footer id="site-footer"></footer>
 
-    <script src="assets/js/menu-builder.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            MenuBuilder.init();
-        });
-    </script>
-    <script src="assets/js/script.js"></script>
+                <script src="assets/js/navigation-system.js"></script>
+                <script src="assets/js/footer-system.js"></script>
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        // Sample Multi-tenant Menu Data
+                        const menuData = {
+                            headerMenu: [
+                                { label: "Home", link: "/index.html", enabled: true, children: [] },
+                                {
+                                    label: "Exams", link: "#", enabled: true,
+                                    children: [
+                                        { label: "Check Results", link: "/pages/results/index.html", enabled: true },
+                                        { label: "Archive", link: "/pages/results/archive.html", enabled: true }
+                                    ]
+                                },
+                                { label: "Services", link: "/pages/services/index.html", enabled: true, children: [] },
+                                { label: "Gallery", link: "/pages/gallery/index.html", enabled: true, children: [] },
+                                { label: "Contact", link: "#contact", enabled: true, children: [] },
+                                { label: "Admin", link: "/pages/admin/dashboard.html", enabled: true, children: [] }
+                            ],
+                            footerMenu: [
+                                { label: "Privacy Policy", link: "/privacy", enabled: true },
+                                { label: "Terms of Service", link: "/terms", enabled: true },
+                                { label: "About Us", link: "/pages/about/index.html", enabled: true }
+                            ]
+                        };
+
+                        // Initialize Systems
+                        if (window.NavigationSystem) {
+                            window.NavigationSystem.init(menuData);
+                        }
+                        if (window.FooterSystem) {
+                            window.FooterSystem.init();
+                        }
+                    });
+                </script>
+                <script src="assets/js/script.js"></script>
 
 
-    <!-- Three.js Background Animation -->
-    <!-- Three.js Background Animation -->
-    <script>
-        // Defer 3D animation until browser is idle
-        const initThreeJS = () => {
-            const canvas = document.getElementById('hero-canvas');
-            if (!canvas) return;
+                <!-- Three.js Background Animation -->
+                <!-- Three.js Background Animation -->
+                <script>
+                    // Defer 3D animation until browser is idle
+                    const initThreeJS = () => {
+                        const canvas = document.getElementById('hero-canvas');
+                        if (!canvas) return;
 
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                        const scene = new THREE.Scene();
+                        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
 
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            camera.position.z = 5;
+                        renderer.setSize(window.innerWidth, window.innerHeight);
+                        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                        camera.position.z = 5;
 
-            // Create particles
-            const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = 1500;
-            const posArray = new Float32Array(particlesCount * 3);
+                        // Create particles
+                        const particlesGeometry = new THREE.BufferGeometry();
+                        const particlesCount = 1500;
+                        const posArray = new Float32Array(particlesCount * 3);
 
-            for (let i = 0; i < particlesCount * 3; i++) {
-                posArray[i] = (Math.random() - 0.5) * 10;
-            }
+                        for (let i = 0; i < particlesCount * 3; i++) {
+                            posArray[i] = (Math.random() - 0.5) * 10;
+                        }
 
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+                        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
-            // Create material with cyan color
-            const particlesMaterial = new THREE.PointsMaterial({
-                size: 0.015,
-                color: 0x00f3ff,
-                transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending
-            });
+                        // Create material with cyan color
+                        const particlesMaterial = new THREE.PointsMaterial({
+                            size: 0.015,
+                            color: 0x00f3ff,
+                            transparent: true,
+                            opacity: 0.8,
+                            blending: THREE.AdditiveBlending
+                        });
 
-            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-            scene.add(particlesMesh);
+                        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+                        scene.add(particlesMesh);
 
-            // Animation
-            let mouseX = 0;
-            let mouseY = 0;
+                        // Animation
+                        let mouseX = 0;
+                        let mouseY = 0;
 
-            document.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-            });
+                        document.addEventListener('mousemove', (e) => {
+                            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+                        });
 
-            function animate() {
-                requestAnimationFrame(animate);
+                        function animate() {
+                            requestAnimationFrame(animate);
 
-                // Rotate particles
-                particlesMesh.rotation.y += 0.0005;
-                particlesMesh.rotation.x += 0.0003;
+                            // Rotate particles
+                            particlesMesh.rotation.y += 0.0005;
+                            particlesMesh.rotation.x += 0.0003;
 
-                // Mouse interaction
-                particlesMesh.rotation.y += mouseX * 0.0002;
-                particlesMesh.rotation.x += mouseY * 0.0002;
+                            // Mouse interaction
+                            particlesMesh.rotation.y += mouseX * 0.0002;
+                            particlesMesh.rotation.x += mouseY * 0.0002;
 
-                renderer.render(scene, camera);
-            }
+                            renderer.render(scene, camera);
+                        }
 
-            animate();
+                        animate();
 
-            // Handle resize
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        };
+                        // Handle resize
+                        window.addEventListener('resize', () => {
+                            camera.aspect = window.innerWidth / window.innerHeight;
+                            camera.updateProjectionMatrix();
+                            renderer.setSize(window.innerWidth, window.innerHeight);
+                        });
+                    };
 
-        if (window.Perf) {
-            window.Perf.runIdle(initThreeJS, 1000);
-        } else {
-            // Fallback if Perf is not loaded (shouldn't happen if head script works)
-            setTimeout(initThreeJS, 1000);
-        }
-    </script>
+                    if (window.Perf) {
+                        window.Perf.runIdle(initThreeJS, 1000);
+                    } else {
+                        // Fallback if Perf is not loaded (shouldn't happen if head script works)
+                        setTimeout(initThreeJS, 1000);
+                    }
+                </script>
 
-    </nav>
+                </nav>
 
-    <!-- Booking Confirmation Modal -->
-    <div id="booking-modal" class="modal-overlay">
-        <div class="modal-content animate-fade-up">
-            <div class="modal-icon">
-                <i class="ph ph-check-circle"></i>
-            </div>
-            <h2>Booking Summary</h2>
-            <div class="modal-body">
-                <p>Hello <span id="modal-name"></span>,</p>
-                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin: 15px 0;">
-                    <p style="margin: 0; color: #888; font-size: 0.85rem;">Subjects:</p>
-                    <p id="modal-subjects" style="color: #fff; font-weight: 600;"></p>
-                    <div style="height: 1px; background: var(--glass-border); margin: 10px 0;"></div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: #888;">Class: <strong id="modal-class" style="color: #fff;"></strong></span>
-                        <span style="color: #888;">Total: <strong id="modal-price"
-                                style="color: var(--primary-color);"></strong></span>
+                <!-- Booking Confirmation Modal -->
+                <div id="booking-modal" class="modal-overlay">
+                    <div class="modal-content animate-fade-up">
+                        <div class="modal-icon">
+                            <i class="ph ph-check-circle"></i>
+                        </div>
+                        <h2>Booking Summary</h2>
+                        <div class="modal-body">
+                            <p>Hello <span id="modal-name"></span>,</p>
+                            <div
+                                style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin: 15px 0;">
+                                <p style="margin: 0; color: #888; font-size: 0.85rem;">Subjects:</p>
+                                <p id="modal-subjects" style="color: #fff; font-weight: 600;"></p>
+                                <div style="height: 1px; background: var(--glass-border); margin: 10px 0;"></div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #888;">Class: <strong id="modal-class"
+                                            style="color: #fff;"></strong></span>
+                                    <span style="color: #888;">Total: <strong id="modal-price"
+                                            style="color: var(--primary-color);"></strong></span>
+                                </div>
+                            </div>
+
+                            <!-- UPI QR Code Section -->
+                            <div class="modal-qr-section"
+                                style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--glass-border);">
+                                <p style="margin-bottom: 15px; color: #bbb; font-size: 0.9rem;">Scan to Pay via UPI</p>
+                                <div class="modal-qr-container"
+                                    style="background: white; padding: 15px; border-radius: 15px; display: inline-block;">
+                                    <img src="assets/upi-qr.jpeg" alt="UPI QR Code" class="modal-qr-img"
+                                        style="max-width: 180px; width: 100%; display: block; height: auto; border-radius: 8px;">
+                                </div>
+                                <div style="margin-top: 15px;">
+                                    <p style="font-size: 0.9rem; color: #fff; margin-bottom: 5px;">UPI ID:
+                                        <b>mmuhsinu2-1@okaxis</b>
+                                    </p>
+                                    <p style="font-size: 0.8rem; color: #888;">Name: Mo Mhn</p>
+                                </div>
+                            </div>
+
+                            <p class="modal-note">Click "Proceed to Pay" to visit your UPI app and confirm the booking.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" id="modal-pay-btn"
+                                style="width: 100; padding: 15px;">Proceed to
+                                Pay</button>
+                            <button onclick="closeBookingModal()"
+                                style="margin-top: 15px; background: none; border: none; color: #666; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- UPI QR Code Section -->
-                <div class="modal-qr-section"
-                    style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--glass-border);">
-                    <p style="margin-bottom: 15px; color: #bbb; font-size: 0.9rem;">Scan to Pay via UPI</p>
-                    <div class="modal-qr-container"
-                        style="background: white; padding: 15px; border-radius: 15px; display: inline-block;">
-                        <img src="assets/upi-qr.jpeg" alt="UPI QR Code" class="modal-qr-img"
-                            style="max-width: 180px; width: 100%; display: block; height: auto; border-radius: 8px;">
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <p style="font-size: 0.9rem; color: #fff; margin-bottom: 5px;">UPI ID: <b>mmuhsinu2-1@okaxis</b>
-                        </p>
-                        <p style="font-size: 0.8rem; color: #888;">Name: Mo Mhn</p>
-                    </div>
-                </div>
+                <script type="module">
+                    import { NewsService } from './assets/js/news-service.js';
 
-                <p class="modal-note">Click "Proceed to Pay" to visit your UPI app and confirm the booking.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="modal-pay-btn" style="width: 100; padding: 15px;">Proceed to
-                    Pay</button>
-                <button onclick="closeBookingModal()"
-                    style="margin-top: 15px; background: none; border: none; color: #666; cursor: pointer; font-size: 0.9rem;">Cancel</button>
-            </div>
-        </div>
-    </div>
+                    // 0. Initialize Systems
+                    window.NewsService = NewsService;
 
-    <script type="module">
-        import { NewsService } from './assets/js/news-service.js';
+                    const subjectContainer = document.getElementById('subject-checkboxes');
+                    const totalPriceEl = document.getElementById('total-price');
 
-        // 0. Initialize Systems
-        window.NewsService = NewsService;
+                    // 1. Local Subject Loader (Replacing Firebase)
+                    function updateTotalPrice() {
+                        let total = 0;
+                        document.querySelectorAll('#subject-checkboxes input:checked').forEach(cb => {
+                            total += Number(cb.dataset.price);
+                        });
+                        if (totalPriceEl) totalPriceEl.textContent = `₹${total}`;
+                        const hiddenPrice = document.getElementById('booking-price-hidden');
+                        if (hiddenPrice) hiddenPrice.value = total;
+                    }
 
-        const subjectContainer = document.getElementById('subject-checkboxes');
-        const totalPriceEl = document.getElementById('total-price');
+                    async function initSubjects() {
+                        if (!subjectContainer) return;
 
-        // 1. Local Subject Loader (Replacing Firebase)
-        function updateTotalPrice() {
-            let total = 0;
-            document.querySelectorAll('#subject-checkboxes input:checked').forEach(cb => {
-                total += Number(cb.dataset.price);
-            });
-            if (totalPriceEl) totalPriceEl.textContent = `₹${total}`;
-            const hiddenPrice = document.getElementById('booking-price-hidden');
-            if (hiddenPrice) hiddenPrice.value = total;
-        }
+                        // Check if SubjectStorage is available
+                        if (typeof SubjectStorage === 'undefined') {
+                            console.error("SubjectStorage not found");
+                            return;
+                        }
 
-        async function initSubjects() {
-            if (!subjectContainer) return;
+                        const activeSubjects = SubjectStorage.getActive();
+                        subjectContainer.innerHTML = "";
 
-            // Check if SubjectStorage is available
-            if (typeof SubjectStorage === 'undefined') {
-                console.error("SubjectStorage not found");
-                return;
-            }
+                        if (activeSubjects.length === 0) {
+                            subjectContainer.innerHTML = "<p style='color: #666; font-size: 0.9rem;'>No subjects available.</p>";
+                            return;
+                        }
 
-            const activeSubjects = SubjectStorage.getActive();
-            subjectContainer.innerHTML = "";
-
-            if (activeSubjects.length === 0) {
-                subjectContainer.innerHTML = "<p style='color: #666; font-size: 0.9rem;'>No subjects available.</p>";
-                return;
-            }
-
-            activeSubjects.forEach(s => {
-                const label = document.createElement('label');
-                if (s.rtl) label.dir = 'rtl';
-                label.innerHTML = `
+                        activeSubjects.forEach(s => {
+                            const label = document.createElement('label');
+                            if (s.rtl) label.dir = 'rtl';
+                            label.innerHTML = `
                     <input type="checkbox" name="subject[]" value="${s.name} (₹${s.price})" data-price="${s.price}">
                     ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
                 `;
-                const input = label.querySelector('input');
-                input.addEventListener('change', () => {
-                    updateTotalPrice();
-                    const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
-                        .map(c => c.value).join(', ');
-                    const hiddenSub = document.getElementById('booking-subjects-hidden');
-                    if (hiddenSub) hiddenSub.value = selected;
-                });
-                subjectContainer.appendChild(label);
-            });
-        }
+                            const input = label.querySelector('input');
+                            input.addEventListener('change', () => {
+                                updateTotalPrice();
+                                const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
+                                    .map(c => c.value).join(', ');
+                                const hiddenSub = document.getElementById('booking-subjects-hidden');
+                                if (hiddenSub) hiddenSub.value = selected;
+                            });
+                            subjectContainer.appendChild(label);
+                        });
+                    }
 
-        // Run on load
-        initSubjects();
+                    // Run on load
+                    initSubjects();
 
-        // 2. Local Notice System (Listen for storage events if needed, or static for now)
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'mhm_site_notice') {
-                const notice = JSON.parse(e.newValue);
-                if (notice && notice.active) {
-                    // Handle local notice
-                }
-            }
-        });
+                    // 2. Local Notice System (Listen for storage events if needed, or static for now)
+                    window.addEventListener('storage', (e) => {
+                        if (e.key === 'mhm_site_notice') {
+                            const notice = JSON.parse(e.newValue);
+                            if (notice && notice.active) {
+                                // Handle local notice
+                            }
+                        }
+                    });
 
-        // 3. GitHub Media Sync
-        const galleryList = document.getElementById('gallery-list');
-        const videoList = document.getElementById('video-list');
-        const downloadIcon = `<svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+                    // 3. GitHub Media Sync
+                    const galleryList = document.getElementById('gallery-list');
+                    const videoList = document.getElementById('video-list');
+                    const downloadIcon = `<svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
 
-        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallery")
-            .then(res => res.json())
-            .then(files => {
-                if (Array.isArray(files) && galleryList) {
-                    // Dynamic loading logic if needed
-                }
-            }).catch(err => console.error("Image sync failed:", err));
+                    fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallery")
+                        .then(res => res.json())
+                        .then(files => {
+                            if (Array.isArray(files) && galleryList) {
+                                // Dynamic loading logic if needed
+                            }
+                        }).catch(err => console.error("Image sync failed:", err));
 
-        // 4. PDF Sync
-        const pdfList = document.getElementById('pdf-list');
-        function addPdfToSessions(name, url) {
-            const item = document.createElement("div");
-            item.className = "session-card pdf-card animate-fade-up";
-            item.innerHTML = `
+                    // 4. PDF Sync
+                    const pdfList = document.getElementById('pdf-list');
+                    function addPdfToSessions(name, url) {
+                        const item = document.createElement("div");
+                        item.className = "session-card pdf-card animate-fade-up";
+                        item.innerHTML = `
                 <div class="pdf-info">
                     <i class="ph ph-file-pdf" style="font-size: 2rem; color: #ff4d4d;"></i>
                     <div>
@@ -754,90 +785,90 @@
                 </div>
                 <a href="${url}" target="_blank" class="btn-pdf">View Document</a>
             `;
-            if (pdfList) pdfList.appendChild(item);
-        }
+                        if (pdfList) pdfList.appendChild(item);
+                    }
 
-        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/pdfs")
-            .then(res => res.json())
-            .then(files => {
-                if (Array.isArray(files)) {
-                    const hasPdfs = files.some(f => f.name.match(/\.(pdf)$/i));
-                    if (hasPdfs && pdfList) pdfList.innerHTML = '';
-                    files.forEach(file => {
-                        if (file.type === "file" && file.name.match(/\.(pdf)$/i)) {
-                            addPdfToSessions(file.name, file.download_url);
-                        }
-                    });
-                }
-            }).catch(err => console.error("PDF sync failed:", err));
+                    fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/pdfs")
+                        .then(res => res.json())
+                        .then(files => {
+                            if (Array.isArray(files)) {
+                                const hasPdfs = files.some(f => f.name.match(/\.(pdf)$/i));
+                                if (hasPdfs && pdfList) pdfList.innerHTML = '';
+                                files.forEach(file => {
+                                    if (file.type === "file" && file.name.match(/\.(pdf)$/i)) {
+                                        addPdfToSessions(file.name, file.download_url);
+                                    }
+                                });
+                            }
+                        }).catch(err => console.error("PDF sync failed:", err));
 
-        // 5. Exam Result Logic
-        const RESULT_SHEET_ID = "1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU";
-        const RESULT_TAB_NAME = "class1";
+                    // 5. Exam Result Logic
+                    const RESULT_SHEET_ID = "1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU";
+                    const RESULT_TAB_NAME = "class1";
 
-        window.fetchHomeResult = async function () {
-            const regnoInput = document.getElementById('home-regno');
-            const regno = regnoInput.value.trim();
-            const status = document.getElementById('home-status');
-            const container = document.getElementById('home-result-container');
-            const area = document.getElementById('home-result-area');
+                    window.fetchHomeResult = async function () {
+                        const regnoInput = document.getElementById('home-regno');
+                        const regno = regnoInput.value.trim();
+                        const status = document.getElementById('home-status');
+                        const container = document.getElementById('home-result-container');
+                        const area = document.getElementById('home-result-area');
 
-            if (!regno) return;
-            status.innerHTML = "🔍 Fetching from local vault...";
-            container.style.display = "none";
+                        if (!regno) return;
+                        status.innerHTML = "🔍 Fetching from local vault...";
+                        container.style.display = "none";
 
-            setTimeout(() => {
-                const result = window.ResultManager.lookup(regno, '2010-01-01', '1'); // Default Public Category
-                if (result) {
-                    status.innerHTML = "✅ Record Found";
-                    area.innerHTML = `
+                        setTimeout(() => {
+                            const result = window.ResultManager.lookup(regno, '2010-01-01', '1'); // Default Public Category
+                            if (result) {
+                                status.innerHTML = "✅ Record Found";
+                                area.innerHTML = `
                         <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">${result.name}</div>
                         <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px;">
                             <span style="color: #888; font-size: 0.9rem;">Status: <b style="color:#00ff88">PASS</b></span>
                             <span style="color: #fff; font-weight: 700;">Score: ${result.score}</span>
                         </div>
                     `;
-                    container.style.display = "block";
-                } else {
-                    status.innerHTML = "❌ ID not found in local records.";
-                }
-            }, 500);
-        };
+                                container.style.display = "block";
+                            } else {
+                                status.innerHTML = "❌ ID not found in local records.";
+                            }
+                        }, 500);
+                    };
 
-        document.getElementById('home-regno')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') window.fetchHomeResult();
-        });
+                    document.getElementById('home-regno')?.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') window.fetchHomeResult();
+                    });
 
-        // --- ADVANCED NEWS SYSTEM ---
-        let currentNewsLang = 'en';
+                    // --- ADVANCED NEWS SYSTEM ---
+                    let currentNewsLang = 'en';
 
-        window.setNewsLang = (lang) => {
-            currentNewsLang = lang;
-            document.querySelectorAll('.lang-btn').forEach(b => {
-                b.classList.toggle('active', b.innerText.toLowerCase() === lang);
-            });
-            window.loadNews();
-        };
+                    window.setNewsLang = (lang) => {
+                        currentNewsLang = lang;
+                        document.querySelectorAll('.lang-btn').forEach(b => {
+                            b.classList.toggle('active', b.innerText.toLowerCase() === lang);
+                        });
+                        window.loadNews();
+                    };
 
-        window.loadNews = async () => {
-            try {
-                const newsGrid = document.getElementById('home-news-grid');
-                if (!newsGrid || !window.NewsService) return;
+                    window.loadNews = async () => {
+                        try {
+                            const newsGrid = document.getElementById('home-news-grid');
+                            if (!newsGrid || !window.NewsService) return;
 
-                const latestNews = window.NewsService.getPublishedNews().slice(0, 3);
-                const currentLang = document.documentElement.lang || 'en';
-                const t = (window.LanguageSystem && window.LanguageSystem.dictionary[currentLang]) || { news_no_updates: "No updates at the moment.", read_more: "Read More" };
+                            const latestNews = window.NewsService.getPublishedNews().slice(0, 3);
+                            const currentLang = document.documentElement.lang || 'en';
+                            const t = (window.LanguageSystem && window.LanguageSystem.dictionary[currentLang]) || { news_no_updates: "No updates at the moment.", read_more: "Read More" };
 
-                if (latestNews.length === 0) {
-                    newsGrid.innerHTML = `
+                            if (latestNews.length === 0) {
+                                newsGrid.innerHTML = `
                         <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
                             <p style="color: #666;">${t.news_no_updates}</p>
                         </div>
                     `;
-                    return;
-                }
+                                return;
+                            }
 
-                newsGrid.innerHTML = latestNews.map((item, index) => `
+                            newsGrid.innerHTML = latestNews.map((item, index) => `
                     <article class="news-card-premium animate-fade-up" style="animation-delay: ${index * 0.1}s;">
                         <div class="img-wrapper" style="height:200px; background:rgba(255,255,255,0.02); display:flex; align-items:center; justify-content:center">
                             ${item.image ? `<img src="${item.image}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover">` : `<i class="ph ph-newspaper" style="font-size:3rem; color:#222"></i>`}
@@ -850,65 +881,62 @@
                         </div>
                     </article>
                 `).join('');
-            } catch (e) { console.error("News load error", e); }
-        };
+                        } catch (e) { console.error("News load error", e); }
+                    };
 
-        // Badge & Sync Logic
-        window.updateBadges = () => {
-            const count = parseInt(localStorage.getItem('mhm_unread_news') || '0');
-            const badges = [document.getElementById('news-badge-nav'), document.getElementById('news-badge-mobile')];
-            badges.forEach(b => {
-                if (b) {
-                    b.innerText = count > 9 ? '9+' : count;
-                    b.style.display = count > 0 ? 'flex' : 'none';
-                }
-            });
-        };
+                    // Badge & Sync Logic
+                    window.updateBadges = () => {
+                        const count = parseInt(localStorage.getItem('mhm_unread_news') || '0');
+                        const badges = [document.getElementById('news-badge-nav'), document.getElementById('news-badge-mobile')];
+                        badges.forEach(b => {
+                            if (b) {
+                                b.innerText = count > 9 ? '9+' : count;
+                                b.style.display = count > 0 ? 'flex' : 'none';
+                            }
+                        });
+                    };
 
-        window.addEventListener('news-updated', window.updateBadges);
-        window.addEventListener('DOMContentLoaded', () => {
-            window.loadNews();
-            window.updateBadges();
-        });
+                    window.addEventListener('news-updated', window.updateBadges);
+                    window.addEventListener('DOMContentLoaded', () => {
+                        window.loadNews();
+                        window.updateBadges();
+                    });
 
-        // Clear badge when visiting news section
-        const newsSection = document.getElementById('news');
-        if (newsSection) {
-            const observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    localStorage.setItem('mhm_unread_news', '0');
-                    window.updateBadges();
-                }
-            }, { threshold: 0.5 });
-            observer.observe(newsSection);
-        }
-    </script>
+                    // Clear badge when visiting news section
+                    const newsSection = document.getElementById('news');
+                    if (newsSection) {
+                        const observer = new IntersectionObserver((entries) => {
+                            if (entries[0].isIntersecting) {
+                                localStorage.setItem('mhm_unread_news', '0');
+                                window.updateBadges();
+                            }
+                        }, { threshold: 0.5 });
+                        observer.observe(newsSection);
+                    }
+                </script>
 
 
-    <!-- Global Footer -->
-    <div id="global-footer"></div>
 
-    <footer id="main-footer"></footer>
 
-    <!-- WhatsApp Floating Button -->
-    <div class="whatsapp-float-wrapper">
-        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp"
-            data-t="whatsapp_aria">
-            <i class="ph-fill ph-whatsapp-logo"></i>
-        </a>
-    </div>
+                <!-- WhatsApp Floating Button -->
+                <div class="whatsapp-float-wrapper">
+                    <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank"
+                        aria-label="Contact us on WhatsApp" data-t="whatsapp_aria">
+                        <i class="ph-fill ph-whatsapp-logo"></i>
+                    </a>
+                </div>
 
-    <!-- Dynamic Site Settings & Renderer -->
-    <script src="assets/js/site-settings.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SiteSettings) SiteSettings.render();
-        });
-    </script>
+                <!-- Dynamic Site Settings & Renderer -->
+                <script src="assets/js/site-settings.js"></script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        if (window.SiteSettings) SiteSettings.render();
+                    });
+                </script>
 
-    <!-- Existing Scripts -->
-    <script src="assets/js/script.js" defer></script>
-    <script type="module" src="assets/js/auth-nav-guard.js" defer></script>
+                <!-- Existing Scripts -->
+                <script src="assets/js/script.js" defer></script>
+                <script type="module" src="assets/js/auth-nav-guard.js" defer></script>
 </body>
 
 </html>

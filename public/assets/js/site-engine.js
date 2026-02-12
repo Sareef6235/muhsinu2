@@ -92,12 +92,33 @@
         renderSite(container, site) {
             console.log("🛠 [SiteEngine] Rendering:", site.name);
 
+            const brand = site.brand || {};
+
             // Safe rendering of sections
             let html = `
-                <div class="site-content">
-                    <h1 class="display-4 fw-bold">${this.escapeHTML(site.name)}</h1>
-                    <p class="lead">${this.escapeHTML(site.domain)}</p>
-                    <div class="preview-badge badge bg-primary rounded-pill px-3">Live Preview Mode</div>
+                <div class="site-preview-content" style="font-family: 'Outfit', sans-serif; color: #333;">
+                    <header style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 40px; height: 40px; background: var(--primary-color, #000); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="bi bi-shop"></i>
+                        </div>
+                        <h4 style="margin: 0; font-weight: 700;">${this.escapeHTML(brand.name || site.name)}</h4>
+                    </header>
+                    
+                    <main style="padding: 40px 20px; text-align: center;">
+                        <div class="preview-badge mb-3" style="display: inline-block; padding: 5px 15px; background: var(--primary-color-faint, #f0f0f0); color: var(--primary-color, #333); border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                            Live Site Context: ${this.escapeHTML(site.id)}
+                        </div>
+                        <h1 class="display-5 fw-bold mb-3">${this.escapeHTML(site.name)}</h1>
+                        <p class="lead text-secondary mb-4">${this.escapeHTML(site.domain)}</p>
+                        
+                        <div class="cta-preview" style="padding: 15px 30px; background: var(--primary-color, #000); color: white; border-radius: 30px; display: inline-block; cursor: default;">
+                            Visit Site
+                        </div>
+                    </main>
+
+                    <footer style="margin-top: 50px; padding: 20px; text-align: center; border-top: 1px solid #eee; font-size: 0.8rem; color: #999;">
+                        &copy; 2026 ${this.escapeHTML(brand.name || 'ProPlatform')} - Powered by SiteEngine
+                    </footer>
                 </div>
             `;
 
