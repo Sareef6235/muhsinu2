@@ -1,8 +1,15 @@
 {
+    "version": 2,
     "rewrites": [
         {
             "source": "/api/(.*)",
             "destination": "/api/index.js"
+        },
+        {
+            "source": "/((?!api/).*)",
+            "destination": "/client/$1"
         }
-    ]
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false
 }

@@ -98,7 +98,13 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`\n🚀 [ProPlatform SaaS] Online`);
-    console.log(`📍 Port: ${PORT}\n`);
-});
+// Export for Vercel
+export default app;
+
+// Start Server locally
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`\n🚀 [ProPlatform SaaS] Online`);
+        console.log(`📍 Port: ${PORT}\n`);
+    });
+}
