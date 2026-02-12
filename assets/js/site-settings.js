@@ -31,9 +31,13 @@
                 text: ""
             },
             menu: [
-                { label: "Home", link: "#", enabled: true },
-                { label: "About", link: "#about", enabled: true },
-                { label: "Admissions", link: "#admissions", enabled: true },
+                { label: "Home", link: "/index.html", enabled: true },
+                { label: "About", link: "/pages/about/index.html", enabled: true },
+                { label: "Exams", link: "/pages/results/index.html", enabled: true },
+                { label: "News", link: "/pages/news/index.html", enabled: true },
+                { label: "Booking", link: "/pages/booking/index.html", enabled: true },
+                { label: "Services", link: "/pages/services/index.html", enabled: true },
+                { label: "Gallery", link: "/pages/gallery/index.html", enabled: true },
                 { label: "Contact", link: "#contact", enabled: true }
             ]
         },
