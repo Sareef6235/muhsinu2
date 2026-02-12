@@ -7,7 +7,12 @@
         },
         {
             "source": "/((?!api/).*)",
-            "destination": "/client/$1"
+            "destination": "/$1",
+            "handle": "filesystem"
+        },
+        {
+            "source": "/((?!api/).*)",
+            "destination": "/index.html"
         }
     ],
     "cleanUrls": true,
