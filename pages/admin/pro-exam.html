@@ -466,9 +466,15 @@
                 <div class="card" style="margin-top: 30px;">
                     <h3>System Status</h3>
                     <p style="color: var(--text-muted);">
-                        Memory-Only Session Active.
-                        <br>Please configure settings and upload results to begin.
+                        <span style="color: var(--success);">● Active & Persistent</span><br>
+                        Data is automatically saved to this device.
                     </p>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="proExamApp.clearSystem()"
+                            style="border-color: var(--danger); color: var(--danger);">
+                            <i class="ph-bold ph-trash"></i> Reset System
+                        </button>
+                    </div>
                     <button class="btn btn-primary"
                         onclick="proExamApp.nav('upload', document.querySelectorAll('.nav-item')[1])">
                         Start Upload
@@ -689,11 +695,57 @@
                 signature: null // base64 string
             },
 
+            // --- PERSISTENCE ---
+            saveState() {
+                localStorage.setItem("pro_exam_state", JSON.stringify(this.state));
+            },
+
+            clearSystem() {
+                if (confirm("Clear all saved data and reset system?")) {
+                    localStorage.removeItem("pro_exam_state");
+                    localStorage.removeItem("pro_exam_mode"); // Also clear mode preference
+                    location.reload();
+                }
+            },
+
             // --- INIT ---
             init() {
                 console.log("Pro Exam App Initialized");
+
+                // 1. Restore State
+                const saved = localStorage.getItem("pro_exam_state");
+                if (saved) {
+                    try {
+                        this.state = JSON.parse(saved);
+                        console.log("State restored from localStorage");
+                    } catch (e) {
+                        console.error("Failed to parse saved state", e);
+                    }
+                }
+
+                // 2. Render UI based on state
                 this.renderSchoolSelector();
                 this.renderSchoolList();
+                this.updateStats();
+                this.renderPreview();
+
+                // Restore Config Inputs
+                if (this.state.config) {
+                    document.getElementById('conf-school').value = this.state.config.institution || "";
+                    document.getElementById('conf-title').value = this.state.config.title || "";
+                    document.getElementById('conf-session').value = this.state.config.session || ""; // Ensure this field exists in HTML if used
+                    document.getElementById('conf-lang').value = this.state.config.lang || "en";
+                    document.getElementById('conf-passEval').value = this.state.config.passMark || 35;
+                }
+
+                // Restore Signature Preview
+                if (this.state.signature) {
+                    const previewEl = document.getElementById('sig-preview');
+                    const statusEl = document.getElementById('sig-status');
+                    previewEl.src = this.state.signature;
+                    previewEl.style.display = 'block';
+                    statusEl.innerHTML = `<span style="color:var(--success)">✅ Restored from storage</span>`;
+                }
 
                 // Determine initial view from storage
                 const mode = localStorage.getItem('pro_exam_mode') || 'public';
@@ -803,9 +855,8 @@
             },
 
             logout() {
-                if (confirm("Logout? All unsaved memory data will be lost.")) {
-                    window.location.href = '../dashboard.html'; // Fallback or logic
-                }
+                // No longer need to warn about data loss
+                window.location.href = '../dashboard.html';
             },
 
             // --- SCHOOL LOGIC ---
@@ -828,6 +879,7 @@
 
             switchSchool(schoolId) {
                 this.state.activeSchoolId = schoolId;
+                this.saveState(); // Save change
                 console.log("Switched to School ID:", schoolId);
                 // In a real app, you might filter students by schoolId here
                 alert(`Switched context to: ${this.state.schools.find(s => s.id === schoolId).name}`);
@@ -843,6 +895,7 @@
                 document.getElementById('new-school-name').value = '';
                 this.renderSchoolSelector();
                 this.renderSchoolList();
+                this.saveState(); // Save new school
             },
 
             // --- RESULTS UPLOAD ---
@@ -896,6 +949,7 @@
 
                         this.updateStats();
                         this.renderPreview();
+                        this.saveState(); // Auto-save after upload
 
                     } catch (err) {
                         console.error(err);
@@ -975,6 +1029,7 @@
                 this.state.config.passMark = Number(document.getElementById('conf-passEval').value);
                 this.state.config.lang = document.getElementById('conf-lang').value;
 
+                this.saveState(); // Save config
                 alert("Configuration saved to memory!");
             },
 
@@ -1054,6 +1109,7 @@
                         // This usually results in very small sizes for signatures
                         const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
                         this.state.signature = compressedDataUrl;
+                        this.saveState(); // Save signature
 
                         // Display
                         previewEl.src = compressedDataUrl;
