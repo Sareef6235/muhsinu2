@@ -1552,17 +1552,18 @@
                             style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
                             <div style="text-align: center; border-right: 1px solid rgba(255,255,255,0.1);">
                                 <div style="font-size: 0.7rem; color: #888; text-transform: uppercase;">Exams</div>
-                                <div id="results-exams-count" style="font-weight: 700; color: var(--primary-color);">0
+                                <div class="stat-results-exams" style="font-weight: 700; color: var(--primary-color);">0
                                 </div>
                             </div>
                             <div style="text-align: center; border-right: 1px solid rgba(255,255,255,0.1);">
                                 <div style="font-size: 0.7rem; color: #888; text-transform: uppercase;">Students</div>
-                                <div id="results-total-count" style="font-weight: 700; color: var(--primary-color);">0
+                                <div class="stat-results-total" style="font-weight: 700; color: var(--primary-color);">0
                                 </div>
                             </div>
                             <div style="text-align: center;">
                                 <div style="font-size: 0.7rem; color: #888; text-transform: uppercase;">Updated</div>
-                                <div id="results-last-sync" style="font-size: 0.75rem; font-weight: 600;">--:--</div>
+                                <div class="stat-results-last-sync" style="font-size: 0.75rem; font-weight: 600;">--:--
+                                </div>
                             </div>
                         </div>
 
@@ -1669,9 +1670,14 @@
                                 studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
                             });
 
-                            document.getElementById('results-exams-count').textContent = exams.length;
-                            document.getElementById('results-total-count').textContent = studentCount;
-                            document.getElementById('results-last-sync').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            const examsCount = exams.length;
+                            const totalStudents = studentCount;
+                            const syncTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                            // Update all instances using classes OR IDs
+                            document.querySelectorAll('.stat-results-exams, #results-exams-count').forEach(el => el.textContent = examsCount);
+                            document.querySelectorAll('.stat-results-total, #results-total-count').forEach(el => el.textContent = totalStudents);
+                            document.querySelectorAll('.stat-results-last-sync, #results-last-sync').forEach(el => el.textContent = syncTime);
 
                             // Align with ResultsManagement state
                             window.uploadedStudents = json.exams ? json.exams.reduce((acc, ex) => acc.concat(ex.results || ex.students || []), []) : [];
@@ -1906,27 +1912,30 @@
                 <h4 style="margin-bottom: 20px; color: var(--primary-color);">Repository Connections</h4>
 
                 <div
-                    style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 25px; overflow: hidden;">
+                    style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 16px; margin-bottom: 25px; overflow: hidden; backdrop-filter: blur(5px);">
                     <ul id="repo-list"
-                        style="list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto;">
+                        style="list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto;">
                         <!-- Injected by JS -->
                     </ul>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px;">
-                    <input id="repo-name-input" class="form-input"
-                        placeholder="Owner/Repository (e.g. Sareef6235/muhsinu2)">
-                    <input id="repo-branch-input" class="form-input" placeholder="Branch (default: main)">
-                    <button class="btn btn-primary" onclick="DeploymentManager.addRepo()">
-                        <i class="ph ph-plus"></i> Add Repository
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr auto; gap: 12px; padding: 5px;">
+                    <input id="repo-name-input" class="form-input" placeholder="Owner/Repository (e.g. username/repo)"
+                        style="background: rgba(255,255,255,0.03);">
+                    <input id="repo-branch-input" class="form-input" placeholder="Branch (default: main)"
+                        style="background: rgba(255,255,255,0.03);">
+                    <button class="btn btn-primary" onclick="DeploymentManager.addRepo()" style="height: 100%;">
+                        <i class="ph-bold ph-plus"></i> Add
                     </button>
                 </div>
             </div>
 
-            <div id="active-repo-status" style="display: none;">
-                <h3 style="margin-bottom: 20px;">Live Status: <span id="status-repo-name"
-                        style="color: var(--primary-color);">Repo</span></h3>
-                <div class="deploy-card">
+            <div id="active-repo-status" style="display: none; animation: animate-fade-up 0.5s ease both;">
+                <h4 style="margin: 30px 0 15px 0; color: #fff; display: flex; align-items: center; gap: 10px;">
+                    <i class="ph-bold ph-activity" style="color: var(--primary-color);"></i>
+                    Live Status: <span id="status-repo-name" style="color: var(--primary-color);">Repo</span>
+                </h4>
+                <div class="glass-card" style="padding: 25px; border-color: rgba(0, 243, 255, 0.2);">
                     <div
                         style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
                         <div>
@@ -2666,15 +2675,6 @@
         }
     </script>
 
-    <script>
-        // Init logic moved to module block above
-        updateStats();
-    </script>
-
-    <script>
-        // Initialize dashboard stats
-        if (typeof updateStats === 'function') updateStats();
-    </script>
 
     <!-- Results System Extension Modules -->
     <script src="../../assets/js/storage-manager.js"></script>
@@ -3274,6 +3274,7 @@
 
         /* ==============================
            RESULTS MANAGEMENT & PUBLISHING
+           
            ============================== */
         window.ResultsManagement = (function () {
             let state = {
@@ -3403,14 +3404,14 @@
                 handleSyncClick,
                 togglePublish,
                 loadFromStorage,
+                updateStats,
                 get state() { return state; }
             };
         })();
 
-
         /* ==============================
         STATIC PUBLISH CONTROL
-        ============================== */
+    ============================== */
         window.StaticPublisher = {
             publish: function () {
                 const state = window.ResultsManagement.state;
@@ -3445,12 +3446,6 @@
                 alert("Static JSON file downloaded successfully ✅");
             }
         };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SchoolManager) SchoolManager.load();
-            if (window.DeploymentManager) DeploymentManager.init();
-            if (window.ResultsManagement) ResultsManagement.loadFromStorage();
-        });
 
         window.ResultsLinkManager = (function () {
 
@@ -3540,27 +3535,110 @@
 
         })();
 
-        document.addEventListener("DOMContentLoaded", function () {
-            ResultsLinkManager.init();
-        });
+        /* ==============================
+           RESULTS HELPERS & UPLOAD
+        ============================== */
+        window.PublishedResultsStore = { data: null, updatedAt: null };
 
+        window.handlePublishedResultsUpload = function (input) {
+            const file = input.files[0];
+            const statusEl = document.getElementById('published-results-status');
+            if (!file) return;
 
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    window.updateResultsStats(json, file.name);
+                    window.PublishedResultsStore.data = json;
+                    window.PublishedResultsStore.updatedAt = new Date().toISOString();
+                } catch (err) {
+                    if (statusEl) {
+                        statusEl.innerHTML = "<i class='ph-bold ph-warning'></i> Error: Invalid JSON";
+                        statusEl.style.color = "#ff4444";
+                    }
+                }
+            };
+            reader.readAsText(file);
+        };
 
+        window.updateResultsStats = function (json, fileName = null) {
+            const statusEl = document.getElementById('published-results-status');
+            const exams = json.exams || [];
+            let studentCount = 0;
+            exams.forEach(ex => {
+                studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
+            });
 
+            const examsCount = exams.length;
+            const totalStudents = studentCount;
+            const syncTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+            document.querySelectorAll('.stat-results-exams, #results-exams-count').forEach(el => el.textContent = examsCount);
+            document.querySelectorAll('.stat-results-total, #results-total-count').forEach(el => el.textContent = totalStudents);
+            document.querySelectorAll('.stat-results-last-sync, #results-last-sync').forEach(el => el.textContent = syncTime);
 
+            window.uploadedStudents = json.exams ? json.exams.reduce((acc, ex) => acc.concat(ex.results || ex.students || []), []) : [];
 
+            if (fileName && statusEl) {
+                statusEl.innerHTML = "<i class='ph-bold ph-check-circle'></i> Loaded: " + fileName;
+                statusEl.style.color = "#2ed573";
+            }
+        };
 
+        function initResultsDragDrop() {
+            const box = document.getElementById('results-upload-box');
+            if (!box) return;
 
+            ['dragenter', 'dragover'].forEach(e => {
+                box.addEventListener(e, ev => {
+                    ev.preventDefault();
+                    box.classList.add('dragover');
+                    const statusEl = document.getElementById('published-results-status');
+                    if (statusEl) statusEl.textContent = "Drop file to upload";
+                });
+            });
 
+            ['dragleave', 'drop'].forEach(e => {
+                box.addEventListener(e, ev => {
+                    ev.preventDefault();
+                    box.classList.remove('dragover');
+                    if (e === 'drop') {
+                        const file = ev.dataTransfer.files[0];
+                        if (file) {
+                            const input = document.getElementById('published-results-upload');
+                            const container = new DataTransfer();
+                            container.items.add(file);
+                            input.files = container.files;
+                            window.handlePublishedResultsUpload(input);
+                        }
+                    }
+                });
+            });
 
+            const input = document.getElementById('published-results-upload');
+            if (input) {
+                input.addEventListener('change', function () { window.handlePublishedResultsUpload(this); });
+            }
+        }
 
+        // Result App Compatibility
+        window.ResultApp = window.ResultApp || {};
+        window.showSearchForm = function () {
+            console.log("ResultApp: Showing search form");
+            const sf = document.getElementById('search-form');
+            const rv = document.getElementById('result-view');
+            if (sf) sf.style.display = 'block';
+            if (rv) rv.style.display = 'none';
+        };
+        window.ResultApp.showSearchForm = window.showSearchForm;
 
-
-
-
-
-
+        // Global Stats Bridge
+        window.updateStats = function () {
+            if (window.ResultsManagement && typeof ResultsManagement.updateStats === 'function') {
+                ResultsManagement.updateStats();
+            }
+        };
 
         // Creative Studio logic
 
@@ -4034,16 +4112,6 @@
             });
         }
 
-        window.addEventListener("DOMContentLoaded", () => {
-            AdminAccess.init();
-
-            // Initialize Site Settings when panel is opened
-            if (window.SiteSettings) {
-                SiteSettings.renderHeaderEditor();
-                SiteSettings.renderFooterEditor();
-            }
-        });
-
         // Tab switching function for Site Settings
         function switchSettingsTab(tabName, buttonElement) {
             // Hide all tab contents
@@ -4067,6 +4135,40 @@
                 buttonElement.classList.add('active');
             }
         }
+
+        // --- GLOBAL INITIALIZATION ---
+        document.addEventListener("DOMContentLoaded", function () {
+            // Initialize All Modules
+            if (window.SchoolManager) SchoolManager.load();
+            if (window.DeploymentManager) DeploymentManager.init();
+            if (window.ResultsManagement) ResultsManagement.loadFromStorage();
+            if (window.ResultsLinkManager) ResultsLinkManager.init();
+            if (typeof initResultsDragDrop === 'function') initResultsDragDrop();
+            if (window.AdminAccess) AdminAccess.init();
+
+            // Initial stats update
+            if (typeof updateStats === 'function') updateStats();
+
+            // Site Settings
+            if (window.SiteSettings) {
+                SiteSettings.renderHeaderEditor();
+                SiteSettings.renderFooterEditor();
+            }
+
+            // Creative Studio
+            if (window.CreativeStudio) CreativeStudio.init();
+
+            // Date Display
+            const dateEl = document.getElementById('date-display');
+            if (dateEl) {
+                dateEl.textContent = new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+        });
     </script>
 
     <!-- Site Settings Module -->
