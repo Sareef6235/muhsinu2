@@ -502,11 +502,13 @@
                     style="display: inline-flex; width: auto; cursor: pointer;">
                     <i class="ph ph-upload-simple"></i> Upload Results JSON
                 </label>
-                <input type="file" id="published-results-upload" accept=".json" style="display: none;">
+                <input type="file" id="published-results-upload" accept=".json" style="display: none;"
+                    onchange="handlePublishedResultsUpload(this)">
                 <div id="published-results-status" style="margin-top: 10px; font-size: 0.8rem; color: #888;">
                     No results file loaded.
                 </div>
             </div>
+
 
             <!-- Merit List View (Hidden by Default) -->
             <div id="merit-view" style="display: none;">
@@ -887,13 +889,63 @@
             }
         }
 
+        // --- UPLOAD HANDLER ---
+        function handlePublishedResultsUpload(input) {
+            const file = input.files[0];
+            const statusEl = document.getElementById('published-results-status');
+
+            if (!file) return;
+
+            statusEl.textContent = "Reading file...";
+            statusEl.style.color = "#888";
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+
+                    // Basic Validation
+                    if (!json.exams && !Array.isArray(json)) {
+                        throw new Error("Invalid structure: missing 'exams' array.");
+                    }
+
+                    console.log("Results Uploaded:", json);
+
+                    // Update Global Store (simulated)
+                    // In a real scenario, this might need to merge with existing data
+                    // For now, we'll assume ResultsSystem can handle raw JSON injection if we expose a method, 
+                    // or we just manually trigger the update if ResultsSystem is global.
+
+                    if (window.ResultsSystem) {
+                        // Use the internal method if accessible, or public API
+                        window.ResultsSystem.loadData(json);
+                    } else {
+                        // Fallback if system not ready
+                        console.warn("ResultsSystem not found. Reloading page might be needed.");
+                    }
+
+                    statusEl.innerHTML = `<span style="color: #00ff88;">✅ Loaded: ${file.name}</span>`;
+
+                } catch (err) {
+                    console.error("JSON Error:", err);
+                    statusEl.innerHTML = `<span style="color: #ff3d3d;">❌ Error: ${err.message}</span>`;
+                }
+            };
+
+            reader.onerror = function () {
+                statusEl.innerHTML = `<span style="color: #ff3d3d;">❌ Error reading file.</span>`;
+            };
+
+            reader.readAsText(file);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             AuthManager.restoreSession();
             updateAuthUI();
 
             // 2. Component Initialization
-            if (window.SiteSettings) SiteSettings.render();
-            if (window.ResultsEngine) ResultsEngine.init();
+            if (window.ResultsSystem) window.ResultsSystem.init();
         });
     </script>
     <!-- Results Portal Logic -->

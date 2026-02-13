@@ -26,7 +26,9 @@ const ResultApp = {
             display: document.getElementById('result-display'),
             meritView: document.getElementById('merit-view'),
             meritBody: document.getElementById('results-table-body'),
-            meritExamName: document.getElementById('merit-exam-name')
+            meritExamName: document.getElementById('merit-exam-name'),
+            uploadInput: document.getElementById('published-results-upload'),
+            uploadStatus: document.getElementById('published-results-status')
         };
 
         try {
@@ -53,10 +55,87 @@ const ResultApp = {
 
             this.handleDeepLinking();
 
+            // Bind Upload Handler
+            if (this.ui.uploadInput) {
+                this.ui.uploadInput.addEventListener('change', (e) => this.handleManualUpload(e.target.files[0]));
+            }
+
         } catch (error) {
             console.error("Critical System Failure:", error);
-            this.handleGlobalFailure();
+            // Don't fail globally yet, maybe manual upload will save us
+            if (this.ui.uploadStatus) this.ui.uploadStatus.innerHTML = '<span style="color:orange">⚠ Search database unavailable. Please upload file manually.</span>';
         }
+    },
+
+    /**
+     * MANUAL UPLOAD HANDLER
+     */
+    handleManualUpload(file) {
+        if (!file) return;
+
+        // Security check if needed
+        // if (typeof AuthManager !== 'undefined' && !AuthManager.isAdmin()) return;
+
+        if (!file.name.endsWith(".json")) {
+            return this.updateUploadStatus("❌ Invalid file. Please upload .json", false);
+        }
+
+        this.updateUploadStatus("⏳ Processing...", true);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const json = JSON.parse(e.target.result);
+                this.loadData(json);
+                this.updateUploadStatus(`✅ Loaded ${this.countTotalStudents()} records.`, true);
+            } catch (err) {
+                console.error(err);
+                this.updateUploadStatus("❌ Error parsing JSON.", false);
+            }
+        };
+        reader.readAsText(file);
+    },
+
+    /**
+     * LOAD DATA INTO ENGINE
+     * Can be called by manual upload or initial fetch
+     */
+    loadData(json) {
+        console.log("Loading Data:", json);
+        let normalizedData = { exams: [] };
+
+        if (json.exams) {
+            normalizedData = json;
+        } else if (JSON.stringify(json).includes('results') || Array.isArray(json)) {
+            // Handle legacy/flat formats
+            if (json.data && json.data.exams) normalizedData = json.data;
+            else if (Array.isArray(json)) normalizedData = { exams: [{ id: 'manual', name: 'Uploaded Data', results: json }] };
+        }
+
+        this.data = normalizedData;
+        this.populateDropdown();
+        this.updateStatsUI();
+    },
+
+    updateUploadStatus(msg, success) {
+        if (this.ui.uploadStatus) {
+            this.ui.uploadStatus.innerHTML = msg;
+            this.ui.uploadStatus.style.color = success ? 'var(--text-main, #888)' : 'red';
+            if (msg.includes('✅')) this.ui.uploadStatus.style.color = 'var(--success, limegreen)';
+        }
+    },
+
+    countTotalStudents() {
+        if (!this.data || !this.data.exams) return 0;
+        return this.data.exams.reduce((acc, ex) => acc + (ex.results ? ex.results.length : 0), 0);
+    },
+
+    updateStatsUI() {
+        // Optional: Update the stats bar numbers if they exist
+        const examsEl = document.getElementById("results-exams-count");
+        const totalEl = document.getElementById("results-total-count");
+        if (examsEl && this.data.exams) examsEl.textContent = this.data.exams.length;
+        if (totalEl) totalEl.textContent = this.countTotalStudents();
     },
 
     /**
@@ -296,216 +375,9 @@ window.showRankList = () => ResultApp.showRankList();
    RESULTS ENGINE (Manual Upload System)
 ========================================= */
 
-window.ResultsEngine = (function () {
-
-    let publishedData = null;
-
-    /* ---------- Utils ---------- */
-
-    function safeText(text) {
-        return String(text).replace(/[<>]/g, "");
-    }
-
-    function updateStats() {
-        if (!publishedData) return;
-
-        const exams = publishedData.exams || [];
-        const totalStudents = exams.reduce((sum, ex) => {
-            const results = ex.results || ex.students || [];
-            return sum + results.length;
-        }, 0);
-
-        const examsEl = document.getElementById("results-exams-count");
-        const totalEl = document.getElementById("results-total-count");
-        const syncEl = document.getElementById("results-last-sync");
-
-        if (examsEl) examsEl.textContent = exams.length;
-        if (totalEl) totalEl.textContent = totalStudents;
-        if (syncEl) syncEl.textContent = new Date().toLocaleTimeString();
-    }
-
-    function populateExamDropdown() {
-        const select = document.getElementById("examSelect");
-        if (!select) return;
-
-        select.innerHTML = `<option value="">-- Select Academic Session --</option>`;
-
-        publishedData.exams.forEach(exam => {
-            const opt = document.createElement("option");
-            opt.value = exam.examId || exam.id;
-            opt.textContent = safeText(exam.examName || exam.name);
-            select.appendChild(opt);
-        });
-
-        select.disabled = false;
-    }
-
-    function showStatus(message, success = true) {
-        const status = document.getElementById("published-results-status");
-        if (!status) return;
-
-        status.style.color = success ? "#2ed573" : "#ff4757";
-        status.innerHTML = success
-            ? `<i class="ph-bold ph-check-circle"></i> ${safeText(message)}`
-            : `<i class="ph-bold ph-warning-circle"></i> ${safeText(message)}`;
-    }
-
-    /* ---------- Upload Handler ---------- */
-
-    function handleUpload(file) {
-        if (!file) return;
-
-        // Logic Protection: Security Check
-        if (typeof AuthManager !== 'undefined' && !AuthManager.isAdmin()) {
-            showStatus("Admin privileges required to upload results.", false);
-            alert("Security Error: Unauthorized upload attempt blocked.");
-            return;
-        }
-
-        if (!file.name.endsWith(".json")) {
-            showStatus("Invalid file format. Upload JSON only.", false);
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                const data = JSON.parse(e.target.result);
-
-                // Basic schema validation
-                if (!data.exams || !Array.isArray(data.exams)) {
-                    throw new Error("Invalid results schema.");
-                }
-
-                publishedData = data;
-
-                updateStats();
-                populateExamDropdown();
-                showStatus("Loaded: " + file.name, true);
-
-            } catch (err) {
-                showStatus("JSON validation failed.", false);
-                console.error(err);
-            }
-        };
-
-        reader.readAsText(file);
-    }
-
-    /* ---------- Search Logic ---------- */
-
-    function handleSearch(e) {
-        if (e) e.preventDefault();
-
-        const examId = document.getElementById("examSelect").value;
-        const roll = document.getElementById("rollInput").value.trim();
-
-        if (!examId || !roll) return;
-
-        const exam = publishedData.exams.find(e => (e.examId || e.id) === examId);
-        if (!exam) return;
-
-        const results = exam.results || exam.students || [];
-        const student = results.find(s => String(s.roll).trim() === String(roll).trim());
-
-        if (!student) {
-            alert("Result not found.");
-            return;
-        }
-
-        // Bridge to ResultApp's renderer
-        if (window.ResultApp && typeof window.ResultApp.renderResult === 'function') {
-            window.ResultApp.renderResult(student, exam.examName || exam.name);
-        } else {
-            alert(`Name: ${student.name}\nTotal: ${student.total}`);
-        }
-    }
-
-    /* ---------- Merit List ---------- */
-
-    function showMerit() {
-        if (!publishedData) return alert("Please upload results file first.");
-
-        const examId = document.getElementById("examSelect").value;
-        if (!examId) return alert("Select exam first.");
-
-        const exam = publishedData.exams.find(e => (e.examId || e.id) === examId);
-        if (!exam) return;
-
-        const results = exam.results || exam.students || [];
-        const sorted = [...results].sort((a, b) => b.total - a.total);
-
-        const tbody = document.getElementById("results-table-body");
-        const meritView = document.getElementById("merit-view");
-        const resultsForm = document.getElementById("resultsForm");
-        const examLabel = document.getElementById("merit-exam-name");
-
-        if (!tbody || !meritView || !resultsForm) return;
-
-        tbody.innerHTML = "";
-        if (examLabel) examLabel.textContent = exam.examName || exam.name;
-
-        sorted.forEach((s, i) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>#${i + 1}</td>
-                <td>${safeText(s.roll)}</td>
-                <td>${safeText(s.name)}</td>
-                <td style="text-align:right; color: var(--primary); font-weight: 800;">${s.total}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        meritView.style.display = "block";
-        resultsForm.style.display = "none";
-
-        const title = document.querySelector('.portal-title');
-        if (title) title.style.display = "none";
-    }
-
-    function showSearch() {
-        const meritView = document.getElementById("merit-view");
-        const resultsForm = document.getElementById("resultsForm");
-        const title = document.querySelector('.portal-title');
-
-        if (meritView) meritView.style.display = "none";
-        if (resultsForm) resultsForm.style.display = "grid";
-        if (title) title.style.display = "block";
-    }
-
-    function clearData() {
-        publishedData = null;
-        const select = document.getElementById("examSelect");
-        if (select) {
-            select.innerHTML = `<option value="">-- Select Academic Session --</option>`;
-            select.disabled = true;
-        }
-        updateStats();
-        showStatus("Cleared.", false);
-    }
-
-    /* ---------- Public API ---------- */
-
-    return {
-        init: function () {
-            const fileInput = document.getElementById("published-results-upload");
-            const form = document.getElementById("resultsForm");
-
-            if (fileInput) {
-                fileInput.addEventListener("change", function () {
-                    handleUpload(this.files[0]);
-                });
-            }
-
-            if (form) {
-                form.addEventListener("submit", handleSearch);
-            }
-
-            // Expose handlers globally
-            window.showRankList = showMerit;
-            window.showSearchForm = showSearch;
-            window.clearPublishedResults = clearData;
-        }
-    };
-
-})();
+// Replaces the old ResultsEngine IIFE
+// Replaces the old ResultsEngine IIFE
+window.ResultsSystem = {
+    init: () => { console.log("ResultsSystem delegated to ResultApp"); },
+    loadData: (json) => ResultApp.loadData(json)
+};
