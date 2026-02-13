@@ -1,80 +1,52 @@
-/**
- * AuthManager.js
- * Production-Safe, Role-Based Access Control (RBAC) Engine
- * Upgraded with SHA-256 Password Authentication
- */
+window.AuthManager = {
 
-(function () {
-    'use strict';
+    currentUser: null,
 
-    // Demo Admin Credentials (Username: admin, Password: Admin@123)
-    const ADMIN_USERNAME = "admin";
-    const ADMIN_PASS_HASH = "fc38b3a0e666a01178a9c279c656365ea2da48419615a137b017770857189196";
+    async login(username, password) {
 
-    window.AuthManager = (function () {
-        let currentUser = null;
+        const ADMIN_USERNAME = "admin";
+        const ADMIN_PASSWORD = "Admin@123"; // Demo only
 
-        // Restore session from localStorage (using 'auth_session' for consistency)
-        try {
-            const savedSession = localStorage.getItem("auth_session");
-            if (savedSession) {
-                currentUser = JSON.parse(savedSession);
-            }
-        } catch (e) {
-            console.warn("[AuthManager] Failed to restore session:", e);
+        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+
+            this.currentUser = {
+                id: 1,
+                username: "admin",
+                role: "admin"
+            };
+
+            localStorage.setItem("auth_session",
+                JSON.stringify(this.currentUser)
+            );
+
+            return { success: true };
         }
 
-        /**
-         * Standard SHA-256 Hashing Utility
-         */
-        async function hashPassword(password) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(password);
-            const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-        }
+        return { success: false, message: "Invalid username or password" };
+    },
 
-        return {
-            /**
-             * Secure Login Flow
-             * @param {string} username 
-             * @param {string} password 
-             */
-            async login(username, password) {
-                const hashed = await hashPassword(password);
+    logout() {
+        this.currentUser = null;
+        localStorage.removeItem("auth_session");
+    },
 
-                if (username === ADMIN_USERNAME && hashed === ADMIN_PASS_HASH) {
-                    currentUser = {
-                        id: "1",
-                        username: "admin",
-                        name: "Super Admin",
-                        role: "admin",
-                        isAuthenticated: true,
-                        loginTime: Date.now()
-                    };
-                    localStorage.setItem("auth_session", JSON.stringify(currentUser));
-                    window.dispatchEvent(new CustomEvent('auth-changed', { detail: currentUser }));
-                    return { success: true };
-                }
-
-                return { success: false, message: "Invalid username or password" };
-            },
-
-            /**
-             * Destroy session
-             */
-            logout() {
-                currentUser = null;
+    restoreSession() {
+        const saved = localStorage.getItem("auth_session");
+        if (saved) {
+            try {
+                this.currentUser = JSON.parse(saved);
+            } catch (e) {
+                console.error("Session parse error", e);
                 localStorage.removeItem("auth_session");
-                window.dispatchEvent(new CustomEvent('auth-changed', { detail: null }));
-            },
+            }
+        }
+    },
 
-            getUser() { return currentUser; },
-            isAuthenticated() { return !!(currentUser && currentUser.isAuthenticated); },
-            isAdmin() { return currentUser && currentUser.role === "admin"; },
-            hasRole(role) { return currentUser && currentUser.role === role; }
-        };
-    })();
+    isAdmin() {
+        return this.currentUser && this.currentUser.role === "admin";
+    },
 
-})();
+    getUser() {
+        return this.currentUser;
+    }
+};

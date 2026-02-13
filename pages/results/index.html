@@ -821,42 +821,21 @@
         }
 
         async function handleLoginAttempt() {
-            const userInp = document.getElementById('login-username');
-            const passInp = document.getElementById('login-password');
-            const errorDiv = document.getElementById('login-error');
-            const loginBtn = document.getElementById('login-submit-btn');
+            const usernameInput = document.getElementById("login-username");
+            const passwordInput = document.getElementById("login-password");
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
 
-            const username = userInp.value.trim();
-            const password = passInp.value;
+            const result = await AuthManager.login(username, password);
 
-            if (!username || !password) {
-                showLoginError("Please enter both credentials");
-                return;
-            }
-
-            // UI State: Loading
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Authenticating...';
-            errorDiv.style.display = 'none';
-
-            try {
-                const result = await AuthManager.login(username, password);
-
-                if (result.success) {
-                    toggleLoginModal();
-                    updateAuthUI();
-                    // Clear inputs for security
-                    userInp.value = '';
-                    passInp.value = '';
-                } else {
-                    showLoginError(result.message);
-                }
-            } catch (err) {
-                showLoginError("System error during authentication");
-                console.error(err);
-            } finally {
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = '<i class="ph ph-lock-key"></i> Authenticate';
+            if (result.success) {
+                toggleLoginModal();
+                updateAuthUI();
+                // Clear inputs
+                usernameInput.value = '';
+                passwordInput.value = '';
+            } else {
+                showLoginError(result.message);
             }
         }
 
@@ -879,29 +858,27 @@
 
         function updateAuthUI() {
             const uploadSection = document.querySelector(".upload-section");
-            const fileInput = document.getElementById("published-results-upload");
             const badge = document.getElementById("auth-status-badge");
-            const badgeText = badge.querySelector(".text");
+            const badgeText = document.querySelector("#auth-status-badge .text");
             const mainBtn = document.getElementById("auth-main-btn");
 
             const isAdmin = AuthManager.isAdmin();
 
-            // Toggle Upload Visibility
-            if (uploadSection) uploadSection.style.display = isAdmin ? "block" : "none";
-            if (fileInput) fileInput.disabled = !isAdmin;
-
-            // Update Badge & Button
             if (isAdmin) {
-                badge.classList.add("admin");
-                badgeText.textContent = "Admin Mode";
-                mainBtn.innerHTML = `<i class="ph-bold ph-sign-out"></i> Logout (${AuthManager.getUser().username})`;
+                if (uploadSection) uploadSection.style.display = "block";
+                if (badge) badge.classList.add("admin");
+                if (badgeText) badgeText.textContent = "Admin Mode";
+
+                mainBtn.innerHTML = '<i class="ph-bold ph-sign-out"></i> Logout (Admin)';
                 mainBtn.onclick = handleLogout;
                 mainBtn.style.background = "rgba(255,255,255,0.05)";
                 mainBtn.style.color = "#fff";
                 mainBtn.style.border = "1px solid var(--border)";
             } else {
-                badge.classList.remove("admin");
-                badgeText.textContent = "Public Mode";
+                if (uploadSection) uploadSection.style.display = "none";
+                if (badge) badge.classList.remove("admin");
+                if (badgeText) badgeText.textContent = "Public Mode";
+
                 mainBtn.innerHTML = '<i class="ph-bold ph-user"></i> Login';
                 mainBtn.onclick = toggleLoginModal;
                 mainBtn.style.background = "var(--primary)";
@@ -911,7 +888,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Initial UI Sync
+            AuthManager.restoreSession();
             updateAuthUI();
 
             // 2. Component Initialization

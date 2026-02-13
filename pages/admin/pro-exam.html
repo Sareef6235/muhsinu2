@@ -324,227 +324,342 @@
             padding: 12px;
             border-bottom: 1px solid var(--border);
         }
+
+        .login-box {
+            max-width: 400px;
+            width: 90%;
+            margin: 100px auto;
+            text-align: center;
+            padding: 40px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        #public-view {
+            display: none;
+            /* Hidden by default if admin is logged in */
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        #admin-view {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- Mobile Toggle -->
-    <button class="mobile-toggle" onclick="document.getElementById('proExamSidebar').classList.toggle('open')">
-        <i class="ph-bold ph-list"></i>
-    </button>
+    <!-- ================= PUBLIC VIEW ================= -->
+    <div id="public-view">
+        <div class="login-box">
+            <div style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;">
+                <i class="ph-bold ph-student"></i>
+            </div>
+            <h2 style="margin-bottom: 5px;">Result Portal</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Enter your details to view result</p>
 
-    <!-- SIDEBAR -->
-    <aside id="proExamSidebar">
-        <div class="sidebar-logo">
-            <i class="ph-bold ph-shield-check"></i> PRO EXAM
-        </div>
-
-        <div class="school-select-container">
-            <label style="margin-bottom:5px; font-size:0.8rem;">Active School</label>
-            <select id="active-school-selector" onchange="proExamApp.switchSchool(this.value)">
-                <!-- Populated by JS -->
-            </select>
-        </div>
-
-        <nav>
-            <div class="nav-item active" onclick="proExamApp.nav('dashboard', this)">
-                <i class="ph-bold ph-squares-four"></i> Dashboard
-            </div>
-            <div class="nav-item" onclick="proExamApp.nav('upload', this)">
-                <i class="ph-bold ph-upload-simple"></i> Upload Results
-            </div>
-            <div class="nav-item" onclick="proExamApp.nav('certificate', this)">
-                <i class="ph-bold ph-certificate"></i> Certificate
-            </div>
-            <div class="nav-item" onclick="proExamApp.nav('signature', this)">
-                <i class="ph-bold ph-signature"></i> Signature
-            </div>
-            <div class="nav-item" onclick="proExamApp.nav('analytics', this)">
-                <i class="ph-bold ph-chart-pie-slice"></i> Analytics
-            </div>
-            <div class="nav-item" onclick="proExamApp.nav('schools', this)">
-                <i class="ph-bold ph-buildings"></i> School Profiles
-            </div>
-
-            <div class="nav-item nav-logout" onclick="proExamApp.logout()">
-                <i class="ph-bold ph-sign-out"></i> Logout
-            </div>
-        </nav>
-    </aside>
-
-    <!-- MAIN PANEL CONTAINER -->
-    <main id="panelContainer">
-
-        <!-- 1. DASHBOARD PANEL -->
-        <section id="panel-dashboard" class="panel active">
-            <h2>Dashboard Overview</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-val" id="stat-total">0</div>
-                    <div class="stat-label">Total Students</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-val" id="stat-pass" style="color: var(--success);">0%</div>
-                    <div class="stat-label">Pass Percentage</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-val" id="stat-top">0</div>
-                    <div class="stat-label">Top Score</div>
-                </div>
-            </div>
-
-            <div class="card" style="margin-top: 30px;">
-                <h3>System Status</h3>
-                <p style="color: var(--text-muted);">
-                    Memory-Only Session Active.
-                    <br>Please configure settings and upload results to begin.
-                </p>
+            <div class="card" style="text-align: left;">
+                <label
+                    style="font-size: 0.8rem; font-weight: bold; color: #666; display: block; margin-bottom: 5px;">Register/Roll
+                    Number</label>
+                <input type="text" id="publicRegInput" class="form-control" placeholder="e.g. 4029">
                 <button class="btn btn-primary"
-                    onclick="proExamApp.nav('upload', document.querySelectorAll('.nav-item')[1])">
-                    Start Upload
+                    style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;"
+                    onclick="proExamApp.publicSearch()">
+                    View Result
                 </button>
             </div>
 
-            <div class="card" style="border-color: var(--primary);">
-                <h3>Static Site Publishing</h3>
-                <p style="color: var(--text-muted);">
-                    Generate a combined data file to update the public portal.
-                </p>
-                <button class="btn btn-primary" onclick="proExamApp.publishData()">
-                    <i class="ph-bold ph-paper-plane-tilt"></i> Publish & Download JSON
-                </button>
+            <div id="public-msg" style="margin-top: 15px; color: var(--danger);"></div>
+            <p style="margin-top: 20px; font-size: 0.8rem; color: #444;" onclick="proExamApp.toggleView('admin')">Admin
+                Access</p>
+        </div>
+    </div>
+
+    <!-- ================= ADMIN VIEW ================= -->
+    <div id="admin-view">
+
+
+
+
+
+
+
+        <!-- Mobile Toggle -->
+        <button class="mobile-toggle" onclick="document.getElementById('proExamSidebar').classList.toggle('open')">
+            <i class="ph-bold ph-list"></i>
+        </button>
+
+        <!-- SIDEBAR -->
+        <aside id="proExamSidebar">
+            <div class="sidebar-logo">
+                <i class="ph-bold ph-shield-check"></i> PRO EXAM
             </div>
-        </section>
 
-        <!-- 2. UPLOAD RESULTS PANEL -->
-        <section id="panel-upload" class="panel">
-            <h2>Upload Results Data</h2>
-            <div class="card">
-                <div class="form-group">
-                    <label>Select `published-results.json` File</label>
-                    <input type="file" accept=".json" class="form-control" onchange="proExamApp.handleJsonUpload(this)">
-                </div>
-                <div id="upload-status" style="margin-top: 10px; color: var(--text-muted);">Waiting for file...</div>
+            <div class="school-select-container">
+                <label style="margin-bottom:5px; font-size:0.8rem;">Active School</label>
+                <select id="active-school-selector" onchange="proExamApp.switchSchool(this.value)">
+                    <!-- Populated by JS -->
+                </select>
             </div>
 
-            <h3>Data Preview</h3>
-            <div class="card">
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Roll No</th>
-                                <th>Name</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="preview-tbody">
-                            <tr>
-                                <td colspan="4" style="text-align: center; color: var(--text-muted);">No Data Loaded
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <nav>
+                <div class="nav-item active" onclick="proExamApp.nav('dashboard', this)">
+                    <i class="ph-bold ph-squares-four"></i> Dashboard
                 </div>
-            </div>
-        </section>
-
-        <!-- 3. CERTIFICATE CONFIG PANEL -->
-        <section id="panel-certificate" class="panel">
-            <h2>Certificate Configuration</h2>
-            <div class="card" style="max-width: 600px;">
-                <div class="form-group">
-                    <label>Institution Name</label>
-                    <input type="text" id="conf-school" class="form-control" value="Global Excellence Academy">
+                <div class="nav-item" onclick="proExamApp.nav('upload', this)">
+                    <i class="ph-bold ph-upload-simple"></i> Upload Results
                 </div>
-                <div class="form-group">
-                    <label>Certificate Title</label>
-                    <input type="text" id="conf-title" class="form-control" value="Official Statement of Marks">
+                <div class="nav-item" onclick="proExamApp.nav('certificate', this)">
+                    <i class="ph-bold ph-certificate"></i> Certificate
                 </div>
-                <div class="form-group">
-                    <label>Academic Session</label>
-                    <input type="text" id="conf-session" class="form-control" value="2025-2026">
+                <div class="nav-item" onclick="proExamApp.nav('signature', this)">
+                    <i class="ph-bold ph-signature"></i> Signature
                 </div>
-                <div class="form-group">
-                    <label>Language</label>
-                    <select id="conf-lang" class="form-control">
-                        <option value="en">English</option>
-                        <option value="mal">Malayalam</option>
-                        <option value="ar">Arabic</option>
-                        <option value="urd">Urdu</option>
-                        <option value="hin">Hindi</option>
-                    </select>
+                <div class="nav-item" onclick="proExamApp.nav('analytics', this)">
+                    <i class="ph-bold ph-chart-pie-slice"></i> Analytics
                 </div>
-                <div class="form-group">
-                    <label>Pass Mark Value</label>
-                    <input type="number" id="conf-passEval" class="form-control" value="35">
+                <div class="nav-item" onclick="proExamApp.nav('schools', this)">
+                    <i class="ph-bold ph-buildings"></i> School Profiles
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-                    <button class="btn btn-primary" onclick="proExamApp.saveConfig()">Save Configuration</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. SIGNATURE PANEL -->
-        <section id="panel-signature" class="panel">
-            <h2>Principal Signature</h2>
-            <div class="card" style="max-width: 500px;">
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
-                    Upload signature image (PNG/JPG). It will be automatically compressed to &lt;100KB for performance.
-                </p>
-
-                <div class="form-group">
-                    <input type="file" accept="image/*" class="form-control"
-                        onchange="proExamApp.handleSignature(this)">
+                <div class="nav-item" onclick="proExamApp.nav('students', this)">
+                    <i class="ph-bold ph-student"></i> Search Results
                 </div>
 
-                <div
-                    style="margin-top: 20px; text-align: center; border: 1px dashed var(--border); padding: 20px; border-radius: 8px;">
-                    <img id="sig-preview" src="" style="max-height: 100px; max-width: 100%; display: none;">
-                    <p id="sig-status" style="margin-top: 10px; font-size: 0.8rem; color: var(--text-muted);">No
-                        signature uploaded</p>
-                </div>
-            </div>
-        </section>
 
-        <!-- 5. ANALYTICS PANEL -->
-        <section id="panel-analytics" class="panel">
-            <h2>Detailed Analytics</h2>
-            <div class="card">
-                <p>Analytics view becomes available after uploading results.</p>
-                <!-- Placeholder for future charts/graphs -->
-                <div id="analytics-content" style="padding: 40px; text-align: center; color: var(--text-muted);">
-                    Waiting for data...
-                </div>
-            </div>
-        </section>
 
-        <!-- 6. SCHOOL PROFILES PANEL -->
-        <section id="panel-schools" class="panel">
-            <h2>School Profiles</h2>
-            <div class="card">
-                <p>Manage multiple school identities here.</p>
-                <div style="margin-top: 20px;">
-                    <label>Add New School</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="new-school-name" class="form-control" placeholder="School Name">
-                        <button class="btn btn-primary" onclick="proExamApp.addSchool()">Add</button>
+
+                <div class="nav-item nav-logout" onclick="proExamApp.logout()">
+                    <i class="ph-bold ph-sign-out"></i> Logout
+                </div>
+            </nav>
+        </aside>
+
+        <!-- MAIN PANEL CONTAINER -->
+        <main id="panelContainer">
+
+            <!-- 1. DASHBOARD PANEL -->
+            <section id="panel-dashboard" class="panel active">
+                <h2>Dashboard Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-total">0</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-pass" style="color: var(--success);">0%</div>
+                        <div class="stat-label">Pass Percentage</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-top">0</div>
+                        <div class="stat-label">Top Score</div>
                     </div>
                 </div>
 
-                <div style="margin-top: 20px;">
-                    <h4>Active Schools List</h4>
-                    <ul id="school-list" style="list-style: none; padding: 0;">
-                        <!-- JS populated -->
-                    </ul>
+                <div class="card" style="margin-top: 30px;">
+                    <h3>System Status</h3>
+                    <p style="color: var(--text-muted);">
+                        Memory-Only Session Active.
+                        <br>Please configure settings and upload results to begin.
+                    </p>
+                    <button class="btn btn-primary"
+                        onclick="proExamApp.nav('upload', document.querySelectorAll('.nav-item')[1])">
+                        Start Upload
+                    </button>
                 </div>
-            </div>
-        </section>
 
-    </main>
+                <div class="card" style="border-color: var(--primary);">
+                    <h3>Static Site Publishing</h3>
+                    <p style="color: var(--text-muted);">
+                        Generate a combined data file to update the public portal.
+                    </p>
+                    <button class="btn btn-primary" onclick="proExamApp.publishData()">
+                        <i class="ph-bold ph-paper-plane-tilt"></i> Publish & Download JSON
+                    </button>
+                </div>
+            </section>
+
+            <!-- 2. UPLOAD RESULTS PANEL -->
+            <section id="panel-upload" class="panel">
+                <h2>Upload Results Data</h2>
+                <div class="card">
+                    <div class="form-group">
+                        <label>Select `published-results.json` File</label>
+                        <input type="file" accept=".json" class="form-control"
+                            onchange="proExamApp.handleJsonUpload(this)">
+                    </div>
+                    <div id="upload-status" style="margin-top: 10px; color: var(--text-muted);">Waiting for file...
+                    </div>
+                </div>
+
+                <h3>Data Preview</h3>
+                <div class="card">
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-tbody">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: var(--text-muted);">No Data
+                                        Loaded
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. CERTIFICATE CONFIG PANEL -->
+            <section id="panel-certificate" class="panel">
+                <h2>Certificate Configuration</h2>
+                <div class="card" style="max-width: 600px;">
+                    <div class="form-group">
+                        <label>Institution Name</label>
+                        <input type="text" id="conf-school" class="form-control" value="Global Excellence Academy">
+                    </div>
+                    <div class="form-group">
+                        <label>Certificate Title</label>
+                        <input type="text" id="conf-title" class="form-control" value="Official Statement of Marks">
+                    </div>
+                    <div class="form-group">
+                        <label>Academic Session</label>
+                        <input type="text" id="conf-session" class="form-control" value="2025-2026">
+                    </div>
+                    <div class="form-group">
+                        <label>Language</label>
+                        <select id="conf-lang" class="form-control">
+                            <option value="en">English</option>
+                            <option value="mal">Malayalam</option>
+                            <option value="ar">Arabic</option>
+                            <option value="urd">Urdu</option>
+                            <option value="hin">Hindi</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Pass Mark Value</label>
+                        <input type="number" id="conf-passEval" class="form-control" value="35">
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="proExamApp.saveConfig()">Save
+                            Configuration</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. SIGNATURE PANEL -->
+            <section id="panel-signature" class="panel">
+                <h2>Principal Signature</h2>
+                <div class="card" style="max-width: 500px;">
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+                        Upload signature image (PNG/JPG). It will be automatically compressed to &lt;100KB for
+                        performance.
+                    </p>
+
+                    <div class="form-group">
+                        <input type="file" accept="image/*" class="form-control"
+                            onchange="proExamApp.handleSignature(this)">
+                    </div>
+
+                    <div
+                        style="margin-top: 20px; text-align: center; border: 1px dashed var(--border); padding: 20px; border-radius: 8px;">
+                        <img id="sig-preview" src="" style="max-height: 100px; max-width: 100%; display: none;">
+                        <p id="sig-status" style="margin-top: 10px; font-size: 0.8rem; color: var(--text-muted);">No
+                            signature uploaded</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. ANALYTICS PANEL -->
+            <section id="panel-analytics" class="panel">
+                <h2>Detailed Analytics</h2>
+                <div class="card">
+                    <p>Analytics view becomes available after uploading results.</p>
+                    <!-- Placeholder for future charts/graphs -->
+                    <div id="analytics-content" style="padding: 40px; text-align: center; color: var(--text-muted);">
+                        Waiting for data...
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. SCHOOL PROFILES PANEL -->
+            <section id="panel-schools" class="panel">
+                <h2>School Profiles</h2>
+                <div class="card">
+                    <p>Manage multiple school identities here.</p>
+                    <div style="margin-top: 20px;">
+                        <label>Add New School</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="new-school-name" class="form-control" placeholder="School Name">
+                            <button class="btn btn-primary" onclick="proExamApp.addSchool()">Add</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>Active Schools List</h4>
+                        <ul id="school-list" style="list-style: none; padding: 0;">
+                            <!-- JS populated -->
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. SEARCH RESULTS PANEL -->
+            <section id="panel-students" class="panel">
+                <h2>Search Student Results</h2>
+                <div class="card">
+                    <div class="form-group">
+                        <label>Search by Name or Roll Number</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="adminSearchInput" class="form-control"
+                                placeholder="Enter keywords..."
+                                onkeyup="if(event.key === 'Enter') proExamApp.adminSearch()">
+                            <button class="btn btn-primary" onclick="proExamApp.adminSearch()">
+                                <i class="ph-bold ph-magnifying-glass"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-search-tbody">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: var(--text-muted);">Perform a
+                                        search to see results</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+    </div><!-- End Admin View -->
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
@@ -579,6 +694,27 @@
                 console.log("Pro Exam App Initialized");
                 this.renderSchoolSelector();
                 this.renderSchoolList();
+
+                // Determine initial view from storage
+                const mode = localStorage.getItem('pro_exam_mode') || 'public';
+                this.toggleView(mode);
+            },
+
+            toggleView(mode) {
+                const adminView = document.getElementById('admin-view');
+                const publicView = document.getElementById('public-view');
+                if (mode === 'public') {
+                    if (adminView) adminView.style.display = 'none';
+                    if (publicView) publicView.style.display = 'block';
+                    localStorage.setItem('pro_exam_mode', 'public');
+                } else {
+                    if (adminView) adminView.style.display = 'flex';
+                    if (publicView) publicView.style.display = 'none';
+                    localStorage.setItem('pro_exam_mode', 'admin');
+
+                    // Default to dashboard panel when switching to admin
+                    this.nav('dashboard', document.querySelector('.nav-item'));
+                }
             },
 
             // --- NAVIGATION ---
@@ -598,7 +734,71 @@
 
                 // Mobile: Close sidebar after click
                 if (window.innerWidth <= 768) {
-                    document.getElementById('proExamSidebar').classList.remove('open');
+                    const sidebar = document.getElementById('proExamSidebar');
+                    if (sidebar) sidebar.classList.remove('open');
+                }
+            },
+
+            // --- SEARCH LOGIC ---
+            adminSearch() {
+                const query = document.getElementById('adminSearchInput').value.trim().toLowerCase();
+                const tbody = document.getElementById('admin-search-tbody');
+
+                if (!query) return;
+
+                const filtered = this.state.students.filter(s =>
+                    (s.name && s.name.toLowerCase().includes(query)) ||
+                    (s.roll && s.roll.toString().includes(query)) ||
+                    (s.registerNumber && s.registerNumber.toString().includes(query))
+                );
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No students found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = filtered.map(s => `
+                    <tr>
+                        <td>${s.roll || s.registerNumber || '-'}</td>
+                        <td>${s.name}</td>
+                        <td>${s.total || 0}</td>
+                        <td>
+                            <button class="btn btn-mini btn-secondary" onclick="proExamApp.viewStudentDetails('${s.roll || s.registerNumber}')">
+                                <i class="ph ph-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            },
+
+            publicSearch() {
+                const reg = document.getElementById('publicRegInput').value.trim();
+                const msg = document.getElementById('public-msg');
+
+                if (!reg) {
+                    msg.textContent = "Please enter a register number";
+                    return;
+                }
+
+                const student = this.state.students.find(s =>
+                    (s.roll && s.roll.toString() === reg) ||
+                    (s.registerNumber && s.registerNumber.toString() === reg)
+                );
+
+                if (student) {
+                    msg.textContent = "";
+                    alert(`Result Found: ${student.name} - Total: ${student.total}`);
+                    // Here you would normally show a result modal or redirect
+                } else {
+                    msg.textContent = "No result found for this register number";
+                }
+            },
+
+            // View Student details (Admin Result View)
+            viewStudentDetails(roll) {
+                const student = this.state.students.find(s => (s.roll || s.registerNumber).toString() === roll);
+                if (student) {
+                    alert(`Student: ${student.name}\nRoll: ${student.roll || student.registerNumber}\nTotal: ${student.total}`);
                 }
             },
 

@@ -17,6 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="../../assets/js/pro-exam.js"></script>
+    <script src="../../assets/js/auth-manager.js"></script>
     <style>
         :root {
             --primary-color: #00f3ff;
@@ -3166,31 +3167,32 @@
             if (window.DeploymentManager) DeploymentManager.init();
         });
 
-        <script>
-            window.CreativeStudio = {
-                state: {
+        // Creative Studio logic
+
+        window.CreativeStudio = {
+            state: {
                 layers: [],
-            background: {type: 'color', value: '#111111', image: null },
-            size: {width: 1080, height: 1080, label: 'Instagram Post', key: 'post' },
-            selectedId: null,
-            isDragging: false,
-            initialized: false
+                background: { type: 'color', value: '#111111', image: null },
+                size: { width: 1080, height: 1080, label: 'Instagram Post', key: 'post' },
+                selectedId: null,
+                isDragging: false,
+                initialized: false
             },
 
             presets: {
-                post: {w: 1080, h: 1080, label: 'Instagram Post' },
-            story: {w: 1080, h: 1920, label: 'Instagram Story' },
-            banner: {w: 1920, h: 600, label: 'Web Banner' },
-            a4: {w: 2480, h: 3508, label: 'A4 Document' }
+                post: { w: 1080, h: 1080, label: 'Instagram Post' },
+                story: { w: 1080, h: 1920, label: 'Instagram Story' },
+                banner: { w: 1920, h: 600, label: 'Web Banner' },
+                a4: { w: 2480, h: 3508, label: 'A4 Document' }
             },
 
             init() {
                 if (this.state.initialized) return;
-            console.log("🎨 CreativeStudio: Initializing...");
-            this.loadDraft();
-            this.setupDragEvents();
-            this.state.initialized = true;
-            this.render();
+                console.log("🎨 CreativeStudio: Initializing...");
+                this.loadDraft();
+                this.setupDragEvents();
+                this.state.initialized = true;
+                this.render();
 
                 // Keep draft updated
                 setInterval(() => this.saveDraft(), 5000);
@@ -3198,187 +3200,187 @@
 
             render() {
                 const canvas = document.getElementById('design-canvas');
-            if (!canvas) return;
+                if (!canvas) return;
 
-            // 1. Update Canvas Size
-            const viewport = document.getElementById('canvas-viewport');
-            const vWidth = viewport.clientWidth - 80;
-            const vHeight = viewport.clientHeight - 80;
-            const scale = Math.min(vWidth / this.state.size.width, vHeight / this.state.size.height, 1);
+                // 1. Update Canvas Size
+                const viewport = document.getElementById('canvas-viewport');
+                const vWidth = viewport.clientWidth - 80;
+                const vHeight = viewport.clientHeight - 80;
+                const scale = Math.min(vWidth / this.state.size.width, vHeight / this.state.size.height, 1);
 
-            canvas.style.width = this.state.size.width + 'px';
-            canvas.style.height = this.state.size.height + 'px';
-            canvas.style.transform = `scale(${scale})`;
-            canvas.style.background = this.state.background.type === 'color' ? this.state.background.value : 'none';
+                canvas.style.width = this.state.size.width + 'px';
+                canvas.style.height = this.state.size.height + 'px';
+                canvas.style.transform = `scale(${scale})`;
+                canvas.style.background = this.state.background.type === 'color' ? this.state.background.value : 'none';
 
-            if (this.state.background.image) {
-                canvas.style.backgroundImage = `url(${this.state.background.image})`;
-            canvas.style.backgroundSize = 'cover';
-            canvas.style.backgroundPosition = 'center';
+                if (this.state.background.image) {
+                    canvas.style.backgroundImage = `url(${this.state.background.image})`;
+                    canvas.style.backgroundSize = 'cover';
+                    canvas.style.backgroundPosition = 'center';
                 } else {
-                canvas.style.backgroundImage = 'none';
+                    canvas.style.backgroundImage = 'none';
                 }
 
-            // 2. Render Layers
-            canvas.innerHTML = '';
+                // 2. Render Layers
+                canvas.innerHTML = '';
                 this.state.layers.forEach(layer => {
                     const el = document.createElement('div');
-            el.className = `canvas-element ${this.state.selectedId === layer.id ? 'selected' : ''}`;
-            el.id = `layer-${layer.id}`;
-            el.style.left = layer.x + 'px';
-            el.style.top = layer.y + 'px';
-            el.style.zIndex = layer.zIndex;
-            el.style.color = layer.color || '#fff';
-            el.style.fontSize = (layer.fontSize || 40) + 'px';
-            el.style.textAlign = layer.textAlign || 'center';
-            el.style.opacity = layer.opacity !== undefined ? layer.opacity : 1;
+                    el.className = `canvas-element ${this.state.selectedId === layer.id ? 'selected' : ''}`;
+                    el.id = `layer-${layer.id}`;
+                    el.style.left = layer.x + 'px';
+                    el.style.top = layer.y + 'px';
+                    el.style.zIndex = layer.zIndex;
+                    el.style.color = layer.color || '#fff';
+                    el.style.fontSize = (layer.fontSize || 40) + 'px';
+                    el.style.textAlign = layer.textAlign || 'center';
+                    el.style.opacity = layer.opacity !== undefined ? layer.opacity : 1;
 
-            if (layer.type === 'text') {
-                el.innerText = layer.content;
+                    if (layer.type === 'text') {
+                        el.innerText = layer.content;
                     } else if (layer.type === 'image') {
                         const img = document.createElement('img');
-            img.src = layer.content;
-            img.style.width = layer.width + 'px';
-            img.style.pointerEvents = 'none';
-            el.appendChild(img);
+                        img.src = layer.content;
+                        img.style.width = layer.width + 'px';
+                        img.style.pointerEvents = 'none';
+                        el.appendChild(img);
                     }
 
-            // Handles
-            if (this.state.selectedId === layer.id) {
+                    // Handles
+                    if (this.state.selectedId === layer.id) {
                         const controls = document.createElement('div');
-            controls.className = 'element-controls';
-            controls.innerHTML = `
+                        controls.className = 'element-controls';
+                        controls.innerHTML = `
             <button onclick="CreativeStudio.moveLayer('up')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-arrow-up"></i></button>
             <button onclick="CreativeStudio.deleteElement('${layer.id}')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-trash"></i></button>
             `;
-            el.appendChild(controls);
+                        el.appendChild(controls);
 
-            if (layer.type === 'image') {
+                        if (layer.type === 'image') {
                             const resize = document.createElement('div');
-            resize.className = 'resize-handle';
+                            resize.className = 'resize-handle';
                             resize.onmousedown = (e) => this.startResize(e, layer.id);
-            el.appendChild(resize);
+                            el.appendChild(resize);
                         }
                     }
 
                     el.onmousedown = (e) => {
                         if (e.target.className.includes('resize-handle')) return;
-            this.selectElement(layer.id);
-            this.startDrag(e, layer.id);
+                        this.selectElement(layer.id);
+                        this.startDrag(e, layer.id);
                     };
 
-            canvas.appendChild(el);
+                    canvas.appendChild(el);
                 });
 
-            this.updatePropertiesPanel();
+                this.updatePropertiesPanel();
             },
 
             addText() {
                 const id = 'text_' + Date.now();
-            this.state.layers.push({
-                id, type: 'text', content: 'Double click to edit',
-            x: 50, y: 50, zIndex: this.state.layers.length + 1,
-            fontSize: 40, color: '#ffffff', textAlign: 'center'
+                this.state.layers.push({
+                    id, type: 'text', content: 'Double click to edit',
+                    x: 50, y: 50, zIndex: this.state.layers.length + 1,
+                    fontSize: 40, color: '#ffffff', textAlign: 'center'
                 });
-            this.state.selectedId = id;
-            this.render();
+                this.state.selectedId = id;
+                this.render();
             },
 
             handleLogoUpload(input) {
                 const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
+                if (!file) return;
+                const reader = new FileReader();
                 reader.onload = (e) => {
                     const id = 'img_' + Date.now();
-            this.state.layers.push({
-                id, type: 'image', content: e.target.result,
-            x: 100, y: 100, width: 200, zIndex: this.state.layers.length + 1
+                    this.state.layers.push({
+                        id, type: 'image', content: e.target.result,
+                        x: 100, y: 100, width: 200, zIndex: this.state.layers.length + 1
                     });
-            this.state.selectedId = id;
-            this.render();
+                    this.state.selectedId = id;
+                    this.render();
                 };
-            reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
             },
 
             handleBgUpload(input) {
                 const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
+                if (!file) return;
+                const reader = new FileReader();
                 reader.onload = (e) => {
-                this.state.background.image = e.target.result;
-            this.render();
+                    this.state.background.image = e.target.result;
+                    this.render();
                 };
-            reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
             },
 
             updateBgColor(val) {
                 this.state.background.type = 'color';
-            this.state.background.value = val;
-            this.render();
+                this.state.background.value = val;
+                this.render();
             },
 
             setPreset(key) {
                 const preset = this.presets[key];
-            if (!preset) return;
-            this.state.size = {...preset, key};
-            document.getElementById('canvas-size-indicator').innerText = `${preset.w} x ${preset.h} (${preset.label})`;
-            this.render();
+                if (!preset) return;
+                this.state.size = { ...preset, key };
+                document.getElementById('canvas-size-indicator').innerText = `${preset.w} x ${preset.h} (${preset.label})`;
+                this.render();
             },
 
             selectElement(id) {
                 this.state.selectedId = id;
-            this.render();
+                this.render();
             },
 
             updateSelected(prop, val) {
                 const layer = this.state.layers.find(l => l.id === this.state.selectedId);
-            if (layer) {
-                layer[prop] = prop === 'fontSize' || prop === 'width' ? parseInt(val) : val;
-            this.render();
+                if (layer) {
+                    layer[prop] = prop === 'fontSize' || prop === 'width' ? parseInt(val) : val;
+                    this.render();
                 }
             },
 
             deleteElement(id) {
                 this.state.layers = this.state.layers.filter(l => l.id !== id);
-            this.state.selectedId = null;
-            this.render();
+                this.state.selectedId = null;
+                this.render();
             },
 
             moveLayer(dir) {
                 const idx = this.state.layers.findIndex(l => l.id === this.state.selectedId);
-            if (idx === -1) return;
-            if (dir === 'up' && idx < this.state.layers.length - 1) {
-                [this.state.layers[idx], this.state.layers[idx + 1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
+                if (idx === -1) return;
+                if (dir === 'up' && idx < this.state.layers.length - 1) {
+                    [this.state.layers[idx], this.state.layers[idx + 1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
                 } else if (dir === 'down' && idx > 0) {
-                [this.state.layers[idx], this.state.layers[idx - 1]] = [this.state.layers[idx - 1], this.state.layers[idx]];
+                    [this.state.layers[idx], this.state.layers[idx - 1]] = [this.state.layers[idx - 1], this.state.layers[idx]];
                 }
-            this.render();
+                this.render();
             },
 
             updatePropertiesPanel() {
                 const layer = this.state.layers.find(l => l.id === this.state.selectedId);
-            const noSel = document.getElementById('no-selection-msg');
-            const textProps = document.getElementById('text-properties');
-            const imgProps = document.getElementById('image-properties');
+                const noSel = document.getElementById('no-selection-msg');
+                const textProps = document.getElementById('text-properties');
+                const imgProps = document.getElementById('image-properties');
 
-            if (!layer) {
-                noSel.style.display = 'block';
-            textProps.style.display = 'none';
-            imgProps.style.display = 'none';
-            return;
+                if (!layer) {
+                    noSel.style.display = 'block';
+                    textProps.style.display = 'none';
+                    imgProps.style.display = 'none';
+                    return;
                 }
 
-            noSel.style.display = 'none';
-            if (layer.type === 'text') {
-                textProps.style.display = 'block';
-            imgProps.style.display = 'none';
-            document.getElementById('prop-text-content').value = layer.content;
-            document.getElementById('prop-text-size').value = layer.fontSize;
-            document.getElementById('prop-text-color').value = layer.color;
+                noSel.style.display = 'none';
+                if (layer.type === 'text') {
+                    textProps.style.display = 'block';
+                    imgProps.style.display = 'none';
+                    document.getElementById('prop-text-content').value = layer.content;
+                    document.getElementById('prop-text-size').value = layer.fontSize;
+                    document.getElementById('prop-text-color').value = layer.color;
                 } else {
-                textProps.style.display = 'none';
-            imgProps.style.display = 'block';
-            document.getElementById('prop-img-opacity').value = layer.opacity || 1;
+                    textProps.style.display = 'none';
+                    imgProps.style.display = 'block';
+                    document.getElementById('prop-img-opacity').value = layer.opacity || 1;
                 }
             },
 
@@ -3407,108 +3409,108 @@
                     }
                 };
                 window.onmouseup = () => {
-                this.state.draggingId = null;
-            this.state.resizingId = null;
+                    this.state.draggingId = null;
+                    this.state.resizingId = null;
                 };
             },
 
             startDrag(e, id) {
                 const layer = this.state.layers.find(l => l.id === id);
-            const canvas = document.getElementById('design-canvas');
-            const rect = canvas.getBoundingClientRect();
-            const scale = canvas.offsetWidth / this.state.size.width;
+                const canvas = document.getElementById('design-canvas');
+                const rect = canvas.getBoundingClientRect();
+                const scale = canvas.offsetWidth / this.state.size.width;
 
-            this.state.draggingId = id;
-            this.state.dragOffset = {
-                x: (e.clientX - rect.left) / scale - layer.x,
-            y: (e.clientY - rect.top) / scale - layer.y
+                this.state.draggingId = id;
+                this.state.dragOffset = {
+                    x: (e.clientX - rect.left) / scale - layer.x,
+                    y: (e.clientY - rect.top) / scale - layer.y
                 };
             },
 
             startResize(e, id) {
                 e.stopPropagation();
-            this.state.resizingId = id;
+                this.state.resizingId = id;
             },
 
             // --- Features ---
             generateAIHeadline() {
                 const headlines = [
-            "Empowering Future Leaders Today",
-            "Admissions Open: Journey to Excellence",
-            "Celebrate Our Annual Achievement Night",
-            "New Semester, New Opportunities",
-            "Excellence in Education Since 1995"
-            ];
-            const text = headlines[Math.floor(Math.random() * headlines.length)];
+                    "Empowering Future Leaders Today",
+                    "Admissions Open: Journey to Excellence",
+                    "Celebrate Our Annual Achievement Night",
+                    "New Semester, New Opportunities",
+                    "Excellence in Education Since 1995"
+                ];
+                const text = headlines[Math.floor(Math.random() * headlines.length)];
                 const layer = this.state.layers.find(l => l.id === this.state.selectedId && l.type === 'text');
-            if (layer) {
-                layer.content = text;
+                if (layer) {
+                    layer.content = text;
                 } else {
-                this.addText();
-            this.state.layers[this.state.layers.length - 1].content = text;
+                    this.addText();
+                    this.state.layers[this.state.layers.length - 1].content = text;
                 }
-            this.render();
+                this.render();
             },
 
             applyTemplate(type) {
                 this.resetCanvas();
-            if (type === 'admission') {
-                this.state.background.value = '#0a2e5c';
-            this.state.layers.push(
-            {id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign: 'center' },
-            {id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35, color: '#fff', textAlign: 'center' },
-            {id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color: '#ffcc00', textAlign: 'center' }
-            );
+                if (type === 'admission') {
+                    this.state.background.value = '#0a2e5c';
+                    this.state.layers.push(
+                        { id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign: 'center' },
+                        { id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35, color: '#fff', textAlign: 'center' },
+                        { id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color: '#ffcc00', textAlign: 'center' }
+                    );
                 }
-            this.render();
+                this.render();
             },
 
             exportPNG() {
                 const canvas = document.getElementById('design-canvas');
-            this.state.selectedId = null;
-            this.render();
+                this.state.selectedId = null;
+                this.render();
 
                 setTimeout(() => {
-                html2canvas(canvas, {
-                    scale: 2, // High res
-                    backgroundColor: null,
-                    useCORS: true
-                }).then(canvasExport => {
-                    const link = document.createElement('a');
-                    const date = new Date().toISOString().split('T')[0];
-                    link.download = `creative-studio-${date}.png`;
-                    link.href = canvasExport.toDataURL("image/png");
-                    link.click();
-                    alert("Design Exported Successfully! 🚀");
-                });
+                    html2canvas(canvas, {
+                        scale: 2, // High res
+                        backgroundColor: null,
+                        useCORS: true
+                    }).then(canvasExport => {
+                        const link = document.createElement('a');
+                        const date = new Date().toISOString().split('T')[0];
+                        link.download = `creative-studio-${date}.png`;
+                        link.href = canvasExport.toDataURL("image/png");
+                        link.click();
+                        alert("Design Exported Successfully! 🚀");
+                    });
                 }, 100);
             },
 
             saveDraft() {
                 const data = {
-                layers: this.state.layers,
-            background: this.state.background,
-            size: this.state.size
+                    layers: this.state.layers,
+                    background: this.state.background,
+                    size: this.state.size
                 };
-            localStorage.setItem('creative_studio_draft', JSON.stringify(data));
+                localStorage.setItem('creative_studio_draft', JSON.stringify(data));
             },
 
             loadDraft() {
                 const saved = localStorage.getItem('creative_studio_draft');
-            if (saved) {
+                if (saved) {
                     const data = JSON.parse(saved);
-            this.state.layers = data.layers || [];
-            this.state.background = data.background || {type: 'color', value: '#111111' };
-            this.state.size = data.size || this.presets.post;
+                    this.state.layers = data.layers || [];
+                    this.state.background = data.background || { type: 'color', value: '#111111' };
+                    this.state.size = data.size || this.presets.post;
                 }
             },
 
             resetCanvas() {
                 if (!confirm("Clear design and start fresh?")) return;
-            this.state.layers = [];
-            this.state.background = {type: 'color', value: '#111111', image: null };
-            this.state.selectedId = null;
-            this.render();
+                this.state.layers = [];
+                this.state.background = { type: 'color', value: '#111111', image: null };
+                this.state.selectedId = null;
+                this.render();
             }
         };
     </script>
@@ -3520,8 +3522,10 @@
             style="background:#111; padding:40px; border-radius:15px; width:350px; position:relative; border: 1px solid var(--glass-border);">
             <h2 style="color:#fff; margin-bottom:25px; text-align: center;">Admin Access</h2>
             <form id="loginForm">
-                <input type="password" id="admin-pin" class="login-input" placeholder="Enter Access PIN" required
-                    maxlength="4">
+                <input type="text" id="admin-username" class="login-input" placeholder="Username" required
+                    style="letter-spacing: normal; margin-bottom: 10px;">
+                <input type="password" id="admin-password" class="login-input" placeholder="Password" required
+                    style="letter-spacing: normal;">
                 <button type="submit" class="btn-login" id="login-btn">Login</button>
                 <p id="error-msg"
                     style="color:#ff4d4d; margin-top:15px; display:none; text-align: center; font-size: 0.9rem;"></p>
@@ -3550,16 +3554,11 @@
     </div>
 
     <script>
-            window.AdminAccess = {
-                defaultPin: "2026",
-
+        window.AdminAccess = {
             init() {
-                if (!localStorage.getItem("admin_pin")) {
-                localStorage.setItem("admin_pin", this.defaultPin);
-                }
-
-            if (localStorage.getItem("admin_logged_in") === "true") {
-                this.showPanel();
+                AuthManager.restoreSession();
+                if (AuthManager.isAdmin()) {
+                    this.showPanel();
                 }
             },
 
@@ -3571,33 +3570,33 @@
                 document.getElementById("admin-modal").style.display = "none";
             },
 
-            login(pin) {
-                const savedPin = localStorage.getItem("admin_pin");
-            if (pin === savedPin) {
-                localStorage.setItem("admin_logged_in", "true");
-            this.showPanel();
+            async login(username, password) {
+                const result = await AuthManager.login(username, password);
+                if (result.success) {
+                    this.showPanel();
                 } else {
                     const errorMsg = document.getElementById("error-msg");
-            if (errorMsg) {
-                errorMsg.innerText = "Incorrect PIN";
-            errorMsg.style.display = "block";
+                    if (errorMsg) {
+                        errorMsg.innerText = result.message;
+                        errorMsg.style.display = "block";
                     }
                 }
             },
 
             showPanel() {
                 document.getElementById("loginForm").style.display = "none";
-            document.getElementById("admin-panel").style.display = "block";
-            const errorMsg = document.getElementById("error-msg");
-            if (errorMsg) errorMsg.style.display = "none";
+                document.getElementById("admin-panel").style.display = "block";
+                const errorMsg = document.getElementById("error-msg");
+                if (errorMsg) errorMsg.style.display = "none";
             },
 
             logout() {
-                localStorage.removeItem("admin_logged_in");
-            document.getElementById("loginForm").style.display = "block";
-            document.getElementById("admin-panel").style.display = "none";
-            document.getElementById("change-pin-box").style.display = "none";
-            document.getElementById("admin-pin").value = "";
+                AuthManager.logout();
+                document.getElementById("loginForm").style.display = "block";
+                document.getElementById("admin-panel").style.display = "none";
+                document.getElementById("change-pin-box").style.display = "none";
+                document.getElementById("admin-username").value = "";
+                document.getElementById("admin-password").value = "";
             },
 
             showChangePin() {
@@ -3606,41 +3605,43 @@
 
             changePin() {
                 const newPin = document.getElementById("new-pin").value;
-            if (newPin.length !== 4) {
-                alert("PIN must be 4 digits");
-            return;
+                if (newPin.length !== 4) {
+                    alert("PIN must be 4 digits");
+                    return;
                 }
-            localStorage.setItem("admin_pin", newPin);
-            alert("PIN updated successfully");
-            document.getElementById("change-pin-box").style.display = "none";
-            document.getElementById("new-pin").value = "";
+                localStorage.setItem("admin_pin", newPin);
+                alert("PIN updated successfully");
+                document.getElementById("change-pin-box").style.display = "none";
+                document.getElementById("new-pin").value = "";
             }
         };
 
-            const loginForm = document.getElementById("loginForm");
-            if (loginForm) {
-                loginForm.addEventListener("submit", function (e) {
-                    e.preventDefault();
-                    AdminAccess.login(document.getElementById("admin-pin").value);
-                });
+        const loginForm = document.getElementById("loginForm");
+        if (loginForm) {
+            loginForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                const user = document.getElementById("admin-username").value;
+                const pass = document.getElementById("admin-password").value;
+                AdminAccess.login(user, pass);
+            });
         }
 
         window.addEventListener("DOMContentLoaded", () => {
-                AdminAccess.init();
+            AdminAccess.init();
 
             // Initialize Site Settings when panel is opened
             if (window.SiteSettings) {
                 SiteSettings.renderHeaderEditor();
-            SiteSettings.renderFooterEditor();
-                }
+                SiteSettings.renderFooterEditor();
+            }
         });
 
-            // Tab switching function for Site Settings
-            function switchSettingsTab(tabName, buttonElement) {
-                // Hide all tab contents
-                document.querySelectorAll('.settings-tab-content').forEach(tab => {
-                    tab.style.display = 'none';
-                });
+        // Tab switching function for Site Settings
+        function switchSettingsTab(tabName, buttonElement) {
+            // Hide all tab contents
+            document.querySelectorAll('.settings-tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
 
             // Remove active class from all buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
