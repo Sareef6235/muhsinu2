@@ -1842,30 +1842,45 @@
         </div>
 
         <!-- Add School Modal (Inline) -->
-        <div id="add-school-modal" class="modal-overlay" style="display: none;">
-            <div class="glass-card" style="max-width: 400px; padding: 25px;">
-                <h4 style="margin-bottom: 20px; color: var(--primary-color);">Add New School</h4>
-                <div class="form-group">
-                    <label class="form-label">School Name</label>
-                    <input type="text" id="newSchoolName" class="form-input" placeholder="Enter school name...">
-                </div>
-                <div style="display: flex; gap: 15px; margin-top: 20px;">
-                    <button class="btn btn-primary" style="flex: 1;" onclick="SchoolManager.addSchool()">Add
-                        School</button>
-                    <button class="btn btn-secondary" style="flex: 1;"
-                        onclick="SchoolManager.hideAddForm()">Cancel</button>
+        <div class="glass-card" id="school-info-card" style="padding: 30px; animation: fadeIn 0.4s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3 id="school-display-name" style="color: var(--primary-color); margin: 0;">abc</h3>
+                <div
+                    style="font-size: 0.75rem; color: #888; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 50px;">
+                    ID: school_1770745280154
                 </div>
             </div>
-        </div>
-
-        <div class="school-list-grid" id="schools-grid">
-            <!-- Data is injected by Selecting a school from the sidebar dropdown -->
-            <div
-                style="text-align: center; width: 100%; padding: 40px; color: #666; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px dashed #333;">
-                <i class="ph ph-buildings" style="font-size: 3rem; display: block; margin-bottom: 10px;"></i>
-                <p>Select a school from the sidebar to view its profile.</p>
+            <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div>
+                    <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Address
+                    </div>
+                    <p id="school-display-address" style="font-size: 1.1rem; font-weight: 500;">gvhg</p>
+                </div>
+                <div>
+                    <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">
+                        Principal</div>
+                    <p id="school-display-principal" style="font-size: 1.1rem; font-weight: 500;">jhg</p>
+                </div>
+                <div>
+                    <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Active
+                        Session</div>
+                    <p id="school-display-session"
+                        style="font-size: 1.1rem; font-weight: 500; color: var(--primary-color);">2025-2026</p>
+                </div>
             </div>
-        </div>
+            <div style="margin-top: 25px; display: flex; gap: 10px;">
+                <button class="btn btn-sm btn-primary" id="school-edit-btn" onclick="SchoolManager.editProfile()">
+                    <i class="ph ph-pencil"></i> Edit Profile
+                </button>
+                <button class="btn btn-sm btn-success" id="school-save-btn" style="display: none;"
+                    onclick="SchoolManager.saveProfile()">
+                    <i class="ph ph-check"></i> Save Changes
+                </button>
+                <button class="btn btn-sm btn-secondary" id="school-cancel-btn" style="display: none;"
+                    onclick="SchoolManager.cancelProfile()">
+                    <i class="ph ph-x"></i> Cancel
+                </button>
+            </div>
         </div>
 
         <!-- 10. GITHUB DEPLOYMENT PANEL -->
