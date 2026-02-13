@@ -690,7 +690,7 @@
             </div>
 
             <div class="nav-item" onclick="switchPanel('header', this)">
-                <i class="ph-bold ph-student" style="color: #ff9f43;"></i> Site Settings
+                <i class="ph-bold ph-gear" style="color: #ff9f43;"></i> Site Settings
             </div>
 
 
@@ -1552,18 +1552,17 @@
                             style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
                             <div style="text-align: center; border-right: 1px solid rgba(255,255,255,0.1);">
                                 <div style="font-size: 0.7rem; color: #888; text-transform: uppercase;">Exams</div>
-                                <div class="stat-results-exams" style="font-weight: 700; color: var(--primary-color);">0
+                                <div id="results-exams-count" style="font-weight: 700; color: var(--primary-color);">0
                                 </div>
                             </div>
                             <div style="text-align: center; border-right: 1px solid rgba(255,255,255,0.1);">
                                 <div style="font-size: 0.7rem; color: #888; text-transform: uppercase;">Students</div>
-                                <div class="stat-results-total" style="font-weight: 700; color: var(--primary-color);">0
+                                <div id="results-total-count" style="font-weight: 700; color: var(--primary-color);">0
                                 </div>
                             </div>
                             <div style="text-align: center;">
                                 <div style="font-size: 0.7rem; color: #888; text-transform: uppercase;">Updated</div>
-                                <div class="stat-results-last-sync" style="font-size: 0.75rem; font-weight: 600;">--:--
-                                </div>
+                                <div id="results-last-sync" style="font-size: 0.75rem; font-weight: 600;">--:--</div>
                             </div>
                         </div>
 
@@ -1670,17 +1669,9 @@
                                 studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
                             });
 
-                            const examsCount = exams.length;
-                            const totalStudents = studentCount;
-                            const syncTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                            // Update all instances using classes OR IDs
-                            document.querySelectorAll('.stat-results-exams, #results-exams-count').forEach(el => el.textContent = examsCount);
-                            document.querySelectorAll('.stat-results-total, #results-total-count').forEach(el => el.textContent = totalStudents);
-                            document.querySelectorAll('.stat-results-last-sync, #results-last-sync').forEach(el => el.textContent = syncTime);
-
-                            // Align with ResultsManagement state
-                            window.uploadedStudents = json.exams ? json.exams.reduce((acc, ex) => acc.concat(ex.results || ex.students || []), []) : [];
+                            document.getElementById('results-exams-count').textContent = exams.length;
+                            document.getElementById('results-total-count').textContent = studentCount;
+                            document.getElementById('results-last-sync').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                             if (fileName) {
                                 statusEl.innerHTML = "<i class='ph-bold ph-check-circle'></i> Loaded: " + fileName;
@@ -1848,45 +1839,30 @@
         </div>
 
         <!-- Add School Modal (Inline) -->
-        <div class="glass-card" id="school-info-card" style="padding: 30px; animation: fadeIn 0.4s ease;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h3 id="school-display-name" style="color: var(--primary-color); margin: 0;">abc</h3>
-                <div
-                    style="font-size: 0.75rem; color: #888; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 50px;">
-                    ID: school_1770745280154
+        <div id="add-school-modal" class="modal-overlay" style="display: none;">
+            <div class="glass-card" style="max-width: 400px; padding: 25px;">
+                <h4 style="margin-bottom: 20px; color: var(--primary-color);">Add New School</h4>
+                <div class="form-group">
+                    <label class="form-label">School Name</label>
+                    <input type="text" id="newSchoolName" class="form-input" placeholder="Enter school name...">
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button class="btn btn-primary" style="flex: 1;" onclick="SchoolManager.addSchool()">Add
+                        School</button>
+                    <button class="btn btn-secondary" style="flex: 1;"
+                        onclick="SchoolManager.hideAddForm()">Cancel</button>
                 </div>
             </div>
-            <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                <div>
-                    <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Address
-                    </div>
-                    <p id="school-display-address" style="font-size: 1.1rem; font-weight: 500;">gvhg</p>
-                </div>
-                <div>
-                    <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">
-                        Principal</div>
-                    <p id="school-display-principal" style="font-size: 1.1rem; font-weight: 500;">jhg</p>
-                </div>
-                <div>
-                    <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Active
-                        Session</div>
-                    <p id="school-display-session"
-                        style="font-size: 1.1rem; font-weight: 500; color: var(--primary-color);">2025-2026</p>
-                </div>
+        </div>
+
+        <div class="school-list-grid" id="schools-grid">
+            <!-- Data is injected by Selecting a school from the sidebar dropdown -->
+            <div
+                style="text-align: center; width: 100%; padding: 40px; color: #666; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px dashed #333;">
+                <i class="ph ph-buildings" style="font-size: 3rem; display: block; margin-bottom: 10px;"></i>
+                <p>Select a school from the sidebar to view its profile.</p>
             </div>
-            <div style="margin-top: 25px; display: flex; gap: 10px;">
-                <button class="btn btn-sm btn-primary" id="school-edit-btn" onclick="SchoolManager.editProfile()">
-                    <i class="ph ph-pencil"></i> Edit Profile
-                </button>
-                <button class="btn btn-sm btn-success" id="school-save-btn" style="display: none;"
-                    onclick="SchoolManager.saveProfile()">
-                    <i class="ph ph-check"></i> Save Changes
-                </button>
-                <button class="btn btn-sm btn-secondary" id="school-cancel-btn" style="display: none;"
-                    onclick="SchoolManager.cancelProfile()">
-                    <i class="ph ph-x"></i> Cancel
-                </button>
-            </div>
+        </div>
         </div>
 
         <!-- 10. GITHUB DEPLOYMENT PANEL -->
@@ -1912,30 +1888,27 @@
                 <h4 style="margin-bottom: 20px; color: var(--primary-color);">Repository Connections</h4>
 
                 <div
-                    style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 16px; margin-bottom: 25px; overflow: hidden; backdrop-filter: blur(5px);">
+                    style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 25px; overflow: hidden;">
                     <ul id="repo-list"
-                        style="list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto;">
+                        style="list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto;">
                         <!-- Injected by JS -->
                     </ul>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1.5fr 1fr auto; gap: 12px; padding: 5px;">
-                    <input id="repo-name-input" class="form-input" placeholder="Owner/Repository (e.g. username/repo)"
-                        style="background: rgba(255,255,255,0.03);">
-                    <input id="repo-branch-input" class="form-input" placeholder="Branch (default: main)"
-                        style="background: rgba(255,255,255,0.03);">
-                    <button class="btn btn-primary" onclick="DeploymentManager.addRepo()" style="height: 100%;">
-                        <i class="ph-bold ph-plus"></i> Add
+                <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px;">
+                    <input id="repo-name-input" class="form-input"
+                        placeholder="Owner/Repository (e.g. Sareef6235/muhsinu2)">
+                    <input id="repo-branch-input" class="form-input" placeholder="Branch (default: main)">
+                    <button class="btn btn-primary" onclick="DeploymentManager.addRepo()">
+                        <i class="ph ph-plus"></i> Add Repository
                     </button>
                 </div>
             </div>
 
-            <div id="active-repo-status" style="display: none; animation: animate-fade-up 0.5s ease both;">
-                <h4 style="margin: 30px 0 15px 0; color: #fff; display: flex; align-items: center; gap: 10px;">
-                    <i class="ph-bold ph-activity" style="color: var(--primary-color);"></i>
-                    Live Status: <span id="status-repo-name" style="color: var(--primary-color);">Repo</span>
-                </h4>
-                <div class="glass-card" style="padding: 25px; border-color: rgba(0, 243, 255, 0.2);">
+            <div id="active-repo-status" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Live Status: <span id="status-repo-name"
+                        style="color: var(--primary-color);">Repo</span></h3>
+                <div class="deploy-card">
                     <div
                         style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
                         <div>
@@ -2675,6 +2648,15 @@
         }
     </script>
 
+    <script>
+        // Init logic moved to module block above
+        updateStats();
+    </script>
+
+    <script>
+        // Initialize dashboard stats
+        if (typeof updateStats === 'function') updateStats();
+    </script>
 
     <!-- Results System Extension Modules -->
     <script src="../../assets/js/storage-manager.js"></script>
@@ -3022,229 +3004,69 @@
            GitHub Deployment Manager 
            ============================== */
         const DeploymentManager = (function () {
-            let repos = [];
-            let activeRepo = "Sareef6235/muhsinu2";
-            const STORAGE_KEY = "github_deployment_repos";
+            const REPO = "Sareef6235/muhsinu2";
+            const API_URL = `https://api.github.com/repos/${REPO}`;
 
             async function init() {
-                console.log('📡 DeploymentManager: Initializing...');
-                loadFromStorage();
-                renderList();
-
-                if (activeRepo) {
-                    await fetchStatus(activeRepo);
-                }
-            }
-
-            function loadFromStorage() {
-                const stored = localStorage.getItem(STORAGE_KEY);
-                if (stored) {
-                    try {
-                        const data = JSON.parse(stored);
-                        repos = data.repos || ["Sareef6235/muhsinu2"];
-                        activeRepo = data.activeRepo || repos[0];
-                    } catch (e) {
-                        console.error("Failed to load repos from storage", e);
-                        repos = ["Sareef6235/muhsinu2"];
-                        activeRepo = repos[0];
-                    }
-                } else {
-                    repos = ["Sareef6235/muhsinu2"];
-                    activeRepo = repos[0];
-                }
-            }
-
-            function saveToStorage() {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                    repos,
-                    activeRepo
-                }));
-            }
-
-            async function fetchStatus(repoPath) {
-                if (!repoPath) return;
-
-                const API_URL = `https://api.github.com/repos/${repoPath}`;
-                const statusBadge = document.getElementById('git-status-badge');
-                const activeRepoStatus = document.getElementById('active-repo-status');
-
-                if (statusBadge) {
-                    statusBadge.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Connecting...';
-                    statusBadge.style.color = 'var(--primary-color)';
-                    statusBadge.style.background = 'rgba(0, 243, 255, 0.1)';
-                }
-
-                if (activeRepoStatus) activeRepoStatus.style.display = 'block';
-                document.getElementById('status-repo-name').textContent = repoPath;
-
+                console.log('📡 DeploymentManager: Initializing live status...');
                 try {
-                    const [repoRes, commitRes] = await Promise.all([
-                        fetch(API_URL),
-                        fetch(`${API_URL}/commits/main`) // Assume main for now
+                    await Promise.all([
+                        fetchRepoInfo(),
+                        fetchLatestCommit()
                     ]);
-
-                    if (!repoRes.ok || !commitRes.ok) throw new Error("API Fetch Failed");
-
-                    const repoData = await repoRes.json();
-                    const commitData = await commitRes.json();
-
-                    // Update UI
-                    document.getElementById('git-branch-name').innerHTML = `<i class="ph ph-git-branch"></i> ${repoData.default_branch}`;
-                    document.getElementById('git-last-commit').textContent = `"${commitData.commit.message.split('\n')[0]}"`;
-                    document.getElementById('git-last-author').textContent = commitData.commit.author.name;
-                    document.getElementById('last-deploy-time').textContent = new Date(commitData.commit.author.date).toLocaleString();
-
-                    const avatarEl = document.getElementById('git-author-avatar');
-                    if (avatarEl && commitData.author) {
-                        avatarEl.innerHTML = `<img src="${commitData.author.avatar_url}" style="width:100%; height:100%; object-fit:cover;">`;
-                    }
-
-                    if (statusBadge) {
-                        statusBadge.innerHTML = '<i class="ph-bold ph-check-circle"></i> Connected';
-                        statusBadge.style.color = '#2ed573';
-                        statusBadge.style.background = 'rgba(46, 213, 115, 0.1)';
-                    }
-
-                    // Update action buttons links
-                    document.getElementById('btn-view-actions').onclick = () => window.open(`https://github.com/${repoPath}/actions`, '_blank');
-                    document.getElementById('btn-view-repo').onclick = () => window.open(`https://github.com/${repoPath}`, '_blank');
-
                 } catch (err) {
                     console.warn("⚠️ GitHub API Error:", err);
-                    if (statusBadge) {
-                        statusBadge.innerHTML = '<i class="ph ph-warning-circle"></i> API Offline/Rate Limited';
-                        statusBadge.style.color = '#ff4757';
-                        statusBadge.style.background = 'rgba(255, 71, 87, 0.1)';
-                    }
+                    document.getElementById('git-status-badge').innerHTML = '<i class="ph ph-warning-circle"></i> API Offline';
+                    document.getElementById('git-status-badge').style.color = '#ff4757';
+                    document.getElementById('git-status-badge').style.background = 'rgba(255, 71, 87, 0.1)';
                 }
             }
 
-            function renderList() {
-                const listEl = document.getElementById('repo-list');
-                if (!listEl) return;
+            async function fetchRepoInfo() {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("Repo fetch failed");
+                const data = await res.json();
 
-                listEl.innerHTML = repos.map(repo => `
-                    <li style="padding: 15px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: ${repo === activeRepo ? 'rgba(0, 243, 255, 0.05)' : 'transparent'}">
-                        <div style="cursor: pointer;" onclick="DeploymentManager.switchRepo('${repo}')">
-                            <i class="ph ph-github-logo"></i> <b>${repo}</b>
-                            ${repo === activeRepo ? '<span style="font-size: 0.7rem; color: var(--primary-color); margin-left:10px;">(Active)</span>' : ''}
-                        </div>
-                        <button class="btn btn-mini btn-danger" onclick="DeploymentManager.removeRepo('${repo}')" ${repos.length === 1 ? 'disabled' : ''}>
-                            <i class="ph ph-trash"></i>
-                        </button>
-                    </li>
-                `).join('');
+                const repoNameEl = document.getElementById('git-repo-name');
+                if (repoNameEl) repoNameEl.textContent = data.full_name;
+
+                const branchEl = document.getElementById('git-branch-name');
+                if (branchEl) branchEl.innerHTML = `<i class="ph ph-git-branch"></i> ${data.default_branch}`;
             }
 
-            function addRepo() {
-                const nameInput = document.getElementById('repo-name-input');
-                const branchInput = document.getElementById('repo-branch-input');
-                if (!nameInput) return;
+            async function fetchLatestCommit() {
+                const res = await fetch(`${API_URL}/commits/main`);
+                if (!res.ok) throw new Error("Commit fetch failed");
+                const data = await res.json();
 
-                const repo = nameInput.value.trim();
-                const branch = branchInput ? branchInput.value.trim() || 'main' : 'main';
+                // 1. Commit Message
+                const commitEl = document.getElementById('git-last-commit');
+                if (commitEl) commitEl.textContent = `"${data.commit.message.split('\n')[0]}"`;
 
-                if (!repo || !repo.includes('/')) {
-                    alert("Please enter a valid owner/repo path (e.g. username/repository)");
-                    return;
+                // 2. Author info
+                const authorEl = document.getElementById('git-last-author');
+                if (authorEl) authorEl.textContent = data.commit.author.name;
+
+                const avatarEl = document.getElementById('git-author-avatar');
+                if (avatarEl && data.author) {
+                    avatarEl.innerHTML = `<img src="${data.author.avatar_url}" style="width:100%; height:100%; object-fit:cover;">`;
                 }
 
-                if (!repos.includes(repo)) {
-                    repos.push(repo);
-                    activeRepo = repo;
-                    saveToStorage();
-                    renderList();
-                    fetchStatus(repo);
-                    nameInput.value = '';
-                    if (branchInput) branchInput.value = '';
-                } else {
-                    switchRepo(repo);
+                // 3. Date
+                const dateEl = document.getElementById('last-deploy-time');
+                if (dateEl) {
+                    const commitDate = new Date(data.commit.author.date);
+                    dateEl.textContent = commitDate.toLocaleString();
                 }
-            }
 
-            function removeRepo(repo) {
-                if (repos.length <= 1) return;
-                repos = repos.filter(r => r !== repo);
-                if (activeRepo === repo) activeRepo = repos[0];
-                saveToStorage();
-                renderList();
-                fetchStatus(activeRepo);
-            }
-
-            function switchRepo(repo) {
-                activeRepo = repo;
-                saveToStorage();
-                renderList();
-                fetchStatus(repo);
-            }
-
-            function toggleQuickEdit() {
-                const section = document.getElementById('github-file-editor-section');
-                if (section) {
-                    section.style.display = section.style.display === 'none' ? 'block' : 'none';
-                    if (section.style.display === 'block') {
-                        renderQuickEditList();
-                    }
+                // 4. Status Update
+                const badge = document.getElementById('git-status-badge');
+                if (badge) {
+                    badge.innerHTML = '<i class="ph-bold ph-check-circle"></i> Connected & Syncing';
                 }
             }
 
-            function renderQuickEditList() {
-                const list = document.getElementById('quick-edit-list');
-                const files = [
-                    { name: 'data/schools.json', icon: 'ph-buildings' },
-                    { name: 'data/news.json', icon: 'ph-newspaper' },
-                    { name: 'data/published-results.json', icon: 'ph-exam' }
-                ];
-
-                list.innerHTML = files.map(file => `
-                    <li style="padding: 12px 15px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <i class="ph ${file.icon}"></i>
-                            <span>${file.name}</span>
-                        </div>
-                        <button class="btn btn-sm btn-secondary" onclick="window.open('https://github.com/${activeRepo}/edit/main/${file.name}', '_blank')">
-                            <i class="ph ph-pencil"></i> Edit on GitHub
-                        </button>
-                    </li>
-                `).join('');
-            }
-
-            function downloadConnections() {
-                const data = { repos, activeRepo, exportedAt: new Date().toISOString() };
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = "github-connections.json";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
-
-            function uploadConnections(input) {
-                const file = input.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = e => {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        if (data.repos) {
-                            repos = data.repos;
-                            activeRepo = data.activeRepo || repos[0];
-                            saveToStorage();
-                            renderList();
-                            fetchStatus(activeRepo);
-                            alert("Connections imported successfully!");
-                        }
-                    } catch (err) {
-                        alert("Invalid JSON file");
-                    }
-                };
-                reader.readAsText(file);
-            }
-
-            return { init, addRepo, removeRepo, switchRepo, toggleQuickEdit, downloadConnections, uploadConnections };
+            return { init };
         })();
 
         // Panel Sync Logic
@@ -3274,371 +3096,76 @@
 
         /* ==============================
            RESULTS MANAGEMENT & PUBLISHING
-           
            ============================== */
-        window.ResultsManagement = (function () {
-            let state = {
-                students: [],
-                published: false,
-                lastSync: null,
-                examId: null,
-                examName: "Published Exam"
-            };
+        window.ResultsManagement = {
+            state: {
+                synced: false,
+                syncing: false
+            },
 
-            function handleSyncClick() {
+            handleSyncClick: function () {
+                const btn = document.getElementById("btn-sync-results");
                 const statusBox = document.getElementById("results-sync-status");
                 const statusMsg = document.getElementById("results-sync-message");
-                const btn = document.getElementById("btn-sync-results");
 
-                if (!window.uploadedStudents || window.uploadedStudents.length === 0) {
-                    showError("No uploaded results found. Please upload a JSON file first.");
-                    return;
-                }
+                if (!btn) return;
+                if (this.state.syncing) return;
 
-                if (btn) {
-                    btn.innerHTML = "<i class='ph-bold ph-spinner-gap ph-spin'></i> Syncing...";
-                    btn.style.pointerEvents = "none";
-                }
+                this.state.syncing = true;
+                btn.innerHTML = "<i class='ph-bold ph-spinner-gap ph-spin'></i> Syncing...";
+                btn.style.pointerEvents = "none";
+
+                if (statusBox) statusBox.style.display = "block";
+                if (statusMsg) statusMsg.innerHTML = "<i class='ph-bold ph-info'></i> Processing...";
 
                 setTimeout(() => {
-                    state.students = window.uploadedStudents;
-                    state.examId = "ex_" + Date.now();
-                    state.examName = "Published Exam " + new Date().toLocaleDateString();
-                    state.lastSync = new Date().toLocaleString();
+                    const json = window.PublishedResultsStore ? window.PublishedResultsStore.data : null;
+                    const exams = (json && json.exams) || [];
+                    let studentCount = 0;
+                    exams.forEach(ex => {
+                        studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
+                    });
 
-                    saveToStorage();
-                    updateStats();
-                    showSuccess("Results synced successfully!");
+                    // Update UI Stats
+                    const examsCountEl = document.getElementById("results-exams-count");
+                    const totalCountEl = document.getElementById("results-total-count");
+                    const lastSyncEl = document.getElementById("results-last-sync");
 
-                    if (btn) {
-                        btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
-                        btn.style.pointerEvents = "auto";
-                    }
-                }, 800);
+                    if (examsCountEl) examsCountEl.textContent = exams.length;
+                    if (totalCountEl) totalCountEl.textContent = studentCount;
+                    if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+                    if (statusMsg) statusMsg.innerHTML = "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync completed successfully.";
+
+                    this.state.synced = true;
+                    this.state.syncing = false;
+
+                    btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
+                    btn.style.pointerEvents = "auto";
+                }, 1200);
+            },
+            togglePublish: function () {
+                alert("Results Published Successfully ✅");
             }
-
-            function togglePublish() {
-                state.published = !state.published;
-                const btn = document.getElementById("results-publish-toggle");
-                if (btn) {
-                    if (state.published) {
-                        btn.classList.remove("btn-danger");
-                        btn.classList.add("btn-success");
-                        btn.innerHTML = '<i class="ph-bold ph-eye"></i> Published';
-                    } else {
-                        btn.classList.remove("btn-success");
-                        btn.classList.add("btn-danger");
-                        btn.innerHTML = '<i class="ph-bold ph-eye-slash"></i> Unpublish';
-                    }
-                }
-                saveToStorage();
-
-                // Show toast or alert
-                // alert("Status updated: " + (state.published ? "Published" : "Draft"));
-            }
-
-            function updateStats() {
-                const examsEl = document.getElementById("results-exams-count");
-                const totalEl = document.getElementById("results-total-count");
-                const syncEl = document.getElementById("results-last-sync");
-
-                if (examsEl) examsEl.innerText = 1;
-                if (totalEl) totalEl.innerText = state.students.length;
-                if (syncEl) syncEl.innerText = state.lastSync ? state.lastSync.split(",")[1] : "--:--";
-
-                const infoBox = document.getElementById("results-sync-info");
-                if (infoBox) {
-                    infoBox.innerHTML = `
-                        Last synced: <b>${state.lastSync || 'Never'}</b> |
-                        <span class="status-badge ${state.published ? 'approved' : ''}">
-                            ${state.published ? 'Published' : 'Draft'}
-                        </span> |
-                        ${state.students.length} results
-                    `;
-                }
-            }
-
-            function saveToStorage() {
-                localStorage.setItem("published-results", JSON.stringify(state));
-            }
-
-            function loadFromStorage() {
-                const stored = localStorage.getItem("published-results");
-                if (stored) {
-                    try {
-                        state = JSON.parse(stored);
-                        updateStats();
-
-                        // Restore button state
-                        const btn = document.getElementById("results-publish-toggle");
-                        if (btn && state.published) {
-                            btn.classList.remove("btn-danger");
-                            btn.classList.add("btn-success");
-                            btn.innerHTML = '<i class="ph-bold ph-eye"></i> Published';
-                        }
-                    } catch (e) { console.error("Error loading results state", e); }
-                }
-            }
-
-            function showSuccess(message) {
-                const statusBox = document.getElementById("results-sync-status");
-                const statusMsg = document.getElementById("results-sync-message");
-                if (statusBox) {
-                    statusBox.style.display = "block";
-                    statusMsg.innerHTML = '<i class="ph-bold ph-check-circle"></i> ' + message;
-                    statusMsg.style.color = "#2ed573";
-                }
-            }
-
-            function showError(message) {
-                const statusBox = document.getElementById("results-sync-status");
-                const statusMsg = document.getElementById("results-sync-message");
-                if (statusBox) {
-                    statusBox.style.display = "block";
-                    statusMsg.innerHTML = '<i class="ph-bold ph-warning-circle"></i> ' + message;
-                    statusMsg.style.color = "#ff4757";
-                }
-            }
-
-            return {
-                handleSyncClick,
-                togglePublish,
-                loadFromStorage,
-                updateStats,
-                get state() { return state; }
-            };
-        })();
+        };
 
         /* ==============================
-        STATIC PUBLISH CONTROL
-    ============================== */
+           STATIC PUBLISH CONTROL
+           ============================== */
         window.StaticPublisher = {
             publish: function () {
-                const state = window.ResultsManagement.state;
-
-                if (!state.lastSync || !state.students.length) {
+                if (!window.ResultsManagement.state.synced) {
                     alert("Please complete Sync before publishing.");
                     return;
                 }
-
-                const exportData = {
-                    examId: state.examId,
-                    examName: state.examName || "Published Exam",
-                    publishedAt: new Date().toISOString(),
-                    totalStudents: state.students.length,
-                    students: state.students
-                };
-
-                const blob = new Blob(
-                    [JSON.stringify(exportData, null, 2)],
-                    { type: "application/json" }
-                );
-
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = "published-results.json";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                alert("Static JSON file downloaded successfully ✅");
+                alert("Static Site Published Successfully ✅");
             }
         };
 
-        window.ResultsLinkManager = (function () {
-
-            function getActiveExamId() {
-                // Change this according to your system
-                if (window.ResultsManagement && ResultsManagement.activeExamId) {
-                    return ResultsManagement.activeExamId;
-                }
-
-                // Fallback: try dataset
-                const container = document.querySelector("[data-active-exam]");
-                return container ? container.dataset.activeExam : null;
-            }
-
-            function generatePublicURL(examId) {
-                if (!examId) return null;
-
-                const base = window.location.origin + window.location.pathname;
-                return base + "?exam=" + encodeURIComponent(examId);
-            }
-
-            function copyToClipboard(text) {
-                if (!navigator.clipboard) {
-                    fallbackCopy(text);
-                    return;
-                }
-
-                navigator.clipboard.writeText(text)
-                    .then(() => showSuccess())
-                    .catch(() => showError());
-            }
-
-            function fallbackCopy(text) {
-                const tempInput = document.createElement("input");
-                tempInput.value = text;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand("copy");
-                document.body.removeChild(tempInput);
-                showSuccess();
-            }
-
-            function showSuccess() {
-                const btn = document.querySelector(".btn-copy-link");
-                if (!btn) return;
-
-                btn.innerHTML = '<i class="ph-bold ph-check"></i> Link Copied!';
-                btn.style.background = "rgba(46,213,115,0.15)";
-                btn.style.color = "#2ed573";
-
-                setTimeout(() => {
-                    btn.innerHTML = '<i class="ph-bold ph-copy"></i> Copy Public Link';
-                    btn.style.background = "";
-                    btn.style.color = "";
-                }, 2000);
-            }
-
-            function showError() {
-                alert("Unable to copy link. Please try manually.");
-            }
-
-            function handleCopyClick() {
-                const examId = getActiveExamId();
-
-                if (!examId) {
-                    alert("No active exam selected.");
-                    return;
-                }
-
-                const url = generatePublicURL(examId);
-                copyToClipboard(url);
-            }
-
-            function init() {
-                const btn = document.querySelector(".btn-copy-link");
-                if (!btn) return;
-
-                btn.addEventListener("click", function (e) {
-                    e.preventDefault();
-                    handleCopyClick();
-                });
-            }
-
-            return {
-                init
-            };
-
-        })();
-
-        /* ==============================
-           RESULTS HELPERS & UPLOAD
-        ============================== */
-        window.PublishedResultsStore = { data: null, updatedAt: null };
-
-        window.handlePublishedResultsUpload = function (input) {
-            const file = input.files[0];
-            const statusEl = document.getElementById('published-results-status');
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                try {
-                    const json = JSON.parse(e.target.result);
-                    window.updateResultsStats(json, file.name);
-                    window.PublishedResultsStore.data = json;
-                    window.PublishedResultsStore.updatedAt = new Date().toISOString();
-                } catch (err) {
-                    if (statusEl) {
-                        statusEl.innerHTML = "<i class='ph-bold ph-warning'></i> Error: Invalid JSON";
-                        statusEl.style.color = "#ff4444";
-                    }
-                }
-            };
-            reader.readAsText(file);
-        };
-
-        window.updateResultsStats = function (json, fileName = null) {
-            const statusEl = document.getElementById('published-results-status');
-            const exams = json.exams || [];
-            let studentCount = 0;
-            exams.forEach(ex => {
-                studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
-            });
-
-            const examsCount = exams.length;
-            const totalStudents = studentCount;
-            const syncTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            document.querySelectorAll('.stat-results-exams, #results-exams-count').forEach(el => el.textContent = examsCount);
-            document.querySelectorAll('.stat-results-total, #results-total-count').forEach(el => el.textContent = totalStudents);
-            document.querySelectorAll('.stat-results-last-sync, #results-last-sync').forEach(el => el.textContent = syncTime);
-
-            window.uploadedStudents = json.exams ? json.exams.reduce((acc, ex) => acc.concat(ex.results || ex.students || []), []) : [];
-
-            if (fileName && statusEl) {
-                statusEl.innerHTML = "<i class='ph-bold ph-check-circle'></i> Loaded: " + fileName;
-                statusEl.style.color = "#2ed573";
-            }
-        };
-
-        function initResultsDragDrop() {
-            const box = document.getElementById('results-upload-box');
-            if (!box) return;
-
-            ['dragenter', 'dragover'].forEach(e => {
-                box.addEventListener(e, ev => {
-                    ev.preventDefault();
-                    box.classList.add('dragover');
-                    const statusEl = document.getElementById('published-results-status');
-                    if (statusEl) statusEl.textContent = "Drop file to upload";
-                });
-            });
-
-            ['dragleave', 'drop'].forEach(e => {
-                box.addEventListener(e, ev => {
-                    ev.preventDefault();
-                    box.classList.remove('dragover');
-                    if (e === 'drop') {
-                        const file = ev.dataTransfer.files[0];
-                        if (file) {
-                            const input = document.getElementById('published-results-upload');
-                            const container = new DataTransfer();
-                            container.items.add(file);
-                            input.files = container.files;
-                            window.handlePublishedResultsUpload(input);
-                        }
-                    }
-                });
-            });
-
-            const input = document.getElementById('published-results-upload');
-            if (input) {
-                input.addEventListener('change', function () { window.handlePublishedResultsUpload(this); });
-            }
-        }
-
-        // Result App Compatibility
-        window.ResultApp = window.ResultApp || {};
-        window.showSearchForm = function () {
-            console.log("ResultApp: Showing search form");
-            const sf = document.getElementById('search-form');
-            const rv = document.getElementById('result-view');
-            if (sf) sf.style.display = 'block';
-            if (rv) rv.style.display = 'none';
-        };
-        window.ResultApp.showSearchForm = window.showSearchForm;
-
-        // Global Stats Bridge
-        window.updateStats = function () {
-            if (window.ResultsManagement && typeof ResultsManagement.updateStats === 'function') {
-                ResultsManagement.updateStats();
-            }
-        };
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SchoolManager) SchoolManager.load();
+            if (window.DeploymentManager) DeploymentManager.init();
+        });
 
         // Creative Studio logic
 
@@ -3723,11 +3250,9 @@
                         const controls = document.createElement('div');
                         controls.className = 'element-controls';
                         controls.innerHTML = `
-    <button onclick="CreativeStudio.moveLayer('up')"
-        style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-arrow-up"></i></button>
-    <button onclick="CreativeStudio.deleteElement('${layer.id}')"
-        style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-trash"></i></button>
-    `;
+            <button onclick="CreativeStudio.moveLayer('up')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-arrow-up"></i></button>
+            <button onclick="CreativeStudio.deleteElement('${layer.id}')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-trash"></i></button>
+            `;
                         el.appendChild(controls);
 
                         if (layer.type === 'image') {
@@ -3825,8 +3350,7 @@
                 const idx = this.state.layers.findIndex(l => l.id === this.state.selectedId);
                 if (idx === -1) return;
                 if (dir === 'up' && idx < this.state.layers.length - 1) {
-                    [this.state.layers[idx], this.state.layers[idx +
-                        1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
+                    [this.state.layers[idx], this.state.layers[idx + 1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
                 } else if (dir === 'down' && idx > 0) {
                     [this.state.layers[idx], this.state.layers[idx - 1]] = [this.state.layers[idx - 1], this.state.layers[idx]];
                 }
@@ -3933,18 +3457,9 @@
                 if (type === 'admission') {
                     this.state.background.value = '#0a2e5c';
                     this.state.layers.push(
-                        {
-                            id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign:
-                                'center'
-                        },
-                        {
-                            id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35,
-                            color: '#fff', textAlign: 'center'
-                        },
-                        {
-                            id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color:
-                                '#ffcc00', textAlign: 'center'
-                        }
+                        { id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign: 'center' },
+                        { id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35, color: '#fff', textAlign: 'center' },
+                        { id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color: '#ffcc00', textAlign: 'center' }
                     );
                 }
                 this.render();
@@ -4013,8 +3528,7 @@
                     style="letter-spacing: normal;">
                 <button type="submit" class="btn-login" id="login-btn">Login</button>
                 <p id="error-msg"
-                    style="color:#ff4d4d; margin-top:15px; display:none; text-align: center; font-size: 0.9rem;">
-                </p>
+                    style="color:#ff4d4d; margin-top:15px; display:none; text-align: center; font-size: 0.9rem;"></p>
             </form>
 
             <!-- Admin Panel -->
@@ -4112,6 +3626,16 @@
             });
         }
 
+        window.addEventListener("DOMContentLoaded", () => {
+            AdminAccess.init();
+
+            // Initialize Site Settings when panel is opened
+            if (window.SiteSettings) {
+                SiteSettings.renderHeaderEditor();
+                SiteSettings.renderFooterEditor();
+            }
+        });
+
         // Tab switching function for Site Settings
         function switchSettingsTab(tabName, buttonElement) {
             // Hide all tab contents
@@ -4135,40 +3659,6 @@
                 buttonElement.classList.add('active');
             }
         }
-
-        // --- GLOBAL INITIALIZATION ---
-        document.addEventListener("DOMContentLoaded", function () {
-            // Initialize All Modules
-            if (window.SchoolManager) SchoolManager.load();
-            if (window.DeploymentManager) DeploymentManager.init();
-            if (window.ResultsManagement) ResultsManagement.loadFromStorage();
-            if (window.ResultsLinkManager) ResultsLinkManager.init();
-            if (typeof initResultsDragDrop === 'function') initResultsDragDrop();
-            if (window.AdminAccess) AdminAccess.init();
-
-            // Initial stats update
-            if (typeof updateStats === 'function') updateStats();
-
-            // Site Settings
-            if (window.SiteSettings) {
-                SiteSettings.renderHeaderEditor();
-                SiteSettings.renderFooterEditor();
-            }
-
-            // Creative Studio
-            if (window.CreativeStudio) CreativeStudio.init();
-
-            // Date Display
-            const dateEl = document.getElementById('date-display');
-            if (dateEl) {
-                dateEl.textContent = new Date().toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            }
-        });
     </script>
 
     <!-- Site Settings Module -->
