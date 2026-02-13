@@ -690,7 +690,7 @@
             </div>
 
             <div class="nav-item" onclick="switchPanel('header', this)">
-                <i class="ph-bold ph-gear" style="color: #ff9f43;"></i> Site Settings
+                <i class="ph-bold ph-student" style="color: #ff9f43;"></i> Site Settings
             </div>
 
 
@@ -3097,64 +3097,133 @@
         /* ==============================
            RESULTS MANAGEMENT & PUBLISHING
            ============================== */
-        window.ResultsManagement = {
-            state: {
-                synced: false,
-                syncing: false
-            },
+        window.ResultsManagement = (function () {
+            let state = {
+                students: [],
+                published: false,
+                lastSync: null,
+                examId: null
+            };
 
-            handleSyncClick: function () {
-                const btn = document.getElementById("btn-sync-results");
+            function handleSyncClick() {
                 const statusBox = document.getElementById("results-sync-status");
                 const statusMsg = document.getElementById("results-sync-message");
 
-                if (!btn) return;
-                if (this.state.syncing) return;
+                if (!window.uploadedStudents || window.uploadedStudents.length === 0) {
+                    showError("No uploaded results found. Please upload a JSON file first.");
+                    return;
+                }
 
-                this.state.syncing = true;
-                btn.innerHTML = "<i class='ph-bold ph-spinner-gap ph-spin'></i> Syncing...";
-                btn.style.pointerEvents = "none";
+                state.students = window.uploadedStudents;
+                state.examId = "ex_" + Date.now();
+                state.lastSync = new Date().toLocaleString();
 
-                if (statusBox) statusBox.style.display = "block";
-                if (statusMsg) statusMsg.innerHTML = "<i class='ph-bold ph-info'></i> Processing...";
-
-                setTimeout(() => {
-                    const json = window.PublishedResultsStore ? window.PublishedResultsStore.data : null;
-                    const exams = (json && json.exams) || [];
-                    let studentCount = 0;
-                    exams.forEach(ex => {
-                        studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
-                    });
-
-                    // Update UI Stats
-                    const examsCountEl = document.getElementById("results-exams-count");
-                    const totalCountEl = document.getElementById("results-total-count");
-                    const lastSyncEl = document.getElementById("results-last-sync");
-
-                    if (examsCountEl) examsCountEl.textContent = exams.length;
-                    if (totalCountEl) totalCountEl.textContent = studentCount;
-                    if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-                    if (statusMsg) statusMsg.innerHTML = "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync completed successfully.";
-
-                    this.state.synced = true;
-                    this.state.syncing = false;
-
-                    btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
-                    btn.style.pointerEvents = "auto";
-                }, 1200);
-            },
-            togglePublish: function () {
-                alert("Results Published Successfully ✅");
+                saveToStorage();
+                updateStats();
+                showSuccess("Results synced successfully!");
             }
-        };
+
+            function togglePublish() {
+                state.published = !state.published;
+                const btn = document.getElementById("results-publish-toggle");
+                if (btn) {
+                    if (state.published) {
+                        btn.classList.remove("btn-danger");
+                        btn.classList.add("btn-success");
+                        btn.innerHTML = '<i class="ph-bold ph-eye"></i> Published';
+                    } else {
+                        btn.classList.remove("btn-success");
+                        btn.classList.add("btn-danger");
+                        btn.innerHTML = '<i class="ph-bold ph-eye-slash"></i> Unpublish';
+                    }
+                }
+                saveToStorage();
+
+                // Show toast or alert
+                // alert("Status updated: " + (state.published ? "Published" : "Draft"));
+            }
+
+            function updateStats() {
+                const examsEl = document.getElementById("results-exams-count");
+                const totalEl = document.getElementById("results-total-count");
+                const syncEl = document.getElementById("results-last-sync");
+
+                if (examsEl) examsEl.innerText = 1;
+                if (totalEl) totalEl.innerText = state.students.length;
+                if (syncEl) syncEl.innerText = state.lastSync ? state.lastSync.split(",")[1] : "--:--";
+
+                const infoBox = document.getElementById("results-sync-info");
+                if (infoBox) {
+                    infoBox.innerHTML = `
+                        Last synced: <b>${state.lastSync || 'Never'}</b> |
+                        <span class="status-badge ${state.published ? 'approved' : ''}">
+                            ${state.published ? 'Published' : 'Draft'}
+                        </span> |
+                        ${state.students.length} results
+                    `;
+                }
+            }
+
+            function saveToStorage() {
+                localStorage.setItem("published-results", JSON.stringify(state));
+            }
+
+            function loadFromStorage() {
+                const stored = localStorage.getItem("published-results");
+                if (stored) {
+                    try {
+                        state = JSON.parse(stored);
+                        updateStats();
+
+                        // Restore button state
+                        const btn = document.getElementById("results-publish-toggle");
+                        if (btn && state.published) {
+                            btn.classList.remove("btn-danger");
+                            btn.classList.add("btn-success");
+                            btn.innerHTML = '<i class="ph-bold ph-eye"></i> Published';
+                        }
+                    } catch (e) { console.error("Error loading results state", e); }
+                }
+            }
+
+            function showSuccess(message) {
+                const statusBox = document.getElementById("results-sync-status");
+                const statusMsg = document.getElementById("results-sync-message");
+                if (statusBox) {
+                    statusBox.style.display = "block";
+                    statusMsg.innerHTML = '<i class="ph-bold ph-check-circle"></i> ' + message;
+                    statusMsg.style.color = "#2ed573";
+                }
+            }
+
+            function showError(message) {
+                const statusBox = document.getElementById("results-sync-status");
+                const statusMsg = document.getElementById("results-sync-message");
+                if (statusBox) {
+                    statusBox.style.display = "block";
+                    statusMsg.innerHTML = '<i class="ph-bold ph-warning-circle"></i> ' + message;
+                    statusMsg.style.color = "#ff4757";
+                }
+            }
+
+            return {
+                handleSyncClick,
+                togglePublish,
+                loadFromStorage,
+                get state() { return state; }
+            };
+        })();
+
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.ResultsManagement) ResultsManagement.loadFromStorage();
+        });
 
         /* ==============================
-           STATIC PUBLISH CONTROL
-           ============================== */
+        STATIC PUBLISH CONTROL
+        ============================== */
         window.StaticPublisher = {
             publish: function () {
-                if (!window.ResultsManagement.state.synced) {
+                if (!window.ResultsManagement.state.lastSync) {
                     alert("Please complete Sync before publishing.");
                     return;
                 }
@@ -3250,9 +3319,11 @@
                         const controls = document.createElement('div');
                         controls.className = 'element-controls';
                         controls.innerHTML = `
-            <button onclick="CreativeStudio.moveLayer('up')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-arrow-up"></i></button>
-            <button onclick="CreativeStudio.deleteElement('${layer.id}')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-trash"></i></button>
-            `;
+    <button onclick="CreativeStudio.moveLayer('up')"
+        style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-arrow-up"></i></button>
+    <button onclick="CreativeStudio.deleteElement('${layer.id}')"
+        style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-trash"></i></button>
+    `;
                         el.appendChild(controls);
 
                         if (layer.type === 'image') {
@@ -3350,7 +3421,8 @@
                 const idx = this.state.layers.findIndex(l => l.id === this.state.selectedId);
                 if (idx === -1) return;
                 if (dir === 'up' && idx < this.state.layers.length - 1) {
-                    [this.state.layers[idx], this.state.layers[idx + 1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
+                    [this.state.layers[idx], this.state.layers[idx +
+                        1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
                 } else if (dir === 'down' && idx > 0) {
                     [this.state.layers[idx], this.state.layers[idx - 1]] = [this.state.layers[idx - 1], this.state.layers[idx]];
                 }
@@ -3457,9 +3529,18 @@
                 if (type === 'admission') {
                     this.state.background.value = '#0a2e5c';
                     this.state.layers.push(
-                        { id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign: 'center' },
-                        { id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35, color: '#fff', textAlign: 'center' },
-                        { id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color: '#ffcc00', textAlign: 'center' }
+                        {
+                            id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign:
+                                'center'
+                        },
+                        {
+                            id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35,
+                            color: '#fff', textAlign: 'center'
+                        },
+                        {
+                            id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color:
+                                '#ffcc00', textAlign: 'center'
+                        }
                     );
                 }
                 this.render();
@@ -3528,7 +3609,8 @@
                     style="letter-spacing: normal;">
                 <button type="submit" class="btn-login" id="login-btn">Login</button>
                 <p id="error-msg"
-                    style="color:#ff4d4d; margin-top:15px; display:none; text-align: center; font-size: 0.9rem;"></p>
+                    style="color:#ff4d4d; margin-top:15px; display:none; text-align: center; font-size: 0.9rem;">
+                </p>
             </form>
 
             <!-- Admin Panel -->
