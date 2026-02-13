@@ -17,7 +17,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="../../assets/js/pro-exam.js"></script>
-    <script src="../../assets/js/auth-manager.js"></script>
     <style>
         :root {
             --primary-color: #00f3ff;
@@ -1567,178 +1566,182 @@
                         </div>
 
                         <!-- NEW: Upload Published Results Section -->
-                        <div class="upload-section" id="results-upload-box"
-                            style="margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; text-align: center; transition: 0.3s;">
-                            <label for="published-results-upload" class="btn btn-sm btn-subtle"
-                                style="display: inline-flex; width: auto; cursor: pointer; border: 1px dashed #555; color: #ccc;">
-                                <i class="ph ph-upload-simple"></i> Upload Results JSON
-                            </label>
-                            <input type="file" id="published-results-upload" accept=".json" style="display: none;">
-                            <div id="published-results-status"
-                                style="margin-top: 10px; font-size: 0.8rem; color: #888;">
-                                No results file loaded.
+                        <div class="upload-box" id="results-upload-box"
+                            style="margin-top: 25px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px; transition: 0.3s; border-radius: 12px;">
+                            <h5 style="color: #fff; margin-bottom: 12px; font-size: 0.9rem;">Verify & Preview Published
+                                File</h5>
+
+                            <input type="file" id="published-results-upload" accept=".json" style="display: none;"
+                                onchange="handlePublishedResultsUpload(this)">
+
+                            <div class="upload-actions" style="display: flex; gap: 10px;">
+                                <button class="btn btn-sm btn-subtle"
+                                    onclick="document.getElementById('published-results-upload').click()"
+                                    style="flex: 1; border: 1px dashed #555; color: #ccc;">
+                                    <i class="ph-bold ph-upload-simple"></i> Select JSON
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="clearPublishedResults()"
+                                    style="width: 45px;">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
                             </div>
+
+                            <div id="published-results-status"
+                                style="margin-top: 10px; font-size: 0.8rem; color: #888; text-align: center;">
+                                No file uploaded
+                            </div>
+
+                            <!-- Search/Detail View Placeholders for Preview Flow -->
+                            <div id="search-form" style="margin-top: 20px; display: none;"></div>
+                            <div id="result-view" style="margin-top: 20px; display: none;"></div>
                         </div>
 
-                        <!-- Search/Detail View Placeholders for Preview Flow -->
-                        <div id="search-form" style="margin-top: 20px; display: none;"></div>
-                        <div id="result-view" style="margin-top: 20px; display: none;"></div>
-                    </div>
-
-                    <style>
-                        .upload-section.dragover {
-                            background: rgba(0, 243, 255, 0.05) !important;
-                            border: 1px dashed var(--primary-color) !important;
-                        }
-                    </style>
-
-                    <script>
-                        // --- GLOBAL STORE ---
-                        window.PublishedResultsStore = {
-                            data: null,
-                            updatedAt: null
-                        };
-
-                        // DRAG & DROP SUPPORT
-                        (function () {
-                            const box = document.getElementById('results-upload-box');
-                            if (!box) return;
-
-                            ['dragenter', 'dragover'].forEach(e => {
-                                box.addEventListener(e, ev => {
-                                    ev.preventDefault();
-                                    box.classList.add('dragover');
-                                    const statusEl = document.getElementById('published-results-status');
-                                    if (statusEl) statusEl.textContent = "Drop file to upload";
-                                });
-                            });
-
-                            ['dragleave', 'drop'].forEach(e => {
-                                box.addEventListener(e, ev => {
-                                    ev.preventDefault();
-                                    box.classList.remove('dragover');
-                                    if (e === 'drop') {
-                                        const file = ev.dataTransfer.files[0];
-                                        if (file) {
-                                            const input = document.getElementById('published-results-upload');
-                                            const container = new DataTransfer();
-                                            container.items.add(file);
-                                            input.files = container.files;
-                                            window.handlePublishedResultsUpload(input);
-                                        }
-                                    }
-                                });
-                            });
-
-                            // Manual input change listener
-                            const input = document.getElementById('published-results-upload');
-                            if (input) {
-                                input.addEventListener('change', function () {
-                                    window.handlePublishedResultsUpload(this);
-                                });
+                        <style>
+                            .upload-box.dragover {
+                                background: rgba(0, 243, 255, 0.05);
+                                border: 1px solid var(--primary-color);
                             }
-                        })();
+                        </style>
 
-                        // FILE UPLOAD & STATS LOGIC
-                        window.handlePublishedResultsUpload = function (input) {
-                            const file = input.files[0];
-                            const statusEl = document.getElementById('published-results-status');
+                        <script>
+                            // --- GLOBAL STORE ---
+                            window.PublishedResultsStore = {
+                                data: null,
+                                updatedAt: null
+                            };
 
-                            if (!file) return;
+                            // DRAG & DROP SUPPORT
+                            (function () {
+                                const box = document.getElementById('results-upload-box');
+                                if (!box) return;
 
-                            const reader = new FileReader();
-                            reader.onload = function (e) {
-                                try {
-                                    const json = JSON.parse(e.target.result);
-                                    window.updateResultsStats(json, file.name);
-                                    window.PublishedResultsStore.data = json;
-                                    window.PublishedResultsStore.updatedAt = new Date().toISOString();
-                                } catch (err) {
-                                    statusEl.innerHTML = "<i class='ph-bold ph-warning'></i> Error: Invalid JSON";
-                                    statusEl.style.color = "#ff4444";
+                                ['dragenter', 'dragover'].forEach(e => {
+                                    box.addEventListener(e, ev => {
+                                        ev.preventDefault();
+                                        box.classList.add('dragover');
+                                        const statusEl = document.getElementById('published-results-status');
+                                        if (statusEl) statusEl.textContent = "Drop file to upload";
+                                    });
+                                });
+
+                                ['dragleave', 'drop'].forEach(e => {
+                                    box.addEventListener(e, ev => {
+                                        ev.preventDefault();
+                                        box.classList.remove('dragover');
+                                        if (e === 'drop') {
+                                            const file = ev.dataTransfer.files[0];
+                                            if (file) {
+                                                const input = document.getElementById('published-results-upload');
+                                                const container = new DataTransfer();
+                                                container.items.add(file);
+                                                input.files = container.files;
+                                                window.handlePublishedResultsUpload(input);
+                                            }
+                                        }
+                                    });
+                                });
+                            })();
+
+                            // FILE UPLOAD & STATS LOGIC
+                            window.handlePublishedResultsUpload = function (input) {
+                                const file = input.files[0];
+                                const statusEl = document.getElementById('published-results-status');
+
+                                if (!file) return;
+
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    try {
+                                        const json = JSON.parse(e.target.result);
+                                        window.updateResultsStats(json, file.name);
+                                        window.PublishedResultsStore.data = json;
+                                        window.PublishedResultsStore.updatedAt = new Date().toISOString();
+                                    } catch (err) {
+                                        statusEl.innerHTML = "<i class='ph-bold ph-warning'></i> Error: Invalid JSON";
+                                        statusEl.style.color = "#ff4444";
+                                    }
+                                };
+                                reader.readAsText(file);
+                            };
+
+                            window.updateResultsStats = function (json, fileName = null) {
+                                const statusEl = document.getElementById('published-results-status');
+                                const exams = json.exams || [];
+                                let studentCount = 0;
+                                exams.forEach(ex => {
+                                    studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
+                                });
+
+                                document.getElementById('results-exams-count').textContent = exams.length;
+                                document.getElementById('results-total-count').textContent = studentCount;
+                                document.getElementById('results-last-sync').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                                if (fileName) {
+                                    statusEl.innerHTML = "<i class='ph-bold ph-check-circle'></i> Loaded: " + fileName;
+                                    statusEl.style.color = "#2ed573";
                                 }
                             };
-                            reader.readAsText(file);
-                        };
 
-                        window.updateResultsStats = function (json, fileName = null) {
-                            const statusEl = document.getElementById('published-results-status');
-                            const exams = json.exams || [];
-                            let studentCount = 0;
-                            exams.forEach(ex => {
-                                studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
-                            });
+                            window.clearPublishedResults = function () {
+                                window.PublishedResultsStore.data = null;
+                                document.getElementById('published-results-upload').value = '';
+                                document.getElementById('published-results-status').textContent = 'No file uploaded';
+                                document.getElementById('published-results-status').style.color = '#888';
 
-                            document.getElementById('results-exams-count').textContent = exams.length;
-                            document.getElementById('results-total-count').textContent = studentCount;
-                            document.getElementById('results-last-sync').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                // Reset stats
+                                document.getElementById('results-exams-count').textContent = '0';
+                                document.getElementById('results-total-count').textContent = '0';
+                                document.getElementById('results-last-sync').textContent = '--:--';
+                            };
 
-                            if (fileName) {
-                                statusEl.innerHTML = "<i class='ph-bold ph-check-circle'></i> Loaded: " + fileName;
-                                statusEl.style.color = "#2ed573";
+                            // RESULT APP SHIM (Navigation support)
+                            window.ResultApp = window.ResultApp || {};
+
+                            function showSearchForm() {
+                                console.log("ResultApp: Showing search form");
+                                if (document.getElementById('search-form')) document.getElementById('search-form').style.display = 'block';
+                                if (document.getElementById('result-view')) document.getElementById('result-view').style.display = 'none';
+
+                                // Also reset the table view if needed
+                                const tbody = document.getElementById('results-table-body');
+                                if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#666;">Ready to sync.</td></tr>';
                             }
-                        };
 
-                        window.clearPublishedResults = function () {
-                            window.PublishedResultsStore.data = null;
-                            document.getElementById('published-results-upload').value = '';
-                            document.getElementById('published-results-status').textContent = 'No file uploaded';
-                            document.getElementById('published-results-status').style.color = '#888';
-
-                            // Reset stats
-                            document.getElementById('results-exams-count').textContent = '0';
-                            document.getElementById('results-total-count').textContent = '0';
-                            document.getElementById('results-last-sync').textContent = '--:--';
-                        };
-
-                        // RESULT APP SHIM (Navigation support)
-                        window.ResultApp = window.ResultApp || {};
-
-                        function showSearchForm() {
-                            console.log("ResultApp: Showing search form");
-                            if (document.getElementById('search-form')) document.getElementById('search-form').style.display = 'block';
-                            if (document.getElementById('result-view')) document.getElementById('result-view').style.display = 'none';
-
-                            // Also reset the table view if needed
-                            const tbody = document.getElementById('results-table-body');
-                            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#666;">Ready to sync.</td></tr>';
-                        }
-
-                        window.showSearchForm = showSearchForm;
-                        window.ResultApp.showSearchForm = showSearchForm;
-                    </script>
+                            window.showSearchForm = showSearchForm;
+                            window.ResultApp.showSearchForm = showSearchForm;
+                        </script>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- PREVIEW / RESULTS TABLE -->
-        <div style="margin-top: 30px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h4 style="margin: 0; color: #fff;">Synced Data Preview</h4>
-                <div id="results-sync-info-header" style="font-size: 0.8rem; color: #888;"></div>
+            <!-- PREVIEW / RESULTS TABLE -->
+            <div style="margin-top: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="margin: 0; color: #fff;">Synced Data Preview</h4>
+                    <div id="results-sync-info-header" style="font-size: 0.8rem; color: #888;"></div>
+                </div>
+                <div style="overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Exam</th>
+                                <th>Total</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body">
+                            <tr>
+                                <td colspan="6" style="text-align:center; padding: 30px; color: #666;">Ready to sync.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div style="overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Roll No</th>
-                            <th>Name</th>
-                            <th>Exam</th>
-                            <th>Total</th>
-                            <th>Grade</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="results-table-body">
-                        <tr>
-                            <td colspan="6" style="text-align:center; padding: 30px; color: #666;">Ready to sync.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
         </div>
 
         <!-- 8. ANALYTICS PANEL -->
@@ -3004,69 +3007,184 @@
            GitHub Deployment Manager 
            ============================== */
         const DeploymentManager = (function () {
-            const REPO = "Sareef6235/muhsinu2";
-            const API_URL = `https://api.github.com/repos/${REPO}`;
+            let connections = [];
+            const STORAGE_KEY = 'mifthah_repo_connections';
 
-            async function init() {
-                console.log('📡 DeploymentManager: Initializing live status...');
+            function save() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(connections));
+            }
+
+            function load() {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    connections = JSON.parse(stored);
+                } else {
+                    // Default if empty
+                    connections = [{ name: "Sareef6235/muhsinu2", branch: "main" }];
+                    save();
+                }
+                renderRepoList();
+                if (connections.length > 0) selectRepo(0);
+            }
+
+            function renderRepoList() {
+                const list = document.getElementById('repo-list');
+                if (!list) return;
+                list.innerHTML = connections.map((repo, index) => `
+                    <li style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                        <div style="cursor: pointer; flex: 1;" onclick="DeploymentManager.selectRepo(${index})">
+                            <p style="margin: 0; font-weight: 600; color: ${repo.active ? 'var(--primary-color)' : '#fff'}">${repo.name}</p>
+                            <p style="margin: 0; font-size: 0.8rem; color: #666;">Branch: ${repo.branch}</p>
+                        </div>
+                        <button class="btn btn-mini btn-danger" onclick="DeploymentManager.deleteRepo(${index})">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    </li>
+                `).join('');
+            }
+
+            function addRepo() {
+                const nameInput = document.getElementById('repo-name-input');
+                const branchInput = document.getElementById('repo-branch-input');
+                if (!nameInput || !nameInput.value) return alert("Please enter repository name");
+
+                connections.push({
+                    name: nameInput.value.trim(),
+                    branch: branchInput.value.trim() || "main"
+                });
+                nameInput.value = '';
+                branchInput.value = '';
+                save();
+                renderRepoList();
+            }
+
+            function deleteRepo(index) {
+                if (confirm("Remove this repository connection?")) {
+                    connections.splice(index, 1);
+                    save();
+                    renderRepoList();
+                }
+            }
+
+            function selectRepo(index) {
+                connections.forEach((c, i) => c.active = (i === index));
+                const repo = connections[index];
+                document.getElementById('active-repo-status').style.display = 'block';
+                document.getElementById('status-repo-name').textContent = repo.name;
+                init(repo.name, repo.branch);
+                renderRepoList();
+            }
+
+            async function init(repoPath, branchName) {
+                const repo = repoPath || connections.find(c => c.active)?.name || "Sareef6235/muhsinu2";
+                const branch = branchName || connections.find(c => c.active)?.branch || "main";
+                const API_URL = `https://api.github.com/repos/${repo}`;
+
+                console.log(`📡 DeploymentManager: Loading ${repo} (${branch})...`);
+                const badge = document.getElementById('git-status-badge');
+                if (badge) badge.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Connecting...';
+
                 try {
-                    await Promise.all([
-                        fetchRepoInfo(),
-                        fetchLatestCommit()
+                    const [repoRes, commitRes] = await Promise.all([
+                        fetch(API_URL),
+                        fetch(`${API_URL}/commits/${branch}`)
                     ]);
+
+                    if (!repoRes.ok || !commitRes.ok) throw new Error("GitHub API Error");
+
+                    const repoData = await repoRes.json();
+                    const commitData = await commitRes.json();
+
+                    // Update UI
+                    document.getElementById('git-branch-name').innerHTML = `<i class="ph ph-git-branch"></i> ${branch}`;
+                    document.getElementById('git-last-commit').textContent = `"${commitData.commit.message.split('\n')[0]}"`;
+                    document.getElementById('git-last-author').textContent = commitData.commit.author.name;
+                    document.getElementById('last-deploy-time').textContent = new Date(commitData.commit.author.date).toLocaleString();
+
+                    const avatarEl = document.getElementById('git-author-avatar');
+                    if (avatarEl && commitData.author) {
+                        avatarEl.innerHTML = `<img src="${commitData.author.avatar_url}" style="width:100%; height:100%; object-fit:cover;">`;
+                    }
+
+                    if (badge) {
+                        badge.innerHTML = '<i class="ph-bold ph-check-circle"></i> Connected';
+                        badge.style.color = '#2ed573';
+                        badge.style.background = 'rgba(46, 213, 115, 0.1)';
+                    }
+
+                    // Update Links
+                    document.getElementById('btn-view-repo').onclick = () => window.open(repoData.html_url, '_blank');
+                    document.getElementById('btn-view-actions').onclick = () => window.open(`${repoData.html_url}/actions`, '_blank');
+
                 } catch (err) {
                     console.warn("⚠️ GitHub API Error:", err);
-                    document.getElementById('git-status-badge').innerHTML = '<i class="ph ph-warning-circle"></i> API Offline';
-                    document.getElementById('git-status-badge').style.color = '#ff4757';
-                    document.getElementById('git-status-badge').style.background = 'rgba(255, 71, 87, 0.1)';
+                    if (badge) {
+                        badge.innerHTML = '<i class="ph ph-warning-circle"></i> API Offline';
+                        badge.style.color = '#ff4757';
+                        badge.style.background = 'rgba(255, 71, 87, 0.1)';
+                    }
                 }
             }
 
-            async function fetchRepoInfo() {
-                const res = await fetch(API_URL);
-                if (!res.ok) throw new Error("Repo fetch failed");
-                const data = await res.json();
-
-                const repoNameEl = document.getElementById('git-repo-name');
-                if (repoNameEl) repoNameEl.textContent = data.full_name;
-
-                const branchEl = document.getElementById('git-branch-name');
-                if (branchEl) branchEl.innerHTML = `<i class="ph ph-git-branch"></i> ${data.default_branch}`;
+            function downloadConnections() {
+                const blob = new Blob([JSON.stringify(connections, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `repo-connections-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
             }
 
-            async function fetchLatestCommit() {
-                const res = await fetch(`${API_URL}/commits/main`);
-                if (!res.ok) throw new Error("Commit fetch failed");
-                const data = await res.json();
+            function uploadConnections(input) {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (Array.isArray(data)) {
+                            connections = data;
+                            save();
+                            renderRepoList();
+                            if (connections.length > 0) selectRepo(0);
+                            alert("Connections imported successfully!");
+                        }
+                    } catch (err) { alert("Invalid JSON file"); }
+                };
+                reader.readAsText(file);
+            }
 
-                // 1. Commit Message
-                const commitEl = document.getElementById('git-last-commit');
-                if (commitEl) commitEl.textContent = `"${data.commit.message.split('\n')[0]}"`;
+            function toggleQuickEdit() {
+                const section = document.getElementById('github-file-editor-section');
+                const list = document.getElementById('quick-edit-list');
+                const isHidden = section.style.display === 'none' || !section.style.display;
 
-                // 2. Author info
-                const authorEl = document.getElementById('git-last-author');
-                if (authorEl) authorEl.textContent = data.commit.author.name;
+                if (isHidden) {
+                    section.style.display = 'block';
+                    const files = [
+                        'index.html',
+                        'pages/admin/dashboard.html',
+                        'pages/results/results.js',
+                        'assets/css/styles.css',
+                        'data/schools.json'
+                    ];
+                    const active = connections.find(c => c.active) || connections[0];
+                    const repoUrl = `https://github.com/${active.name}/edit/${active.branch}`;
 
-                const avatarEl = document.getElementById('git-author-avatar');
-                if (avatarEl && data.author) {
-                    avatarEl.innerHTML = `<img src="${data.author.avatar_url}" style="width:100%; height:100%; object-fit:cover;">`;
-                }
-
-                // 3. Date
-                const dateEl = document.getElementById('last-deploy-time');
-                if (dateEl) {
-                    const commitDate = new Date(data.commit.author.date);
-                    dateEl.textContent = commitDate.toLocaleString();
-                }
-
-                // 4. Status Update
-                const badge = document.getElementById('git-status-badge');
-                if (badge) {
-                    badge.innerHTML = '<i class="ph-bold ph-check-circle"></i> Connected & Syncing';
+                    list.innerHTML = files.map(file => `
+                        <li style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.9rem; color: #ccc;"><i class="ph ph-file-code"></i> ${file}</span>
+                            <button class="btn btn-sm btn-subtle" onclick="window.open('${repoUrl}/${file}', '_blank')">
+                                <i class="ph ph-pencil-line"></i> Edit
+                            </button>
+                        </li>
+                    `).join('');
+                } else {
+                    section.style.display = 'none';
                 }
             }
 
-            return { init };
+            return { init: load, addRepo, deleteRepo, selectRepo, downloadConnections, uploadConnections, toggleQuickEdit };
         })();
 
         // Panel Sync Logic
@@ -3167,32 +3285,31 @@
             if (window.DeploymentManager) DeploymentManager.init();
         });
 
-        // Creative Studio logic
-
-        window.CreativeStudio = {
-            state: {
+        <script>
+            window.CreativeStudio = {
+                state: {
                 layers: [],
-                background: { type: 'color', value: '#111111', image: null },
-                size: { width: 1080, height: 1080, label: 'Instagram Post', key: 'post' },
-                selectedId: null,
-                isDragging: false,
-                initialized: false
+            background: {type: 'color', value: '#111111', image: null },
+            size: {width: 1080, height: 1080, label: 'Instagram Post', key: 'post' },
+            selectedId: null,
+            isDragging: false,
+            initialized: false
             },
 
             presets: {
-                post: { w: 1080, h: 1080, label: 'Instagram Post' },
-                story: { w: 1080, h: 1920, label: 'Instagram Story' },
-                banner: { w: 1920, h: 600, label: 'Web Banner' },
-                a4: { w: 2480, h: 3508, label: 'A4 Document' }
+                post: {w: 1080, h: 1080, label: 'Instagram Post' },
+            story: {w: 1080, h: 1920, label: 'Instagram Story' },
+            banner: {w: 1920, h: 600, label: 'Web Banner' },
+            a4: {w: 2480, h: 3508, label: 'A4 Document' }
             },
 
             init() {
                 if (this.state.initialized) return;
-                console.log("🎨 CreativeStudio: Initializing...");
-                this.loadDraft();
-                this.setupDragEvents();
-                this.state.initialized = true;
-                this.render();
+            console.log("🎨 CreativeStudio: Initializing...");
+            this.loadDraft();
+            this.setupDragEvents();
+            this.state.initialized = true;
+            this.render();
 
                 // Keep draft updated
                 setInterval(() => this.saveDraft(), 5000);
@@ -3200,187 +3317,187 @@
 
             render() {
                 const canvas = document.getElementById('design-canvas');
-                if (!canvas) return;
+            if (!canvas) return;
 
-                // 1. Update Canvas Size
-                const viewport = document.getElementById('canvas-viewport');
-                const vWidth = viewport.clientWidth - 80;
-                const vHeight = viewport.clientHeight - 80;
-                const scale = Math.min(vWidth / this.state.size.width, vHeight / this.state.size.height, 1);
+            // 1. Update Canvas Size
+            const viewport = document.getElementById('canvas-viewport');
+            const vWidth = viewport.clientWidth - 80;
+            const vHeight = viewport.clientHeight - 80;
+            const scale = Math.min(vWidth / this.state.size.width, vHeight / this.state.size.height, 1);
 
-                canvas.style.width = this.state.size.width + 'px';
-                canvas.style.height = this.state.size.height + 'px';
-                canvas.style.transform = `scale(${scale})`;
-                canvas.style.background = this.state.background.type === 'color' ? this.state.background.value : 'none';
+            canvas.style.width = this.state.size.width + 'px';
+            canvas.style.height = this.state.size.height + 'px';
+            canvas.style.transform = `scale(${scale})`;
+            canvas.style.background = this.state.background.type === 'color' ? this.state.background.value : 'none';
 
-                if (this.state.background.image) {
-                    canvas.style.backgroundImage = `url(${this.state.background.image})`;
-                    canvas.style.backgroundSize = 'cover';
-                    canvas.style.backgroundPosition = 'center';
+            if (this.state.background.image) {
+                canvas.style.backgroundImage = `url(${this.state.background.image})`;
+            canvas.style.backgroundSize = 'cover';
+            canvas.style.backgroundPosition = 'center';
                 } else {
-                    canvas.style.backgroundImage = 'none';
+                canvas.style.backgroundImage = 'none';
                 }
 
-                // 2. Render Layers
-                canvas.innerHTML = '';
+            // 2. Render Layers
+            canvas.innerHTML = '';
                 this.state.layers.forEach(layer => {
                     const el = document.createElement('div');
-                    el.className = `canvas-element ${this.state.selectedId === layer.id ? 'selected' : ''}`;
-                    el.id = `layer-${layer.id}`;
-                    el.style.left = layer.x + 'px';
-                    el.style.top = layer.y + 'px';
-                    el.style.zIndex = layer.zIndex;
-                    el.style.color = layer.color || '#fff';
-                    el.style.fontSize = (layer.fontSize || 40) + 'px';
-                    el.style.textAlign = layer.textAlign || 'center';
-                    el.style.opacity = layer.opacity !== undefined ? layer.opacity : 1;
+            el.className = `canvas-element ${this.state.selectedId === layer.id ? 'selected' : ''}`;
+            el.id = `layer-${layer.id}`;
+            el.style.left = layer.x + 'px';
+            el.style.top = layer.y + 'px';
+            el.style.zIndex = layer.zIndex;
+            el.style.color = layer.color || '#fff';
+            el.style.fontSize = (layer.fontSize || 40) + 'px';
+            el.style.textAlign = layer.textAlign || 'center';
+            el.style.opacity = layer.opacity !== undefined ? layer.opacity : 1;
 
-                    if (layer.type === 'text') {
-                        el.innerText = layer.content;
+            if (layer.type === 'text') {
+                el.innerText = layer.content;
                     } else if (layer.type === 'image') {
                         const img = document.createElement('img');
-                        img.src = layer.content;
-                        img.style.width = layer.width + 'px';
-                        img.style.pointerEvents = 'none';
-                        el.appendChild(img);
+            img.src = layer.content;
+            img.style.width = layer.width + 'px';
+            img.style.pointerEvents = 'none';
+            el.appendChild(img);
                     }
 
-                    // Handles
-                    if (this.state.selectedId === layer.id) {
+            // Handles
+            if (this.state.selectedId === layer.id) {
                         const controls = document.createElement('div');
-                        controls.className = 'element-controls';
-                        controls.innerHTML = `
+            controls.className = 'element-controls';
+            controls.innerHTML = `
             <button onclick="CreativeStudio.moveLayer('up')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-arrow-up"></i></button>
             <button onclick="CreativeStudio.deleteElement('${layer.id}')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-trash"></i></button>
             `;
-                        el.appendChild(controls);
+            el.appendChild(controls);
 
-                        if (layer.type === 'image') {
+            if (layer.type === 'image') {
                             const resize = document.createElement('div');
-                            resize.className = 'resize-handle';
+            resize.className = 'resize-handle';
                             resize.onmousedown = (e) => this.startResize(e, layer.id);
-                            el.appendChild(resize);
+            el.appendChild(resize);
                         }
                     }
 
                     el.onmousedown = (e) => {
                         if (e.target.className.includes('resize-handle')) return;
-                        this.selectElement(layer.id);
-                        this.startDrag(e, layer.id);
+            this.selectElement(layer.id);
+            this.startDrag(e, layer.id);
                     };
 
-                    canvas.appendChild(el);
+            canvas.appendChild(el);
                 });
 
-                this.updatePropertiesPanel();
+            this.updatePropertiesPanel();
             },
 
             addText() {
                 const id = 'text_' + Date.now();
-                this.state.layers.push({
-                    id, type: 'text', content: 'Double click to edit',
-                    x: 50, y: 50, zIndex: this.state.layers.length + 1,
-                    fontSize: 40, color: '#ffffff', textAlign: 'center'
+            this.state.layers.push({
+                id, type: 'text', content: 'Double click to edit',
+            x: 50, y: 50, zIndex: this.state.layers.length + 1,
+            fontSize: 40, color: '#ffffff', textAlign: 'center'
                 });
-                this.state.selectedId = id;
-                this.render();
+            this.state.selectedId = id;
+            this.render();
             },
 
             handleLogoUpload(input) {
                 const file = input.files[0];
-                if (!file) return;
-                const reader = new FileReader();
+            if (!file) return;
+            const reader = new FileReader();
                 reader.onload = (e) => {
                     const id = 'img_' + Date.now();
-                    this.state.layers.push({
-                        id, type: 'image', content: e.target.result,
-                        x: 100, y: 100, width: 200, zIndex: this.state.layers.length + 1
+            this.state.layers.push({
+                id, type: 'image', content: e.target.result,
+            x: 100, y: 100, width: 200, zIndex: this.state.layers.length + 1
                     });
-                    this.state.selectedId = id;
-                    this.render();
+            this.state.selectedId = id;
+            this.render();
                 };
-                reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
             },
 
             handleBgUpload(input) {
                 const file = input.files[0];
-                if (!file) return;
-                const reader = new FileReader();
+            if (!file) return;
+            const reader = new FileReader();
                 reader.onload = (e) => {
-                    this.state.background.image = e.target.result;
-                    this.render();
+                this.state.background.image = e.target.result;
+            this.render();
                 };
-                reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
             },
 
             updateBgColor(val) {
                 this.state.background.type = 'color';
-                this.state.background.value = val;
-                this.render();
+            this.state.background.value = val;
+            this.render();
             },
 
             setPreset(key) {
                 const preset = this.presets[key];
-                if (!preset) return;
-                this.state.size = { ...preset, key };
-                document.getElementById('canvas-size-indicator').innerText = `${preset.w} x ${preset.h} (${preset.label})`;
-                this.render();
+            if (!preset) return;
+            this.state.size = {...preset, key};
+            document.getElementById('canvas-size-indicator').innerText = `${preset.w} x ${preset.h} (${preset.label})`;
+            this.render();
             },
 
             selectElement(id) {
                 this.state.selectedId = id;
-                this.render();
+            this.render();
             },
 
             updateSelected(prop, val) {
                 const layer = this.state.layers.find(l => l.id === this.state.selectedId);
-                if (layer) {
-                    layer[prop] = prop === 'fontSize' || prop === 'width' ? parseInt(val) : val;
-                    this.render();
+            if (layer) {
+                layer[prop] = prop === 'fontSize' || prop === 'width' ? parseInt(val) : val;
+            this.render();
                 }
             },
 
             deleteElement(id) {
                 this.state.layers = this.state.layers.filter(l => l.id !== id);
-                this.state.selectedId = null;
-                this.render();
+            this.state.selectedId = null;
+            this.render();
             },
 
             moveLayer(dir) {
                 const idx = this.state.layers.findIndex(l => l.id === this.state.selectedId);
-                if (idx === -1) return;
-                if (dir === 'up' && idx < this.state.layers.length - 1) {
-                    [this.state.layers[idx], this.state.layers[idx + 1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
+            if (idx === -1) return;
+            if (dir === 'up' && idx < this.state.layers.length - 1) {
+                [this.state.layers[idx], this.state.layers[idx + 1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
                 } else if (dir === 'down' && idx > 0) {
-                    [this.state.layers[idx], this.state.layers[idx - 1]] = [this.state.layers[idx - 1], this.state.layers[idx]];
+                [this.state.layers[idx], this.state.layers[idx - 1]] = [this.state.layers[idx - 1], this.state.layers[idx]];
                 }
-                this.render();
+            this.render();
             },
 
             updatePropertiesPanel() {
                 const layer = this.state.layers.find(l => l.id === this.state.selectedId);
-                const noSel = document.getElementById('no-selection-msg');
-                const textProps = document.getElementById('text-properties');
-                const imgProps = document.getElementById('image-properties');
+            const noSel = document.getElementById('no-selection-msg');
+            const textProps = document.getElementById('text-properties');
+            const imgProps = document.getElementById('image-properties');
 
-                if (!layer) {
-                    noSel.style.display = 'block';
-                    textProps.style.display = 'none';
-                    imgProps.style.display = 'none';
-                    return;
+            if (!layer) {
+                noSel.style.display = 'block';
+            textProps.style.display = 'none';
+            imgProps.style.display = 'none';
+            return;
                 }
 
-                noSel.style.display = 'none';
-                if (layer.type === 'text') {
-                    textProps.style.display = 'block';
-                    imgProps.style.display = 'none';
-                    document.getElementById('prop-text-content').value = layer.content;
-                    document.getElementById('prop-text-size').value = layer.fontSize;
-                    document.getElementById('prop-text-color').value = layer.color;
+            noSel.style.display = 'none';
+            if (layer.type === 'text') {
+                textProps.style.display = 'block';
+            imgProps.style.display = 'none';
+            document.getElementById('prop-text-content').value = layer.content;
+            document.getElementById('prop-text-size').value = layer.fontSize;
+            document.getElementById('prop-text-color').value = layer.color;
                 } else {
-                    textProps.style.display = 'none';
-                    imgProps.style.display = 'block';
-                    document.getElementById('prop-img-opacity').value = layer.opacity || 1;
+                textProps.style.display = 'none';
+            imgProps.style.display = 'block';
+            document.getElementById('prop-img-opacity').value = layer.opacity || 1;
                 }
             },
 
@@ -3409,108 +3526,108 @@
                     }
                 };
                 window.onmouseup = () => {
-                    this.state.draggingId = null;
-                    this.state.resizingId = null;
+                this.state.draggingId = null;
+            this.state.resizingId = null;
                 };
             },
 
             startDrag(e, id) {
                 const layer = this.state.layers.find(l => l.id === id);
-                const canvas = document.getElementById('design-canvas');
-                const rect = canvas.getBoundingClientRect();
-                const scale = canvas.offsetWidth / this.state.size.width;
+            const canvas = document.getElementById('design-canvas');
+            const rect = canvas.getBoundingClientRect();
+            const scale = canvas.offsetWidth / this.state.size.width;
 
-                this.state.draggingId = id;
-                this.state.dragOffset = {
-                    x: (e.clientX - rect.left) / scale - layer.x,
-                    y: (e.clientY - rect.top) / scale - layer.y
+            this.state.draggingId = id;
+            this.state.dragOffset = {
+                x: (e.clientX - rect.left) / scale - layer.x,
+            y: (e.clientY - rect.top) / scale - layer.y
                 };
             },
 
             startResize(e, id) {
                 e.stopPropagation();
-                this.state.resizingId = id;
+            this.state.resizingId = id;
             },
 
             // --- Features ---
             generateAIHeadline() {
                 const headlines = [
-                    "Empowering Future Leaders Today",
-                    "Admissions Open: Journey to Excellence",
-                    "Celebrate Our Annual Achievement Night",
-                    "New Semester, New Opportunities",
-                    "Excellence in Education Since 1995"
-                ];
-                const text = headlines[Math.floor(Math.random() * headlines.length)];
+            "Empowering Future Leaders Today",
+            "Admissions Open: Journey to Excellence",
+            "Celebrate Our Annual Achievement Night",
+            "New Semester, New Opportunities",
+            "Excellence in Education Since 1995"
+            ];
+            const text = headlines[Math.floor(Math.random() * headlines.length)];
                 const layer = this.state.layers.find(l => l.id === this.state.selectedId && l.type === 'text');
-                if (layer) {
-                    layer.content = text;
+            if (layer) {
+                layer.content = text;
                 } else {
-                    this.addText();
-                    this.state.layers[this.state.layers.length - 1].content = text;
+                this.addText();
+            this.state.layers[this.state.layers.length - 1].content = text;
                 }
-                this.render();
+            this.render();
             },
 
             applyTemplate(type) {
                 this.resetCanvas();
-                if (type === 'admission') {
-                    this.state.background.value = '#0a2e5c';
-                    this.state.layers.push(
-                        { id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign: 'center' },
-                        { id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35, color: '#fff', textAlign: 'center' },
-                        { id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color: '#ffcc00', textAlign: 'center' }
-                    );
+            if (type === 'admission') {
+                this.state.background.value = '#0a2e5c';
+            this.state.layers.push(
+            {id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign: 'center' },
+            {id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35, color: '#fff', textAlign: 'center' },
+            {id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color: '#ffcc00', textAlign: 'center' }
+            );
                 }
-                this.render();
+            this.render();
             },
 
             exportPNG() {
                 const canvas = document.getElementById('design-canvas');
-                this.state.selectedId = null;
-                this.render();
+            this.state.selectedId = null;
+            this.render();
 
                 setTimeout(() => {
-                    html2canvas(canvas, {
-                        scale: 2, // High res
-                        backgroundColor: null,
-                        useCORS: true
-                    }).then(canvasExport => {
-                        const link = document.createElement('a');
-                        const date = new Date().toISOString().split('T')[0];
-                        link.download = `creative-studio-${date}.png`;
-                        link.href = canvasExport.toDataURL("image/png");
-                        link.click();
-                        alert("Design Exported Successfully! 🚀");
-                    });
+                html2canvas(canvas, {
+                    scale: 2, // High res
+                    backgroundColor: null,
+                    useCORS: true
+                }).then(canvasExport => {
+                    const link = document.createElement('a');
+                    const date = new Date().toISOString().split('T')[0];
+                    link.download = `creative-studio-${date}.png`;
+                    link.href = canvasExport.toDataURL("image/png");
+                    link.click();
+                    alert("Design Exported Successfully! 🚀");
+                });
                 }, 100);
             },
 
             saveDraft() {
                 const data = {
-                    layers: this.state.layers,
-                    background: this.state.background,
-                    size: this.state.size
+                layers: this.state.layers,
+            background: this.state.background,
+            size: this.state.size
                 };
-                localStorage.setItem('creative_studio_draft', JSON.stringify(data));
+            localStorage.setItem('creative_studio_draft', JSON.stringify(data));
             },
 
             loadDraft() {
                 const saved = localStorage.getItem('creative_studio_draft');
-                if (saved) {
+            if (saved) {
                     const data = JSON.parse(saved);
-                    this.state.layers = data.layers || [];
-                    this.state.background = data.background || { type: 'color', value: '#111111' };
-                    this.state.size = data.size || this.presets.post;
+            this.state.layers = data.layers || [];
+            this.state.background = data.background || {type: 'color', value: '#111111' };
+            this.state.size = data.size || this.presets.post;
                 }
             },
 
             resetCanvas() {
                 if (!confirm("Clear design and start fresh?")) return;
-                this.state.layers = [];
-                this.state.background = { type: 'color', value: '#111111', image: null };
-                this.state.selectedId = null;
-                this.render();
+            this.state.layers = [];
+            this.state.background = {type: 'color', value: '#111111', image: null };
+            this.state.selectedId = null;
+            this.render();
             }
         };
     </script>
@@ -3522,10 +3639,8 @@
             style="background:#111; padding:40px; border-radius:15px; width:350px; position:relative; border: 1px solid var(--glass-border);">
             <h2 style="color:#fff; margin-bottom:25px; text-align: center;">Admin Access</h2>
             <form id="loginForm">
-                <input type="text" id="admin-username" class="login-input" placeholder="Username" required
-                    style="letter-spacing: normal; margin-bottom: 10px;">
-                <input type="password" id="admin-password" class="login-input" placeholder="Password" required
-                    style="letter-spacing: normal;">
+                <input type="password" id="admin-pin" class="login-input" placeholder="Enter Access PIN" required
+                    maxlength="4">
                 <button type="submit" class="btn-login" id="login-btn">Login</button>
                 <p id="error-msg"
                     style="color:#ff4d4d; margin-top:15px; display:none; text-align: center; font-size: 0.9rem;"></p>
@@ -3554,11 +3669,16 @@
     </div>
 
     <script>
-        window.AdminAccess = {
+            window.AdminAccess = {
+                defaultPin: "2026",
+
             init() {
-                AuthManager.restoreSession();
-                if (AuthManager.isAdmin()) {
-                    this.showPanel();
+                if (!localStorage.getItem("admin_pin")) {
+                localStorage.setItem("admin_pin", this.defaultPin);
+                }
+
+            if (localStorage.getItem("admin_logged_in") === "true") {
+                this.showPanel();
                 }
             },
 
@@ -3570,33 +3690,33 @@
                 document.getElementById("admin-modal").style.display = "none";
             },
 
-            async login(username, password) {
-                const result = await AuthManager.login(username, password);
-                if (result.success) {
-                    this.showPanel();
+            login(pin) {
+                const savedPin = localStorage.getItem("admin_pin");
+            if (pin === savedPin) {
+                localStorage.setItem("admin_logged_in", "true");
+            this.showPanel();
                 } else {
                     const errorMsg = document.getElementById("error-msg");
-                    if (errorMsg) {
-                        errorMsg.innerText = result.message;
-                        errorMsg.style.display = "block";
+            if (errorMsg) {
+                errorMsg.innerText = "Incorrect PIN";
+            errorMsg.style.display = "block";
                     }
                 }
             },
 
             showPanel() {
                 document.getElementById("loginForm").style.display = "none";
-                document.getElementById("admin-panel").style.display = "block";
-                const errorMsg = document.getElementById("error-msg");
-                if (errorMsg) errorMsg.style.display = "none";
+            document.getElementById("admin-panel").style.display = "block";
+            const errorMsg = document.getElementById("error-msg");
+            if (errorMsg) errorMsg.style.display = "none";
             },
 
             logout() {
-                AuthManager.logout();
-                document.getElementById("loginForm").style.display = "block";
-                document.getElementById("admin-panel").style.display = "none";
-                document.getElementById("change-pin-box").style.display = "none";
-                document.getElementById("admin-username").value = "";
-                document.getElementById("admin-password").value = "";
+                localStorage.removeItem("admin_logged_in");
+            document.getElementById("loginForm").style.display = "block";
+            document.getElementById("admin-panel").style.display = "none";
+            document.getElementById("change-pin-box").style.display = "none";
+            document.getElementById("admin-pin").value = "";
             },
 
             showChangePin() {
@@ -3605,43 +3725,41 @@
 
             changePin() {
                 const newPin = document.getElementById("new-pin").value;
-                if (newPin.length !== 4) {
-                    alert("PIN must be 4 digits");
-                    return;
+            if (newPin.length !== 4) {
+                alert("PIN must be 4 digits");
+            return;
                 }
-                localStorage.setItem("admin_pin", newPin);
-                alert("PIN updated successfully");
-                document.getElementById("change-pin-box").style.display = "none";
-                document.getElementById("new-pin").value = "";
+            localStorage.setItem("admin_pin", newPin);
+            alert("PIN updated successfully");
+            document.getElementById("change-pin-box").style.display = "none";
+            document.getElementById("new-pin").value = "";
             }
         };
 
-        const loginForm = document.getElementById("loginForm");
-        if (loginForm) {
-            loginForm.addEventListener("submit", function (e) {
-                e.preventDefault();
-                const user = document.getElementById("admin-username").value;
-                const pass = document.getElementById("admin-password").value;
-                AdminAccess.login(user, pass);
-            });
+            const loginForm = document.getElementById("loginForm");
+            if (loginForm) {
+                loginForm.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    AdminAccess.login(document.getElementById("admin-pin").value);
+                });
         }
 
         window.addEventListener("DOMContentLoaded", () => {
-            AdminAccess.init();
+                AdminAccess.init();
 
             // Initialize Site Settings when panel is opened
             if (window.SiteSettings) {
                 SiteSettings.renderHeaderEditor();
-                SiteSettings.renderFooterEditor();
-            }
+            SiteSettings.renderFooterEditor();
+                }
         });
 
-        // Tab switching function for Site Settings
-        function switchSettingsTab(tabName, buttonElement) {
-            // Hide all tab contents
-            document.querySelectorAll('.settings-tab-content').forEach(tab => {
-                tab.style.display = 'none';
-            });
+            // Tab switching function for Site Settings
+            function switchSettingsTab(tabName, buttonElement) {
+                // Hide all tab contents
+                document.querySelectorAll('.settings-tab-content').forEach(tab => {
+                    tab.style.display = 'none';
+                });
 
             // Remove active class from all buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
