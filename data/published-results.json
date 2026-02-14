@@ -1,0 +1,54 @@
+{
+    "exams": [
+        {
+            "examId": "exam_001",
+            "examName": "Annual Examination 2025",
+            "published": true,
+            "results": [
+                {
+                    "roll": "101",
+                    "name": "Ahmad Abdullah",
+                    "total": 92,
+                    "subjects": {
+                        "Tajweed": 45,
+                        "Fiqh": 47
+                    }
+                },
+                {
+                    "roll": "102",
+                    "name": "Fathima Suhara",
+                    "total": 88,
+                    "subjects": {
+                        "Tajweed": 42,
+                        "Fiqh": 46
+                    }
+                },
+                {
+                    "roll": "103",
+                    "name": "Mohammad Bilal",
+                    "total": 75,
+                    "subjects": {
+                        "Tajweed": 35,
+                        "Fiqh": 40
+                    }
+                }
+            ]
+        },
+        {
+            "examId": "exam_002",
+            "examName": "Half Yearly 2024",
+            "published": true,
+            "results": [
+                {
+                    "roll": "201",
+                    "name": "Zaid Ibrahim",
+                    "total": 85,
+                    "subjects": {
+                        "Tajweed": 40,
+                        "Fiqh": 45
+                    }
+                }
+            ]
+        }
+    ]
+}

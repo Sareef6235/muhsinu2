@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Antigravity Results</title>
+
+    <!-- Unified Assets -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* Admin Specific Overrides */
+        :root {
+            --sidebar-width: 280px;
+        }
+
+        body {
+            display: flex;
+            background: #050505;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #0a0a0a;
+            border-right: 1px solid var(--border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            transition: 0.3s;
+            z-index: 1100;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            min-height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            color: #888;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: 0.3s;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--primary-color);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+            animation: fadeUp 0.4s ease forwards;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        @media (max-width: 991px) {
+            .sidebar {
+                left: -100%;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+
+            #admin-menu-toggle {
+                display: block !important;
+            }
+        }
+    </style>
+
+    <script type="module">
+        import AppState from './assets/js/state.js';
+        import AdminApp from './assets/js/admin.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AppState.init();
+            AdminApp.init();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="ph ph-lightning-fill"></i>
+            <span>ANTIGRAVITY</span>
+        </div>
+
+        <nav>
+            <div class="nav-item active" data-panel="dashboard">
+                <i class="ph ph-squares-four"></i> Dashboard
+            </div>
+            <div class="nav-item" data-panel="exams">
+                <i class="ph ph-exam"></i> Exams Manager
+            </div>
+            <div class="nav-item" data-panel="results">
+                <i class="ph ph-file-arrow-up"></i> Results Sync
+            </div>
+            <div class="nav-item" data-panel="reports">
+                <i class="ph ph-chart-bar"></i> Reports
+            </div>
+            <div class="nav-item" data-panel="settings">
+                <i class="ph ph-gear-six"></i> Site Settings
+            </div>
+        </nav>
+
+        <div style="margin-top: auto;">
+            <div class="nav-item" style="color: #ff4444;"
+                onclick="AppState.logout(); window.location.href='/index.html'">
+                <i class="ph ph-sign-out"></i> Logout
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <div id="admin-menu-toggle" style="display: none; font-size: 1.5rem; cursor: pointer;">
+                <i class="ph ph-list"></i>
+            </div>
+            <h1>Admin Control Center</h1>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: right;">
+                    <div style="font-weight: 700;">Admin User</div>
+                    <div style="font-size: 0.75rem; color: #666;">Super Admin</div>
+                </div>
+                <div
+                    style="width: 40px; height: 40px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--primary-color);">
+                    <i class="ph ph-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD PANEL -->
+        <div id="panel-dashboard" class="panel active">
+            <div class="footer-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="stat-card">
+                    <i class="ph ph-graduation-cap"
+                        style="font-size: 2rem; color: var(--primary-color); margin-bottom: 10px;"></i>
+                    <div id="stat-exams-count" style="font-size: 2rem; font-weight: 700;">0</div>
+                    <div style="color: #666; text-transform: uppercase; font-size: 0.7rem;">Active Exams</div>
+                </div>
+                <div class="stat-card">
+                    <i class="ph ph-users"
+                        style="font-size: 2rem; color: var(--secondary-color); margin-bottom: 10px;"></i>
+                    <div id="stat-students-count" style="font-size: 2rem; font-weight: 700;">0</div>
+                    <div style="color: #666; text-transform: uppercase; font-size: 0.7rem;">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <i class="ph ph-globe" style="font-size: 2rem; color: #2ed573; margin-bottom: 10px;"></i>
+                    <div style="font-size: 1.1rem; color: #2ed573; font-weight: 700;">Online</div>
+                    <div style="color: #666; text-transform: uppercase; font-size: 0.7rem;">Status</div>
+                </div>
+            </div>
+
+            <div class="glass-card" style="margin-top: 30px; padding: 30px;">
+                <h3>System Activities</h3>
+                <div style="margin-top: 20px; color: #666;">
+                    No recent activities recorded.
+                </div>
+            </div>
+        </div>
+
+        <!-- EXAMS PANEL -->
+        <div id="panel-exams" class="panel">
+            <h2>Exams Manager</h2>
+            <div class="glass-card" style="margin-top: 30px; padding: 30px;">
+                <p>Loading exam modules...</p>
+            </div>
+        </div>
+
+        <!-- RESULTS PANEL -->
+        <div id="panel-results" class="panel">
+            <h2>Results Synchronization</h2>
+            <div class="glass-card" style="margin-top: 30px; padding: 30px;">
+                <p style="margin-bottom: 20px; color: #888;">Manage the conversion of database records into highly
+                    optimized static JSON files for the public portal.</p>
+                <div style="display: flex; gap: 15px;">
+                    <button id="btn-sync-results" class="nav-link"
+                        style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+                        <i class="ph ph-arrows-clockwise"></i> SYNC FROM DATABASE
+                    </button>
+                    <button id="btn-publish-results" class="nav-link"
+                        style="background: var(--primary-color); color: #000; font-weight: 700;">
+                        PUBLISH FOR STATIC SITE
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+
+</html>
