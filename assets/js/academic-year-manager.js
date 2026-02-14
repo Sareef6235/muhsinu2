@@ -5,22 +5,7 @@
 const AcademicYearManager = (function () {
     'use strict';
 
-    const CONFIG_KEY = 'schoolConfig';
-
-    function _getSchoolId() {
-        return localStorage.getItem('activeSchoolId') || 'default';
-    }
-
-    function _getConfig() {
-        let config = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
-        const schoolId = _getSchoolId();
-        if (!config[schoolId]) config[schoolId] = { academicYears: [], examTypes: [] };
-        return config;
-    }
-
-    function _saveConfig(config) {
-        localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-    }
+    const STORAGE_KEY = 'academic_years';
 
     function init() {
         console.log('📅 AcademicYearManager: Initializing...');
@@ -32,20 +17,20 @@ const AcademicYearManager = (function () {
             renderTable();
             refreshDropdowns();
         });
+
+        // Listen for storage updates
+        window.addEventListener(`storage-update-${STORAGE_KEY}`, () => {
+            renderTable();
+            refreshDropdowns();
+        });
     }
 
     function getAll() {
-        const schoolId = _getSchoolId();
-        const config = _getConfig();
-        return config[schoolId].academicYears || [];
+        return StorageManager.get(STORAGE_KEY, []);
     }
 
     function saveAll(years) {
-        const config = _getConfig();
-        const schoolId = _getSchoolId();
-        config[schoolId].academicYears = years;
-        _saveConfig(config);
-
+        StorageManager.set(STORAGE_KEY, years);
         window.dispatchEvent(new CustomEvent('yearChanged', { detail: years }));
         refreshDropdowns();
     }

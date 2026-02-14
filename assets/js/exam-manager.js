@@ -26,58 +26,25 @@ const ExamManager = (function () {
             console.log('📝 ExamManager: Types updated.');
             refreshAllExamSelectors();
         });
-    }
 
-    /**
-     * INTERNAL: Helper to get active school ID
-     */
-    function _getSchoolId() {
-        // Safe check for current context
-        const schoolId = localStorage.getItem('activeSchoolId') || 'default';
-        if (schoolId === 'default') console.warn('📝 ExamManager: No active school set, using default.');
-        return schoolId;
-    }
-
-    /**
-     * INTERNAL: Handles the requested nested structure localStorage.exams = { [schoolId]: [...] }
-     */
-    function _getStorage() {
-        try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            return raw ? JSON.parse(raw) : {};
-        } catch (e) {
-            console.error('📝 ExamManager: Storage error', e);
-            return {};
-        }
-    }
-
-    function _saveStorage(all) {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-        } catch (e) {
-            console.error('📝 ExamManager: Save error', e);
-            alert("Storage quota exceeded!");
-        }
+        // Listen for storage updates
+        window.addEventListener(`storage-update-${STORAGE_KEY}`, () => {
+            refreshAllExamSelectors();
+        });
     }
 
     /**
      * Get exams for the ACTIVE school only
      */
     function getAll() {
-        const schoolId = _getSchoolId();
-        const all = _getStorage();
-        return all[schoolId] || [];
+        return StorageManager.get(STORAGE_KEY, []);
     }
 
     /**
      * Save exams for the ACTIVE school
      */
     function saveAll(exams) {
-        const schoolId = _getSchoolId();
-        const all = _getStorage();
-        all[schoolId] = exams;
-        _saveStorage(all);
-
+        StorageManager.set(STORAGE_KEY, exams);
         // Dispatch event for other modules
         window.dispatchEvent(new CustomEvent('examsUpdated', { detail: exams }));
     }

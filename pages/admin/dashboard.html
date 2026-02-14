@@ -749,9 +749,9 @@
                     <div class="stat-label">Tuition Bookings</div>
                 </div>
                 <div class="stat-card" style="border-color: rgba(0, 243, 255, 0.3);">
-                    <i class="ph ph-book-open stat-icon" style="color: var(--primary-color);"></i>
-                    <div class="stat-value" id="total-subjects-stat">0</div>
-                    <div class="stat-label">Active Subjects</div>
+                    <i class="ph ph-git-branch stat-icon" style="color: var(--primary-color);"></i>
+                    <div class="stat-value" id="github-sync-status">Checking...</div>
+                    <div class="stat-label">GitHub Sync Status</div>
                 </div>
             </div>
             <h3 style="margin-bottom: 20px; font-size: 1.2rem;">Quick Actions Needed</h3>
@@ -3112,6 +3112,13 @@
                         badge.style.background = 'rgba(46, 213, 115, 0.1)';
                     }
 
+                    // Update Global Status Card
+                    const globalStatus = document.getElementById('github-sync-status');
+                    if (globalStatus) {
+                        globalStatus.textContent = "Synced";
+                        globalStatus.style.color = "#2ed573";
+                    }
+
                     // Update Links
                     document.getElementById('btn-view-repo').onclick = () => window.open(repoData.html_url, '_blank');
                     document.getElementById('btn-view-actions').onclick = () => window.open(`${repoData.html_url}/actions`, '_blank');
@@ -3122,6 +3129,11 @@
                         badge.innerHTML = '<i class="ph ph-warning-circle"></i> API Offline';
                         badge.style.color = '#ff4757';
                         badge.style.background = 'rgba(255, 71, 87, 0.1)';
+                    }
+                    const globalStatus = document.getElementById('github-sync-status');
+                    if (globalStatus) {
+                        globalStatus.textContent = "Offline";
+                        globalStatus.style.color = "#ff4757";
                     }
                 }
             }
