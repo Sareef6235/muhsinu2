@@ -363,65 +363,6 @@
             border: 1px dashed rgba(255, 61, 61, 0.3);
         }
 
-        @media (max-width: 768px) {
-            .auth-controls {
-                top: 10px;
-                right: 10px;
-                gap: 8px;
-            }
-
-            .auth-badge {
-                padding: 6px 12px;
-                font-size: 0.7rem;
-            }
-
-            .btn-auth {
-                padding: 8px 14px;
-                font-size: 0.8rem;
-            }
-
-            .login-modal {
-                width: calc(100% - 40px);
-                padding: 25px;
-            }
-
-            .portal-wrapper {
-                margin-top: 80px;
-                padding: 0 15px;
-            }
-
-            .glass-card {
-                padding: 25px 20px;
-            }
-
-            .portal-title h1 {
-                font-size: 1.8rem;
-            }
-
-            .stats-bar {
-                grid-template-columns: 1fr;
-                gap: 10px;
-                text-align: left;
-            }
-
-            .stat-item {
-                border: none !important;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 0;
-            }
-
-            .stat-item>div:first-child {
-                font-size: 1.2rem !important;
-                order: 2;
-            }
-
-            .stat-item>div:last-child {
-                order: 1;
-            }
-        }
-
         @media print {
             .portal-wrapper {
                 margin: 0;
@@ -443,8 +384,7 @@
             .search-section,
             .actions,
             .modal-overlay,
-            #printModal,
-            .auth-controls {
+            #printModal {
                 display: none !important;
             }
 
@@ -511,7 +451,7 @@
             </button>
 
             <p style="font-size: 0.75rem; color: #555; margin-top: 15px;">
-                Demo Credentials: admin / admin
+                Demo Credentials: admin / Admin@123
             </p>
         </div>
     </div>
@@ -562,11 +502,13 @@
                     style="display: inline-flex; width: auto; cursor: pointer;">
                     <i class="ph ph-upload-simple"></i> Upload Results JSON
                 </label>
-                <input type="file" id="published-results-upload" accept=".json" style="display: none;">
+                <input type="file" id="published-results-upload" accept=".json" style="display: none;"
+                    onchange="handlePublishedResultsUpload(this)">
                 <div id="published-results-status" style="margin-top: 10px; font-size: 0.8rem; color: #888;">
                     No results file loaded.
                 </div>
             </div>
+
 
             <!-- Merit List View (Hidden by Default) -->
             <div id="merit-view" style="display: none;">
@@ -579,8 +521,8 @@
                         <i class="ph ph-arrow-left"></i> Back to Search
                     </button>
                 </div>
-                <div style="max-height: 600px; overflow-y: auto; overflow-x: auto; border-radius: 12px;">
-                    <table class="marks-table" style="min-width: 500px;">
+                <div style="max-height: 600px; overflow-y: auto;">
+                    <table class="marks-table">
                         <thead>
                             <tr>
                                 <th>RANK</th>
@@ -594,15 +536,14 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
 
             <form id="resultsForm" class="search-grid">
                 <div class="input-group">
                     <label>Exam Session</label>
                     <div style="position: relative;">
-                        <select id="examSelect" required disabled>
-                            <option value="">Upload results to select exam...</option>
+                        <select id="examSelect" required>
+                            <option value="">Loading Exams...</option>
                         </select>
                         <div id="dropdown-loader"
                             style="display:none; position: absolute; right: 40px; top: 50%; transform: translateY(-50%);">
@@ -615,8 +556,7 @@
                     <label>Roll Number</label>
                     <input type="text" id="rollInput" placeholder="Enter Registration No." required>
                 </div>
-                <button type="submit" class="btn-check" id="submitBtn" disabled
-                    style="opacity: 0.5; cursor: not-allowed;">
+                <button type="submit" class="btn-check" id="submitBtn">
                     <span>Check Performance</span>
                     <i class="ph-bold ph-arrow-right"></i>
                 </button>
@@ -949,18 +889,67 @@
             }
         }
 
+        // --- UPLOAD HANDLER ---
+        function handlePublishedResultsUpload(input) {
+            const file = input.files[0];
+            const statusEl = document.getElementById('published-results-status');
+
+            if (!file) return;
+
+            statusEl.textContent = "Reading file...";
+            statusEl.style.color = "#888";
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+
+                    // Basic Validation
+                    if (!json.exams && !Array.isArray(json)) {
+                        throw new Error("Invalid structure: missing 'exams' array.");
+                    }
+
+                    console.log("Results Uploaded:", json);
+
+                    // Update Global Store (simulated)
+                    // In a real scenario, this might need to merge with existing data
+                    // For now, we'll assume ResultsSystem can handle raw JSON injection if we expose a method, 
+                    // or we just manually trigger the update if ResultsSystem is global.
+
+                    if (window.ResultsSystem) {
+                        // Use the internal method if accessible, or public API
+                        window.ResultsSystem.loadData(json);
+                    } else {
+                        // Fallback if system not ready
+                        console.warn("ResultsSystem not found. Reloading page might be needed.");
+                    }
+
+                    statusEl.innerHTML = `<span style="color: #00ff88;">✅ Loaded: ${file.name}</span>`;
+
+                } catch (err) {
+                    console.error("JSON Error:", err);
+                    statusEl.innerHTML = `<span style="color: #ff3d3d;">❌ Error: ${err.message}</span>`;
+                }
+            };
+
+            reader.onerror = function () {
+                statusEl.innerHTML = `<span style="color: #ff3d3d;">❌ Error reading file.</span>`;
+            };
+
+            reader.readAsText(file);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             AuthManager.restoreSession();
             updateAuthUI();
 
             // 2. Component Initialization
-            if (window.SiteSettings) SiteSettings.render();
-            if (window.ResultsEngine) ResultsEngine.init();
+            if (window.ResultsSystem) window.ResultsSystem.init();
         });
     </script>
     <!-- Results Portal Logic -->
     <script src="results.js"></script>
-    <script src="../../assets/js/portal.js"></script>
 
 </body>
 

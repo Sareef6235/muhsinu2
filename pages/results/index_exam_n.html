@@ -497,37 +497,102 @@
 <body>
 
     <!-- ================= PUBLIC VIEW ================= -->
-    <div id="public-view">
-        <div class="login-box">
-            <div style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;">
-                <i class="ph-bold ph-student"></i>
+    <div id="public-view" class="container">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="font-size: 4rem; color: var(--primary); margin-bottom: 20px;">
+                <i class="ph-bold ph-graduation-cap"></i>
             </div>
-            <h2 style="margin-bottom: 5px;">Result Portal</h2>
-            <p style="color: var(--text-light); margin-bottom: 30px;">Enter your details to view result</p>
+            <h1 style="margin: 0; font-family: 'Cinzel', serif; color: var(--primary);">Public Result Portal</h1>
+            <p style="color: var(--text-light);">Secure & Verified Examination Results</p>
+        </div>
 
-            <div class="card" style="text-align: left;">
-                <label
-                    style="font-size: 0.8rem; font-weight: bold; color: #666; display: block; margin-bottom: 5px;">Register/Roll
-                    Number</label>
-                <input type="text" id="publicRegInput" class="form-control" placeholder="e.g. 4029">
-                <button class="btn btn-primary"
-                    style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;"
-                    onclick="proExamApp.publicSearch()">
-                    View Result
+        <!-- 1. Upload Results Section -->
+        <div class="card" style="max-width: 600px; margin: 0 auto 30px;">
+            <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+                <i class="ph-bold ph-upload-simple"></i> Load Published Results
+            </h3>
+            <p style="font-size: 0.9rem; color: #666;">Upload the <code>published-results.json</code> file provided by
+                your institution.</p>
+            <input type="file" accept=".json" class="form-control" onchange="handlePublishedResultsUpload(this)">
+            <p id="published-results-status" style="margin-top: 10px; font-weight: 500; font-size: 0.9rem;"></p>
+        </div>
+
+        <!-- 2. Portal Dashboard (Hidden until loaded) -->
+        <div id="portal-stats" class="stats-grid" style="max-width: 800px; margin: 0 auto 30px; display: none;">
+            <div class="stat-card">
+                <div class="stat-val" id="results-exams-count">0</div>
+                <div class="stat-label">Active Exams</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="results-total-count">0</div>
+                <div class="stat-label">Total Results</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="results-last-sync">--:--</div>
+                <div class="stat-label">Last Published</div>
+            </div>
+        </div>
+
+        <!-- 3. Search Section -->
+        <div id="search-section" class="card" style="max-width: 600px; margin: 0 auto 30px; display: none;">
+            <form id="resultsForm">
+                <div class="form-group">
+                    <label class="form-label">Select Exam</label>
+                    <select id="examSelect" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Roll / Register Number</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="rollInput" class="form-control" placeholder="e.g. 101" required
+                            style="margin-bottom: 0;">
+                        <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
+                            <i class="ph-bold ph-magnifying-glass"></i> View Result
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-secondary btn-sm" onclick="showRankList()">
+                    <i class="ph-bold ph-list-numbers"></i> View Merit List
                 </button>
             </div>
+        </div>
 
-            <div id="public-msg" style="margin-top: 15px; color: var(--danger);"></div>
+        <!-- 4. Merit List View -->
+        <div id="merit-view" class="card" style="max-width: 800px; margin: 0 auto; display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0;">Merit List</h3>
+                <button class="btn btn-secondary btn-sm"
+                    onclick="document.getElementById('merit-view').style.display='none'">
+                    <i class="ph-bold ph-x"></i> Close
+                </button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                    <thead style="background: #f8f9fa; text-align: left; border-bottom: 2px solid var(--border);">
+                        <tr>
+                            <th style="padding: 12px;">Rank</th>
+                            <th style="padding: 12px;">Roll No</th>
+                            <th style="padding: 12px;">Name</th>
+                            <th style="padding: 12px; text-align: right;">Total Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body"></tbody>
+                </table>
+            </div>
+        </div>
 
-            <button class="btn btn-secondary btn-sm" style="margin-top: 40px;" onclick="proExamApp.toggleAdminLogin()">
-                <i class="ph-bold ph-lock-key"></i> Admin Login
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="btn btn-secondary btn-sm" onclick="proExamApp.toggleAdminLogin()">
+                <i class="ph-bold ph-lock-key"></i> Internal Access
             </button>
-
-            <div id="admin-login-form" class="card hidden" style="margin-top: 15px; text-align: left;">
-                <label>Admin Password</label>
-                <input type="password" id="adminPassInput" class="form-control" placeholder="Default: admin123"
+            <div id="admin-login-form" class="card hidden"
+                style="max-width: 300px; margin: 20px auto; text-align: left;">
+                <label>Access Key</label>
+                <input type="password" id="adminPassInput" class="form-control" placeholder="Enter key..."
                     onkeydown="if(event.key==='Enter') proExamApp.adminLogin()">
-                <button class="btn btn-primary btn-sm" onclick="proExamApp.adminLogin()">Login</button>
+                <button class="btn btn-primary btn-sm" style="width: 100%;"
+                    onclick="proExamApp.adminLogin()">Login</button>
             </div>
         </div>
     </div>
@@ -1118,6 +1183,98 @@
         // Initialize App
         document.addEventListener('DOMContentLoaded', () => {
             proExamApp.init();
+
+            // Public Portal Logic
+            let publicResultsData = null;
+
+            window.handlePublishedResultsUpload = function (input) {
+                const file = input.files[0];
+                const status = document.getElementById("published-results-status");
+
+                if (!file || !file.name.endsWith(".json")) {
+                    status.innerHTML = "❌ Please upload a valid JSON file.";
+                    status.style.color = "#ff4757";
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.students || !Array.isArray(data.students)) {
+                            throw new Error("Invalid format");
+                        }
+                        publicResultsData = data;
+                        initializePublicPortal(data);
+                        status.innerHTML = "✅ Results loaded successfully.";
+                        status.style.color = "#2ed573";
+                    } catch (err) {
+                        status.innerHTML = "❌ Invalid JSON structure.";
+                        status.style.color = "#ff4757";
+                    }
+                };
+                reader.readAsText(file);
+            };
+
+            function initializePublicPortal(data) {
+                document.getElementById("portal-stats").style.display = "grid";
+                document.getElementById("search-section").style.display = "block";
+
+                document.getElementById("results-exams-count").innerText = 1;
+                document.getElementById("results-total-count").innerText = data.totalStudents;
+                document.getElementById("results-last-sync").innerText =
+                    new Date(data.publishedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const examSelect = document.getElementById("examSelect");
+                examSelect.innerHTML = `<option value="${data.examId}">${data.examName || "Published Exam"}</option>`;
+            }
+
+            document.getElementById("resultsForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+                if (!publicResultsData) {
+                    alert("Please upload results JSON first.");
+                    return;
+                }
+
+                const roll = document.getElementById("rollInput").value.trim();
+                const student = publicResultsData.students.find(s =>
+                    String(s.rollNo || s.roll || s.registerNumber) === roll
+                );
+
+                if (!student) {
+                    alert("Result not found for Roll No: " + roll);
+                    return;
+                }
+
+                // Integration with existing cert preview
+                proExamApp.state.students = publicResultsData.students;
+                proExamApp.previewCert(roll);
+            });
+
+            window.showRankList = function () {
+                if (!publicResultsData) {
+                    alert("Please upload results JSON first.");
+                    return;
+                }
+
+                const sorted = [...publicResultsData.students].sort((a, b) => (b.total || 0) - (a.total || 0));
+                const tbody = document.getElementById("results-table-body");
+                tbody.innerHTML = "";
+
+                sorted.forEach((student, index) => {
+                    tbody.innerHTML += `
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 12px; font-weight: bold;">#${index + 1}</td>
+                            <td style="padding: 12px;">${student.rollNo || student.roll || student.registerNumber}</td>
+                            <td style="padding: 12px;">${student.name}</td>
+                            <td style="padding: 12px; text-align: right; font-weight: 500;">${student.total || 0}</td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById("merit-view").style.display = "block";
+                document.getElementById("merit-view").scrollIntoView({ behavior: 'smooth' });
+            };
         });
     </script>
 

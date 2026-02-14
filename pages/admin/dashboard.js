@@ -146,8 +146,8 @@ const StaticPublisher = (() => {
                 {
                     examId: String(bridge.examId),
                     examName: String(bridge.examName),
-                    publishedAt: new Date().toISOString(),
-                    students: bridge.results // Mapping results to students for compatibility
+                    published: true,
+                    results: bridge.results // Already normalized by sync flow
                 }
             ]
         };
