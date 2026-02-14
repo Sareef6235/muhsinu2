@@ -363,6 +363,65 @@
             border: 1px dashed rgba(255, 61, 61, 0.3);
         }
 
+        @media (max-width: 768px) {
+            .auth-controls {
+                top: 10px;
+                right: 10px;
+                gap: 8px;
+            }
+
+            .auth-badge {
+                padding: 6px 12px;
+                font-size: 0.7rem;
+            }
+
+            .btn-auth {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+            }
+
+            .login-modal {
+                width: calc(100% - 40px);
+                padding: 25px;
+            }
+
+            .portal-wrapper {
+                margin-top: 80px;
+                padding: 0 15px;
+            }
+
+            .glass-card {
+                padding: 25px 20px;
+            }
+
+            .portal-title h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats-bar {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                text-align: left;
+            }
+
+            .stat-item {
+                border: none !important;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+            }
+
+            .stat-item>div:first-child {
+                font-size: 1.2rem !important;
+                order: 2;
+            }
+
+            .stat-item>div:last-child {
+                order: 1;
+            }
+        }
+
         @media print {
             .portal-wrapper {
                 margin: 0;
@@ -384,7 +443,8 @@
             .search-section,
             .actions,
             .modal-overlay,
-            #printModal {
+            #printModal,
+            .auth-controls {
                 display: none !important;
             }
 
@@ -519,8 +579,8 @@
                         <i class="ph ph-arrow-left"></i> Back to Search
                     </button>
                 </div>
-                <div style="max-height: 600px; overflow-y: auto;">
-                    <table class="marks-table">
+                <div style="max-height: 600px; overflow-y: auto; overflow-x: auto; border-radius: 12px;">
+                    <table class="marks-table" style="min-width: 500px;">
                         <thead>
                             <tr>
                                 <th>RANK</th>
@@ -534,6 +594,7 @@
                         </tbody>
                     </table>
                 </div>
+
             </div>
 
             <form id="resultsForm" class="search-grid">

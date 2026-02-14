@@ -138,7 +138,8 @@ window.ResultsPortal = (function () {
 
     function bindSearch() {
         const form = document.getElementById("resultsForm");
-        if (!form) return;
+        const submitBtn = document.getElementById("submitBtn");
+        if (!form || !submitBtn) return;
 
         form.addEventListener("submit", function (e) {
             e.preventDefault();
@@ -148,15 +149,28 @@ window.ResultsPortal = (function () {
                 return;
             }
 
-            const roll = document.getElementById("rollInput").value.trim();
-            const student = data.students.find(s => String(s.rollNo) === roll);
+            // Visual feedback: Searching state
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.innerHTML = `<i class="ph ph-circle-notch animate-spin"></i> Analyzing...`;
+            submitBtn.style.pointerEvents = "none";
+            submitBtn.style.opacity = "0.8";
 
-            if (!student) {
-                alert("Result not found for Roll No: " + roll);
-                return;
-            }
+            setTimeout(() => {
+                const roll = document.getElementById("rollInput").value.trim();
+                const student = data.students.find(s => String(s.rollNo) === roll);
 
-            renderResult(student);
+                // Revert button
+                submitBtn.innerHTML = originalContent;
+                submitBtn.style.pointerEvents = "auto";
+                submitBtn.style.opacity = "1";
+
+                if (!student) {
+                    alert("Result not found for Roll No: " + roll);
+                    return;
+                }
+
+                renderResult(student);
+            }, 600);
         });
     }
 
