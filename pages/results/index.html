@@ -601,8 +601,8 @@
                 <div class="input-group">
                     <label>Exam Session</label>
                     <div style="position: relative;">
-                        <select id="examSelect" required>
-                            <option value="">Loading Exams...</option>
+                        <select id="examSelect" required disabled>
+                            <option value="">Upload results to select exam...</option>
                         </select>
                         <div id="dropdown-loader"
                             style="display:none; position: absolute; right: 40px; top: 50%; transform: translateY(-50%);">
@@ -615,7 +615,8 @@
                     <label>Roll Number</label>
                     <input type="text" id="rollInput" placeholder="Enter Registration No." required>
                 </div>
-                <button type="submit" class="btn-check" id="submitBtn">
+                <button type="submit" class="btn-check" id="submitBtn" disabled
+                    style="opacity: 0.5; cursor: not-allowed;">
                     <span>Check Performance</span>
                     <i class="ph-bold ph-arrow-right"></i>
                 </button>

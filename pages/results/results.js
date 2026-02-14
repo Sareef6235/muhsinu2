@@ -79,17 +79,11 @@ window.ResultsPortal = (function () {
                 try {
                     const parsed = JSON.parse(e.target.result);
 
-                    // Support both user's minimal structure and standard structure
-                    const students = parsed.students || (parsed.exams ? parsed.exams.flatMap(ex => ex.results || ex.students || []) : []);
-
-                    if (!students || !Array.isArray(students)) {
-                        throw new Error("Invalid structure: students array missing");
+                    if (!parsed.exams || !Array.isArray(parsed.exams)) {
+                        throw new Error("Invalid structure: exams array missing");
                     }
 
                     data = parsed;
-                    // Ensure we have a students array at top level for simpler logic
-                    if (!data.students) data.students = students;
-
                     localStorage.setItem("published-results", JSON.stringify(data));
 
                     activatePortal();
@@ -99,7 +93,7 @@ window.ResultsPortal = (function () {
 
                 } catch (err) {
                     console.error("Upload error:", err);
-                    status.innerHTML = "<i class='ph ph-x-circle'></i> JSON validation failed.";
+                    status.innerHTML = "<i class='ph ph-x-circle'></i> " + (err.message || "JSON validation failed.");
                     status.style.color = "#ff4d4d";
                 }
             };
@@ -116,15 +110,42 @@ window.ResultsPortal = (function () {
         const totalCountEl = document.getElementById("results-total-count");
         const lastSyncEl = document.getElementById("results-last-sync");
 
-        if (examCountEl) examCountEl.innerText = (data.exams ? data.exams.length : 1);
-        if (totalCountEl) totalCountEl.innerText = data.students.length;
-        if (lastSyncEl) lastSyncEl.innerText = new Date(data.publishedAt || Date.now()).toLocaleTimeString();
+        const exams = data.exams || [];
+        const totalStudents = exams.reduce((sum, ex) => sum + (ex.students ? ex.students.length : 0), 0);
 
-        const examSelect = document.getElementById("examSelect");
-        if (examSelect) {
-            examSelect.disabled = false;
-            examSelect.innerHTML = `<option value="${data.examId || 'default'}">${data.examName || "Standard Examination"}</option>`;
-        }
+        if (examCountEl) examCountEl.innerText = exams.length;
+        if (totalCountEl) totalCountEl.innerText = totalStudents;
+        if (lastSyncEl) lastSyncEl.innerText = new Date(data.publishedAt || (data.meta ? data.meta.generatedAt : null) || Date.now()).toLocaleTimeString();
+
+        populateExamDropdown(exams);
+        updateSearchButtonState();
+    }
+
+    function populateExamDropdown(exams) {
+        const select = document.getElementById("examSelect");
+        if (!select) return;
+
+        select.innerHTML = '<option value="">-- Select Exam --</option>';
+        exams.forEach(exam => {
+            const option = document.createElement('option');
+            option.value = exam.examId;
+            option.textContent = exam.examName;
+            select.appendChild(option);
+        });
+
+        select.disabled = false;
+        select.addEventListener('change', updateSearchButtonState);
+    }
+
+    function updateSearchButtonState() {
+        const select = document.getElementById("examSelect");
+        const submitBtn = document.getElementById("submitBtn");
+        if (!select || !submitBtn) return;
+
+        const isEnabled = data && select.value;
+        submitBtn.disabled = !isEnabled;
+        submitBtn.style.opacity = isEnabled ? "1" : "0.5";
+        submitBtn.style.cursor = isEnabled ? "pointer" : "not-allowed";
     }
 
     function showOfflineWarning() {
@@ -144,8 +165,15 @@ window.ResultsPortal = (function () {
         form.addEventListener("submit", function (e) {
             e.preventDefault();
 
-            if (!data) {
-                alert("Please upload results file.");
+            const selectedExamId = document.getElementById("examSelect").value;
+            if (!selectedExamId) {
+                alert("Please select an exam session first.");
+                return;
+            }
+
+            const exam = data.exams.find(ex => String(ex.examId) === String(selectedExamId));
+            if (!exam) {
+                alert("Selected exam data not found.");
                 return;
             }
 
@@ -157,7 +185,7 @@ window.ResultsPortal = (function () {
 
             setTimeout(() => {
                 const roll = document.getElementById("rollInput").value.trim();
-                const student = data.students.find(s => String(s.rollNo) === roll);
+                const student = (exam.students || []).find(s => String(s.roll || s.rollNo) === roll);
 
                 // Revert button
                 submitBtn.innerHTML = originalContent;
@@ -165,7 +193,7 @@ window.ResultsPortal = (function () {
                 submitBtn.style.opacity = "1";
 
                 if (!student) {
-                    alert("Result not found for Roll No: " + roll);
+                    alert("Result not found for Roll No: " + roll + " in " + exam.examName);
                     return;
                 }
 
@@ -220,19 +248,26 @@ window.ResultsPortal = (function () {
     }
 
     function showRankList() {
-        if (!data) {
-            alert("Upload results data first.");
+        const selectedExamId = document.getElementById("examSelect").value;
+        if (!selectedExamId) {
+            alert("Please select an exam session first.");
             return;
         }
 
-        const sorted = [...data.students].sort((a, b) => (Number(b.total) || 0) - (Number(a.total) || 0));
+        const exam = data.exams.find(ex => String(ex.examId) === String(selectedExamId));
+        if (!exam || !exam.students) {
+            alert("No data available for the selected exam.");
+            return;
+        }
+
+        const sorted = [...exam.students].sort((a, b) => (Number(b.total) || 0) - (Number(a.total) || 0));
 
         const tbody = document.getElementById("results-table-body");
         if (tbody) {
             tbody.innerHTML = sorted.map((s, i) => `
                 <tr>
                     <td style="font-weight: 700; color: var(--primary);">#${i + 1}</td>
-                    <td style="font-family: monospace;">${escapeHTML(s.rollNo)}</td>
+                    <td style="font-family: monospace;">${escapeHTML(s.roll || s.rollNo)}</td>
                     <td>${escapeHTML(s.name)}</td>
                     <td style="text-align:right; font-weight: 600;">${escapeHTML(s.total)}</td>
                 </tr>
@@ -241,13 +276,12 @@ window.ResultsPortal = (function () {
 
         const meritView = document.getElementById("merit-view");
         const resultsForm = document.getElementById("resultsForm");
-        const portalTitle = document.querySelector(".portal-title");
 
         if (meritView) meritView.style.display = "block";
         if (resultsForm) resultsForm.style.display = "none";
 
         const meritExamName = document.getElementById("merit-exam-name");
-        if (meritExamName) meritExamName.innerText = data.examName || "Standard Examination";
+        if (meritExamName) meritExamName.innerText = exam.examName;
     }
 
     function showSearchForm() {
