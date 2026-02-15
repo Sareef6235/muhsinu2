@@ -5,50 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Result Archive | MIFTHAHUL HUDA</title>
-    <link rel="stylesheet" href="../../assets/css/styles.css">
-    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
-    <link rel="stylesheet" href="../../assets/css/site-footer.css">
+
+    <!-- Unified Assets -->
+    <link rel="stylesheet" href="../../assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-        body {
-            background: #080808;
-            color: #fff;
-            font-family: 'Outfit', sans-serif;
-        }
 
+    <style>
         .archive-wrapper {
             max-width: 800px;
-            margin: 150px auto;
+            margin: 50px auto;
             padding: 0 20px;
             text-align: center;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
             padding: 60px;
-            backdrop-filter: blur(20px);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            background: linear-gradient(90deg, #fff, #00e5ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p {
-            color: #888;
-            line-height: 1.6;
         }
 
         .coming-soon {
             display: inline-block;
             padding: 8px 20px;
-            background: rgba(0, 229, 255, 0.1);
+            background: rgba(0, 243, 255, 0.1);
             border: 1px solid rgba(0, 229, 255, 0.2);
             border-radius: 30px;
             color: #00e5ff;
@@ -57,31 +35,43 @@
             margin-bottom: 20px;
         }
     </style>
+
+    <script type="module">
+        import AppState from '../../assets/js/state.js';
+        import NavigationSystem from '../../assets/js/navigation.js';
+        import FooterSystem from '../../assets/js/footer.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AppState.init();
+            NavigationSystem.init(AppState.navigation.menuData);
+            FooterSystem.init();
+        });
+    </script>
 </head>
 
 <body>
-    <header id="main-header"></header>
-    <div class="archive-wrapper">
-        <div class="glass-card">
+    <header id="site-header"></header>
+    <div id="site-breadcrumbs"></div>
+
+    <main class="archive-wrapper">
+        <div class="glass-card animate-fade-up">
             <span class="coming-soon">COMING SOON</span>
-            <h1>Result Archive</h1>
-            <p>We are currently digitizing our historical examination records. <br> Soon you will be able to search
-                results from previous academic years (2020-2024) here.</p>
+            <h1
+                style="font-size: 2.5rem; margin-bottom: 20px; background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                Result Archive</h1>
+            <p style="color: #888; line-height: 1.6;">We are currently digitizing our historical examination records.
+                <br> Soon you will be able to search results from previous academic years (2020-2024) here.
+            </p>
             <div style="margin-top: 40px;">
                 <a href="index.html" class="nav-link"
-                    style="color: #00e5ff; text-decoration: none; font-weight: 700;"><i class="ph ph-arrow-left"></i>
-                    Back to Current Results</a>
+                    style="color: var(--primary-color); text-decoration: none; font-weight: 700;">
+                    <i class="ph ph-arrow-left"></i> Back to Current Results
+                </a>
             </div>
         </div>
-    </div>
-    <header id="main-header"></header>
-    <footer id="main-footer"></footer>
-    <script src="../../assets/js/site-settings.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SiteSettings) SiteSettings.render();
-        });
-    </script>
+    </main>
+
+    <footer id="site-footer"></footer>
 </body>
 
 </html>

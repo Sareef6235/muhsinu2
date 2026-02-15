@@ -5,38 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Examination Rules | MIFTHAHUL HUDA</title>
-    <link rel="stylesheet" href="../../assets/css/styles.css">
-    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
-    <link rel="stylesheet" href="../../assets/css/site-footer.css">
+
+    <!-- Unified Assets -->
+    <link rel="stylesheet" href="../../assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-        body {
-            background: #080808;
-            color: #fff;
-            font-family: 'Outfit', sans-serif;
-        }
 
+    <style>
         .rules-wrapper {
             max-width: 900px;
-            margin: 120px auto 100px;
+            margin: 50px auto;
             padding: 0 20px;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
             padding: 40px;
-            backdrop-filter: blur(20px);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            background: linear-gradient(90deg, #fff, #00e5ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         .rule-item {
@@ -53,7 +36,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #00e5ff;
+            color: var(--primary-color);
             font-weight: 800;
             flex-shrink: 0;
         }
@@ -70,13 +53,29 @@
             line-height: 1.6;
         }
     </style>
+
+    <script type="module">
+        import AppState from '../../assets/js/state.js';
+        import NavigationSystem from '../../assets/js/navigation.js';
+        import FooterSystem from '../../assets/js/footer.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AppState.init();
+            NavigationSystem.init(AppState.navigation.menuData);
+            FooterSystem.init();
+        });
+    </script>
 </head>
 
 <body>
-    <header id="main-header"></header>
-    <div class="rules-wrapper">
-        <div class="glass-card">
-            <h1>Examination Rules</h1>
+    <header id="site-header"></header>
+    <div id="site-breadcrumbs"></div>
+
+    <main class="rules-wrapper">
+        <div class="glass-card animate-fade-up">
+            <h1
+                style="font-size: 2.5rem; margin-bottom: 30px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Examination Rules</h1>
 
             <div class="rule-item">
                 <div class="rule-num">01</div>
@@ -113,20 +112,14 @@
                 </div>
             </div>
 
-            <div
-                style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:20px; text-align:center;">
-                <p style="font-size: 0.8rem;">For further queries, please visit the Administrative Office.</p>
+            <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top:20px; text-align:center;">
+                <p style="font-size: 0.8rem; color: #666;">For further queries, please visit the Administrative Office.
+                </p>
             </div>
         </div>
-    </div>
-    <header id="main-header"></header>
-    <footer id="main-footer"></footer>
-    <script src="../../assets/js/site-settings.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SiteSettings) SiteSettings.render();
-        });
-    </script>
+    </main>
+
+    <footer id="site-footer"></footer>
 </body>
 
 </html>

@@ -42,6 +42,7 @@
 
 <body data-page-id="home">
     <header id="site-header"></header>
+    <div id="site-breadcrumbs"></div>
 
     <main>
         <!-- Dynamic Hero Section -->
@@ -49,15 +50,17 @@
             style="min-height: 80vh; display: flex; align-items: center; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);">
             <div class="container animate-fade-up" style="text-align: center;">
                 <h2 style="color: var(--primary-color); font-size: 1.5rem; margin-bottom: 10px;">Welcome to</h2>
-                <h1 style="font-size: 4rem; margin-bottom: 20px; font-weight: 800;">MIFTHAHUL HUDA MADRASA</h1>
-                <p style="max-width: 700px; margin: 0 auto 40px; color: #888; font-size: 1.15rem;">
+                <h1 id="hero-title" style="font-size: 4rem; margin-bottom: 20px; font-weight: 800;">MIFTHAHUL HUDA
+                    MADRASA</h1>
+                <p id="hero-desc" style="max-width: 700px; margin: 0 auto 40px; color: #888; font-size: 1.15rem;">
                     Excellence in education, character building, and community service.
                     Empowering students with knowledge and values for a brighter future.
                 </p>
                 <div class="cta-group">
                     <a href="/pages/results/index.html" class="nav-link"
                         style="background: var(--primary-color); color: #000; font-weight: 700;">Check Results</a>
-                    <a href="#about" class="nav-link" style="border: 1px solid var(--border);">Learn More</a>
+                    <a id="hero-cta" href="#about" class="nav-link" style="border: 1px solid var(--border);">Learn
+                        More</a>
                 </div>
             </div>
         </section>

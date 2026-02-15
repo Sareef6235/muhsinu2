@@ -5,11 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us | MIFTHAHUL HUDA</title>
-    <link rel="stylesheet" href="../../assets/css/styles.css">
-    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
-    <link rel="stylesheet" href="../../assets/css/site-footer.css">
-    <link rel="stylesheet" href="../../assets/css/site-languages.css">
-    <script src="../../assets/js/site-languages.js"></script>
+    <link rel="stylesheet" href="../../assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -55,7 +51,7 @@
             font-size: 3.5rem;
             margin-bottom: 2rem;
             font-weight: 700;
-            color: var(--primary-color);
+            color: #00f3ff;
         }
 
         h2 {
@@ -88,41 +84,40 @@
     <div class="dark-overlay"></div>
 
     <div class="content">
-        <h1 class="animate-fade-up" data-t="about_us">About Us</h1>
+        <h1 class="animate-fade-up" data-id="about-title">About Us</h1>
 
         <div class="section animate-fade-up">
-            <p data-t="about_welcome">Welcome to <strong>MIFTHAHUL HUDA MADRASA</strong>, where we believe in nurturing
-                minds and inspiring
-                futures. Located at Vengara S S Road, our institution is dedicated to empowering students through
-                quality education and Islamic values.</p>
+            <p data-id="about-description">Welcome to <strong>MIFTHAHUL HUDA MADRASA</strong>, where we believe in
+                nurturing
+                minds and inspiring futures. Located at Vengara S S Road, our institution is dedicated to empowering
+                students through quality education and Islamic values.</p>
         </div>
 
         <div class="section animate-fade-up" style="animation-delay: 0.1s;">
             <h2 data-t="vision_title">Our Vision</h2>
             <p data-t="vision_desc">To be a beacon of excellence in education, fostering innovation, critical thinking,
-                and character
-                development. We envision a future where our students become global citizens who make meaningful
-                contributions to society.</p>
+                and character development. We envision a future where our students become global citizens who make
+                meaningful contributions to society.</p>
         </div>
 
         <div class="section animate-fade-up" style="animation-delay: 0.2s;">
             <h2 data-t="mission_title">Our Mission</h2>
             <p data-t="mission_desc">We are committed to providing world-class education that combines academic rigor
-                with holistic
-                development. Our mission is to create an inclusive, supportive environment where every student can
-                thrive intellectually, emotionally, and socially.</p>
+                with holistic development. Our mission is to create an inclusive, supportive environment where every
+                student can thrive intellectually, emotionally, and socially.</p>
         </div>
     </div>
 
     <footer id="main-footer"></footer>
 
     <script src="../../assets/js/site-settings.js"></script>
+    <script src="../../assets/js/site-languages.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SiteSettings) SiteSettings.render();
+            if (window.LanguageSystem) LanguageSystem.init();
         });
     </script>
-    <script src="../../assets/js/script.js"></script>
     <script>
         // Space Background Animation logic (simplified/restored from original about-space-bg.html)
         const canvas = document.getElementById('bg-canvas');

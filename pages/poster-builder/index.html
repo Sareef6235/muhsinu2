@@ -5,31 +5,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poster Builder | Pro Media Suite</title>
-    <link rel="stylesheet" href="../../assets/css/styles.css">
+
+    <!-- Unified Assets -->
+    <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="../../assets/css/poster-builder.css">
-    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
-    <link rel="stylesheet" href="../../assets/css/premium-animations.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;700;800&family=Poppins:wght@300;400;600;700;800&family=Outfit:wght@400;700&family=Amiri:wght@400;700&family=Cairo:wght@400;700&family=Noto+Sans+Malayalam:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         .builder-layout {
-            height: calc(100vh - 80px);
-            margin-top: 80px;
+            height: calc(100vh - 70px);
+            margin-top: 70px;
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
         }
 
         body {
             overflow: hidden;
         }
+
+        #site-breadcrumbs {
+            display: none;
+        }
+
+        /* Hide breadcrumbs on full-screen builder */
     </style>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation"></script>
+
+    <script type="module">
+        import AppState from '../../assets/js/state.js';
+        import NavigationSystem from '../../assets/js/navigation.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AppState.init();
+            NavigationSystem.init(AppState.navigation.menuData);
+        });
+    </script>
 </head>
 
 <body>
-    <header id="main-header"></header>
+    <header id="site-header"></header>
 
     <main class="builder-layout">
         <aside class="tool-sidebar">
@@ -46,12 +61,10 @@
                 <button class="tab-btn" data-tab="bg-remover" style="color: #25D366;"><i
                         class="ph-bold ph-scissors"></i><span>AI cut</span></button>
             </div>
-
-            <div class="tab-content">
+            <div class="tab-content" id="panel-container">
                 <div class="panel-section active" id="templates-panel">
                     <div id="template-grid" class="template-grid"></div>
                 </div>
-                <!-- ... other panels as inherited from original ... -->
             </div>
         </aside>
 
@@ -66,7 +79,6 @@
                     <button id="zoom-in"><i class="ph-bold ph-plus"></i></button>
                 </div>
             </div>
-
             <div class="canvas-container" id="canvas-container">
                 <div id="poster-canvas" class="poster-canvas">
                     <div class="empty-canvas-state"><i class="ph ph-layout"></i>
@@ -85,11 +97,8 @@
     </main>
 
     <script src="../../assets/js/utils/performance.js"></script>
-    <script src="../../assets/js/site-nav.js" defer></script>
     <script src="../../assets/js/poster-templates.js" defer></script>
-    <script src="../../assets/js/premium-animations.js" defer></script>
     <script src="../../assets/js/poster-builder.js" defer></script>
-    <script src="../../assets/js/script.js" defer></script>
 </body>
 
 </html>

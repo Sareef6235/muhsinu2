@@ -499,7 +499,7 @@ const ResultsManagement = (() => {
         }
 
         // Sort by Total Marks (Ranking)
-        const sorted = [...examData.data].sort((a, b) => (b.totalMarks || 0) - (a.totalMarks || 0));
+        const sorted = [...examData.data].sort((a, b) => (b.total || 0) - (a.total || 0));
 
         // Build subject-wise display
         tbody.innerHTML = sorted.map((r, index) => {
@@ -510,14 +510,14 @@ const ResultsManagement = (() => {
 
             return `
             <tr>
-                <td>${r.rollNo}</td>
+                <td>${r.roll}</td>
                 <td><b style="color:#fff;">${r.name}</b></td>
                 <td title="${subjectBreakdown}">${r.exam || '---'}</td>
-                <td style="color:var(--primary-color); font-weight:bold;">${r.totalMarks || 0}</td>
+                <td style="color:var(--primary-color); font-weight:bold;">${r.total || 0}</td>
                 <td><span class="status-badge" style="background:rgba(255,255,255,0.05);">${r.grade || 'N/A'}</span></td>
                 <td><span class="status-badge ${r.status === 'Pass' ? 'approved' : 'pending'}">${r.status || 'Unknown'}</span></td>
                 <td>
-                    <a href="../../pages/results/index.html?exam=${examId}&roll=${r.rollNo}" 
+                    <a href="../../pages/results/index.html?exam=${examId}&roll=${r.roll}" 
                        target="_blank" 
                        class="btn btn-mini btn-subtle" 
                        title="View on Public Portal">
@@ -694,155 +694,110 @@ const ResultsManagement = (() => {
     };
 
     /**
-     * ========================================
-     * SYNC LOGIC: Process & Store Results
-     * ========================================
-     * Validates mapping, fetches data, transforms with subject-wise marks
+     * VERSION HISTORY: Save previous version before update
      */
-    const handleSyncClick = async () => {
-        const examId = examSelect?.value;
-        const sheetId = sheetIdInput?.value?.trim();
-        const schoolId = window.SchoolManager ? SchoolManager.getActiveSchool() : 'default';
+    const saveToHistory = (examId, oldData) => {
+        if (!oldData) return;
+        const historyKey = 'results_history';
+        const history = StorageManager.get(historyKey, {});
 
-        // 1. Initial Validation
-        if (!examId) {
-            showStatus('<span style="color:#ffcc00;">⚠️ Please select an exam session first.</span>', 'warning');
-            return;
-        }
-        if (!sheetId) {
-            showStatus('<span style="color:#ffcc00;">⚠️ Please provide a valid Google Sheet ID.</span>', 'warning');
-            return;
+        if (!history[examId]) history[examId] = [];
+
+        // Keep last 5 versions
+        history[examId].unshift({
+            timestamp: new Date().toISOString(),
+            data: oldData
+        });
+
+        if (history[examId].length > 5) history[examId].pop();
+
+        StorageManager.set(historyKey, history);
+        console.log(`📊 History: Saved version for ${examId}`);
+    };
+
+    /**
+     * SYNC PREVIEW MODAL
+     */
+    const showSyncPreview = (examId, results, sheetId) => {
+        const modalId = 'sync-preview-modal';
+        let modal = document.getElementById(modalId);
+
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = modalId;
+            modal.className = 'glass-modal';
+            Object.assign(modal.style, {
+                position: 'fixed', top: '0', left: '0', width: '100%', height: '100%',
+                background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
+                zIndex: '20000', display: 'flex', alignItems: 'center', justifyContent: 'center'
+            });
+            document.body.appendChild(modal);
         }
 
-        // 2. Mapping Configuration Validation (ONLY Roll No and Name required)
-        const mapping = {
-            roll: document.getElementById('map-roll')?.value,
-            name: document.getElementById('map-name')?.value,
-            dob: document.getElementById('map-dob')?.value || null, // Optional
-            subjects: Array.from(document.querySelectorAll('.map-subject-checkbox:checked')).map(cb => cb.value)
+        const stats = {
+            total: results.length,
+            subjects: Object.keys(results[0].subjects).join(', '),
+            avg: Math.round(results.reduce((s, r) => s + r.percentage, 0) / results.length),
+            passCount: results.filter(r => r.status === 'Pass').length
         };
 
-        // STRICT VALIDATION: Only Roll No and Name are mandatory
-        if (!mapping.roll || !mapping.name) {
-            showStatus('<span style="color:#ff4444;">❌ Error: Roll No and Name columns must be mapped.</span>', 'error');
-            const mappingUI = document.getElementById('column-mapping-ui');
-            if (mappingUI) mappingUI.style.display = 'block';
-            return;
-        }
+        modal.innerHTML = `
+            <div class="glass-card" style="width: 90%; max-width: 600px; padding: 40px; border-radius: 30px; animation: scaleUp 0.3s ease;">
+                <h2 style="margin-bottom: 20px;"><i class="ph-bold ph-eye"></i> Sync Preview</h2>
+                
+                <div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px;">
+                        <small style="color: #888;">Students Detected</small>
+                        <div style="font-size: 1.5rem; font-weight: 700;">${stats.total}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px;">
+                        <small style="color: #888;">Passing Rate</small>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #00ff88;">${Math.round((stats.passCount / stats.total) * 100)}%</div>
+                    </div>
+                </div>
 
-        // Validate at least one subject is selected
-        if (mapping.subjects.length === 0) {
-            showStatus('<span style="color:#ff4444;">❌ Error: Please select at least one subject column.</span>', 'error');
-            return;
-        }
+                <div style="margin-bottom: 25px;">
+                    <label style="color: #888; font-size: 0.8rem;">Subjects Detected:</label>
+                    <p style="color: var(--primary-color); font-weight: 500;">${stats.subjects}</p>
+                </div>
 
-        console.log('📊 Sync Configuration:');
-        console.log('  Roll No Column:', mapping.roll);
-        console.log('  Name Column:', mapping.name);
-        console.log('  DOB Column:', mapping.dob || 'Not mapped (optional)');
-        console.log('  Subject Columns:', mapping.subjects);
-        console.log('  ⚠️ Grade, Status, Percentage will be CALCULATED in JavaScript');
-        console.log('  ⚠️ Metadata (CLASS, SECTION, etc.) ignored');
+                <div style="display: flex; gap: 15px;">
+                    <button id="cancel-sync" class="btn btn-subtle" style="flex: 1;">Cancel</button>
+                    <button id="confirm-sync" class="btn btn-primary" style="flex: 2;">Commit & Save</button>
+                </div>
+            </div>
+        `;
 
-        // UI State: Loading
-        syncButton.disabled = true;
-        const originalBtnHtml = syncButton.innerHTML;
-        syncButton.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Processing...';
+        modal.style.display = 'flex';
 
+        document.getElementById('cancel-sync').onclick = () => {
+            modal.style.display = 'none';
+            showStatus('<span style="color: #ffcc00;">⚠️ Sync cancelled by user.</span>', 'warning');
+        };
+
+        document.getElementById('confirm-sync').onclick = () => {
+            modal.style.display = 'none';
+            commitPublish(examId, results, sheetId);
+        };
+    };
+
+    const commitPublish = (examId, results, sheetId) => {
         try {
-            // Step 1: Network Check & Fetch
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Fetching data from Google Sheets...', 'loading');
+            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Committing results to database...', 'loading');
 
-            // Use GViz API for robust fetching
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&tq&cache_bust=${Date.now()}`;
+            // Version History
+            const oldData = getExamResults(examId);
+            saveToHistory(examId, oldData);
 
-            const response = await fetch(csvUrl);
-            if (!response.ok) {
-                if (response.status === 404) throw new Error('Sheet not found. Check the ID.');
-                throw new Error('Could not reach Google Sheets. Ensure the sheet is Public (Anyone with link can view).');
-            }
-
-            const csvText = await response.text();
-
-            // Check for HTML response (Private sheet)
-            if (csvText.includes('<html') || csvText.startsWith('<!DOCTYPE')) {
-                throw new Error('Access Denied: Sheet is private. Please change sharing to "Anyone with the link".');
-            }
-
-            // Step 2: Parse CSV
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Parsing spreadsheet content...', 'loading');
-            const rawData = parseCSV(csvText);
-            if (!rawData || rawData.length === 0) {
-                throw new Error('Spreadsheet appears to be empty or misformatted.');
-            }
-
-            // Step 3: Transformation with Subject-Wise Marks
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Processing subject marks...', 'loading');
-            const examMeta = (window.ExamManager ? ExamManager.getAll() : []).find(e => e.id === examId);
-            const examName = examMeta ? `${examMeta.name} (${examMeta.examTypeName || ''})` : 'Result';
-
-            const results = rawData.map(row => {
-                const subjects = {}; // Store subject-wise marks with EXACT names
-                let totalMarks = 0;
-
-                // Process each subject column (preserving exact names from sheet)
-                mapping.subjects.forEach(subjectName => {
-                    const rawValue = row[subjectName];
-                    const marks = parseFloat(rawValue) || 0;
-
-                    // Store with EXACT subject name from sheet header
-                    subjects[subjectName] = marks;
-                    totalMarks += marks;
-                });
-
-                // Get status (Pass/Fail)
-                const resStatus = row[mapping.status] || (totalMarks > 0 ? 'Pass' : 'Absent');
-
-                // Calculate computed values (JS-based)
-                const maxMarksPerSubject = 100;
-                const totalMaxMarks = mapping.subjects.length * maxMarksPerSubject;
-                const percentage = calculatePercentage(totalMarks, totalMaxMarks);
-                const grade = calculateGrade(percentage);
-                const status = calculateStatus(subjects, 33);
-
-                return {
-                    rollNo: row[mapping.roll] || '',
-                    name: row[mapping.name] || '',
-                    dob: mapping.dob ? row[mapping.dob] : '',
-                    examId: examId,
-                    exam: examName,
-                    subjects: subjects,
-                    totalMarks: totalMarks,
-                    maxMarks: totalMaxMarks,   // New field
-                    percentage: percentage,    // New field
-                    grade: grade,
-                    status: status,
-                    rank: null
-                };
-            }).filter(r => r.rollNo && r.name); // Only include rows with valid identity
-
-            if (results.length === 0) {
-                throw new Error('No valid results found after processing. Check your column mappings.');
-            }
-
-            console.log('📊 Processed Results Sample:', results[0]);
-            console.log(`✓ Total Students: ${results.length}`);
-            console.log(`✓ Subjects per Student: ${Object.keys(results[0].subjects).length}`);
-
-            // Step 4: Storage & UI Update
-            showStatus('<i class="ph-bold ph-spinner ph-spin"></i> Saving locally...', 'loading');
+            // Save
             saveExamResults(examId, results, sheetId, false);
 
-            // =====================================================
-            // BRIDGE PATTERN: Populate ResultsBridge
-            // =====================================================
-            // WHY: Creates an in-memory bridge between sync and publish.
-            // This allows the publish button to access the EXACT data
-            // that was just synced without re-fetching from localStorage.
+            // Bridge update
+            const examMeta = (window.ExamManager ? ExamManager.getAll() : []).find(e => e.id === examId);
             window.ResultsBridge = {
                 generated: {
                     examId: examId,
-                    examName: examName,
+                    examName: examMeta ? `${examMeta.name}` : 'Result',
                     session: examMeta?.academicYear || new Date().getFullYear(),
                     results: results.map(r => ({
                         roll: String(r.rollNo).trim(),
@@ -851,24 +806,92 @@ const ResultsManagement = (() => {
                         total: r.totalMarks
                     }))
                 },
-                published: false,
                 syncedAt: new Date().toISOString()
             };
 
-            console.log('🔗 ResultsBridge populated:', window.ResultsBridge);
-
             showStatus(
-                `<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> ✓ Sync success! ${results.length} results loaded. Click "Publish" to go live.`,
+                `<i class="ph-bold ph-check-circle" style="color:#00ff88;"></i> ✓ Successfully published ${results.length} results locally.`,
                 'success'
             );
+        } catch (e) {
+            showStatus(`<span style="color:#ff4444;">❌ Commit Failed: ${e.message}</span>`, 'error');
+        }
+    };
+
+    /**
+     * ========================================
+     * SYNC LOGIC: Process & Store Results
+     * ========================================
+     */
+    const handleSyncClick = async () => {
+        const examId = examSelect?.value;
+        const sheetId = sheetIdInput?.value?.trim();
+
+        if (!examId || !sheetId) {
+            showStatus('<span style="color:#ffcc00;">⚠️ Select an exam and provide a Sheet ID.</span>', 'warning');
+            return;
+        }
+
+        const mapping = {
+            roll: document.getElementById('map-roll')?.value,
+            name: document.getElementById('map-name')?.value,
+            dob: document.getElementById('map-dob')?.value || null,
+            subjects: Array.from(document.querySelectorAll('.map-subject-checkbox:checked')).map(cb => cb.value)
+        };
+
+        if (!mapping.roll || !mapping.name || mapping.subjects.length === 0) {
+            showStatus('<span style="color:#ff4444;">❌ Error: Mapping incomplete.</span>', 'error');
+            return;
+        }
+
+        syncButton.disabled = true;
+        const originalBtnHtml = syncButton.innerHTML;
+        syncButton.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Validating...';
+
+        try {
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&tq&cache_bust=${Date.now()}`;
+            const response = await fetch(csvUrl);
+            if (!response.ok) throw new Error('Could not reach Google Sheets.');
+
+            const csvText = await response.text();
+            if (csvText.includes('<html')) throw new Error('Sheet is private.');
+
+            const rawData = parseCSV(csvText);
+            const results = rawData.map(row => {
+                const subjects = {};
+                let totalMarks = 0;
+                mapping.subjects.forEach(s => {
+                    const m = parseFloat(row[s]) || 0;
+                    subjects[s] = m;
+                    totalMarks += m;
+                });
+
+                const totalMaxMarks = mapping.subjects.length * 100;
+                const percentage = calculatePercentage(totalMarks, totalMaxMarks);
+
+                return {
+                    roll: row[mapping.roll] || '',
+                    name: row[mapping.name] || '',
+                    dob: mapping.dob ? row[mapping.dob] : '',
+                    examId: examId,
+                    subjects: subjects,
+                    total: totalMarks,
+                    percentage: percentage,
+                    grade: calculateGrade(percentage),
+                    status: calculateStatus(subjects, 33)
+                };
+            }).filter(r => r.roll && r.name);
+
+            if (results.length === 0) throw new Error('No valid data processed.');
+
+            // Show Preview instead of immediate save
+            showSyncPreview(examId, results, sheetId);
 
         } catch (error) {
-            console.error('📊 ResultsManagement Sync Error:', error);
             showStatus(`<span style="color:#ff4444;">❌ Sync Failed: ${error.message}</span>`, 'error');
         } finally {
             syncButton.disabled = false;
             syncButton.innerHTML = originalBtnHtml;
-            updateButtonState();
         }
     };
 

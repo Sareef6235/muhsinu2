@@ -1,94 +1,118 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Approved Fee Receipts - MIFTHAHUL HUDA MADRASA</title>
-    <link rel="stylesheet" href="../../assets/css/styles.css">
-    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
-    <link rel="stylesheet" href="../../assets/css/site-footer.css">
-    <link rel="stylesheet" href="../../assets/css/site-languages.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Fee Receipts | MIFTHAHUL HUDA</title>
+
+    <!-- Unified Assets -->
+    <link rel="stylesheet" href="../../assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        .receipt-header {
+            padding: 80px 0 40px;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .receipt-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            transition: 0.3s;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .receipt-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .receipt-img {
+            width: 100%;
+            border-radius: 12px;
+            margin: 15px 0;
+            background: #000;
+            cursor: zoom-in;
+        }
+    </style>
+
+    <script type="module">
+        import AppState from '../../assets/js/state.js';
+        import NavigationSystem from '../../assets/js/navigation.js';
+        import FooterSystem from '../../assets/js/footer.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AppState.init();
+            NavigationSystem.init(AppState.navigation.menuData);
+            FooterSystem.init();
+            renderReceipts();
+        });
+
+        window.renderReceipts = (filter = 'all') => {
+            const receipts = JSON.parse(localStorage.getItem("fee_receipts") || "[]");
+            const gallery = document.getElementById("gallery");
+            const approved = receipts.filter(r => r.approved && (filter === 'all' || r.cls == filter));
+
+            if (approved.length === 0) {
+                gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #666;'>No approved receipts found.</p>";
+                return;
+            }
+
+            gallery.innerHTML = approved.map(r => `
+                <div class="receipt-card animate-fade-up">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="color: #2ed573; font-weight: 700; font-size: 0.8rem;">Approved</span>
+                        <span style="color: #444; font-size: 0.8rem;">${r.date || ''}</span>
+                    </div>
+                    <h3 style="margin-bottom: 5px;">Receipt #${r.receiptNo}</h3>
+                    <p style="color: var(--primary-color); font-weight: 600;">${r.name}</p>
+                    <p style="color: #666; font-size: 0.9rem;">Class ${r.cls}</p>
+                    ${r.img ? `<img src="${r.img}" class="receipt-img" onclick="window.open(this.src)">` : ``}
+                    ${r.content ? `<p style="margin-top: 10px; font-size: 0.9rem; color: #aaa;">${r.content}</p>` : ''}
+                </div>
+            `).join('');
+        };
+    </script>
 </head>
 
 <body>
-    <header id="main-header"></header>
+    <header id="site-header"></header>
+    <div id="site-breadcrumbs"></div>
 
-    <header class="creative-header">
-        <h1 class="creative-title">🧾 Approved Fee Receipts</h1>
-        <p>List of students who have successfully submitted their fee proof.</p>
-    </header>
+    <main class="container">
+        <header class="receipt-header">
+            <h1
+                style="font-size: 3rem; background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                Approved Fee Receipts</h1>
+            <p style="color: #888;">Transparency in every transaction.</p>
+        </header>
 
-    <section>
-        <div class="container" style="margin-bottom: 30px; text-align: center;">
-            <select id="class-filter" onchange="renderReceipts(this.value)"
-                style="padding: 12px 20px; border-radius: 8px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); font-size: 1rem; cursor: pointer;">
+        <section style="padding-bottom: 30px; text-align: center;">
+            <select onchange="renderReceipts(this.value)"
+                style="padding: 10px 20px; border-radius: 10px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--border);">
                 <option value="all">Filter by Class: All</option>
                 <script>
                     for (let i = 1; i <= 12; i++) document.write(`<option value="${i}">Class ${i}</option>`);
                 </script>
             </select>
-        </div>
-        <div class="grid" id="gallery"></div>
-    </section>
+        </section>
 
-    <footer id="main-footer"></footer>
+        <section style="padding-bottom: 100px;">
+            <div class="grid" id="gallery"></div>
+        </section>
+    </main>
 
-    <!-- WhatsApp Floating Button -->
-    <div class="whatsapp-float-wrapper">
-        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp">
-            <i class="ph-fill ph-whatsapp-logo"></i>
-        </a>
-    </div>
-
-    <script src="../../assets/js/script.js"></script>
-    <script src="../../assets/js/site-settings.js"></script>
-    <script>
-        // Load fee receipts from storage
-        const works = JSON.parse(localStorage.getItem("fee_receipts") || "[]");
-        const gallery = document.getElementById("gallery");
-
-        function renderReceipts(filterClass = "all") {
-            // Filter only approved receipts AND matching class
-            const approvedWorks = works.filter(w => w.approved && (filterClass === "all" || w.cls == filterClass));
-
-            gallery.innerHTML = "";
-
-            if (approvedWorks.length === 0) {
-                gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #666;'>No approved receipts found for this selection.</p>";
-                return;
-            }
-
-            approvedWorks.forEach((w, i) => {
-                gallery.innerHTML += `
-                <div class="card creation-card animate-fade-up" style="border-left: 4px solid var(--primary-color);">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                        <span style="background: rgba(46, 213, 115, 0.1); color: #2ed573; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: 700;">Approved</span>
-                        <span style="color: #666; font-size: 0.8rem;">${w.date || 'N/A'}</span>
-                    </div>
-                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.2rem;">Receipt #${w.receiptNo}</h3>
-                    <p style="color: var(--primary-color); font-size: 1rem; margin-bottom: 10px; font-weight: 600;">${w.name}</p>
-                    <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 15px;">Class: ${w.cls}</p>
-                    
-                    ${w.img ? `<div style="margin-bottom: 15px; border-radius: 8px; overflow: hidden; background: #000;"><img src="${w.img}" onclick="window.open(this.src)" style="width: 100%; height: 200px; object-fit: contain; cursor: zoom-in;" title="Click to view full receipt"></div>` : ``}
-                    
-                    ${w.content ? `<p style="font-size: 0.9rem; line-height: 1.5; color: #888; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">Remarks: ${w.content}</p>` : ''}
-                </div>`;
-            });
-        }
-
-        // Initial Render
-        renderReceipts();
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SiteSettings) SiteSettings.render();
-        });
-    </script>
-    <script type="module" src="../../assets/js/auth-nav-guard.js"></script>
+    <footer id="site-footer"></footer>
 </body>
 
 </html>

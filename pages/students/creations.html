@@ -1,70 +1,105 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creations - MIFTHAHUL HUDA MADRASA</title>
-    <link rel="stylesheet" href="../../assets/css/styles.css">
-    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
-    <link rel="stylesheet" href="../../assets/css/site-footer.css">
-    <link rel="stylesheet" href="../../assets/css/site-languages.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Student Creations | MIFTHAHUL HUDA</title>
+
+    <!-- Unified Assets -->
+    <link rel="stylesheet" href="../../assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        .creative-header {
+            padding: 80px 0 40px;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .creation-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            transition: 0.3s;
+        }
+
+        .creation-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .creation-card img {
+            width: 100%;
+            border-radius: 12px;
+            margin: 15px 0;
+            border: 1px solid var(--border);
+        }
+    </style>
+
+    <script type="module">
+        import AppState from '../../assets/js/state.js';
+        import NavigationSystem from '../../assets/js/navigation.js';
+        import FooterSystem from '../../assets/js/footer.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AppState.init();
+            NavigationSystem.init(AppState.navigation.menuData);
+            FooterSystem.init();
+            renderCreations();
+        });
+
+        function renderCreations() {
+            const works = JSON.parse(localStorage.getItem("works") || "[]");
+            const gallery = document.getElementById("gallery");
+            const approvedWorks = works.filter(w => w.approved);
+
+            if (approvedWorks.length === 0) {
+                gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #666;'>No approved creations yet. Check back soon!</p>";
+                return;
+            }
+
+            gallery.innerHTML = approvedWorks.map(w => `
+                <div class="creation-card animate-fade-up">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="color: var(--primary-color); font-weight: 700; font-size: 0.8rem;">${w.type}</span>
+                        <span style="color: #444; font-size: 0.8rem;">${w.date || ''}</span>
+                    </div>
+                    <h3 style="margin-bottom: 5px;">${w.title}</h3>
+                    <p style="color: #666; font-size: 0.9rem;">By ${w.name} (Class ${w.cls})</p>
+                    ${w.img ? `<img src="${w.img}">` : ``}
+                    <p style="margin-top: 15px; line-height: 1.6; color: #aaa;">${w.content}</p>
+                </div>
+            `).join('');
+        }
+    </script>
 </head>
 
 <body>
-    <header id="main-header"></header>
+    <header id="site-header"></header>
+    <div id="site-breadcrumbs"></div>
 
-    <header class="creative-header">
-        <h1 class="creative-title">🖼 Approved Creations</h1>
-        <p>Showcasing the best works from our students.</p>
-    </header>
+    <main class="container">
+        <header class="creative-header">
+            <h1
+                style="font-size: 3rem; background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                Approved Creations</h1>
+            <p style="color: #888;">Showcasing the best works from our talented students.</p>
+        </header>
 
-    <section>
-        <div class="container">
+        <section style="padding-bottom: 100px;">
             <div class="grid" id="gallery"></div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <footer id="main-footer"></footer>
-
-    <script src="../../assets/js/script.js"></script>
-    <script src="../../assets/js/site-settings.js"></script>
-    <script>
-        // Load works from storage
-        const works = JSON.parse(localStorage.getItem("works") || "[]");
-        const gallery = document.getElementById("gallery");
-
-        // Filter only approved works
-        const approvedWorks = works.filter(w => w.approved);
-
-        if (approvedWorks.length === 0) {
-            gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #666;'>No approved creations yet. Check back soon!</p>";
-        } else {
-            gallery.innerHTML = "";
-            approvedWorks.forEach(w => {
-                gallery.innerHTML += `
-                <div class="card creation-card animate-fade-up">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                        <span style="background: rgba(0, 243, 255, 0.1); color: var(--primary-color); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: 700;">${w.type}</span>
-                        <span style="color: #555; font-size: 0.8rem;">${w.date || ''}</span>
-                    </div>
-                    <h3 style="margin-bottom: 5px; color: #fff;">${w.title}</h3>
-                    <p style="color: var(--primary-color); font-size: 0.9rem; margin-bottom: 20px;">By ${w.name} (Class ${w.cls})</p>
-                    ${w.img ? `<img src="${w.img}">` : ``}
-                    <p style="font-size: 1rem; line-height: 1.6; color: #bbb;">${w.content}</p>
-                </div>`;
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SiteSettings) SiteSettings.render();
-        });
-    </script>
-    <script type="module" src="../../assets/js/auth-nav-guard.js"></script>
+    <footer id="site-footer"></footer>
 </body>
 
 </html>

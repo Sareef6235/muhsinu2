@@ -285,7 +285,7 @@
     <script src="../../assets/js/tenant-manager.js"></script>
     <script src="../../assets/js/theme-engine.js"></script>
     <script src="../../assets/js/page-builder.js"></script>
-    <script src="../../assets/js/site-engine.js"></script>
+    <script src="../../assets/js/site-settings.js"></script>
 
     <script>
         let currentEditingId = null;
@@ -438,7 +438,7 @@
 
         function checkIntegrity() {
             const results = [];
-            if (window.SiteEngine) results.push('✅ SiteEngine Loaded');
+            if (window.SiteSettings) results.push('✅ SiteSettings Loaded');
             if (window.TenantManager) results.push('✅ TenantManager Ready');
             if (window.PageBuilder) results.push('✅ PageBuilder Initialized');
 
@@ -450,14 +450,16 @@
 
         // Initialize platform
         window.addEventListener('DOMContentLoaded', () => {
-            SiteEngine.init();
+            if (window.SiteSettings) window.SiteSettings.init();
             renderSites();
 
             // Sync settings inputs
             const t = TenantManager.getTenant();
-            document.getElementById('input-brand-name').value = t.brand.name;
-            document.getElementById('input-brand-primary').value = t.brand.primaryColor;
-            document.getElementById('input-brand-logo').value = t.brand.logo;
+            if (t && t.brand) {
+                document.getElementById('input-brand-name').value = t.brand.name;
+                document.getElementById('input-brand-primary').value = t.brand.primaryColor;
+                document.getElementById('input-brand-logo').value = t.brand.logo;
+            }
         });
     </script>
 </body>

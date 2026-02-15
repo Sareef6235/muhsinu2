@@ -4,403 +4,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Services | MIFTHAHUL HUDA MADRASA</title>
-    <meta name="description"
-        content="Explore the comprehensive services at MIFTHAHUL HUDA MADRASA including Quality Education, Personal Mentoring, and Success Records.">
-    <link rel="stylesheet" href="../../assets/css/styles.css">
-    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
-    <link rel="stylesheet" href="../../assets/css/site-footer.css">
-    <link rel="stylesheet" href="../../assets/css/site-languages.css">
-    <script src="../../assets/js/site-languages.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Our Services | MIFTHAHUL HUDA</title>
+
+    <!-- Unified Assets -->
+    <link rel="stylesheet" href="../../assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
-        :root {
-            --glass-bg-accent: rgba(255, 255, 255, 0.08);
-        }
-
         .services-hero {
-            padding: 180px 0 100px;
-            background: linear-gradient(135deg, rgba(10, 10, 10, 1) 0%, rgba(0, 243, 255, 0.05) 100%);
+            padding: 80px 0 40px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
         }
 
-        .services-hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.1) 0%, transparent 70%);
-            z-index: 1;
-        }
-
-        .breadcrumb {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: #888;
-            position: relative;
-            z-index: 2;
-        }
-
-        .breadcrumb a {
-            color: var(--primary-color);
-        }
-
-        .breadcrumb span {
-            color: #555;
-        }
-
-        .services-hero h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 2;
-            letter-spacing: -1px;
-        }
-
-        .services-hero p {
-            font-size: 1.2rem;
-            color: #aaa;
-            max-width: 600px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        .service-detail-section {
-            padding: 100px 0;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .service-detail-section:last-child {
-            border-bottom: none;
-        }
-
-        .service-container {
+        .service-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: center;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 50px 0;
         }
 
-        .service-content h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .service-content h2 i {
-            font-size: 3rem;
-            color: var(--secondary-color);
-        }
-
-        .service-content p {
-            font-size: 1.1rem;
-            color: #bbb;
-            line-height: 1.8;
-            margin-bottom: 30px;
-        }
-
-        .detail-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .detail-item {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            padding: 20px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .service-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
             transition: 0.3s;
         }
 
-        .detail-item:hover {
-            background: var(--glass-bg-accent);
+        .service-card:hover {
+            transform: translateY(-10px);
             border-color: var(--primary-color);
-            transform: translateY(-5px);
         }
 
-        .detail-item i {
+        .service-icon {
+            font-size: 3rem;
             color: var(--primary-color);
-            font-size: 1.5rem;
-        }
-
-        .detail-item span {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .service-visual {
-            position: relative;
-            height: 400px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .service-visual i {
-            font-size: 10rem;
-            opacity: 0.1;
-            color: var(--primary-color);
-            position: absolute;
-        }
-
-        .floating-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 20px;
-            width: 80%;
-            text-align: center;
-            z-index: 2;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-20px);
-            }
-        }
-
-        .cta-section {
-            padding: 100px 0;
-            text-align: center;
-            background: linear-gradient(0deg, rgba(10, 10, 10, 1) 0%, rgba(188, 19, 254, 0.05) 100%);
-        }
-
-        .cta-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            padding: 60px;
-            border-radius: 30px;
-            max-width: 800px;
-            margin: 0 auto;
-            backdrop-filter: blur(20px);
-        }
-
-        .cta-card h2 {
-            font-size: 2.5rem;
             margin-bottom: 20px;
         }
-
-        .cta-card p {
-            color: #aaa;
-            margin-bottom: 40px;
-            font-size: 1.1rem;
-        }
-
-        @media (max-width: 992px) {
-            .service-container {
-                grid-template-columns: 1fr;
-                gap: 50px;
-            }
-
-            .service-visual {
-                order: -1;
-                height: 300px;
-            }
-
-            .services-hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .detail-list {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
+
+    <script type="module">
+        import AppState from '../../assets/js/state.js';
+        import NavigationSystem from '../../assets/js/navigation.js';
+        import FooterSystem from '../../assets/js/footer.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AppState.init();
+            NavigationSystem.init(AppState.navigation.menuData);
+            FooterSystem.init();
+            // SiteSettings.init() is auto-called by its script and will handle renderDynamicServices
+        });
+    </script>
 </head>
 
 <body>
-    <header id="main-header">
-        <!-- Navigation injected via site-nav.js -->
-    </header>
+    <header id="site-header"></header>
+    <div id="site-breadcrumbs"></div>
 
-    <main>
+    <main class="container">
         <section class="services-hero">
-            <div class="container">
-                <div class="breadcrumb">
-                    <a href="../../index.html">Home</a>
-                    <span>/</span>
-                    <span>Services</span>
-                </div>
-                <h1 class="animate-fade-up" data-t="our_services">Our Services</h1>
-                <p class="animate-fade-up delay-1" data-t="services_hero_text">What We Offer at MIFTHAHUL HUDA MADRASA
-                </p>
-            </div>
+            <h1
+                style="font-size: 3.5rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                Our Services</h1>
+            <p style="color: #888; font-size: 1.2rem;">Experience the best in value-based educational and spiritual
+                services.</p>
         </section>
 
-        <div id="services-detail-container">
-            <!-- Service details rendered dynamically via JS -->
-        </div>
-
-        <script type="module">
-            import StorageManager from '../../assets/js/storage-manager.js';
-            import ServicesCMS from '../../assets/js/services-cms.js';
-
-            // Initialization (Frontend)
-            ServicesCMS.init();
-            const listContainer = document.getElementById('services-detail-container');
-
-            function render() {
-                const services = ServicesCMS.getActive();
-                if (listContainer) {
-                    renderServicesList(services);
-                }
-            }
-
-            function renderServicesList(items) {
-                const currentLang = document.documentElement.lang || 'en';
-                const theme = StorageManager.get('theme_config', { primary: '#00f3ff' });
-                document.documentElement.style.setProperty('--primary-color', theme.primary);
-
-                if (items.length === 0) {
-                    listContainer.innerHTML = '<div class="container" style="text-align:center; padding:100px 0; color:#666;"><p>Bringing our premium services to you soon...</p></div>';
-                    return;
-                }
-
-                listContainer.innerHTML = `
-                    <div class="container">
-                        <p style="text-align:center; color:#666; margin-bottom:40px;">Showing ${items.length} premium services in ${currentLang.toUpperCase()}</p>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; padding: 20px 0 100px;">
-                            ${items.map(s => {
-                    const title = s.title[currentLang] || s.title['en'] || s.title;
-                    const desc = s.desc[currentLang] || s.desc['en'] || s.desc;
-                    return `
-                                    <div class="floating-card glass-mhm animate-fade-up" style="text-align: left; background: rgba(255,255,255,0.02); height: 100%; display: flex; flex-direction: column;">
-                                        ${s.image ? `<div style="height:200px; overflow:hidden; border-radius:15px; margin-bottom:20px;"><img src="${s.image}" style="width:100%; height:100%; object-fit:cover;"></div>` : ''}
-                                        <div style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 20px;"><i class="${s.icon || 'ph ph-app-window'}"></i></div>
-                                        <h2 style="font-size: 1.6rem; margin-bottom: 12px; color: #fff;">${title}</h2>
-                                        <p style="color: #aaa; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.6; flex-grow: 1;">${desc}</p>
-                                        <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid rgba(255,255,255,0.05); pt:15px; margin-top:auto;">
-                                            <a href="../../index.html#booking" class="btn-lean" style="color: var(--primary-color); font-weight: 600; text-decoration:none; font-size:0.9rem;">
-                                                Enquire Now <i class="ph-bold ph-arrow-right"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                `;
-                }).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            render();
-
-            // Re-render on language change or storage update
-            window.addEventListener('siteLangChange', render);
-            window.addEventListener('storage-update-site_services', render);
-        </script>
-
-        <section class="cta-section">
-            <div class="container">
-                <div class="cta-card animate-fade-up">
-                    <h2 data-t="ready_to_join">Ready to Join Us?</h2>
-                    <p data-t="enroll_now_desc">Experience the best in value-based education. Book a consultation or
-                        tuition session today.</p>
-                    <a href="../../index.html#booking" class="btn btn-primary" data-t="enroll_now_btn">Enroll Now</a>
-                </div>
-            </div>
-        </section>
+        <div class="service-grid" id="services-grid"></div>
     </main>
 
-    <footer id="main-footer"></footer>
-
-    <!-- WhatsApp Floating Button handled by site-footer.js if needed, or keeping for now -->
-    <!-- WhatsApp Floating Button -->
-    <div class="whatsapp-float-wrapper">
-        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp"
-            data-t="whatsapp_aria">
-            <i class="ph-fill ph-whatsapp-logo"></i>
-        </a>
-    </div>
-
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <div class="bottom-nav-container">
-            <a href="../../index.html#hero" class="nav-item">
-                <i class="ph ph-house"></i>
-                <span data-t="home">Home</span>
-            </a>
-            <a href="../gallery/index.html" class="nav-item">
-                <i class="ph ph-image"></i>
-                <span data-t="gallery">Gallery</span>
-            </a>
-            <a href="#" class="nav-item active">
-                <i class="ph ph-briefcase"></i>
-                <span data-t="services">Services</span>
-            </a>
-
-            <!-- CENTER ACTION BUTTON -->
-            <a href="../../index.html#booking" class="btn-book-nav" aria-label="Book Tuition"
-                data-t="book_tuition_aria">
-                <i class="ph-bold ph-calendar-plus" style="color: #000; font-size: 1.6rem;"></i>
-            </a>
-
-            <a href="../students/creations.html" class="nav-item">
-                <i class="ph ph-student"></i>
-                <span data-t="student_zone">Student</span>
-            </a>
-            <a href="../../index.html#contact" class="nav-item">
-                <i class="ph ph-chat-circle"></i>
-                <span data-t="contact">Contact</span>
-            </a>
-        </div>
-    </nav>
-
-    <script src="../../assets/js/site-settings.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SiteSettings) SiteSettings.render();
-        });
-    </script>
-    <script src="../../assets/js/script.js"></script>
-    <script>
-        // Smooth scroll for hash links (Modified for relative)
-        window.addEventListener('load', () => {
-            if (window.location.hash) {
-                const target = document.querySelector(window.location.hash);
-                if (target) {
-                    setTimeout(() => {
-                        window.scrollTo({
-                            top: target.offsetTop - 100,
-                            behavior: 'smooth'
-                        });
-                    }, 500);
-                }
-            }
-        });
-    </script>
+    <footer id="site-footer"></footer>
 </body>
 
 </html>

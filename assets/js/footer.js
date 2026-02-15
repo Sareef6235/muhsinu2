@@ -8,8 +8,12 @@ const FooterSystem = {
     },
 
     init() {
+        if (window.SiteSettings) {
+            console.log("FooterSystem: Deferring to SiteSettings for dynamic footer.");
+            return;
+        }
         this.renderFooter();
-        console.log("FooterSystem Initialized");
+        console.log("FooterSystem Initialized (Static Fallback)");
     },
 
     renderFooter() {
