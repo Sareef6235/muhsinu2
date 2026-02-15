@@ -7,6 +7,7 @@
     <title>Exams Admin | MIFTHAHUL HUDA</title>
     <link rel="stylesheet" href="../../assets/css/styles.css">
     <link rel="stylesheet" href="../../assets/css/modern-nav.css">
+    <link rel="stylesheet" href="../../assets/css/admin-header.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -147,6 +148,53 @@
 </head>
 
 <body>
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <div class="header-left">
+            <!-- Desktop Toggle (Sidebar collapse etc.) -->
+            <div class="admin-toggle-desktop" onclick="toggleDesktopMenu()">
+                <i class="ph-bold ph-sidebar"></i>
+            </div>
+
+            <!-- Mobile Toggle (Hamburger Menu) -->
+            <div class="admin-toggle-mobile" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="admin-logo">Result<span>Admin</span></div>
+        </div>
+
+
+        <nav class="admin-nav" id="adminNav">
+            <div class="admin-nav-item">
+                <a href="../admin/dashboard.html" class="admin-nav-link">Dashboard</a>
+            </div>
+
+            <div class="admin-nav-item">
+                <a href="#" class="admin-nav-link active">Exams</a>
+            </div>
+
+            <div class="admin-nav-item">
+                <a href="#" class="admin-nav-link">
+                    Data Tools ▾
+                </a>
+                <div class="admin-dropdown">
+                    <div class="admin-dropdown-item">Download JSON</div>
+                    <div class="admin-dropdown-item">Import JSON</div>
+                    <div class="admin-dropdown-item">Static Publish</div>
+                    <div class="admin-dropdown-item danger">Clear Data</div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="admin-user">
+            <div class="admin-avatar">AD</div>
+            <div class="admin-username">Admin</div>
+        </div>
+    </header>
+
     <div class="admin-container">
         <!-- Sidebar: Global Settings -->
         <div class="glass-panel">
@@ -383,6 +431,20 @@
         };
 
         init();
+
+        // Desktop sidebar toggle (for future sidebar implementation)
+        function toggleDesktopMenu() {
+            // TODO: Implement sidebar collapse/expand functionality
+            console.log('Desktop menu toggle clicked');
+        }
+
+        // Mobile hamburger menu toggle
+        function toggleMobileMenu() {
+            const nav = document.getElementById('adminNav');
+            const toggle = document.querySelector('.admin-toggle-mobile');
+            nav.classList.toggle('active');
+            toggle.classList.toggle('active');
+        }
     </script>
 </body>
 

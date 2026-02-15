@@ -16,6 +16,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <script src="../../assets/js/pro-exam.js"></script>
+    <script src="../../assets/js/nav-dropdown.js"></script>
+
+    <!-- CMS Modules -->
+    <link rel="stylesheet" href="../../assets/css/toast-notifications.css">
+    <script src="../../assets/js/cms/core/toast-notification.js"></script>
+    <script src="../../assets/js/cms/core/data-manager.js"></script>
+    <script src="../../assets/js/cms/core/validation-engine.js"></script>
+    <script src="../../assets/js/cms/features/backup-manager.js"></script>
+    <script src="../../assets/js/cms/features/static-publisher.js"></script>
+    <script src="../../assets/js/cms/features/json-importer.js"></script>
+    <script src="../../assets/js/cms/cms-init.js"></script>
+
     <style>
         :root {
             --primary-color: #00f3ff;
@@ -129,6 +141,81 @@
         .nav-item.active {
             background: rgba(0, 243, 255, 0.1);
             color: var(--primary-color);
+        }
+
+        /* Dropdown Navigation Styles */
+        .nav-dropdown-toggle {
+            position: relative;
+            justify-content: space-between;
+        }
+
+        .nav-dropdown-toggle .dropdown-arrow {
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+            margin-left: auto;
+        }
+
+        .nav-dropdown-toggle.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-dropdown {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-left: 20px;
+            margin-bottom: 0;
+        }
+
+        .nav-dropdown.active {
+            max-height: 500px;
+            opacity: 1;
+            margin-bottom: 8px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #666;
+            border-radius: 10px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(-10px);
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .dropdown-item i {
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0, 243, 255, 0.08);
+            color: var(--primary-color);
+            transform: translateX(2px);
+        }
+
+        .dropdown-item:hover i {
+            color: var(--primary-color);
+        }
+
+        .dropdown-item:focus {
+            outline: 2px solid rgba(0, 243, 255, 0.3);
+            outline-offset: 2px;
         }
 
         /* Sidebar Footer (Safe Mode) */
@@ -463,6 +550,37 @@
             <div class="nav-item" onclick="switchPanel('results', this)">
                 <i class="ph ph-exam"></i> Results
             </div>
+
+            <!-- Data Management Dropdown -->
+            <div class="nav-item nav-dropdown-toggle" data-dropdown-toggle="data-management-dropdown"
+                aria-expanded="false" aria-haspopup="true">
+                <i class="ph ph-database"></i>
+                <span>Data Management</span>
+                <i class="ph ph-caret-down dropdown-arrow"></i>
+            </div>
+            <div id="data-management-dropdown" class="nav-dropdown" role="menu">
+                <div class="dropdown-item" role="menuitem" tabindex="0"
+                    onclick="switchPanel('sheet-to-json', this); NavDropdown.closeAllDropdowns();">
+                    <i class="ph ph-file-arrow-down"></i>
+                    <span>Google Sheet → JSON</span>
+                </div>
+                <div class="dropdown-item" role="menuitem" tabindex="0"
+                    onclick="switchPanel('results', this); NavDropdown.closeAllDropdowns();">
+                    <i class="ph ph-arrows-clockwise"></i>
+                    <span>Results Sync</span>
+                </div>
+                <div class="dropdown-item" role="menuitem" tabindex="0" data-cms-action="publish"
+                    onclick="CMS.publishWithPreview(); NavDropdown.closeAllDropdowns();">
+                    <i class="ph ph-rocket-launch"></i>
+                    <span>Static Publish</span>
+                </div>
+                <div class="dropdown-item" role="menuitem" tabindex="0"
+                    onclick="CMS.importJSON(); NavDropdown.closeAllDropdowns();">
+                    <i class="ph ph-upload"></i>
+                    <span>Import JSON</span>
+                </div>
+            </div>
+
             <div class="nav-item" onclick="switchPanel('analytics', this)">
                 <i class="ph ph-chart-line-up"></i> Analytics
             </div>
@@ -1396,6 +1514,218 @@
                     </table>
                 </div>
             </div>
+        </div>
+
+        <!-- 7.5 SHEET TO JSON PANEL -->
+        <div id="sheet-to-json" class="panel">
+            <div class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <div>
+                    <h3 style="margin: 0;">📊 Google Sheet to JSON Converter</h3>
+                    <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">
+                        Convert public Google Sheets to downloadable JSON files
+                    </p>
+                </div>
+            </div>
+
+            <div class="glass-card" style="padding: 40px; max-width: 800px; margin: 0 auto;">
+                <div class="form-group">
+                    <label class="form-label" style="font-size: 0.95rem; margin-bottom: 10px;">
+                        <i class="ph ph-link"></i> Google Sheet ID
+                    </label>
+                    <input type="text" id="sheet-converter-id" class="form-input"
+                        placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+                        style="font-family: 'Courier New', monospace; font-size: 0.9rem;">
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 25px;">
+                    <button class="btn btn-md btn-secondary" onclick="SheetConverterPanel.previewData()"
+                        style="flex: 1;">
+                        <i class="ph ph-eye"></i> Preview Data
+                    </button>
+                    <button class="btn btn-md btn-primary" onclick="SheetConverterPanel.downloadJSON()"
+                        style="flex: 1;">
+                        <i class="ph ph-file-arrow-down"></i> Download JSON
+                    </button>
+                </div>
+
+                <div id="sheet-converter-status"
+                    style="margin-top: 20px; padding: 16px; border-radius: 12px; display: none;"></div>
+
+                <div class="glass-card"
+                    style="margin-top: 30px; padding: 20px; background: rgba(255, 165, 0, 0.05); border-color: rgba(255, 165, 0, 0.2);">
+                    <div style="display: flex; align-items: start; gap: 12px;">
+                        <i class="ph-bold ph-lightbulb" style="font-size: 1.5rem; color: orange; margin-top: 2px;"></i>
+                        <div>
+                            <strong style="color: orange; display: block; margin-bottom: 8px;">How to use:</strong>
+                            <ol
+                                style="margin: 0; padding-left: 20px; color: #888; font-size: 0.85rem; line-height: 1.8;">
+                                <li>Open your Google Sheet</li>
+                                <li>Click <strong>File → Share → Publish to web</strong></li>
+                                <li>Copy the Sheet ID from the URL</li>
+                                <li>Paste it above and click Download JSON</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Sheet Converter Panel Integration
+                window.SheetConverterPanel = {
+                    showStatus(message, type = 'info') {
+                        const statusEl = document.getElementById('sheet-converter-status');
+                        statusEl.style.display = 'block';
+                        statusEl.textContent = message;
+
+                        // Reset classes
+                        statusEl.className = '';
+
+                        // Apply styling based on type
+                        if (type === 'success') {
+                            statusEl.style.background = 'rgba(46, 213, 115, 0.1)';
+                            statusEl.style.color = '#2ed573';
+                            statusEl.style.border = '1px solid rgba(46, 213, 115, 0.3)';
+                        } else if (type === 'error') {
+                            statusEl.style.background = 'rgba(255, 68, 68, 0.1)';
+                            statusEl.style.color = '#ff4444';
+                            statusEl.style.border = '1px solid rgba(255, 68, 68, 0.3)';
+                        } else {
+                            statusEl.style.background = 'rgba(0, 243, 255, 0.1)';
+                            statusEl.style.color = 'var(--primary-color)';
+                            statusEl.style.border = '1px solid rgba(0, 243, 255, 0.3)';
+                        }
+
+                        // Auto-hide success messages
+                        if (type === 'success') {
+                            setTimeout(() => {
+                                statusEl.style.display = 'none';
+                            }, 5000);
+                        }
+                    },
+
+                    async fetchSheetData(sheetId) {
+                        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+                        const response = await fetch(url);
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: Sheet not accessible. Ensure it's published to web.`);
+                        }
+
+                        const text = await response.text();
+                        const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?$/);
+
+                        const jsonData = jsonMatch
+                            ? JSON.parse(jsonMatch[1])
+                            : JSON.parse(text.substring(47).slice(0, -2));
+
+                        if (!jsonData.table || !jsonData.table.cols || !jsonData.table.rows) {
+                            throw new Error('Invalid sheet structure. Sheet may be empty.');
+                        }
+
+                        const headers = jsonData.table.cols.map(col => col.label || col.id || '');
+                        const rows = jsonData.table.rows.map(row => {
+                            const obj = {};
+                            row.c.forEach((cell, index) => {
+                                obj[headers[index]] = cell ? cell.v : null;
+                            });
+                            return obj;
+                        });
+
+                        return { headers, rows };
+                    },
+
+                    async previewData() {
+                        const sheetId = document.getElementById('sheet-converter-id').value.trim();
+
+                        if (!sheetId) {
+                            this.showStatus('⚠️ Please enter a Google Sheet ID', 'error');
+                            return;
+                        }
+
+                        this.showStatus('🔍 Fetching preview...', 'info');
+
+                        try {
+                            const { headers, rows } = await this.fetchSheetData(sheetId);
+
+                            console.group('📊 Sheet Preview');
+                            console.log('Headers:', headers);
+                            console.log('Total Rows:', rows.length);
+                            console.log('First 5 rows:', rows.slice(0, 5));
+                            console.groupEnd();
+
+                            this.showStatus(
+                                `✅ Preview ready! Check console (F12) - ${rows.length} rows found`,
+                                'success'
+                            );
+                        } catch (error) {
+                            console.error('Preview error:', error);
+                            this.showStatus('❌ ' + error.message, 'error');
+                        }
+                    },
+
+                    async downloadJSON() {
+                        const sheetId = document.getElementById('sheet-converter-id').value.trim();
+
+                        if (!sheetId) {
+                            this.showStatus('⚠️ Please enter a Google Sheet ID', 'error');
+                            return;
+                        }
+
+                        this.showStatus('📡 Fetching sheet data...', 'info');
+
+                        try {
+                            const { rows } = await this.fetchSheetData(sheetId);
+
+                            if (rows.length === 0) {
+                                throw new Error('Sheet is empty or has no data rows');
+                            }
+
+                            const finalJSON = {
+                                metadata: {
+                                    generatedAt: new Date().toISOString(),
+                                    sheetId: sheetId,
+                                    totalRecords: rows.length,
+                                    source: 'Google Sheets',
+                                    converter: 'Admin Dashboard v1.0'
+                                },
+                                data: rows
+                            };
+
+                            // Create download
+                            const blob = new Blob(
+                                [JSON.stringify(finalJSON, null, 2)],
+                                { type: 'application/json' }
+                            );
+
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = `sheet-${sheetId}.json`;
+                            link.click();
+
+                            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+
+                            this.showStatus(
+                                `✅ Successfully downloaded ${rows.length} records!`,
+                                'success'
+                            );
+                        } catch (error) {
+                            console.error('Download error:', error);
+
+                            let errorMessage = '❌ Failed to fetch sheet. ';
+                            if (error.message.includes('not accessible')) {
+                                errorMessage += 'Make sure the sheet is published to web.';
+                            } else if (error.message.includes('Invalid sheet structure')) {
+                                errorMessage += 'Sheet appears to be empty.';
+                            } else {
+                                errorMessage += error.message;
+                            }
+
+                            this.showStatus(errorMessage, 'error');
+                        }
+                    }
+                };
+            </script>
         </div>
 
         <!-- 8. ANALYTICS PANEL -->
@@ -3186,6 +3516,92 @@
             SchoolManager.load();
             DeploymentManager.init();
         });
+
+
+        // Add this inside ResultsManagement object
+        ResultsManagement.downloadSheetAsJSON = async function () {
+
+            const sheetId = document.getElementById('results-sheet-id').value.trim();
+
+            if (!sheetId) {
+                alert("Please enter Google Sheet ID");
+                return;
+            }
+
+            try {
+
+                // Public published sheet URL (must be shared as Anyone with link → Viewer)
+                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+                const response = await fetch(url);
+                const text = await response.text();
+
+                // Google returns weird wrapped JSON
+                const jsonData = JSON.parse(
+                    text.substring(47).slice(0, -2)
+                );
+
+                const headers = jsonData.table.cols.map(col => col.label);
+
+                const rows = jsonData.table.rows.map(row => {
+                    const obj = {};
+                    row.c.forEach((cell, i) => {
+                        obj[headers[i]] = cell ? cell.v : null;
+                    });
+                    return obj;
+                });
+
+                const finalJSON = {
+                    generatedAt: new Date().toISOString(),
+                    sheetId: sheetId,
+                    totalRecords: rows.length,
+                    data: rows
+                };
+
+                // Create downloadable file
+                const blob = new Blob(
+                    [JSON.stringify(finalJSON, null, 2)],
+                    { type: "application/json" }
+                );
+
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "results.json";
+                link.click();
+
+            } catch (error) {
+                console.error(error);
+                alert("Failed to fetch sheet. Make sure it is public.");
+            }
+        };
+<div style="display: flex; gap: 10px;">
+    <input type="text" id="results-sheet-id" class="form-input" 
+           placeholder="Paste Sheet ID here..." 
+           style="flex: 1; padding: 12px;">
+
+    <button class="btn btn-sm btn-secondary" 
+            onclick="ResultsManagement.fetchHeaders()">
+        Fetch Headers
+    </button>
+
+    <button class="btn btn-sm btn-primary" 
+            onclick="ResultsManagement.downloadSheetAsJSON()" 
+            style="white-space: nowrap;">
+        <i class="ph-bold ph-file-arrow-down"></i> Download JSON
+    </button>
+</div>
+
+<button class="btn btn-sm btn-primary" 
+        onclick="ResultsManagement.downloadSheetAsJSON()" 
+        style="white-space: nowrap;">
+    <i class="ph-bold ph-file-arrow-down"></i> Download JSON
+</button>
+
+
+
+
+
+
     </script>
 </body>
 
