@@ -1,0 +1,19 @@
+/* Admin Sidebar Responsive Styles */
+.admin-sidebar {
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .admin-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
+    }
+
+    .admin-sidebar.open {
+        transform: translateX(0);
+    }
+}
