@@ -86,10 +86,43 @@ const AdminApp = {
                 this.updateDashboardStats();
                 break;
             case 'exams':
-                // ExamManager.init() - to be implemented/imported
+                // ExamManager.init()
                 break;
             case 'results':
                 import('./admin-panels.js').then(m => m.default.init());
+                break;
+            case 'services':
+                if (window.SiteSettings) {
+                    window.SiteSettings.openPanel();
+                    window.SiteSettings.switchTab('content');
+                }
+                break;
+            case 'fees':
+                // Load Fees via StorageManager if needed
+                break;
+            case 'news':
+                // Load News via NewsService if needed
+                break;
+            case 'menus':
+                if (window.SiteSettings) {
+                    window.SiteSettings.openPanel();
+                    window.SiteSettings.switchTab('header');
+                }
+                break;
+            case 'settings':
+                if (window.SiteSettings) {
+                    window.SiteSettings.openPanel();
+                    window.SiteSettings.switchTab('pages');
+                }
+                break;
+            case 'theme':
+                if (window.SiteSettings) {
+                    window.SiteSettings.openPanel();
+                    window.SiteSettings.switchTab('theme');
+                }
+                break;
+            case 'security':
+                // Initialize security settings
                 break;
         }
     },
@@ -104,133 +137,5 @@ const AdminApp = {
 window.AdminApp = AdminApp;
 export default AdminApp;
 
-// =============================
-// ADMIN PANEL ROUTER SYSTEM
-// =============================
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    const navLinks = document.querySelectorAll(".nav-link");
-    const container = document.getElementById("admin-panel-container");
-    const breadcrumb = document.getElementById("breadcrumb-current");
-
-    // Panel Templates
-    const panels = {
-
-        dashboard: `
-            <div class="panel">
-                <h2>Dashboard</h2>
-                <p>Welcome to Admin Dashboard.</p>
-            </div>
-        `,
-
-        "services-cms": `
-            <div class="panel">
-                <h2>Services Engine</h2>
-                <p>Manage services here.</p>
-            </div>
-        `,
-
-        "result-manager": `
-            <div class="panel">
-                <h2>Exam Results Manager</h2>
-                <p>Upload, sync, publish results.</p>
-            </div>
-        `,
-
-        "fee-submissions": `
-            <div class="panel">
-                <h2>Fee Management</h2>
-                <p>Manage fee records.</p>
-            </div>
-        `,
-
-        "news-manager": `
-            <div class="panel">
-                <h2>News & Events</h2>
-                <p>Create and edit news posts.</p>
-            </div>
-        `,
-
-        "menu-manager": `
-            <div class="panel">
-                <h2>Menu Control</h2>
-                <p>Reorder and manage navigation.</p>
-            </div>
-        `,
-
-        "site-settings": `
-            <div class="panel">
-                <h2>Page Config</h2>
-                <p>Control page settings.</p>
-            </div>
-        `,
-
-        "theme-settings": `
-            <div class="panel">
-                <h2>Theme & UI</h2>
-                <p>Customize site theme.</p>
-            </div>
-        `,
-
-        "security-settings": `
-            <div class="panel">
-                <h2>Security</h2>
-                <p>Admin security settings.</p>
-            </div>
-        `
-    };
-
-
-    function loadPanel(panelName) {
-
-        if (!panels[panelName]) {
-            container.innerHTML = "<p>Panel not found.</p>";
-            return;
-        }
-
-        container.innerHTML = panels[panelName];
-        breadcrumb.textContent = panelName.replace("-", " ");
-    }
-
-
-    // Attach Click Events
-    navLinks.forEach(link => {
-
-        link.addEventListener("click", function (e) {
-
-            e.preventDefault();
-
-            // Remove active
-            navLinks.forEach(l => l.classList.remove("active"));
-            this.classList.add("active");
-
-            const panel = this.dataset.panel;
-            loadPanel(panel);
-
-            // Close sidebar on mobile
-            document.getElementById("admin-sidebar")
-                .classList.remove("open");
-        });
-
-    });
-
-    // Load default panel
-    loadPanel("dashboard");
-
-});
-
-// Sidebar Toggle
-document.getElementById("sidebar-toggle")
-    .addEventListener("click", function () {
-        document.getElementById("admin-sidebar")
-            .classList.toggle("open");
-    });
-
-// Sidebar Close
-document.querySelector(".sidebar-close")
-    .addEventListener("click", function () {
-        document.getElementById("admin-sidebar")
-            .classList.remove("open");
-    });
 
