@@ -110,44 +110,217 @@ const ResultsManagement = {
         if (syncBtn) {
             syncBtn.addEventListener("click", this.handleSyncClick);
         }
+
+        // Google Sheet Fetch Listener
+        const fetchBtn = document.getElementById("btn-fetch-headers");
+        if (fetchBtn) {
+            fetchBtn.addEventListener("click", () => this.fetchHeaders());
+        }
     },
 
+    // Import Button Listener
+    const importBtn = document.getElementById("btn-import-sheet");
+    if(importBtn) {
+        importBtn.addEventListener("click", () => this.importFromSheet());
+    }
+},
+
     handleSyncClick: function () {
-        // Bridge to ProExam if it has data
-        if (window.ProExam && window.ProExam.state && window.ProExam.state.students.length > 0) {
-            state.students = window.ProExam.state.students;
-        }
+        // ... existing legacy sync logic ...
+        // If sheet data is already imported (state.students has data), just update UI/Time
+        if (state.students && state.students.length > 0) {
+    state.lastSynced = new Date();
+    this.updateStatsUI();
+    // Show Success Message
+    const statusDiv = document.getElementById("results-sync-status");
+    const messageDiv = document.getElementById("results-sync-message");
+    if (statusDiv) statusDiv.style.display = "block";
+    if (messageDiv) messageDiv.innerHTML = "Sync Verified. " + state.students.length + " records ready to publish.";
+    return;
+}
 
-        if (!state.students || state.students.length === 0) {
-            alert("Please upload results JSON before syncing.");
-            return;
-        }
+// Bridge to ProExam (Legacy)
+if (window.ProExam && window.ProExam.state && window.ProExam.state.students.length > 0) {
+    state.students = window.ProExam.state.students;
+    state.lastSynced = new Date();
+    this.updateStatsUI();
+    // Show Success Message
+    const statusDiv = document.getElementById("results-sync-status");
+    const messageDiv = document.getElementById("results-sync-message");
+    if (statusDiv) statusDiv.style.display = "block";
+    if (messageDiv) messageDiv.innerHTML = "Preview Ready. " + state.students.length + " students synced successfully!";
+    return;
+}
 
-        if (!state.examId) {
-            alert("Please select exam profile before syncing.");
-            return;
-        }
+alert("No data found. Please Import from Sheet or Upload JSON.");
+    },
 
+updateStatsUI: function() {
+    const examsCountEl = document.getElementById("results-exams-count");
+    const totalCountEl = document.getElementById("results-total-count");
+    const lastSyncEl = document.getElementById("results-last-sync");
+
+    if (examsCountEl) examsCountEl.textContent = 1;
+    if (totalCountEl) totalCountEl.textContent = state.students ? state.students.length : 0;
+    if (lastSyncEl) lastSyncEl.textContent = state.lastSynced.toLocaleTimeString();
+},
+
+importFromSheet: async function() {
+    const sheetInput = document.getElementById("results-sheet-id");
+    const sheetId = sheetInput ? sheetInput.value.trim() : "";
+    if (!sheetId) return alert("Sheet ID missing");
+
+    // Get Mappings
+    const rollMap = document.getElementById("map-roll").value;
+    const nameMap = document.getElementById("map-name").value;
+    const statusMap = document.getElementById("map-status").value;
+
+    // Get Selected Subjects
+    const subjectChecks = document.querySelectorAll("#map-subjects-container input:checked");
+    const subjectMaps = Array.from(subjectChecks).map(cb => cb.value);
+
+    if (!rollMap || !nameMap || !statusMap) {
+        return alert("Please map at least Register No, Name, and Status fields.");
+    }
+
+    try {
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+        const response = await fetch(url);
+        const text = await response.text();
+        const json = JSON.parse(text.substring(47).slice(0, -2));
+
+        const headers = json.table.cols.map(col => col.label);
+        const rows = json.table.rows;
+
+        // Helper to get value from row by header name
+        const getValue = (row, header) => {
+            const index = headers.indexOf(header);
+            if (index === -1) return "";
+            const cell = row.c[index];
+            return cell ? (cell.v || cell.f || "") : "";
+        };
+
+        const students = rows.map(row => {
+            return {
+                regNo: String(getValue(row, rollMap)),
+                name: getValue(row, nameMap),
+                status: getValue(row, statusMap), // "Pass" or "Fail"
+                subjects: subjectMaps.map(subHeader => ({
+                    name: subHeader,
+                    score: getValue(row, subHeader),
+                    max: 100 // Default or infer?
+                }))
+            };
+        }).filter(s => s.regNo); // Filter empty rows
+
+        state.students = students;
         state.lastSynced = new Date();
 
-        // Update UI Stats
-        const examsCountEl = document.getElementById("results-exams-count");
-        const totalCountEl = document.getElementById("results-total-count");
-        const lastSyncEl = document.getElementById("results-last-sync");
+        this.updateStatsUI();
 
-        if (examsCountEl) examsCountEl.textContent = 1;
-        if (totalCountEl) totalCountEl.textContent = state.students.length;
-        if (lastSyncEl) lastSyncEl.textContent = state.lastSynced.toLocaleTimeString();
+        alert(`Import Successful! ${students.length} students loaded.`);
 
-        // Show Success Message
-        const statusDiv = document.getElementById("results-sync-status");
-        const messageDiv = document.getElementById("results-sync-message");
-
-        if (statusDiv) statusDiv.style.display = "block";
-        if (messageDiv) messageDiv.innerHTML = "Preview Ready. " + state.students.length + " students synced successfully!";
-
-        console.log("Sync successful:", state);
+    } catch (e) {
+        console.error(e);
+        alert("Error importing data: " + e.message);
     }
+},
+
+fetchHeaders: async function () {
+    const sheetInput = document.getElementById("results-sheet-id");
+    const sheetId = sheetInput ? sheetInput.value.trim() : "";
+
+    if (!sheetId) {
+        alert("Please enter Google Sheet ID");
+        return;
+    }
+
+    try {
+        // Using Google Visualization API query to get JSON
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Network response was not ok");
+
+        const text = await response.text();
+
+        // Google returns JSON wrapped in: /*O_o*/ google.visualization.Query.setResponse(...);
+        // We need to extract the JSON object.
+        const jsonStart = text.indexOf('{');
+        const jsonEnd = text.lastIndexOf('}');
+
+        if (jsonStart === -1 || jsonEnd === -1) {
+            throw new Error("Invalid response format from Google Sheets");
+        }
+
+        const jsonString = text.substring(jsonStart, jsonEnd + 1);
+        const json = JSON.parse(jsonString);
+
+        // Extract headers from the first row of columns definition
+        const headers = json.table.cols.map(col => col.label).filter(Boolean);
+
+        // If labels are empty (sometimes happens), try first row of data?
+        // Usually 'label' contains the header if the sheet has a header row and it's treated as such.
+        // If the query didn't auto-detect headers, we might need to look at rows[0].
+
+        if (!headers.length) {
+            alert("No headers found. Ensure the first row of your sheet contains headers.");
+            return;
+        }
+
+        this.populateMappingUI(headers);
+
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        alert("Failed to fetch sheet. Check Sheet ID and ensure 'Anyone with the link' can view.");
+    }
+},
+
+populateMappingUI: function (headers) {
+    const selects = ["map-roll", "map-name", "map-dob", "map-status"];
+
+    selects.forEach(id => {
+        const select = document.getElementById(id);
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Select Column</option>';
+
+        headers.forEach(header => {
+            const opt = document.createElement("option");
+            opt.value = header;
+            opt.textContent = header;
+            select.appendChild(opt);
+        });
+    });
+
+    const subjectContainer = document.getElementById("map-subjects-container");
+    if (subjectContainer) {
+        subjectContainer.innerHTML = "";
+
+        headers.forEach(header => {
+            const div = document.createElement("div");
+            div.innerHTML = `
+                    <label style="font-size:0.75rem; display: flex; align-items: center; gap: 5px; color: #ccc;">
+                        <input type="checkbox" value="${header}">
+                        ${header}
+                    </label>
+                `;
+            subjectContainer.appendChild(div);
+        });
+    }
+
+    const mappingUI = document.getElementById("column-mapping-ui");
+    if (mappingUI) {
+        mappingUI.style.display = "block";
+        // Animate it?
+        mappingUI.animate([
+            { opacity: 0, transform: 'translateY(-10px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+        ], { duration: 300, fill: 'forwards' });
+    }
+
+    alert("Headers loaded successfully! Please map the columns below.");
+}
 };
 
 const StaticPublisher = {
