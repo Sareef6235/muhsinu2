@@ -1593,6 +1593,202 @@
                     </style>
 
                     <script>
+                        // --- RESULTS MANAGEMENT CORE ---
+                        window.ResultsManagement = window.ResultsManagement || {};
+
+                        ResultsManagement.fetchHeaders = async function () {
+                            const sheetId = document.getElementById('results-sheet-id').value.trim();
+                            if (!sheetId) {
+                                alert("Please enter Sheet ID first");
+                                return;
+                            }
+
+                            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+                            try {
+                                const res = await fetch(url);
+                                const text = await res.text();
+                                // Strip Google wrapper
+                                const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\)/);
+                                if (!match) throw new Error("Invalid response from Google Sheets");
+
+                                const data = JSON.parse(match[1]);
+                                const cols = data.table.cols.map(c => c.label).filter(Boolean);
+
+                                // Populate mapping selects
+                                const mapIds = ['map-roll', 'map-name', 'map-dob', 'map-status'];
+                                mapIds.forEach(id => {
+                                    const select = document.getElementById(id);
+                                    if (!select) return;
+                                    select.innerHTML = '<option value="">Select Column</option>';
+                                    cols.forEach(col => {
+                                        const opt = document.createElement('option');
+                                        opt.value = col;
+                                        opt.textContent = col;
+                                        select.appendChild(opt);
+                                    });
+                                });
+
+                                // Populate subjects container with checkboxes
+                                const container = document.getElementById('map-subjects-container');
+                                if (container) {
+                                    container.innerHTML = '';
+                                    cols.forEach(col => {
+                                        const colLower = col.toLowerCase();
+                                        // Skip common static fields
+                                        if (['roll', 'name', 'dob', 'status', 'reg', 'index'].some(k => colLower.includes(k))) return;
+
+                                        const div = document.createElement('div');
+                                        div.innerHTML = `
+                                            <label style="font-size:0.75rem; display: flex; align-items: center; gap: 5px; color: #ccc; cursor: pointer;">
+                                                <input type="checkbox" value="${col}" checked>
+                                                ${col}
+                                            </label>
+                                        `;
+                                        container.appendChild(div);
+                                    });
+                                }
+
+                                // Show mapping UI
+                                const mappingUI = document.getElementById('column-mapping-ui');
+                                if (mappingUI) {
+                                    mappingUI.style.display = 'block';
+                                    mappingUI.style.animation = 'slideDown 0.3s ease forwards';
+                                }
+
+                                alert(`Fetched ${cols.length} headers successfully!`);
+                            } catch (err) {
+                                console.error(err);
+                                alert("Failed to fetch headers. Check Sheet ID and ensure 'Anyone with the link' can view.");
+                            }
+                        };
+
+                        ResultsManagement.handleSyncClick = async function () {
+                            const examSelect = document.getElementById("results-exam-select");
+                            const selectedExamId = examSelect ? examSelect.value : "";
+                            const selectedExamName = examSelect ? examSelect.selectedOptions[0].text : "";
+
+                            const sheetId = document.getElementById('results-sheet-id').value.trim();
+                            const rollMap = document.getElementById("map-roll").value;
+                            const nameMap = document.getElementById("map-name").value;
+
+                            if (!selectedExamId) return alert("Please select an Exam Profile first.");
+                            if (!sheetId) return alert("Please enter a Google Sheet ID.");
+                            if (!rollMap || !nameMap) return alert("Please map at least Roll No and Student Name.");
+
+                            const statusMap = document.getElementById("map-status").value;
+                            const dobMap = document.getElementById("map-dob") ? document.getElementById("map-dob").value : "";
+                            const subjectChecks = document.querySelectorAll("#map-subjects-container input:checked");
+                            const subjectMaps = Array.from(subjectChecks).map(cb => cb.value);
+
+                            try {
+                                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+                                const res = await fetch(url);
+                                const text = await res.text();
+                                const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\)/);
+                                if (!match) throw new Error("Could not parse sheet data");
+                                const data = JSON.parse(match[1]);
+
+                                const headers = data.table.cols.map(col => col.label || "");
+                                const rows = data.table.rows;
+
+                                const getValue = (row, header) => {
+                                    const index = headers.indexOf(header);
+                                    if (index === -1) return "";
+                                    const cell = row.c[index];
+                                    if (!cell) return "";
+                                    return cell.v !== null ? cell.v : (cell.f || "");
+                                };
+
+                                const students = rows.map(row => {
+                                    const student = {
+                                        roll: String(getValue(row, rollMap)),
+                                        name: String(getValue(row, nameMap)),
+                                        dob: dobMap ? String(getValue(row, dobMap)) : "",
+                                        status: statusMap ? String(getValue(row, statusMap)) : "N/A",
+                                        subjects: {}
+                                    };
+
+                                    let total = 0;
+                                    subjectMaps.forEach(sub => {
+                                        const score = parseFloat(getValue(row, sub)) || 0;
+                                        student.subjects[sub] = score;
+                                        total += score;
+                                    });
+                                    student.total = total;
+                                    return student;
+                                }).filter(s => s.roll && s.name);
+
+                                window.GeneratedResults = {
+                                    examId: selectedExamId,
+                                    examName: selectedExamName,
+                                    generatedAt: new Date().toISOString(),
+                                    students: students
+                                };
+
+                                // Update local state stats if available
+                                const examsCountEl = document.getElementById("results-exams-count");
+                                const totalCountEl = document.getElementById("results-total-count");
+                                const lastSyncEl = document.getElementById("results-last-sync");
+
+                                if (examsCountEl) examsCountEl.textContent = 1;
+                                if (totalCountEl) totalCountEl.textContent = students.length;
+                                if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleTimeString();
+
+                                // Show success message
+                                const statusDiv = document.getElementById("results-sync-status");
+                                const messageDiv = document.getElementById("results-sync-message");
+                                if (statusDiv) statusDiv.style.display = "block";
+                                if (messageDiv) messageDiv.innerHTML = `Preview Ready – ${students.length} Students Synced Successfully!`;
+
+                                alert(`Preview Ready – ${students.length} Students Synced Successfully!`);
+                            } catch (e) {
+                                console.error(e);
+                                alert("Sync Failed: " + e.message);
+                            }
+                        };
+
+                        window.StaticPublisher = {
+                            publish: function () {
+                                if (!window.GeneratedResults || !window.GeneratedResults.students.length) {
+                                    alert("Error: No data found. Please PREVIEW & SYNC first.");
+                                    return;
+                                }
+
+                                try {
+                                    const exportData = {
+                                        published: true,
+                                        lastUpdated: new Date().toISOString(),
+                                        exams: [
+                                            {
+                                                examId: window.GeneratedResults.examId,
+                                                examName: window.GeneratedResults.examName,
+                                                publishedAt: window.GeneratedResults.generatedAt,
+                                                students: window.GeneratedResults.students
+                                            }
+                                        ]
+                                    };
+
+                                    const jsonString = JSON.stringify(exportData, null, 2);
+                                    const blob = new Blob([jsonString], { type: "application/json" });
+                                    const url = URL.createObjectURL(blob);
+
+                                    const link = document.createElement("a");
+                                    link.href = url;
+                                    link.download = "published-results.json";
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    URL.revokeObjectURL(url);
+
+                                    alert("Results JSON Downloaded Successfully!\n\nRename to results-store.json and move to /data/.");
+                                } catch (error) {
+                                    console.error(error);
+                                    alert("Publish Failed: " + error.message);
+                                }
+                            }
+                        };
+
                         // --- GLOBAL STORE ---
                         window.PublishedResultsStore = {
                             data: null,
