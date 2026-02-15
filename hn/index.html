@@ -13,7 +13,36 @@
 </head>
 
 <body>
-    <header id="main-header"></header>
+    <header id="main-header">
+        <nav class="container">
+            <a href="#" class="logo">MHMV 2026.</a>
+            <ul class="nav-links">
+                <li><a href="#hero">Home</a></li>
+                <li class="dropdown">
+                    <a href="#gallery" class="dropdown-toggle">Gallery</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#gallerySection">Photo Gallery</a></li>
+                        <li><a href="#video-gallery">Video Gallery</a></li>
+                    </ul>
+                </li>
+                <li><a href="creations.html">Creations</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Result</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="exam_result.html">Exam Result</a></li>
+                        <li><a href="meelad_result.html">Meelad Result</a></li>
+                    </ul>
+                </li>
+                <li><a href="#news-notice">News</a></li>
+                <li><a href="#contact" class="btn-secondary" style="padding: 8px 15px;">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-btn" aria-label="Toggle navigation">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </nav>
+    </header>
 
     <main>
         <section id="hero"
@@ -681,15 +710,57 @@
     </script>
 
 
-    <footer id="main-footer"></footer>
-
-    <!-- Dynamic Site Editor & Renderer -->
-    <script src="../assets/js/site-settings.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SiteSettings) SiteSettings.render();
-        });
-    </script>
+    <footer
+        style="background: #0a0a0a; border-top: 1px solid var(--glass-border); padding: 60px 0 30px; margin-top: 80px;">
+        <div class="container">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <div>
+                    <h3 style="color: var(--primary-color); margin-bottom: 20px; font-size: 1.3rem;">MIFTHAHUL HUDA
+                        MADRASA</h3>
+                    <p style="color: #888; line-height: 1.8;">Empowering students through quality education and Islamic
+                        values at Vengara S S Road.</p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Quick Links</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 12px;"><a href="#about"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">About Us</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#booking"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Book Tuition</a></li>
+                        <li style="margin-bottom: 12px;"><a href="exam_result.html"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Exam Results</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#gallery"
+                                style="color: #888; text-decoration: none; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='#888'">Gallery</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Contact</h4>
+                    <p style="color: #888; margin-bottom: 10px;">📍 Vengara S S Road</p>
+                    <p style="color: #888; margin-bottom: 10px;">📞 <a href="https://t.me/+916235989198"
+                            style="color: #888; text-decoration: none;">+91 6235989198</a></p>
+                    <p style="color: #888;">✉️ Contact via Telegram</p>
+                </div>
+                <div>
+                    <h4 style="color: #fff; margin-bottom: 20px;">Enroll Now</h4>
+                    <p style="color: #888; margin-bottom: 20px; line-height: 1.6;">Start your learning journey with us
+                        today!</p>
+                    <a href="#booking" class="btn btn-primary" style="display: inline-block;">Book a Tuition Session</a>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; text-align: center;">
+                <p style="color: #666; font-size: 0.9rem;">© 2026 MHMV. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 
 </html>

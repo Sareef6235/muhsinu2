@@ -13,118 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        /* Auth & Login UI */
-        .auth-controls {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1002;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .auth-badge {
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(10px);
-        }
-
-        .auth-badge.admin {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: rgba(0, 229, 255, 0.05);
-        }
-
-        .auth-badge .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #888;
-        }
-
-        .auth-badge.admin .dot {
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary);
-        }
-
-        .btn-auth {
-            padding: 10px 20px;
-            background: var(--primary);
-            color: #000;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(0, 229, 255, 0.2);
-        }
-
-        .btn-auth:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .login-modal {
-            background: #111;
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            width: 400px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-10px);
-            }
-
-            75% {
-                transform: translateX(10px);
-            }
-        }
-
         :root {
             --primary: #00e5ff;
             --accent: #ff007a;
@@ -363,65 +251,6 @@
             border: 1px dashed rgba(255, 61, 61, 0.3);
         }
 
-        @media (max-width: 768px) {
-            .auth-controls {
-                top: 10px;
-                right: 10px;
-                gap: 8px;
-            }
-
-            .auth-badge {
-                padding: 6px 12px;
-                font-size: 0.7rem;
-            }
-
-            .btn-auth {
-                padding: 8px 14px;
-                font-size: 0.8rem;
-            }
-
-            .login-modal {
-                width: calc(100% - 40px);
-                padding: 25px;
-            }
-
-            .portal-wrapper {
-                margin-top: 80px;
-                padding: 0 15px;
-            }
-
-            .glass-card {
-                padding: 25px 20px;
-            }
-
-            .portal-title h1 {
-                font-size: 1.8rem;
-            }
-
-            .stats-bar {
-                grid-template-columns: 1fr;
-                gap: 10px;
-                text-align: left;
-            }
-
-            .stat-item {
-                border: none !important;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 0;
-            }
-
-            .stat-item>div:first-child {
-                font-size: 1.2rem !important;
-                order: 2;
-            }
-
-            .stat-item>div:last-child {
-                order: 1;
-            }
-        }
-
         @media print {
             .portal-wrapper {
                 margin: 0;
@@ -443,8 +272,7 @@
             .search-section,
             .actions,
             .modal-overlay,
-            #printModal,
-            .auth-controls {
+            #printModal {
                 display: none !important;
             }
 
@@ -472,49 +300,6 @@
 <body>
 
     <header id="main-header"></header>
-
-    <!-- Auth Controls -->
-    <div class="auth-controls">
-        <div id="auth-status-badge" class="auth-badge">
-            <span class="dot"></span>
-            <span class="text">Public Mode</span>
-        </div>
-        <button id="auth-main-btn" class="btn-auth" onclick="toggleLoginModal()">
-            <i class="ph-bold ph-user"></i> Login
-        </button>
-    </div>
-
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal-overlay" onclick="if(event.target === this) toggleLoginModal()">
-        <div class="login-modal animate-fade-up">
-            <h2 style="margin-bottom: 25px; font-size: 1.8rem;">Admin Access</h2>
-
-            <div id="login-error"
-                style="display: none; padding: 12px; background: rgba(255, 61, 61, 0.1); border: 1px solid rgba(255, 61, 61, 0.2); border-radius: 12px; color: #ff3d3d; font-size: 0.85rem; margin-bottom: 20px;">
-                <i class="ph ph-warning-circle"></i> <span class="error-msg"></span>
-            </div>
-
-            <div class="input-group" style="text-align: left; margin-bottom: 20px;">
-                <label>Username</label>
-                <input type="text" id="login-username" placeholder="Enter username"
-                    style="background: rgba(255,255,255,0.03);">
-            </div>
-
-            <div class="input-group" style="text-align: left; margin-bottom: 25px;">
-                <label>Password</label>
-                <input type="password" id="login-password" placeholder="••••••••"
-                    style="background: rgba(255,255,255,0.03);">
-            </div>
-
-            <button class="btn-check" id="login-submit-btn" onclick="handleLoginAttempt()">
-                <i class="ph ph-lock-key"></i> Authenticate
-            </button>
-
-            <p style="font-size: 0.75rem; color: #555; margin-top: 15px;">
-                Demo Credentials: admin / admin
-            </p>
-        </div>
-    </div>
 
     <div class="portal-wrapper">
         <div id="sync-warning" class="error-state"
@@ -555,19 +340,6 @@
                 <p style="color: #666;">Enter your details to view your academic performance</p>
             </div>
 
-            <!-- Manual Upload Section -->
-            <div class="upload-section"
-                style="margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: 16px; text-align: center;">
-                <label for="published-results-upload" class="btn-sec"
-                    style="display: inline-flex; width: auto; cursor: pointer;">
-                    <i class="ph ph-upload-simple"></i> Upload Results JSON
-                </label>
-                <input type="file" id="published-results-upload" accept=".json" style="display: none;">
-                <div id="published-results-status" style="margin-top: 10px; font-size: 0.8rem; color: #888;">
-                    No results file loaded.
-                </div>
-            </div>
-
             <!-- Merit List View (Hidden by Default) -->
             <div id="merit-view" style="display: none;">
                 <div
@@ -579,8 +351,8 @@
                         <i class="ph ph-arrow-left"></i> Back to Search
                     </button>
                 </div>
-                <div style="max-height: 600px; overflow-y: auto; overflow-x: auto; border-radius: 12px;">
-                    <table class="marks-table" style="min-width: 500px;">
+                <div style="max-height: 600px; overflow-y: auto;">
+                    <table class="marks-table">
                         <thead>
                             <tr>
                                 <th>RANK</th>
@@ -594,15 +366,14 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
 
             <form id="resultsForm" class="search-grid">
                 <div class="input-group">
                     <label>Exam Session</label>
                     <div style="position: relative;">
-                        <select id="examSelect" required disabled>
-                            <option value="">Upload results to select exam...</option>
+                        <select id="examSelect" required>
+                            <option value="">Loading Exams...</option>
                         </select>
                         <div id="dropdown-loader"
                             style="display:none; position: absolute; right: 40px; top: 50%; transform: translateY(-50%);">
@@ -615,8 +386,7 @@
                     <label>Roll Number</label>
                     <input type="text" id="rollInput" placeholder="Enter Registration No." required>
                 </div>
-                <button type="submit" class="btn-check" id="submitBtn" disabled
-                    style="opacity: 0.5; cursor: not-allowed;">
+                <button type="submit" class="btn-check" id="submitBtn">
                     <span>Check Performance</span>
                     <i class="ph-bold ph-arrow-right"></i>
                 </button>
@@ -871,96 +641,10 @@
         }
     </style>
 
-    <!-- Security & Auth -->
-    <script src="../../assets/js/auth-manager.js"></script>
-    <script src="../../assets/js/site-settings.js"></script>
-    <script>
-        // --- AUTH UI LOGIC ---
-
-        function toggleLoginModal() {
-            const modal = document.getElementById('loginModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        async function handleLoginAttempt() {
-            const usernameInput = document.getElementById("login-username");
-            const passwordInput = document.getElementById("login-password");
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value;
-
-            const result = await AuthManager.login(username, password);
-
-            if (result.success) {
-                toggleLoginModal();
-                updateAuthUI();
-                // Clear inputs
-                usernameInput.value = '';
-                passwordInput.value = '';
-            } else {
-                showLoginError(result.message);
-            }
-        }
-
-        function showLoginError(msg) {
-            const errorDiv = document.getElementById('login-error');
-            errorDiv.querySelector(".error-msg").textContent = msg;
-            errorDiv.style.display = 'block';
-
-            // Shake effect
-            const modal = document.querySelector(".login-modal");
-            modal.style.animation = 'none';
-            modal.offsetHeight; // trigger reflow
-            modal.style.animation = 'shake 0.4s ease';
-        }
-
-        function handleLogout() {
-            AuthManager.logout();
-            updateAuthUI();
-        }
-
-        function updateAuthUI() {
-            const uploadSection = document.querySelector(".upload-section");
-            const badge = document.getElementById("auth-status-badge");
-            const badgeText = document.querySelector("#auth-status-badge .text");
-            const mainBtn = document.getElementById("auth-main-btn");
-
-            const isAdmin = AuthManager.isAdmin();
-
-            if (isAdmin) {
-                if (uploadSection) uploadSection.style.display = "block";
-                if (badge) badge.classList.add("admin");
-                if (badgeText) badgeText.textContent = "Admin Mode";
-
-                mainBtn.innerHTML = '<i class="ph-bold ph-sign-out"></i> Logout (Admin)';
-                mainBtn.onclick = handleLogout;
-                mainBtn.style.background = "rgba(255,255,255,0.05)";
-                mainBtn.style.color = "#fff";
-                mainBtn.style.border = "1px solid var(--border)";
-            } else {
-                if (uploadSection) uploadSection.style.display = "none";
-                if (badge) badge.classList.remove("admin");
-                if (badgeText) badgeText.textContent = "Public Mode";
-
-                mainBtn.innerHTML = '<i class="ph-bold ph-user"></i> Login';
-                mainBtn.onclick = toggleLoginModal;
-                mainBtn.style.background = "var(--primary)";
-                mainBtn.style.color = "#000";
-                mainBtn.style.border = "none";
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            AuthManager.restoreSession();
-            updateAuthUI();
-
-            // 2. Component Initialization
-            if (window.SiteSettings) SiteSettings.render();
-            if (window.ResultsEngine) ResultsEngine.init();
-        });
-    </script>
+    <script src="../../assets/js/site-nav.js"></script>
+    <script src="../../assets/js/site-footer.js"></script>
     <!-- Results Portal Logic -->
     <script src="results.js"></script>
-    <script src="../../assets/js/portal.js"></script>
 
 </body>
 

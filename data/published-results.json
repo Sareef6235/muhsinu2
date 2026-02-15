@@ -1,0 +1,2915 @@
+{
+  "meta": {
+    "generatedAt": "2026-02-09T18:15:16.953Z",
+    "published": true
+  },
+  "exams": [
+    {
+      "examId": "ex_1770660897473",
+      "examName": "4 (sdsdg)",
+      "published": true,
+      "results": [
+        {
+          "roll": "4029",
+          "name": "محمد محسن",
+          "subjects": {
+            "QURA'N HIFZ ": 3,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 64,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 67
+        },
+        {
+          "roll": "4030",
+          "name": "رزل رزاق",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 70,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 70
+        },
+        {
+          "roll": "4031",
+          "name": "آبس جليل",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 94,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 94
+        },
+        {
+          "roll": "4032",
+          "name": "إشا فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 2,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 2
+        },
+        {
+          "roll": "4033",
+          "name": "هزل مريم",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 80,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 80
+        },
+        {
+          "roll": "4034",
+          "name": "هزوة مريم",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 39,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 39
+        },
+        {
+          "roll": "4035",
+          "name": "هزّ مريم",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 37,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 37
+        },
+        {
+          "roll": "4036",
+          "name": "حبر مهرين",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 88,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 88
+        },
+        {
+          "roll": "4037",
+          "name": "عائشة فرجة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 33,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 33
+        },
+        {
+          "roll": "4038",
+          "name": "فاطمة شنزة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 86,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 86
+        },
+        {
+          "roll": "4039",
+          "name": "فاطمة ننشة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 27,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 27
+        },
+        {
+          "roll": "4040",
+          "name": "فاطمة شيمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 5,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 5
+        },
+        {
+          "roll": "4041",
+          "name": "محمّد بادشاه.دي",
+          "subjects": {
+            "QURA'N HIFZ ": 49,
+            "FIQH ": 40,
+            "LISAN QURAA'N ": 6,
+            "AQEEDA ": 46,
+            "THAJVEETH ": 5,
+            "THAREEKH ": 31,
+            "AQLAQH ": 12,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 189
+        },
+        {
+          "roll": "4042",
+          "name": "محمّد نشوان. دي",
+          "subjects": {
+            "QURA'N HIFZ ": 44,
+            "FIQH ": 9,
+            "LISAN QURAA'N ": 1,
+            "AQEEDA ": 15,
+            "THAJVEETH ": 20,
+            "THAREEKH ": 8,
+            "AQLAQH ": 36,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 133
+        },
+        {
+          "roll": "4043",
+          "name": "محمّد شيان. كى.كى",
+          "subjects": {
+            "QURA'N HIFZ ": 49,
+            "FIQH ": 24,
+            "LISAN QURAA'N ": 32,
+            "AQEEDA ": 42,
+            "THAJVEETH ": 19,
+            "THAREEKH ": 46,
+            "AQLAQH ": 46,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 258
+        },
+        {
+          "roll": "4044",
+          "name": "محمّد شفن.كى",
+          "subjects": {
+            "QURA'N HIFZ ": 44,
+            "FIQH ": 23,
+            "LISAN QURAA'N ": 48,
+            "AQEEDA ": 3,
+            "THAJVEETH ": 39,
+            "THAREEKH ": 33,
+            "AQLAQH ": 12,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 202
+        },
+        {
+          "roll": "4045",
+          "name": "أحمد هادى.كى",
+          "subjects": {
+            "QURA'N HIFZ ": 20,
+            "FIQH ": 28,
+            "LISAN QURAA'N ": 36,
+            "AQEEDA ": 41,
+            "THAJVEETH ": 25,
+            "THAREEKH ": 2,
+            "AQLAQH ": 19,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 171
+        },
+        {
+          "roll": "4046",
+          "name": "شنزا مريم.كى",
+          "subjects": {
+            "QURA'N HIFZ ": 22,
+            "FIQH ": 10,
+            "LISAN QURAA'N ": 16,
+            "AQEEDA ": 19,
+            "THAJVEETH ": 9,
+            "THAREEKH ": 39,
+            "AQLAQH ": 25,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 140
+        },
+        {
+          "roll": "4047",
+          "name": "فاطمة نسمن.بى",
+          "subjects": {
+            "QURA'N HIFZ ": 19,
+            "FIQH ": 27,
+            "LISAN QURAA'N ": 49,
+            "AQEEDA ": 8,
+            "THAJVEETH ": 43,
+            "THAREEKH ": 13,
+            "AQLAQH ": 3,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 162
+        },
+        {
+          "roll": "4048",
+          "name": "عائشة سنة.كى كى",
+          "subjects": {
+            "QURA'N HIFZ ": 3,
+            "FIQH ": 5,
+            "LISAN QURAA'N ": 11,
+            "AQEEDA ": 47,
+            "THAJVEETH ": 23,
+            "THAREEKH ": 32,
+            "AQLAQH ": 36,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 157
+        },
+        {
+          "roll": "4049",
+          "name": "مهيلمة مجلمة.دي كى",
+          "subjects": {
+            "QURA'N HIFZ ": 25,
+            "FIQH ": 15,
+            "LISAN QURAA'N ": 39,
+            "AQEEDA ": 14,
+            "THAJVEETH ": 33,
+            "THAREEKH ": 30,
+            "AQLAQH ": 41,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 197
+        },
+        {
+          "roll": "4050",
+          "name": "عائشة تسمن.ام",
+          "subjects": {
+            "QURA'N HIFZ ": 32,
+            "FIQH ": 18,
+            "LISAN QURAA'N ": 44,
+            "AQEEDA ": 43,
+            "THAJVEETH ": 40,
+            "THAREEKH ": 11,
+            "AQLAQH ": 16,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 204
+        },
+        {
+          "roll": "4051",
+          "name": "سينمو",
+          "subjects": {
+            "QURA'N HIFZ ": 4,
+            "FIQH ": 1,
+            "LISAN QURAA'N ": 6,
+            "AQEEDA ": 4,
+            "THAJVEETH ": 31,
+            "THAREEKH ": 12,
+            "AQLAQH ": 26,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 84
+        },
+        {
+          "roll": "4052",
+          "name": "محمد زيان.بى.دى",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 27,
+            "LISAN QURAA'N ": 38,
+            "AQEEDA ": 22,
+            "THAJVEETH ": 36,
+            "THAREEKH ": 11,
+            "AQLAQH ": 1,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 135
+        },
+        {
+          "roll": "4053",
+          "name": "عدنان شا.كى",
+          "subjects": {
+            "QURA'N HIFZ ": 4,
+            "FIQH ": 4,
+            "LISAN QURAA'N ": 22,
+            "AQEEDA ": 21,
+            "THAJVEETH ": 14,
+            "THAREEKH ": 23,
+            "AQLAQH ": 50,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 138
+        },
+        {
+          "roll": "4054",
+          "name": "هيمن.كى",
+          "subjects": {
+            "QURA'N HIFZ ": 43,
+            "FIQH ": 35,
+            "LISAN QURAA'N ": 40,
+            "AQEEDA ": 22,
+            "THAJVEETH ": 10,
+            "THAREEKH ": 31,
+            "AQLAQH ": 38,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 219
+        },
+        {
+          "roll": "4055",
+          "name": "محمّد يزيد.ام",
+          "subjects": {
+            "QURA'N HIFZ ": 29,
+            "FIQH ": 32,
+            "LISAN QURAA'N ": 38,
+            "AQEEDA ": 47,
+            "THAJVEETH ": 46,
+            "THAREEKH ": 22,
+            "AQLAQH ": 17,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 231
+        },
+        {
+          "roll": "4056",
+          "name": "محمد رنان .بى",
+          "subjects": {
+            "QURA'N HIFZ ": 39,
+            "FIQH ": 42,
+            "LISAN QURAA'N ": 45,
+            "AQEEDA ": 9,
+            "THAJVEETH ": 35,
+            "THAREEKH ": 29,
+            "AQLAQH ": 8,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 207
+        },
+        {
+          "roll": "4057",
+          "name": "محمّد أجود.بى.وي",
+          "subjects": {
+            "QURA'N HIFZ ": 50,
+            "FIQH ": 34,
+            "LISAN QURAA'N ": 8,
+            "AQEEDA ": 2,
+            "THAJVEETH ": 10,
+            "THAREEKH ": 42,
+            "AQLAQH ": 2,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 148
+        },
+        {
+          "roll": "4058",
+          "name": "هباد محمد .كى",
+          "subjects": {
+            "QURA'N HIFZ ": 46,
+            "FIQH ": 21,
+            "LISAN QURAA'N ": 45,
+            "AQEEDA ": 8,
+            "THAJVEETH ": 44,
+            "THAREEKH ": 8,
+            "AQLAQH ": 18,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 190
+        },
+        {
+          "roll": "4059",
+          "name": "شاه الحسيد.بى",
+          "subjects": {
+            "QURA'N HIFZ ": 32,
+            "FIQH ": 23,
+            "LISAN QURAA'N ": 47,
+            "AQEEDA ": 4,
+            "THAJVEETH ": 44,
+            "THAREEKH ": 24,
+            "AQLAQH ": 35,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 209
+        },
+        {
+          "roll": "4060",
+          "name": "محمد دلف.بى",
+          "subjects": {
+            "QURA'N HIFZ ": 5,
+            "FIQH ": 9,
+            "LISAN QURAA'N ": 37,
+            "AQEEDA ": 6,
+            "THAJVEETH ": 41,
+            "THAREEKH ": 2,
+            "AQLAQH ": 4,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 104
+        },
+        {
+          "roll": "4061",
+          "name": "محمد نشان.كى.كى",
+          "subjects": {
+            "QURA'N HIFZ ": 30,
+            "FIQH ": 13,
+            "LISAN QURAA'N ": 36,
+            "AQEEDA ": 24,
+            "THAJVEETH ": 41,
+            "THAREEKH ": 49,
+            "AQLAQH ": 13,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 206
+        },
+        {
+          "roll": "4062",
+          "name": "نجا فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 39,
+            "FIQH ": 8,
+            "LISAN QURAA'N ": 5,
+            "AQEEDA ": 15,
+            "THAJVEETH ": 29,
+            "THAREEKH ": 49,
+            "AQLAQH ": 14,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 159
+        },
+        {
+          "roll": "4063",
+          "name": "فاطمة فلسة",
+          "subjects": {
+            "QURA'N HIFZ ": 46,
+            "FIQH ": 21,
+            "LISAN QURAA'N ": 1,
+            "AQEEDA ": 8,
+            "THAJVEETH ": 26,
+            "THAREEKH ": 31,
+            "AQLAQH ": 6,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 139
+        },
+        {
+          "roll": "4064",
+          "name": "فاطمة رسي",
+          "subjects": {
+            "QURA'N HIFZ ": 44,
+            "FIQH ": 32,
+            "LISAN QURAA'N ": 35,
+            "AQEEDA ": 7,
+            "THAJVEETH ": 39,
+            "THAREEKH ": 42,
+            "AQLAQH ": 14,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 213
+        },
+        {
+          "roll": "4065",
+          "name": "فاطمة هادية",
+          "subjects": {
+            "QURA'N HIFZ ": 37,
+            "FIQH ": 31,
+            "LISAN QURAA'N ": 19,
+            "AQEEDA ": 33,
+            "THAJVEETH ": 23,
+            "THAREEKH ": 22,
+            "AQLAQH ": 46,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 211
+        },
+        {
+          "roll": "4066",
+          "name": "فاطمة هزي",
+          "subjects": {
+            "QURA'N HIFZ ": 9,
+            "FIQH ": 41,
+            "LISAN QURAA'N ": 33,
+            "AQEEDA ": 37,
+            "THAJVEETH ": 38,
+            "THAREEKH ": 45,
+            "AQLAQH ": 13,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 216
+        },
+        {
+          "roll": "4067",
+          "name": "فاطمة شمرن",
+          "subjects": {
+            "QURA'N HIFZ ": 41,
+            "FIQH ": 14,
+            "LISAN QURAA'N ": 2,
+            "AQEEDA ": 11,
+            "THAJVEETH ": 46,
+            "THAREEKH ": 21,
+            "AQLAQH ": 24,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 159
+        },
+        {
+          "roll": "4068",
+          "name": "محمد شبن",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 17,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 17
+        },
+        {
+          "roll": "4069",
+          "name": "سلمان الفارس",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 42,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 40,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 82
+        },
+        {
+          "roll": "4070",
+          "name": "محمد يس",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4071",
+          "name": "أرشق محمد",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4072",
+          "name": "محمد أنفاس",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4073",
+          "name": "حمزة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4074",
+          "name": "شهباس عبد الرحمن",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4075",
+          "name": "محمد رادن",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4076",
+          "name": "شناس الرحمن",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4077",
+          "name": "محمد رفنش",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4078",
+          "name": "عادل فرح",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 25,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 25
+        },
+        {
+          "roll": "4079",
+          "name": "محمد أنس",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4080",
+          "name": "فاطمة نسلة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4081",
+          "name": "فاطمة رسنى",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4082",
+          "name": "فاطمة نفلة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 49,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 49
+        },
+        {
+          "roll": "4083",
+          "name": "فرحة فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4084",
+          "name": "فاطمة أفنة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4085",
+          "name": "فاطمة حنة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4086",
+          "name": "منشا",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4087",
+          "name": "هشا فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4088",
+          "name": "دية",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 45,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 50,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 95
+        },
+        {
+          "roll": "4089",
+          "name": "عائشة مهرين",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 44,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 44
+        },
+        {
+          "roll": "4090",
+          "name": "فاطمة شنفى",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 32,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 28,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 60
+        },
+        {
+          "roll": "4091",
+          "name": "فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4092",
+          "name": "محمد شارح",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4093",
+          "name": "محمد عيان",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4094",
+          "name": "محمد رزن",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4095",
+          "name": "محمد ربيع",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4096",
+          "name": "محمد مدلاج",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4097",
+          "name": "محمد مختار",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4098",
+          "name": "محمد ربّان",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4099",
+          "name": "فاطمة محزة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4100",
+          "name": "رسى فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4101",
+          "name": "سدرة المنتهى",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4102",
+          "name": "نفيسة المصرية",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4103",
+          "name": "فاطمة شزي",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4104",
+          "name": "مريم تسني",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4105",
+          "name": "سفي",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4106",
+          "name": "سمي فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4107",
+          "name": "فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4108",
+          "name": "فاطمة رشدة فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4109",
+          "name": "محمّد شامل .بى وى",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4110",
+          "name": "سواد",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4111",
+          "name": "محمد رازي",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4112",
+          "name": "محمد وفى",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4113",
+          "name": "رزان محمد",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4114",
+          "name": "راحل منشف",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4115",
+          "name": "فاطمة رنشة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4116",
+          "name": "نجة فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4117",
+          "name": "فاطمة رنة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4118",
+          "name": "فاطمة شافية",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4119",
+          "name": "حمدة فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4120",
+          "name": "نيشة مجن",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4121",
+          "name": "فاطمة نسبة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4122",
+          "name": "فاطمة سمرن",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4123",
+          "name": "فاطمة نشبة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4124",
+          "name": "فاطمة نشمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4125",
+          "name": "محمد رشاب",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 0,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 0
+        },
+        {
+          "roll": "4126",
+          "name": "نسل رحمن",
+          "subjects": {
+            "QURA'N HIFZ ": 45,
+            "FIQH ": 17,
+            "LISAN QURAA'N ": 2,
+            "AQEEDA ": 30,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 24,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 118
+        },
+        {
+          "roll": "4127",
+          "name": "عدنان",
+          "subjects": {
+            "QURA'N HIFZ ": 47,
+            "FIQH ": 14,
+            "LISAN QURAA'N ": 42,
+            "AQEEDA ": 32,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 43,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 178
+        },
+        {
+          "roll": "4128",
+          "name": "أجسل",
+          "subjects": {
+            "QURA'N HIFZ ": 1,
+            "FIQH ": 22,
+            "LISAN QURAA'N ": 2,
+            "AQEEDA ": 12,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 16,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 53
+        },
+        {
+          "roll": "4129",
+          "name": "فاطمة مهنة",
+          "subjects": {
+            "QURA'N HIFZ ": 4,
+            "FIQH ": 25,
+            "LISAN QURAA'N ": 26,
+            "AQEEDA ": 22,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 38,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 115
+        },
+        {
+          "roll": "4130",
+          "name": "سجى مريم",
+          "subjects": {
+            "QURA'N HIFZ ": 17,
+            "FIQH ": 49,
+            "LISAN QURAA'N ": 13,
+            "AQEEDA ": 23,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 39,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 141
+        },
+        {
+          "roll": "4131",
+          "name": "هد الرحمن",
+          "subjects": {
+            "QURA'N HIFZ ": 3,
+            "FIQH ": 39,
+            "LISAN QURAA'N ": 34,
+            "AQEEDA ": 26,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 48,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 150
+        },
+        {
+          "roll": "4132",
+          "name": "فاطمة جزي",
+          "subjects": {
+            "QURA'N HIFZ ": 33,
+            "FIQH ": 39,
+            "LISAN QURAA'N ": 44,
+            "AQEEDA ": 36,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 18,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 170
+        },
+        {
+          "roll": "4133",
+          "name": "نسو فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 2,
+            "FIQH ": 30,
+            "LISAN QURAA'N ": 15,
+            "AQEEDA ": 4,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 7,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 58
+        },
+        {
+          "roll": "4134",
+          "name": "فاطمة شبلة",
+          "subjects": {
+            "QURA'N HIFZ ": 1,
+            "FIQH ": 25,
+            "LISAN QURAA'N ": 8,
+            "AQEEDA ": 49,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 7,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 90
+        },
+        {
+          "roll": "4135",
+          "name": "فاطمة يمنة",
+          "subjects": {
+            "QURA'N HIFZ ": 8,
+            "FIQH ": 35,
+            "LISAN QURAA'N ": 27,
+            "AQEEDA ": 5,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 14,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 89
+        },
+        {
+          "roll": "4136",
+          "name": "محرى على",
+          "subjects": {
+            "QURA'N HIFZ ": 23,
+            "FIQH ": 20,
+            "LISAN QURAA'N ": 42,
+            "AQEEDA ": 17,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 26,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 128
+        },
+        {
+          "roll": "4137",
+          "name": "فاطمة دية",
+          "subjects": {
+            "QURA'N HIFZ ": 50,
+            "FIQH ": 31,
+            "LISAN QURAA'N ": 7,
+            "AQEEDA ": 45,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 33,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 166
+        },
+        {
+          "roll": "4138",
+          "name": "محمد سناح",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 42,
+            "LISAN QURAA'N ": 19,
+            "AQEEDA ": 42,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 6,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 109
+        },
+        {
+          "roll": "4139",
+          "name": "رنشاد",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 41,
+            "LISAN QURAA'N ": 13,
+            "AQEEDA ": 34,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 22,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 110
+        },
+        {
+          "roll": "4140",
+          "name": "شهان",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 10,
+            "LISAN QURAA'N ": 50,
+            "AQEEDA ": 29,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 31,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 120
+        },
+        {
+          "roll": "4141",
+          "name": "شامل",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 23,
+            "LISAN QURAA'N ": 43,
+            "AQEEDA ": 41,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 41,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 148
+        },
+        {
+          "roll": "4142",
+          "name": "محمد دانش",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 32,
+            "LISAN QURAA'N ": 11,
+            "AQEEDA ": 41,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 45,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 129
+        },
+        {
+          "roll": "4143",
+          "name": "محمد أبوبكر",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 49,
+            "LISAN QURAA'N ": 45,
+            "AQEEDA ": 44,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 42,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 180
+        },
+        {
+          "roll": "4144",
+          "name": "محمد رزان",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 50,
+            "LISAN QURAA'N ": 32,
+            "AQEEDA ": 36,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 36,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 154
+        },
+        {
+          "roll": "4145",
+          "name": "محمد يامن",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 27,
+            "LISAN QURAA'N ": 28,
+            "AQEEDA ": 15,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 19,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 89
+        },
+        {
+          "roll": "4146",
+          "name": "حبا تشنى",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 39,
+            "LISAN QURAA'N ": 28,
+            "AQEEDA ": 33,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 31,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 131
+        },
+        {
+          "roll": "4147",
+          "name": "فاطمة هادية",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 21,
+            "LISAN QURAA'N ": 23,
+            "AQEEDA ": 44,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 50,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 138
+        },
+        {
+          "roll": "4148",
+          "name": "شافية",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 13,
+            "LISAN QURAA'N ": 14,
+            "AQEEDA ": 28,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 12,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 67
+        },
+        {
+          "roll": "4149",
+          "name": "محمد دانش",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 16,
+            "LISAN QURAA'N ": 39,
+            "AQEEDA ": 23,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 28,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 106
+        },
+        {
+          "roll": "4150",
+          "name": "شهيدة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 35,
+            "LISAN QURAA'N ": 28,
+            "AQEEDA ": 24,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 24,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 111
+        },
+        {
+          "roll": "4151",
+          "name": "فاطمة سلوى",
+          "subjects": {
+            "QURA'N HIFZ ": 14,
+            "FIQH ": 8,
+            "LISAN QURAA'N ": 35,
+            "AQEEDA ": 49,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 34,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 140
+        },
+        {
+          "roll": "4152",
+          "name": "فاطمة حنة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 16,
+            "LISAN QURAA'N ": 37,
+            "AQEEDA ": 30,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 25,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 108
+        },
+        {
+          "roll": "4153",
+          "name": "سجا فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 18,
+            "LISAN QURAA'N ": 44,
+            "AQEEDA ": 4,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 1,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 67
+        },
+        {
+          "roll": "4154",
+          "name": "فاطمة شنشى",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 2,
+            "LISAN QURAA'N ": 4,
+            "AQEEDA ": 21,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 15,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 42
+        },
+        {
+          "roll": "4155",
+          "name": "ديا فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 39,
+            "LISAN QURAA'N ": 36,
+            "AQEEDA ": 28,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 50,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 153
+        },
+        {
+          "roll": "4156",
+          "name": "فاطمة منها",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 1,
+            "LISAN QURAA'N ": 11,
+            "AQEEDA ": 5,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 41,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 58
+        },
+        {
+          "roll": "4157",
+          "name": "فاطمة فسنة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 10,
+            "LISAN QURAA'N ": 20,
+            "AQEEDA ": 8,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 12,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 0,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 50
+        },
+        {
+          "roll": "4158",
+          "name": "فارس الرحمن",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 45,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 29,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 74
+        },
+        {
+          "roll": "4159",
+          "name": "محمد نهال",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 7,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 7,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 14
+        },
+        {
+          "roll": "4160",
+          "name": "شفنة سنة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 49,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 12,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 61
+        },
+        {
+          "roll": "4161",
+          "name": "شانة شرن",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 33,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 3,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 36
+        },
+        {
+          "roll": "4162",
+          "name": "ناجية",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 11,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 27,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 38
+        },
+        {
+          "roll": "4163",
+          "name": "شاكرة بيكم",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 13,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 34,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 47
+        },
+        {
+          "roll": "4164",
+          "name": "شمزة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 1,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 46,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 47
+        },
+        {
+          "roll": "4165",
+          "name": "فاطمة نبة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 18,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 39,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 57
+        },
+        {
+          "roll": "4166",
+          "name": "هبة فاطمة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 49,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 31,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 80
+        },
+        {
+          "roll": "4167",
+          "name": "فاطمة حسنة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 11,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 11,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 22
+        },
+        {
+          "roll": "4168",
+          "name": "محمد على",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 2,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 31,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 33
+        },
+        {
+          "roll": "4169",
+          "name": "فاطمة دلنة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 2,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 13,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 15
+        },
+        {
+          "roll": "4170",
+          "name": "رشي نجنة",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 44,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 35,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 79
+        },
+        {
+          "roll": "4171",
+          "name": "فاطمةسنية",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 39,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 26,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 65
+        },
+        {
+          "roll": "4172",
+          "name": "هشى مريم",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 25,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 27,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 52
+        },
+        {
+          "roll": "4173",
+          "name": "محمد زياد",
+          "subjects": {
+            "QURA'N HIFZ ": 0,
+            "FIQH ": 41,
+            "LISAN QURAA'N ": 0,
+            "AQEEDA ": 0,
+            "THAJVEETH ": 0,
+            "THAREEKH ": 0,
+            "AQLAQH ": 0,
+            "THAFHEEMU THILAVAH ": 0,
+            "THAFSEER ": 28,
+            "Column 13 ": 0,
+            "Column 14 ": 0,
+            "Column 15 ": 0,
+            "@dropdown ": 0
+          },
+          "total": 69
+        }
+      ]
+    }
+  ]
+}

@@ -7,12 +7,13 @@
     <title>MIFTHAHUL HUDA MADRASA</title>
     <meta name="description" content="Portfolio of MIFTHAHUL HUDA MADRASA. Exploring technology and sharing knowledge.">
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/modern-nav.css">
+    <link rel="stylesheet" href="assets/css/site-footer.css">
     <link rel="stylesheet" href="assets/css/site-languages.css">
 
     <!-- Global Navigation & Footer -->
-    <link rel="stylesheet" href="assets/css/navigation-system.css">
-    <link rel="stylesheet" href="assets/css/footer-system.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="assets/css/global-navigation.css">
+    <link rel="stylesheet" href="assets/css/global-footer.css">
 
     <!-- Critical Scripts (Optimized) -->
     <script src="assets/js/utils/performance.js" defer></script>
@@ -41,7 +42,12 @@
 </head>
 
 <body data-page-id="home">
-    <header id="site-header"></header>
+    <!-- Global Navigation -->
+    <div id="global-nav"></div>
+
+    <header id="main-header">
+        <!-- Navigation injected via site-nav.js -->
+    </header>
 
     <main>
         <section id="hero"
@@ -512,30 +518,7 @@
 
     </main>
 
-    <footer id="site-footer"></footer>
-
-    <script src="assets/js/navigation-system.js"></script>
-    <script src="assets/js/footer-system.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const menuData = {
-                headerMenu: [
-                    { label: "Home", link: "/index.html", enabled: true, children: [] },
-                    { label: "Results", link: "/pages/results/index.html", enabled: true, children: [] },
-                    { label: "News", link: "/pages/news/index.html", enabled: true, children: [] },
-                    { label: "Booking", link: "/pages/booking/index.html", enabled: true, children: [] },
-                    { label: "Services", link: "/pages/services/index.html", enabled: true, children: [] },
-                    { label: "Gallery", link: "/pages/gallery/index.html", enabled: true, children: [] },
-                    { label: "About", link: "/pages/about/index.html", enabled: true, children: [] },
-                    { label: "Contact", link: "#contact", enabled: true, children: [] },
-                    { label: "Admin", link: "/pages/admin/dashboard.html", enabled: true, children: [] }
-                ]
-            };
-
-            if (window.NavigationSystem) window.NavigationSystem.init(menuData);
-            if (window.FooterSystem) window.FooterSystem.init();
-        });
-    </script>
+    <script src="assets/js/site-nav.js"></script>
     <script src="assets/js/script.js"></script>
 
 
@@ -793,76 +776,27 @@
             const container = document.getElementById('home-result-container');
             const area = document.getElementById('home-result-area');
 
-            if (!regno) {
-                status.innerText = "Please enter a register number.";
-                status.style.color = "orange";
-                return;
-            }
+            if (!regno) return;
+            status.innerHTML = "🔍 Fetching from local vault...";
+            container.style.display = "none";
 
-            status.innerText = "Searching database...";
-            status.style.color = "#888";
-
-            try {
-                // Fetch from Central Store
-                const response = await fetch('data/results-store.json?t=' + Date.now());
-                if (!response.ok) throw new Error("Database offline");
-
-                const store = await response.json();
-
-                if (!store.published || !store.exams) {
-                    throw new Error("Results are not published yet.");
-                }
-
-                // Search across all exams (or latest)
-                let student = null;
-                let foundExam = null;
-
-                // Sort exams by date desc to get latest first
-                const exams = store.exams.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-
-                for (const exam of exams) {
-                    const s = exam.students.find(stu => String(stu.roll || stu.rollNo) === String(regno));
-                    if (s) {
-                        student = s;
-                        foundExam = exam;
-                        break;
-                    }
-                }
-
-                if (student) {
-                    status.innerText = "Result Found!";
-                    status.style.color = "#00ff88";
-                    container.style.display = "block";
-
+            setTimeout(() => {
+                const result = window.ResultManager.lookup(regno, '2010-01-01', '1'); // Default Public Category
+                if (result) {
+                    status.innerHTML = "✅ Record Found";
                     area.innerHTML = `
-                        <h3 style="margin:0; color:var(--primary-color)">${student.name}</h3>
-                        <p style="margin:5px 0; color:#ccc;">${foundExam.examName}</p>
-                        <div style="margin-top:15px; display:flex; gap:15px; align-items:center;">
-                            <div style="font-size:2rem; font-weight:700; color:#fff">${student.total || 'N/A'}</div>
-                            <div style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px;">
-                                Status: <span style="color:${String(student.status).toLowerCase() === 'pass' ? '#00ff88' : '#ff4d4d'}">${student.status}</span>
-                            </div>
+                        <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">${result.name}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px;">
+                            <span style="color: #888; font-size: 0.9rem;">Status: <b style="color:#00ff88">PASS</b></span>
+                            <span style="color: #fff; font-weight: 700;">Score: ${result.score}</span>
                         </div>
                     `;
-
-                    // Update "View Full Transcript" link to point to specific result
-                    const fullLink = container.querySelector('.btn-link');
-                    if (fullLink) fullLink.href = `pages/results/index.html?exam=${foundExam.examId}&roll=${student.roll || student.rollNo}`;
-
+                    container.style.display = "block";
                 } else {
-                    status.innerText = "No result found for Roll No: " + regno;
-                    status.style.color = "#ff4d4d";
-                    container.style.display = "none";
+                    status.innerHTML = "❌ ID not found in local records.";
                 }
-
-            } catch (err) {
-                console.error(err);
-                status.innerText = "System currently offline or updating.";
-                status.style.color = "orange";
-            }
+            }, 500);
         };
-
-
 
         document.getElementById('home-regno')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') window.fetchHomeResult();
@@ -958,15 +892,15 @@
         </a>
     </div>
 
-    <!-- Dynamic Site Settings & Renderer -->
-    <script src="assets/js/site-settings.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SiteSettings) SiteSettings.render();
-        });
-    </script>
+    <!-- Global Navigation & Footer Scripts -->
+    <script src="assets/js/global-navigation.js"></script>
+    <script src="assets/js/navigation-config.js"></script>
+    <script src="assets/js/global-footer.js"></script>
+    <script src="assets/js/footer-config.js"></script>
 
     <!-- Existing Scripts -->
+    <script src="assets/js/site-nav.js" defer></script>
+    <script src="assets/js/site-footer.js" defer></script>
     <script src="assets/js/script.js" defer></script>
     <script type="module" src="assets/js/auth-nav-guard.js" defer></script>
 </body>

@@ -65,29 +65,13 @@
                 grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             }
         }
-
-        .lang-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-family: inherit;
-        }
-
-        .lang-btn.active {
-            background: var(--primary-color);
-            color: #000;
-            border-color: var(--primary-color);
-            font-weight: 700;
-        }
     </style>
 </head>
 
 <body>
-    <header id="main-header"></header>
+    <header id="main-header">
+        <!-- Navigation injected via site-nav.js -->
+    </header>
 
     <main id="main-content">
         <div class="not-found" style="margin-top: 150px; text-align: center;">
@@ -96,39 +80,21 @@
         </div>
     </main>
 
+
     <footer id="main-footer"></footer>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (matches index.html style but relative links) -->
     <nav class="bottom-nav">
         <div class="bottom-nav-container">
             <a href="../../index.html" class="nav-item">
                 <i class="ph ph-house"></i>
                 <span data-t="home">Home</span>
             </a>
-            <a href="../students/creations.html" class="nav-item">
-                <i class="ph ph-paint-brush"></i>
-                <span>Creations</span>
-            </a>
-            <a href="../../index.html#hero" class="btn-book-nav">
-                <i class="ph ph-calendar-plus"></i>
-            </a>
-            <a href="index.html" class="nav-item active">
-                <i class="ph ph-newspaper"></i>
-                <span>News</span>
-            </a>
-            <a href="../../index.html#contact" class="nav-item">
-                <i class="ph ph-chat-circle"></i>
-                <span>Contact</span>
-            </a>
         </div>
     </nav>
 
-    <script src="../../assets/js/site-settings.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SiteSettings) SiteSettings.render();
-        });
-    </script>
+    <script src="../../assets/js/site-nav.js"></script>
+    <script src="../../assets/js/site-footer.js"></script>
     <script src="../../assets/js/script.js"></script>
     <script type="module" src="../../assets/js/auth-nav-guard.js"></script>
     <script type="module">
@@ -160,9 +126,9 @@
             mainContent.innerHTML = `
                 <div class="news-hero">
                     <div class="container">
-                        <div class="section-badge" style="background: rgba(0, 243, 255, 0.1); color: var(--primary-color); display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Newsroom</div>
-                        <h1 style="font-size: 3.5rem; margin-top: 20px; font-weight: 800; letter-spacing: -2px;">Latest Updates</h1>
-                        <div class="lang-toggle-wrapper" style="margin-top: 30px; display: flex; justify-content: center; gap: 10px;">
+                        <div class="section-badge">Newsroom</div>
+                        <h1 style="font-size: 3.5rem; margin-top: 10px; font-weight: 800; letter-spacing: -2px;">Latest Updates</h1>
+                        <div class="lang-toggle-wrapper" style="margin-top: 30px;">
                             <button class="lang-btn ${currentLang === 'en' ? 'active' : ''}" onclick="switchNewsLang('en')">English</button>
                             <button class="lang-btn ${currentLang === 'ml' ? 'active' : ''}" onclick="switchNewsLang('ml')">Malayalam</button>
                             <button class="lang-btn ${currentLang === 'ar' ? 'active' : ''}" onclick="switchNewsLang('ar')">Arabic</button>
@@ -173,17 +139,17 @@
                     <div class="grid">
                         ${news.length === 0 ? '<p style="text-align: center; color: #666; width: 100%;">No news available.</p>' :
                     news.map((item, idx) => {
-                        const title = (item.title && item.title[currentLang]) || (item.title && item.title.en) || "Untitled";
-                        const short = (item.shortDescription && item.shortDescription[currentLang]) || (item.shortDescription && item.shortDescription.en) || "";
+                        const title = item.title[currentLang] || item.title.en || "Untitled";
+                        const short = item.shortDescription[currentLang] || item.shortDescription.en || "";
                         const date = new Date(item.date).toLocaleDateString(currentLang === 'ml' ? 'ml-IN' : 'en-US');
                         return `
-                            <article class="news-card-premium animate-fade-up" style="animation-delay: ${idx * 0.1}s; direction: ${currentLang === 'ar' ? 'rtl' : 'ltr'}; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 20px; overflow: hidden; transition: 0.3s;" onclick="window.location.href='index.html?id=${item.id}'">
-                                <div class="img-wrapper" style="height: 200px; overflow: hidden;">
-                                    ${item.image ? `<img src="../../${item.image}" alt="${title}" style="width: 100%; height: 100%; object-fit: cover;">` : `<div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #111; color: #222;"><i class="ph ph-newspaper" style="font-size: 4rem;"></i></div>`}
+                            <article class="news-card-premium animate-fade-up" style="animation-delay: ${idx * 0.1}s; direction: ${currentLang === 'ar' ? 'rtl' : 'ltr'}" onclick="window.location.href='index.html?id=${item.id}'">
+                                <div class="img-wrapper">
+                                    ${item.image ? `<img src="../../${item.image}" alt="${title}">` : `<div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #111; color: #222;"><i class="ph ph-newspaper" style="font-size: 4rem;"></i></div>`}
                                 </div>
                                 <div style="padding: 30px;">
                                     <span style="color: var(--primary-color); font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;">${date}</span>
-                                    <h3 style="margin: 15px 0; font-size: 1.4rem; color: #fff;">${title}</h3>
+                                    <h3 style="margin: 15px 0; font-size: 1.4rem;">${title}</h3>
                                     <p style="color: #888; font-size: 0.95rem; line-height: 1.6;">${short}</p>
                                 </div>
                             </article>
@@ -195,25 +161,19 @@
         }
 
         function renderArticle(item) {
-            const title = (item.title && item.title[currentLang]) || (item.title && item.title.en) || "Untitled";
-            const content = (item.fullContent && item.fullContent[currentLang]) || (item.fullContent && item.fullContent.en) || "Content not available.";
+            const title = item.title[currentLang] || item.title.en || "Untitled";
+            const content = item.fullContent[currentLang] || item.fullContent.en || "Content not available.";
             const date = new Date(item.date).toLocaleDateString(currentLang === 'ml' ? 'ml-IN' : 'en-US');
             const isRtl = currentLang === 'ar';
 
             mainContent.innerHTML = `
                 <div class="container" style="margin-top: 150px; display: flex; justify-content: space-between; align-items: center;">
                     <a href="index.html" class="back-btn"><i class="ph ph-arrow-left"></i> All Updates</a>
-                    <div class="lang-toggle-wrapper" style="display: flex; gap: 10px;">
-                        <button class="lang-btn ${currentLang === 'en' ? 'active' : ''}" onclick="switchNewsLang('en')">EN</button>
-                        <button class="lang-btn ${currentLang === 'ml' ? 'active' : ''}" onclick="switchNewsLang('ml')">ML</button>
-                        <button class="lang-btn ${currentLang === 'ar' ? 'active' : ''}" onclick="switchNewsLang('ar')">AR</button>
-                    </div>
                 </div>
                 <article style="direction: ${isRtl ? 'rtl' : 'ltr'}">
                     <div class="news-hero" style="padding-top: 40px; text-align: ${isRtl ? 'right' : 'left'}">
                         <div class="container">
-                            <h1 style="font-size: 3.5rem; margin-bottom: 25px; font-weight: 800; color: #fff;">${title}</h1>
-                            <p style="color: var(--primary-color); font-weight: 600;">${date}</p>
+                            <h1 style="font-size: 3.5rem; margin-bottom: 25px; font-weight: 800;">${title}</h1>
                         </div>
                     </div>
                     <div class="news-container">
@@ -225,14 +185,7 @@
         }
 
         function render404() {
-            mainContent.innerHTML = `
-                <div class="container" style="margin-top: 150px; text-align: center; padding-bottom: 100px;">
-                    <i class="ph ph-warning-circle" style="font-size: 4rem; color: #ff4d4d; margin-bottom: 20px;"></i>
-                    <h2 style="color: #fff;">Article Not Found</h2>
-                    <p style="color: #888; margin-bottom: 30px;">The requested update could not be found.</p>
-                    <a href="index.html" class="btn btn-primary" style="text-decoration: none; background: var(--primary-color); color: #000; padding: 12px 25px; border-radius: 8px; font-weight: 700;">Back to News Archive</a>
-                </div>
-            `;
+            mainContent.innerHTML = `<div class="container" style="margin-top: 150px; text-align: center;"><h2>Article Not Found</h2><a href="index.html">Back to News</a></div>`;
         }
 
         window.onload = render;

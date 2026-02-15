@@ -1,16 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Approved Fee Receipts - MIFTHAHUL HUDA MADRASA</title>
+    <title>Approved Fee Receipts - MIFTHAHUL HUDA</title>
     <link rel="stylesheet" href="../../assets/css/styles.css">
     <link rel="stylesheet" href="../../assets/css/modern-nav.css">
-    <link rel="stylesheet" href="../../assets/css/site-footer.css">
-    <link rel="stylesheet" href="../../assets/css/site-languages.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
@@ -18,77 +14,20 @@
 <body>
     <header id="main-header"></header>
 
-    <header class="creative-header">
+    <header class="creative-header" style="margin-top: 100px; text-align: center;">
         <h1 class="creative-title">🧾 Approved Fee Receipts</h1>
-        <p>List of students who have successfully submitted their fee proof.</p>
     </header>
 
-    <section>
-        <div class="container" style="margin-bottom: 30px; text-align: center;">
-            <select id="class-filter" onchange="renderReceipts(this.value)"
-                style="padding: 12px 20px; border-radius: 8px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); font-size: 1rem; cursor: pointer;">
-                <option value="all">Filter by Class: All</option>
-                <script>
-                    for (let i = 1; i <= 12; i++) document.write(`<option value="${i}">Class ${i}</option>`);
-                </script>
-            </select>
-        </div>
-        <div class="grid" id="gallery"></div>
+    <section class="container">
+        <div id="gallery" class="grid"></div>
     </section>
 
-    <footer id="main-footer"></footer>
-
-    <!-- WhatsApp Floating Button -->
-    <div class="whatsapp-float-wrapper">
-        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp">
-            <i class="ph-fill ph-whatsapp-logo"></i>
-        </a>
-    </div>
-
+    <script src="../../assets/js/site-nav.js"></script>
     <script src="../../assets/js/script.js"></script>
-    <script src="../../assets/js/site-settings.js"></script>
-    <script>
-        // Load fee receipts from storage
-        const works = JSON.parse(localStorage.getItem("fee_receipts") || "[]");
-        const gallery = document.getElementById("gallery");
-
-        function renderReceipts(filterClass = "all") {
-            // Filter only approved receipts AND matching class
-            const approvedWorks = works.filter(w => w.approved && (filterClass === "all" || w.cls == filterClass));
-
-            gallery.innerHTML = "";
-
-            if (approvedWorks.length === 0) {
-                gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #666;'>No approved receipts found for this selection.</p>";
-                return;
-            }
-
-            approvedWorks.forEach((w, i) => {
-                gallery.innerHTML += `
-                <div class="card creation-card animate-fade-up" style="border-left: 4px solid var(--primary-color);">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                        <span style="background: rgba(46, 213, 115, 0.1); color: #2ed573; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: 700;">Approved</span>
-                        <span style="color: #666; font-size: 0.8rem;">${w.date || 'N/A'}</span>
-                    </div>
-                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.2rem;">Receipt #${w.receiptNo}</h3>
-                    <p style="color: var(--primary-color); font-size: 1rem; margin-bottom: 10px; font-weight: 600;">${w.name}</p>
-                    <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 15px;">Class: ${w.cls}</p>
-                    
-                    ${w.img ? `<div style="margin-bottom: 15px; border-radius: 8px; overflow: hidden; background: #000;"><img src="${w.img}" onclick="window.open(this.src)" style="width: 100%; height: 200px; object-fit: contain; cursor: zoom-in;" title="Click to view full receipt"></div>` : ``}
-                    
-                    ${w.content ? `<p style="font-size: 0.9rem; line-height: 1.5; color: #888; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">Remarks: ${w.content}</p>` : ''}
-                </div>`;
-            });
-        }
-
-        // Initial Render
-        renderReceipts();
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SiteSettings) SiteSettings.render();
-        });
-    </script>
     <script type="module" src="../../assets/js/auth-nav-guard.js"></script>
+    <script>
+        // Inherited logic from creation_receipt.html
+    </script>
 </body>
 
 </html>

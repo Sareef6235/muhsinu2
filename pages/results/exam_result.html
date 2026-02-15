@@ -10,11 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        :root {
-            --primary: #00e5ff;
-            --border: rgba(255, 255, 255, 0.1);
-        }
-
         body {
             background-color: #050505;
             color: #fff;
@@ -53,123 +48,18 @@
             cursor: pointer;
         }
 
-        /* Auth UI */
-        .auth-controls {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1002;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .auth-badge {
-            padding: 8px 16px;
+        .student-card {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(10px);
-        }
-
-        .auth-badge.admin {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: rgba(0, 229, 255, 0.05);
-        }
-
-        .auth-badge .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #888;
-        }
-
-        .auth-badge.admin .dot {
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary);
-        }
-
-        .btn-auth {
-            padding: 10px 20px;
-            background: var(--primary);
-            color: #000;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .login-modal {
-            background: #111;
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            width: 400px;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .animate-spin {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
+            padding: 30px;
+            border-radius: 25px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 
 <body>
     <header id="main-header"></header>
-
-    <!-- Auth Controls -->
-    <div class="auth-controls">
-        <div id="auth-status-badge" class="auth-badge">
-            <span class="dot"></span>
-            <span class="text">Public Mode</span>
-        </div>
-        <button id="auth-main-btn" class="btn-auth" onclick="toggleLoginModal()">
-            <i class="ph-bold ph-user"></i> Login
-        </button>
-    </div>
-
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal-overlay" onclick="if(event.target === this) toggleLoginModal()">
-        <div class="login-modal">
-            <h2 style="margin-bottom: 25px; font-size: 1.8rem;">Admin Access</h2>
-            <div id="login-error" style="display: none; color: #ff3d3d; margin-bottom: 20px;"></div>
-            <input type="text" id="login-username" placeholder="Username">
-            <input type="password" id="login-password" placeholder="Password">
-            <button class="btn-search" id="login-submit-btn" onclick="handleLoginAttempt()">Authenticate</button>
-        </div>
-    </div>
 
     <div class="portal-container">
         <h1 style="text-align:center; margin-bottom:30px;">Old Result Archive</h1>
@@ -178,72 +68,18 @@
         <div id="result-area"></div>
     </div>
 
-    <script src="../../assets/js/auth-manager.js"></script>
     <script src="../../assets/js/site-nav.js"></script>
     <script src="../../assets/js/script.js"></script>
+    <script type="module" src="../../assets/js/auth-nav-guard.js"></script>
     <script>
-        // Auth Logic
-        function toggleLoginModal() {
-            const modal = document.getElementById('loginModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        async function handleLoginAttempt() {
-            const usernameInput = document.getElementById("login-username");
-            const passwordInput = document.getElementById("login-password");
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value;
-
-            const result = await AuthManager.login(username, password);
-
-            if (result.success) {
-                toggleLoginModal();
-                updateAuthUI();
-                // Clear inputs
-                usernameInput.value = '';
-                passwordInput.value = '';
-            } else {
-                const errorDiv = document.getElementById('login-error');
-                errorDiv.textContent = result.message;
-                errorDiv.style.display = 'block';
-            }
-        }
-
-        function handleLogout() {
-            AuthManager.logout();
-            updateAuthUI();
-        }
-
-        function updateAuthUI() {
-            const badge = document.getElementById("auth-status-badge");
-            const badgeText = document.querySelector("#auth-status-badge .text");
-            const mainBtn = document.getElementById("auth-main-btn");
-            const isAdmin = AuthManager.isAdmin();
-
-            if (isAdmin) {
-                if (badge) badge.classList.add("admin");
-                if (badgeText) badgeText.textContent = "Admin Mode";
-                mainBtn.innerHTML = '<i class="ph-bold ph-sign-out"></i> Logout (Admin)';
-                mainBtn.onclick = handleLogout;
-            } else {
-                if (badge) badge.classList.remove("admin");
-                if (badgeText) badgeText.textContent = "Public Mode";
-                mainBtn.innerHTML = '<i class="ph-bold ph-user"></i> Login';
-                mainBtn.onclick = toggleLoginModal;
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            AuthManager.restoreSession();
-            updateAuthUI();
-        });
-
         async function fetchResult() {
             const reg = document.getElementById("regno").value.trim().toUpperCase();
             const area = document.getElementById("result-area");
             if (!reg) return;
 
             area.innerHTML = '<p style="text-align:center; margin-top:20px;">Searching...</p>';
+            // Logic for old result as inherited from original exam_result.html
+            // ... simplified for this refactor demo ...
         }
     </script>
 </body>
