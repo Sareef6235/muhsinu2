@@ -15,9 +15,7 @@
     <!-- Pro Exam Cert Deps -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="../../assets/js/pro-exam.js"></script>
-    <script src="../../assets/js/auth-manager.js"></script>
     <style>
         :root {
             --primary-color: #00f3ff;
@@ -29,7 +27,7 @@
 
         body {
             background: #050505;
-            color: #eee;
+            color: #fff;
             font-family: 'Outfit', sans-serif;
             margin: 0;
             overflow-x: hidden;
@@ -129,7 +127,7 @@
 
         .nav-item:hover,
         .nav-item.active {
-            background: rgba(11, 78, 82, 0.938);
+            background: rgba(0, 243, 255, 0.1);
             color: var(--primary-color);
         }
 
@@ -296,9 +294,7 @@
             border: 1px solid var(--glass-border);
             padding: 12px 20px;
             border-radius: 12px;
-            color: #12f1d4;
-            outline: none;
-            transition: 0.3s;
+            color: #fff;
             font-family: inherit;
         }
 
@@ -357,7 +353,7 @@
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            color: #c25353;
+            color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -372,7 +368,7 @@
         }
 
         .btn-subtle:hover {
-            color: #f19494ff;
+            color: #fff;
             background: rgba(255, 255, 255, 0.05);
         }
 
@@ -414,200 +410,6 @@
             backdrop-filter: blur(20px);
             border-radius: 24px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* --- CREATIVE STUDIO UI --- */
-        .studio-container {
-            display: grid;
-            grid-template-columns: 280px 1fr 280px;
-            gap: 20px;
-            height: calc(100vh - 250px);
-            min-height: 600px;
-        }
-
-        .studio-sidebar {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-        }
-
-        .canvas-viewport {
-            background: #000;
-            border-radius: 20px;
-            padding: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: auto;
-            position: relative;
-            border: 1px solid var(--glass-border);
-        }
-
-        #design-canvas {
-            background: #111;
-            position: relative;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-origin: center;
-        }
-
-        .canvas-element {
-            position: absolute;
-            cursor: move;
-            user-select: none;
-            padding: 10px;
-            border: 1px solid transparent;
-            transition: border 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: pre-wrap;
-        }
-
-        .canvas-element:hover {
-            border: 1px dashed var(--primary-color);
-        }
-
-        .canvas-element.selected {
-            border: 2px solid var(--primary-color);
-            background: rgba(0, 243, 255, 0.05);
-        }
-
-        .element-controls {
-            position: absolute;
-            top: -35px;
-            right: 0;
-            display: none;
-            gap: 5px;
-            background: var(--primary-color);
-            padding: 5px;
-            border-radius: 5px;
-        }
-
-        .canvas-element.selected .element-controls {
-            display: flex;
-        }
-
-        .studio-tool-btn {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            padding: 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            transition: 0.2s;
-        }
-
-        .studio-tool-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--primary-color);
-        }
-
-        .prop-group {
-            margin-bottom: 20px;
-        }
-
-        .prop-label {
-            font-size: 0.75rem;
-            color: #666;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            display: block;
-            letter-spacing: 1px;
-        }
-
-        .resize-handle {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: var(--primary-color);
-            border: 2px solid #000;
-            bottom: -6px;
-            right: -6px;
-            cursor: nwse-resize;
-            border-radius: 50%;
-        }
-
-        @media (max-width: 1200px) {
-            .studio-container {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-
-            .studio-sidebar {
-                height: 300px;
-            }
-
-            .canvas-viewport {
-                height: 500px;
-            }
-        }
-
-
-        /* --- ADMIN LOGIN SYSTEM --- */
-        .login-input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            padding: 15px;
-            border-radius: 12px;
-            color: #da4e4e;
-            font-size: 1.1rem;
-            text-align: center;
-            letter-spacing: 5px;
-            margin-bottom: 20px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .login-input:focus {
-            border-color: var(--primary-color);
-            background: rgba(0, 243, 255, 0.05);
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 15px;
-            background: var(--primary-color);
-            border: none;
-            border-radius: 12px;
-            color: #000;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);
-        }
-
-        @keyframes animate-fade-up {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-up {
-            animation: animate-fade-up 0.4s ease forwards;
         }
     </style>
 </head>
@@ -678,25 +480,6 @@
                 <i class="ph-bold ph-desktop"></i> Pro Console
             </div>
 
-
-            <div class="nav-item" onclick="window.location.href='index.html'">
-                <i class="ph-bold ph-wrench"></i> Services
-            </div>
-
-
-
-            <div class="nav-item" onclick="switchPanel('dashboardh', this)">
-                <i class="ph-bold ph-hard-drives" style="color: #00f3ff;"></i> Server
-            </div>
-
-            <div class="nav-item" onclick="switchPanel('header', this)">
-                <i class="ph-bold ph-gear" style="color: #ff9f43;"></i> Site Settings
-            </div>
-
-
-
-
-
         </nav>
 
         <div style="padding: 20px;">
@@ -717,8 +500,7 @@
                 <div class="date-display" id="date-display">Tuesday, February 3, 2026</div>
             </div>
             <div style="text-align: right; display: flex; align-items: center; gap: 20px;">
-                <div class="user-profile" onclick="AdminAccess.open()"
-                    style="display: flex; align-items: center; gap: 15px; cursor: pointer;">
+                <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
                     <div style="text-align: right;">
                         <div style="font-weight: 600; color: #fff;">Admin User</div>
                         <div style="font-size: 0.8rem; color: #666;">Administrator</div>
@@ -796,157 +578,21 @@
             </div>
         </div>
 
-        <!-- 3. CREATIVE STUDIO PANEL -->
+        <!-- 3. CREATIVE APPROVAL PANEL -->
         <div id="creative" class="panel">
             <div class="panel-header"
-                style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h3 style="margin:0; color: var(--primary-color);">Creative Studio</h3>
-                    <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">Pro Design Engine for School Content</p>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <div id="canvas-size-indicator"
-                        style="font-size: 0.8rem; color: #888; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 50px; border: 1px solid var(--glass-border); display: flex; align-items: center;">
-                        1080 x 1080 (Instagram Post)
-                    </div>
-                    <button class="btn btn-sm btn-primary" onclick="CreativeStudio.exportPNG()">
-                        <i class="ph-bold ph-download-simple"></i> Export PNG
-                    </button>
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Creative Submissions</h3>
+                <div style="display: flex; gap: 15px;">
+                    <select class="form-input" style="width: 200px;" onchange="renderCreativeTable(this.value)">
+                        <option value="all">All Items</option>
+                        <option value="pending">Pending Only</option>
+                    </select>
                 </div>
             </div>
-
-            <div class="studio-container">
-                <!-- Left Sidebar: Tools -->
-                <div class="studio-sidebar">
-                    <div class="prop-group">
-                        <span class="prop-label">Add Elements</span>
-                        <div style="display: grid; gap: 10px;">
-                            <button class="studio-tool-btn" onclick="CreativeStudio.addText()">
-                                <i class="ph-bold ph-text-aa"></i> Add Text
-                            </button>
-                            <button class="studio-tool-btn"
-                                onclick="document.getElementById('studio-logo-upload').click()">
-                                <i class="ph-bold ph-image"></i> Add Logo
-                            </button>
-                            <input type="file" id="studio-logo-upload" hidden accept="image/*"
-                                onchange="CreativeStudio.handleLogoUpload(this)">
-                        </div>
-                    </div>
-
-                    <div class="prop-group">
-                        <span class="prop-label">Background</span>
-                        <div style="display: grid; gap: 10px;">
-                            <input type="color" id="studio-bg-color" class="form-input"
-                                style="height: 40px; padding: 2px;" onchange="CreativeStudio.updateBgColor(this.value)">
-                            <button class="studio-tool-btn"
-                                onclick="document.getElementById('studio-bg-upload').click()">
-                                <i class="ph-bold ph-picture-in-picture"></i> Upload BG Image
-                            </button>
-                            <input type="file" id="studio-bg-upload" hidden accept="image/*"
-                                onchange="CreativeStudio.handleBgUpload(this)">
-                        </div>
-                    </div>
-
-                    <div class="prop-group">
-                        <span class="prop-label">Presets & Templates</span>
-                        <select id="studio-preset-select" class="form-input"
-                            onchange="CreativeStudio.setPreset(this.value)">
-                            <option value="post">Instagram Post (1:1)</option>
-                            <option value="story">Instagram Story (9:16)</option>
-                            <option value="banner">Web Banner (3:1)</option>
-                            <option value="a4">A4 Document (Print)</option>
-                        </select>
-                        <button class="studio-tool-btn" style="margin-top:10px;"
-                            onclick="CreativeStudio.applyTemplate('admission')">
-                            <i class="ph-bold ph-template"></i> Admission Poster
-                        </button>
-                    </div>
-
-                    <div class="prop-group">
-                        <span class="prop-label">AI Headline Generator</span>
-                        <button class="studio-tool-btn" onclick="CreativeStudio.generateAIHeadline()">
-                            <i class="ph-bold ph-sparkle" style="color: var(--primary-color);"></i> Magic Headline
-                        </button>
-                    </div>
-
-                    <div style="margin-top:auto; display: grid; gap: 10px;">
-                        <button class="btn btn-sm btn-secondary" style="width:100%;"
-                            onclick="CreativeStudio.saveDraft()">
-                            <i class="ph-bold ph-floppy-disk"></i> Save Draft
-                        </button>
-                        <button class="btn btn-sm btn-danger" style="width:100%;"
-                            onclick="CreativeStudio.resetCanvas()">
-                            <i class="ph-bold ph-trash"></i> Reset
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Center: Canvas Viewport -->
-                <div class="canvas-viewport" id="canvas-viewport">
-                    <div id="design-canvas" style="width: 500px; height: 500px;">
-                        <!-- Draggable elements go here -->
-                    </div>
-                </div>
-
-                <!-- Right Sidebar: Properties -->
-                <div class="studio-sidebar" id="properties-panel">
-                    <div id="no-selection-msg" style="text-align: center; color: #444; margin-top: 100px;">
-                        <i class="ph ph-cursor-click" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
-                        Select an element to edit properties
-                    </div>
-
-                    <div id="text-properties" style="display: none;">
-                        <h4 style="margin: 0 0 20px 0; color: var(--primary-color);">Text Options</h4>
-                        <div class="prop-group">
-                            <span class="prop-label">Content</span>
-                            <textarea id="prop-text-content" class="form-input" style="min-height: 80px;"
-                                oninput="CreativeStudio.updateSelected('content', this.value)"></textarea>
-                        </div>
-                        <div class="prop-group">
-                            <span class="prop-label">Font Size</span>
-                            <input type="range" id="prop-text-size" min="12" max="200" value="40" style="width: 100%;"
-                                oninput="CreativeStudio.updateSelected('fontSize', this.value)">
-                        </div>
-                        <div class="prop-group">
-                            <span class="prop-label">Color</span>
-                            <input type="color" id="prop-text-color" class="form-input"
-                                style="height: 40px; padding: 2px;"
-                                onchange="CreativeStudio.updateSelected('color', this.value)">
-                        </div>
-                        <div class="prop-group">
-                            <span class="prop-label">Alignment</span>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
-                                <button class="btn btn-mini btn-secondary"
-                                    onclick="CreativeStudio.updateSelected('textAlign', 'left')"><i
-                                        class="ph ph-text-align-left"></i></button>
-                                <button class="btn btn-mini btn-secondary"
-                                    onclick="CreativeStudio.updateSelected('textAlign', 'center')"><i
-                                        class="ph ph-text-align-center"></i></button>
-                                <button class="btn btn-mini btn-secondary"
-                                    onclick="CreativeStudio.updateSelected('textAlign', 'right')"><i
-                                        class="ph ph-text-align-right"></i></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="image-properties" style="display: none;">
-                        <h4 style="margin: 0 0 20px 0; color: var(--primary-color);">Image Options</h4>
-                        <div class="prop-group">
-                            <span class="prop-label">Opacity</span>
-                            <input type="range" id="prop-img-opacity" min="0" max="1" step="0.1" value="1"
-                                style="width: 100%;" oninput="CreativeStudio.updateSelected('opacity', this.value)">
-                        </div>
-                        <div class="prop-group">
-                            <span class="prop-label">Bring to front / Send back</span>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <button class="btn btn-sm btn-secondary"
-                                    onclick="CreativeStudio.moveLayer('up')">Forward</button>
-                                <button class="btn btn-sm btn-secondary"
-                                    onclick="CreativeStudio.moveLayer('down')">Backward</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="grid" id="creative-grid"
+                style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; display: grid;">
+                <!-- Filled by JS -->
             </div>
         </div>
 
@@ -1478,9 +1124,16 @@
                     <div>
                         <div class="form-group">
                             <label class="form-label">1. Target Exam</label>
-                            <select id="results-exam-select" class="form-input" style="padding: 12px; font-size: 1rem;">
-                                <!-- Populated by JS -->
-                            </select>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select id="results-exam-select" class="form-input"
+                                    style="flex: 1; padding: 12px; font-size: 1rem;">
+                                    <option value="">-- Select Exam Profile --</option>
+                                </select>
+                                <button class="btn btn-sm btn-secondary" onclick="ExamManager.openEditor()"
+                                    title="Add / Manage Exams">
+                                    <i class="ph-bold ph-pencil-simple"></i> Manage
+                                </button>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -1537,10 +1190,10 @@
                             <i class="ph-bold ph-cloud-arrow-up"></i> PUBLISH FOR STATIC SITE
                         </button>
 
-                        <div id="results-sync-status" style="display:none;">
-                            <div id="results-sync-message"></div>
+                        <div id="results-sync-status"
+                            style="display: none; margin-top: 15px; font-size: 0.85rem; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div id="results-sync-message">...</div>
                         </div>
-
 
                         <!-- Sync Info Display -->
                         <div id="results-sync-info"
@@ -1567,374 +1220,182 @@
                         </div>
 
                         <!-- NEW: Upload Published Results Section -->
-                        <div class="upload-section" id="results-upload-box"
-                            style="margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; text-align: center; transition: 0.3s;">
-                            <label for="published-results-upload" class="btn btn-sm btn-subtle"
-                                style="display: inline-flex; width: auto; cursor: pointer; border: 1px dashed #555; color: #ccc;">
-                                <i class="ph ph-upload-simple"></i> Upload Results JSON
-                            </label>
-                            <input type="file" id="published-results-upload" accept=".json" style="display: none;">
-                            <div id="published-results-status"
-                                style="margin-top: 10px; font-size: 0.8rem; color: #888;">
-                                No results file loaded.
+                        <div class="upload-box" id="results-upload-box"
+                            style="margin-top: 25px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px; transition: 0.3s; border-radius: 12px;">
+                            <h5 style="color: #fff; margin-bottom: 12px; font-size: 0.9rem;">Verify & Preview Published
+                                File</h5>
+
+                            <input type="file" id="published-results-upload" accept=".json" style="display: none;"
+                                onchange="handlePublishedResultsUpload(this)">
+
+                            <div class="upload-actions" style="display: flex; gap: 10px;">
+                                <button class="btn btn-sm btn-subtle"
+                                    onclick="document.getElementById('published-results-upload').click()"
+                                    style="flex: 1; border: 1px dashed #555; color: #ccc;">
+                                    <i class="ph-bold ph-upload-simple"></i> Select JSON
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="clearPublishedResults()"
+                                    style="width: 45px;">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
                             </div>
+
+                            <div id="published-results-status"
+                                style="margin-top: 10px; font-size: 0.8rem; color: #888; text-align: center;">
+                                No file uploaded
+                            </div>
+
+                            <!-- Search/Detail View Placeholders for Preview Flow -->
+                            <div id="search-form" style="margin-top: 20px; display: none;"></div>
+                            <div id="result-view" style="margin-top: 20px; display: none;"></div>
                         </div>
 
-                        <!-- Search/Detail View Placeholders for Preview Flow -->
-                        <div id="search-form" style="margin-top: 20px; display: none;"></div>
-                        <div id="result-view" style="margin-top: 20px; display: none;"></div>
-                    </div>
-
-                    <style>
-                        .upload-section.dragover {
-                            background: rgba(0, 243, 255, 0.05) !important;
-                            border: 1px dashed var(--primary-color) !important;
-                        }
-                    </style>
-
-                    <script>
-                        // --- RESULTS MANAGEMENT CORE ---
-                        window.ResultsManagement = window.ResultsManagement || {};
-
-                        ResultsManagement.fetchHeaders = async function () {
-                            const sheetId = document.getElementById('results-sheet-id').value.trim();
-                            if (!sheetId) {
-                                alert("Please enter Sheet ID first");
-                                return;
+                        <style>
+                            .upload-box.dragover {
+                                background: rgba(0, 243, 255, 0.05);
+                                border: 1px solid var(--primary-color);
                             }
+                        </style>
 
-                            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+                        <script>
+                            // --- GLOBAL STORE ---
+                            window.PublishedResultsStore = {
+                                data: null,
+                                updatedAt: null
+                            };
 
-                            try {
-                                const res = await fetch(url);
-                                const text = await res.text();
-                                // Strip Google wrapper
-                                const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\)/);
-                                if (!match) throw new Error("Invalid response from Google Sheets");
+                            // DRAG & DROP SUPPORT
+                            (function () {
+                                const box = document.getElementById('results-upload-box');
+                                if (!box) return;
 
-                                const data = JSON.parse(match[1]);
-                                const cols = data.table.cols.map(c => c.label).filter(Boolean);
-
-                                // Populate mapping selects
-                                const mapIds = ['map-roll', 'map-name', 'map-dob', 'map-status'];
-                                mapIds.forEach(id => {
-                                    const select = document.getElementById(id);
-                                    if (!select) return;
-                                    select.innerHTML = '<option value="">Select Column</option>';
-                                    cols.forEach(col => {
-                                        const opt = document.createElement('option');
-                                        opt.value = col;
-                                        opt.textContent = col;
-                                        select.appendChild(opt);
+                                ['dragenter', 'dragover'].forEach(e => {
+                                    box.addEventListener(e, ev => {
+                                        ev.preventDefault();
+                                        box.classList.add('dragover');
+                                        const statusEl = document.getElementById('published-results-status');
+                                        if (statusEl) statusEl.textContent = "Drop file to upload";
                                     });
                                 });
 
-                                // Populate subjects container with checkboxes
-                                const container = document.getElementById('map-subjects-container');
-                                if (container) {
-                                    container.innerHTML = '';
-                                    cols.forEach(col => {
-                                        const colLower = col.toLowerCase();
-                                        // Skip common static fields
-                                        if (['roll', 'name', 'dob', 'status', 'reg', 'index'].some(k => colLower.includes(k))) return;
-
-                                        const div = document.createElement('div');
-                                        div.innerHTML = `
-                                            <label style="font-size:0.75rem; display: flex; align-items: center; gap: 5px; color: #ccc; cursor: pointer;">
-                                                <input type="checkbox" value="${col}" checked>
-                                                ${col}
-                                            </label>
-                                        `;
-                                        container.appendChild(div);
-                                    });
-                                }
-
-                                // Show mapping UI
-                                const mappingUI = document.getElementById('column-mapping-ui');
-                                if (mappingUI) {
-                                    mappingUI.style.display = 'block';
-                                    mappingUI.style.animation = 'slideDown 0.3s ease forwards';
-                                }
-
-                                alert(`Fetched ${cols.length} headers successfully!`);
-                            } catch (err) {
-                                console.error(err);
-                                alert("Failed to fetch headers. Check Sheet ID and ensure 'Anyone with the link' can view.");
-                            }
-                        };
-
-                        ResultsManagement.handleSyncClick = async function () {
-                            const examSelect = document.getElementById("results-exam-select");
-                            const selectedExamId = examSelect ? examSelect.value : "";
-                            const selectedExamName = examSelect ? examSelect.selectedOptions[0].text : "";
-
-                            const sheetId = document.getElementById('results-sheet-id').value.trim();
-                            const rollMap = document.getElementById("map-roll").value;
-                            const nameMap = document.getElementById("map-name").value;
-
-                            if (!selectedExamId) return alert("Please select an Exam Profile first.");
-                            if (!sheetId) return alert("Please enter a Google Sheet ID.");
-                            if (!rollMap || !nameMap) return alert("Please map at least Roll No and Student Name.");
-
-                            const statusMap = document.getElementById("map-status").value;
-                            const dobMap = document.getElementById("map-dob") ? document.getElementById("map-dob").value : "";
-                            const subjectChecks = document.querySelectorAll("#map-subjects-container input:checked");
-                            const subjectMaps = Array.from(subjectChecks).map(cb => cb.value);
-
-                            try {
-                                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-                                const res = await fetch(url);
-                                const text = await res.text();
-                                const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\)/);
-                                if (!match) throw new Error("Could not parse sheet data");
-                                const data = JSON.parse(match[1]);
-
-                                const headers = data.table.cols.map(col => col.label || "");
-                                const rows = data.table.rows;
-
-                                const getValue = (row, header) => {
-                                    const index = headers.indexOf(header);
-                                    if (index === -1) return "";
-                                    const cell = row.c[index];
-                                    if (!cell) return "";
-                                    return cell.v !== null ? cell.v : (cell.f || "");
-                                };
-
-                                const students = rows.map(row => {
-                                    const student = {
-                                        roll: String(getValue(row, rollMap)),
-                                        name: String(getValue(row, nameMap)),
-                                        dob: dobMap ? String(getValue(row, dobMap)) : "",
-                                        status: statusMap ? String(getValue(row, statusMap)) : "N/A",
-                                        subjects: {}
-                                    };
-
-                                    let total = 0;
-                                    subjectMaps.forEach(sub => {
-                                        const score = parseFloat(getValue(row, sub)) || 0;
-                                        student.subjects[sub] = score;
-                                        total += score;
-                                    });
-                                    student.total = total;
-                                    return student;
-                                }).filter(s => s.roll && s.name);
-
-                                window.GeneratedResults = {
-                                    examId: selectedExamId,
-                                    examName: selectedExamName,
-                                    generatedAt: new Date().toISOString(),
-                                    students: students
-                                };
-
-                                // Update local state stats if available
-                                const examsCountEl = document.getElementById("results-exams-count");
-                                const totalCountEl = document.getElementById("results-total-count");
-                                const lastSyncEl = document.getElementById("results-last-sync");
-
-                                if (examsCountEl) examsCountEl.textContent = 1;
-                                if (totalCountEl) totalCountEl.textContent = students.length;
-                                if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleTimeString();
-
-                                // Show success message
-                                const statusDiv = document.getElementById("results-sync-status");
-                                const messageDiv = document.getElementById("results-sync-message");
-                                if (statusDiv) statusDiv.style.display = "block";
-                                if (messageDiv) messageDiv.innerHTML = `Preview Ready – ${students.length} Students Synced Successfully!`;
-
-                                alert(`Preview Ready – ${students.length} Students Synced Successfully!`);
-                            } catch (e) {
-                                console.error(e);
-                                alert("Sync Failed: " + e.message);
-                            }
-                        };
-
-                        window.StaticPublisher = {
-                            publish: function () {
-                                if (!window.GeneratedResults || !window.GeneratedResults.students.length) {
-                                    alert("Error: No data found. Please PREVIEW & SYNC first.");
-                                    return;
-                                }
-
-                                try {
-                                    const exportData = {
-                                        published: true,
-                                        lastUpdated: new Date().toISOString(),
-                                        exams: [
-                                            {
-                                                examId: window.GeneratedResults.examId,
-                                                examName: window.GeneratedResults.examName,
-                                                publishedAt: window.GeneratedResults.generatedAt,
-                                                students: window.GeneratedResults.students
+                                ['dragleave', 'drop'].forEach(e => {
+                                    box.addEventListener(e, ev => {
+                                        ev.preventDefault();
+                                        box.classList.remove('dragover');
+                                        if (e === 'drop') {
+                                            const file = ev.dataTransfer.files[0];
+                                            if (file) {
+                                                const input = document.getElementById('published-results-upload');
+                                                const container = new DataTransfer();
+                                                container.items.add(file);
+                                                input.files = container.files;
+                                                window.handlePublishedResultsUpload(input);
                                             }
-                                        ]
-                                    };
-
-                                    const jsonString = JSON.stringify(exportData, null, 2);
-                                    const blob = new Blob([jsonString], { type: "application/json" });
-                                    const url = URL.createObjectURL(blob);
-
-                                    const link = document.createElement("a");
-                                    link.href = url;
-                                    link.download = "published-results.json";
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    document.body.removeChild(link);
-                                    URL.revokeObjectURL(url);
-
-                                    alert("Results JSON Downloaded Successfully!\n\nRename to results-store.json and move to /data/.");
-                                } catch (error) {
-                                    console.error(error);
-                                    alert("Publish Failed: " + error.message);
-                                }
-                            }
-                        };
-
-                        // --- GLOBAL STORE ---
-                        window.PublishedResultsStore = {
-                            data: null,
-                            updatedAt: null
-                        };
-
-                        // DRAG & DROP SUPPORT
-                        (function () {
-                            const box = document.getElementById('results-upload-box');
-                            if (!box) return;
-
-                            ['dragenter', 'dragover'].forEach(e => {
-                                box.addEventListener(e, ev => {
-                                    ev.preventDefault();
-                                    box.classList.add('dragover');
-                                    const statusEl = document.getElementById('published-results-status');
-                                    if (statusEl) statusEl.textContent = "Drop file to upload";
-                                });
-                            });
-
-                            ['dragleave', 'drop'].forEach(e => {
-                                box.addEventListener(e, ev => {
-                                    ev.preventDefault();
-                                    box.classList.remove('dragover');
-                                    if (e === 'drop') {
-                                        const file = ev.dataTransfer.files[0];
-                                        if (file) {
-                                            const input = document.getElementById('published-results-upload');
-                                            const container = new DataTransfer();
-                                            container.items.add(file);
-                                            input.files = container.files;
-                                            window.handlePublishedResultsUpload(input);
                                         }
+                                    });
+                                });
+                            })();
+
+                            // FILE UPLOAD & STATS LOGIC
+                            window.handlePublishedResultsUpload = function (input) {
+                                const file = input.files[0];
+                                const statusEl = document.getElementById('published-results-status');
+
+                                if (!file) return;
+
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    try {
+                                        const json = JSON.parse(e.target.result);
+                                        window.updateResultsStats(json, file.name);
+                                        window.PublishedResultsStore.data = json;
+                                        window.PublishedResultsStore.updatedAt = new Date().toISOString();
+                                    } catch (err) {
+                                        statusEl.innerHTML = "<i class='ph-bold ph-warning'></i> Error: Invalid JSON";
+                                        statusEl.style.color = "#ff4444";
                                     }
+                                };
+                                reader.readAsText(file);
+                            };
+
+                            window.updateResultsStats = function (json, fileName = null) {
+                                const statusEl = document.getElementById('published-results-status');
+                                const exams = json.exams || [];
+                                let studentCount = 0;
+                                exams.forEach(ex => {
+                                    studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
                                 });
-                            });
 
-                            // Manual input change listener
-                            const input = document.getElementById('published-results-upload');
-                            if (input) {
-                                input.addEventListener('change', function () {
-                                    window.handlePublishedResultsUpload(this);
-                                });
-                            }
-                        })();
+                                document.getElementById('results-exams-count').textContent = exams.length;
+                                document.getElementById('results-total-count').textContent = studentCount;
+                                document.getElementById('results-last-sync').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                        // FILE UPLOAD & STATS LOGIC
-                        window.handlePublishedResultsUpload = function (input) {
-                            const file = input.files[0];
-                            const statusEl = document.getElementById('published-results-status');
-
-                            if (!file) return;
-
-                            const reader = new FileReader();
-                            reader.onload = function (e) {
-                                try {
-                                    const json = JSON.parse(e.target.result);
-                                    window.updateResultsStats(json, file.name);
-                                    window.PublishedResultsStore.data = json;
-                                    window.PublishedResultsStore.updatedAt = new Date().toISOString();
-                                } catch (err) {
-                                    statusEl.innerHTML = "<i class='ph-bold ph-warning'></i> Error: Invalid JSON";
-                                    statusEl.style.color = "#ff4444";
+                                if (fileName) {
+                                    statusEl.innerHTML = "<i class='ph-bold ph-check-circle'></i> Loaded: " + fileName;
+                                    statusEl.style.color = "#2ed573";
                                 }
                             };
-                            reader.readAsText(file);
-                        };
 
-                        window.updateResultsStats = function (json, fileName = null) {
-                            const statusEl = document.getElementById('published-results-status');
-                            const exams = json.exams || [];
-                            let studentCount = 0;
-                            exams.forEach(ex => {
-                                studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
-                            });
+                            window.clearPublishedResults = function () {
+                                window.PublishedResultsStore.data = null;
+                                document.getElementById('published-results-upload').value = '';
+                                document.getElementById('published-results-status').textContent = 'No file uploaded';
+                                document.getElementById('published-results-status').style.color = '#888';
 
-                            document.getElementById('results-exams-count').textContent = exams.length;
-                            document.getElementById('results-total-count').textContent = studentCount;
-                            document.getElementById('results-last-sync').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                // Reset stats
+                                document.getElementById('results-exams-count').textContent = '0';
+                                document.getElementById('results-total-count').textContent = '0';
+                                document.getElementById('results-last-sync').textContent = '--:--';
+                            };
 
-                            if (fileName) {
-                                statusEl.innerHTML = "<i class='ph-bold ph-check-circle'></i> Loaded: " + fileName;
-                                statusEl.style.color = "#2ed573";
+                            // RESULT APP SHIM (Navigation support)
+                            window.ResultApp = window.ResultApp || {};
+
+                            function showSearchForm() {
+                                console.log("ResultApp: Showing search form");
+                                if (document.getElementById('search-form')) document.getElementById('search-form').style.display = 'block';
+                                if (document.getElementById('result-view')) document.getElementById('result-view').style.display = 'none';
+
+                                // Also reset the table view if needed
+                                const tbody = document.getElementById('results-table-body');
+                                if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#666;">Ready to sync.</td></tr>';
                             }
-                        };
 
-                        window.clearPublishedResults = function () {
-                            window.PublishedResultsStore.data = null;
-                            document.getElementById('published-results-upload').value = '';
-                            document.getElementById('published-results-status').textContent = 'No file uploaded';
-                            document.getElementById('published-results-status').style.color = '#888';
-
-                            // Reset stats
-                            document.getElementById('results-exams-count').textContent = '0';
-                            document.getElementById('results-total-count').textContent = '0';
-                            document.getElementById('results-last-sync').textContent = '--:--';
-                        };
-
-                        // RESULT APP SHIM (Navigation support)
-                        window.ResultApp = window.ResultApp || {};
-
-                        function showSearchForm() {
-                            console.log("ResultApp: Showing search form");
-                            if (document.getElementById('search-form')) document.getElementById('search-form').style.display = 'block';
-                            if (document.getElementById('result-view')) document.getElementById('result-view').style.display = 'none';
-
-                            // Also reset the table view if needed
-                            const tbody = document.getElementById('results-table-body');
-                            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#666;">Ready to sync.</td></tr>';
-                        }
-
-                        window.showSearchForm = showSearchForm;
-                        window.ResultApp.showSearchForm = showSearchForm;
-                    </script>
+                            window.showSearchForm = showSearchForm;
+                            window.ResultApp.showSearchForm = showSearchForm;
+                        </script>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- PREVIEW / RESULTS TABLE -->
-        <div style="margin-top: 30px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h4 style="margin: 0; color: #fff;">Synced Data Preview</h4>
-                <div id="results-sync-info-header" style="font-size: 0.8rem; color: #888;"></div>
+            <!-- PREVIEW / RESULTS TABLE -->
+            <div style="margin-top: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="margin: 0; color: #fff;">Synced Data Preview</h4>
+                    <div id="results-sync-info-header" style="font-size: 0.8rem; color: #888;"></div>
+                </div>
+                <div style="overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Exam</th>
+                                <th>Total</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body">
+                            <tr>
+                                <td colspan="6" style="text-align:center; padding: 30px; color: #666;">Ready to sync.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div style="overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Roll No</th>
-                            <th>Name</th>
-                            <th>Exam</th>
-                            <th>Total</th>
-                            <th>Grade</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="results-table-body">
-                        <tr>
-                            <td colspan="6" style="text-align:center; padding: 30px; color: #666;">Ready to sync.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
         </div>
 
         <!-- 8. ANALYTICS PANEL -->
@@ -1980,18 +1441,20 @@
                 <div class="glass-card" style="max-width: 500px; width: 90%; padding: 30px;">
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                        <h4 style="color: var(--primary-color); margin: 0;">School Manager</h4>
-                        <button class="btn btn-mini" onclick="SchoolManager.closeEditor()"
-                            style="background: rgba(255,255,255,0.05);">
+                        <h4
+                            style="color: var(--primary-color); margin: 0; display: flex; align-items: center; gap: 10px;">
+                            <i class="ph-bold ph-buildings"></i> School Manager
+                        </h4>
+                        <button class="btn btn-mini btn-subtle" onclick="SchoolManager.closeEditor()">
                             <i class="ph ph-x"></i>
                         </button>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
                         <div style="display: flex; gap: 10px;">
-                            <input id="school-name-input" class="form-input" placeholder="Enter school name..."
+                            <input id="school-manager-name-input" class="form-input" placeholder="Enter school name..."
                                 style="flex: 1;">
-                            <button class="btn btn-primary" onclick="SchoolManager.addSchool()">
+                            <button class="btn btn-primary" onclick="SchoolManager.addSchoolFromInput()">
                                 <i class="ph ph-plus"></i> Add
                             </button>
                         </div>
@@ -1999,7 +1462,7 @@
 
                     <div
                         style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; max-height: 250px; overflow-y: auto; margin-bottom: 25px;">
-                        <ul id="school-list" style="list-style: none; padding: 0; margin: 0;">
+                        <ul id="school-manager-list" style="list-style: none; padding: 0; margin: 0;">
                             <!-- Filled by JS -->
                         </ul>
                     </div>
@@ -2020,45 +1483,15 @@
                     </div>
                 </div>
             </div>
-            <label for="school-json-upload"
-                style="cursor: pointer; color: var(--primary-color); font-size: 0.9rem; font-weight: 500; margin: 0; display: flex; align-items: center; gap: 8px;">
-                <i class="ph ph-upload-simple"></i> Restore/Upload schools.json
-            </label>
-        </div>
-        </div>
-        <p style="margin-top: 15px; font-size: 0.75rem; color: #888; line-height: 1.4;">
-            <i class="ph ph-info"></i> <b>How to save:</b> Add/remove schools, click <b>Download</b>,
-            replace the file in your repository, and push to GitHub.
-        </p>
-        </div>
-        </div>
-        </div>
 
-        <!-- Add School Modal (Inline) -->
-        <div id="add-school-modal" class="modal-overlay" style="display: none;">
-            <div class="glass-card" style="max-width: 400px; padding: 25px;">
-                <h4 style="margin-bottom: 20px; color: var(--primary-color);">Add New School</h4>
-                <div class="form-group">
-                    <label class="form-label">School Name</label>
-                    <input type="text" id="newSchoolName" class="form-input" placeholder="Enter school name...">
-                </div>
-                <div style="display: flex; gap: 15px; margin-top: 20px;">
-                    <button class="btn btn-primary" style="flex: 1;" onclick="SchoolManager.addSchool()">Add
-                        School</button>
-                    <button class="btn btn-secondary" style="flex: 1;"
-                        onclick="SchoolManager.hideAddForm()">Cancel</button>
+            <div class="school-list-grid" id="schools-grid">
+                <!-- Data is injected by Selecting a school from the sidebar dropdown -->
+                <div
+                    style="text-align: center; width: 100%; padding: 40px; color: #666; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px dashed #333;">
+                    <i class="ph ph-buildings" style="font-size: 3rem; display: block; margin-bottom: 10px;"></i>
+                    <p>Select a school from the sidebar to view its profile.</p>
                 </div>
             </div>
-        </div>
-
-        <div class="school-list-grid" id="schools-grid">
-            <!-- Data is injected by Selecting a school from the sidebar dropdown -->
-            <div
-                style="text-align: center; width: 100%; padding: 40px; color: #666; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px dashed #333;">
-                <i class="ph ph-buildings" style="font-size: 3rem; display: block; margin-bottom: 10px;"></i>
-                <p>Select a school from the sidebar to view its profile.</p>
-            </div>
-        </div>
         </div>
 
         <!-- 10. GITHUB DEPLOYMENT PANEL -->
@@ -2176,6 +1609,7 @@
                 </div>
             </div>
         </div>
+
         <!-- 10. PRO EXAM PANEL -->
         <div id="pro-exam" class="panel">
             <div class="panel-header"
@@ -2297,124 +1731,6 @@
             </div>
         </div>
 
-        <!-- 11. SERVER HEALTH PANEL -->
-        <div id="dashboardh" class="panel">
-            <div class="panel-header"
-                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3>Server Status</h3>
-                <div class="git-status-badge">
-                    <i class="ph-bold ph-check-circle"></i> System Online
-                </div>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value">Healthy</div>
-                    <div class="stat-label">System State</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">99.9%</div>
-                    <div class="stat-label">Uptime</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">24ms</div>
-                    <div class="stat-label">Latency</div>
-                </div>
-            </div>
-
-            <div class="glass-card" style="margin-top: 30px; padding: 30px;">
-                <h4 style="margin-bottom: 20px;">Real-time Metrics</h4>
-                <div
-                    style="height: 200px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
-                    <p style="color: #666;">Metrics visualization ready. System monitoring active.</p>
-                </div>
-            </div>
-            <!-- 12. SITE SETTINGS PANEL -->
-            <div id="header" class="panel">
-                <div class="panel-header"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3><i class="ph-bold ph-gear"></i> Site Settings</h3>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="SiteSettings.resetAll()">
-                            <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset All
-                        </button>
-                        <button class="btn btn-primary" onclick="SiteSettings.save(); alert('Settings saved!');">
-                            <i class="ph-bold ph-floppy-disk"></i> Save Changes
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Tab Navigation -->
-                <div class="tab-scroller"
-                    style="margin-bottom: 25px; overflow-x: auto; white-space: nowrap; display: flex; gap: 10px; padding: 5px;">
-                    <button class="btn btn-mini tab-btn active" onclick="switchSettingsTab('header', this)"
-                        style="border-radius: 50px; padding: 10px 20px;">
-                        <i class="ph-bold ph-browser"></i> Header Settings
-                    </button>
-                    <button class="btn btn-mini tab-btn" onclick="switchSettingsTab('footer', this)"
-                        style="border-radius: 50px; padding: 10px 20px;">
-                        <i class="ph-bold ph-layout"></i> Footer Settings
-                    </button>
-                    <button class="btn btn-mini tab-btn" onclick="switchSettingsTab('advanced', this)"
-                        style="border-radius: 50px; padding: 10px 20px;">
-                        <i class="ph-bold ph-gear-six"></i> Advanced
-                    </button>
-                </div>
-
-                <!-- Header Settings Tab -->
-                <div id="header-settings-content" class="settings-tab-content">
-                    <!-- Dynamically rendered by SiteSettings.renderHeaderEditor() -->
-                </div>
-
-                <!-- Footer Settings Tab -->
-                <div id="footer-settings-content" class="settings-tab-content" style="display: none;">
-                    <!-- Dynamically rendered by SiteSettings.renderFooterEditor() -->
-                </div>
-
-                <!-- Advanced Tab -->
-                <div id="advanced-settings-content" class="settings-tab-content" style="display: none;">
-                    <div style="display: grid; gap: 25px; max-width: 800px;">
-                        <!-- Theme Toggle -->
-                        <div class="glass-card" style="padding: 20px;">
-                            <h4 style="margin-top: 0;"><i class="ph-bold ph-moon-stars"></i> Theme</h4>
-                            <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Switch between light and
-                                dark mode for the site.</p>
-                            <button class="btn btn-secondary" onclick="SiteSettings.toggleTheme()" style="width: 100%;">
-                                <i class="ph-bold ph-sun"></i> Toggle Theme Mode
-                            </button>
-                        </div>
-
-                        <!-- Export/Import -->
-                        <div class="glass-card" style="padding: 20px;">
-                            <h4 style="margin-top: 0;"><i class="ph-bold ph-download-simple"></i> Backup & Restore</h4>
-                            <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Export your settings as JSON
-                                or import from a backup file.</p>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <button class="btn btn-primary" onclick="SiteSettings.exportSettings()">
-                                    <i class="ph-bold ph-export"></i> Export Settings
-                                </button>
-                                <button class="btn btn-secondary"
-                                    onclick="document.getElementById('import-file-input').click()">
-                                    <i class="ph-bold ph-upload-simple"></i> Import Settings
-                                </button>
-                            </div>
-                            <input type="file" id="import-file-input" accept=".json" style="display: none;"
-                                onchange="if(this.files[0]) SiteSettings.importSettings(this.files[0]); this.value='';">
-                        </div>
-
-                        <!-- Reset -->
-                        <div class="glass-card" style="padding: 20px;">
-                            <h4 style="margin-top: 0;"><i class="ph-bold ph-warning"></i> Danger Zone</h4>
-                            <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Reset all settings to
-                                factory defaults. This action cannot be undone.</p>
-                            <button class="btn btn-danger" onclick="SiteSettings.resetAll()" style="width: 100%;">
-                                <i class="ph-bold ph-trash"></i> Reset to Defaults
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
     </main>
 
     <!-- Student Profile Modal -->
@@ -2465,6 +1781,55 @@
             style="max-height: 80vh; max-width: 90%; border-radius: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
         <button onclick="document.getElementById('img-modal').style.display='none'"
             style="margin-top: 20px; padding: 10px 30px; background: #333; color: #fff; border: none; border-radius: 50px; cursor: pointer;">Close</button>
+    </div>
+
+    <!-- Exam Manager Editor Modal -->
+    <div id="exam-editor-modal" class="modal-overlay" style="display: none;">
+        <div class="glass-card" style="max-width: 500px; width: 95%; padding: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <i class="ph-bold ph-exam" style="color: var(--primary-color);"></i> Exam Manager
+                </h3>
+                <button onclick="ExamManager.closeEditor()" class="btn btn-mini btn-subtle"><i
+                        class="ph-bold ph-x"></i></button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Add New Exam Profile</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="exam-manager-name-input" placeholder="e.g. Annual Exam 2026"
+                        class="form-input" style="flex: 1;">
+                    <button class="btn btn-sm btn-primary" onclick="ExamManager.addExam()">Add</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <label class="form-label">Existing Exams</label>
+                <div id="exam-list-container"
+                    style="max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border); padding: 10px;">
+                    <ul id="exam-list" style="margin: 0; padding: 0; list-style: none;">
+                        <li style="color: #666; text-align: center; padding: 20px;">No exams found.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div
+                style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--glass-border); display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn btn-md btn-secondary" onclick="ExamManager.downloadJSON()" style="width: 100%;">
+                    <i class="ph-bold ph-download-simple"></i> Download
+                </button>
+                <div style="position: relative; overflow: hidden; display: inline-block; width: 100%;">
+                    <button class="btn btn-md btn-secondary" style="width: 100%;">
+                        <i class="ph-bold ph-upload-simple"></i> Upload
+                    </button>
+                    <input type="file" accept=".json" onchange="ExamManager.uploadJSON(this)"
+                        style="position: absolute; font-size: 100px; right: 0; top: 0; opacity: 0; cursor: pointer;">
+                </div>
+            </div>
+
+            <button class="btn btn-md btn-subtle" onclick="ExamManager.closeEditor()"
+                style="width: 100%; margin-top: 15px;">Close Editor</button>
+        </div>
     </div>
 
     <!-- Scripts -->
@@ -2709,9 +2074,7 @@
                     'analytics': 'Performance Analytics',
                     'schools': 'School Profiles',
                     'deployment': 'GitHub Deployment',
-                    'pro-exam': 'Pro Exam Controller',
-                    'dashboardh': 'Server Status',
-                    'site-settings': 'Site Settings'
+                    'pro-exam': 'Pro Exam Controller'
                 };
                 const titleEl = document.getElementById('panel-title');
                 if (titleEl) titleEl.textContent = titleMap[panelId] || 'Admin Dashboard';
@@ -2721,10 +2084,11 @@
 
                 // Specific panel initializations
                 try {
+                    if (panelId === 'fee' && typeof renderFeeTable === 'function') renderFeeTable();
+                    if (panelId === 'creative' && typeof renderCreativeTable === 'function') renderCreativeTable();
                     if (panelId === 'news' && typeof renderNewsTable === 'function') renderNewsTable();
                     if (panelId === 'bookings' && typeof renderBookingsTable === 'function') renderBookingsTable();
                     if (panelId === 'subjects' && typeof renderSubjectsTable === 'function') renderSubjectsTable();
-                    if (panelId === 'creative' && window.CreativeStudio) CreativeStudio.init();
 
                     if (panelId === 'results') {
                         if (window.AcademicYearManager) AcademicYearManager.init();
@@ -2735,7 +2099,6 @@
                     }
 
                     if (panelId === 'pro-exam' && window.ProExam) ProExam.init();
-                    if (panelId === 'header' && window.SiteSettings) SiteSettings.openPanel();
                 } catch (err) {
                     console.error("Panel Init Error:", err);
                 }
@@ -2858,9 +2221,180 @@
     <script src="../../assets/js/storage-manager.js"></script>
     <script src="../../assets/js/academic-year-manager.js"></script>
     <script src="../../assets/js/exam-type-manager.js"></script>
-    <script src="../../assets/js/exam-manager.js"></script>
+    <!-- <script src="../../assets/js/exam-manager.js"></script> -->
     <script src="../../assets/js/results-management.js"></script>
-    <script src="../../assets/js/site-editor.js"></script>
+
+    <script>
+        /**
+         * Dynamic ExamManager Replacement
+         * Supports in-memory management with localStorage persistence and JSON I/O
+         */
+        window.ExamManager = (() => {
+            const STORAGE_KEY = 'mhm_v2_exams_data';
+            let DATA = { exams: [] };
+
+            function load() {
+                // 1. Try LocalStorage first (for persistence across refreshes)
+                const cached = localStorage.getItem(STORAGE_KEY);
+                if (cached) {
+                    try {
+                        DATA = JSON.parse(cached);
+                        console.log('✅ ExamManager: Loaded from LocalStorage');
+                        renderSelect();
+                        return;
+                    } catch (e) { console.error('Error parsing cached exams:', e); }
+                }
+
+                // 2. Fallback to server file
+                fetch('/data/exams.json')
+                    .then(res => res.json())
+                    .then(json => {
+                        DATA = json;
+                        saveToCache();
+                        renderSelect();
+                    })
+                    .catch(() => {
+                        console.warn('No exams.json found on server, starting fresh.');
+                        renderSelect();
+                    });
+            }
+
+            function saveToCache() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
+                window.dispatchEvent(new CustomEvent('examsUpdated', { detail: DATA.exams }));
+            }
+
+            function renderSelect() {
+                const sel = document.getElementById('results-exam-select');
+                if (!sel) return;
+
+                sel.innerHTML = '<option value="">-- Select Exam Profile --</option>';
+                DATA.exams.forEach(ex => {
+                    const o = document.createElement('option');
+                    o.value = ex.id;
+                    o.textContent = ex.name;
+                    sel.appendChild(o);
+                });
+
+                // Compatibility for other modules
+                if (typeof refreshAllExamSelectors === 'function') {
+                    // We don't want recursion, but we might want to update other selectors if they exist
+                }
+            }
+
+            function openEditor() {
+                document.getElementById('exam-editor-modal').style.display = 'flex';
+                renderList();
+            }
+
+            function closeEditor() {
+                document.getElementById('exam-editor-modal').style.display = 'none';
+            }
+
+            function renderList() {
+                const ul = document.getElementById('exam-list');
+                if (!ul) return;
+
+                if (DATA.exams.length === 0) {
+                    ul.innerHTML = '<li style="color: #666; text-align: center; padding: 20px;">No exams found.</li>';
+                    return;
+                }
+
+                ul.innerHTML = '';
+                DATA.exams.forEach(ex => {
+                    const li = document.createElement('li');
+                    li.style.display = 'flex';
+                    li.style.justifyContent = 'space-between';
+                    li.style.alignItems = 'center';
+                    li.style.padding = '10px 15px';
+                    li.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                    li.innerHTML = `
+                        <span style="font-weight: 500;">${ex.name}</span>
+                        <button class="btn btn-mini btn-danger" onclick="ExamManager.removeExam('${ex.id}')">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    `;
+                    ul.appendChild(li);
+                });
+            }
+
+            function addExam() {
+                const nameInput = document.getElementById('exam-manager-name-input');
+                const name = nameInput.value.trim();
+                if (!name) return alert('Enter exam name');
+
+                const id = 'ex_' + Date.now();
+                DATA.exams.push({ id, name, isActive: true });
+
+                saveToCache();
+                renderSelect();
+                renderList();
+                nameInput.value = '';
+            }
+
+            function removeExam(id) {
+                if (!confirm("Are you sure you want to remove this exam profile?")) return;
+                DATA.exams = DATA.exams.filter(e => e.id !== id);
+                saveToCache();
+                renderSelect();
+                renderList();
+            }
+
+            function downloadJSON() {
+                const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'exams.json';
+                a.click();
+            }
+
+            function uploadJSON(input) {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        if (json && Array.isArray(json.exams)) {
+                            DATA = json;
+                            saveToCache();
+                            renderSelect();
+                            renderList();
+                            alert('exams.json loaded successfully');
+                        } else {
+                            alert('Invalid JSON format. Expected { exams: [] }');
+                        }
+                    } catch (err) {
+                        alert('Error parsing JSON file.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // Compatibility/External Interface
+            return {
+                init: load,
+                load,
+                openEditor,
+                closeEditor,
+                addExam,
+                removeExam,
+                downloadJSON,
+                uploadJSON,
+                getAll: () => DATA.exams,
+                getActive: () => DATA.exams.filter(e => e.isActive),
+                refresh: renderSelect,
+                // Compatibility for legacy dashboard buttons
+                toggleAddForm: openEditor,
+                saveExam: addExam
+            };
+        })();
+
+        // Re-bind init
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof ExamManager !== 'undefined' && ExamManager.init) ExamManager.init();
+        });
+    </script>
 
     <!-- Static Publisher for GitHub Pages Deployment -->
     <script src="dashboard.js"></script>
@@ -3003,69 +2537,78 @@
            JSON-Safe School Manager 
            ============================== */
         const SchoolManager = (function () {
-            let DATA = { activeSchool: null, schools: [] };
+            const STORAGE_KEY = 'mhm_v2_schools_data';
+            let DATA = { schools: [], activeSchool: null };
 
-            // 1. LOAD FROM JSON SOURCE OF TRUTH
-            async function load() {
-                try {
-                    console.log('📡 SchoolManager: Fetching schools.json...');
-                    const res = await fetch('../../data/schools.json?v=' + Date.now());
-                    if (!res.ok) throw new Error("Could not load schools.json");
+            function load() {
+                console.log('📡 SchoolManager: Initializing with persistence...');
 
-                    DATA = await res.json();
-                    console.log('✅ Schools loaded:', DATA.schools.length);
-
-                    renderSelector();
-
-                    // Restore active school state
-                    if (DATA.activeSchool) {
-                        switchSchool(DATA.activeSchool);
+                // 1. Try local cache first
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    try {
+                        DATA = JSON.parse(saved);
+                        finalizeLoad();
+                        return;
+                    } catch (e) {
+                        console.error("Cache corrupted:", e);
                     }
-                } catch (err) {
-                    console.error("❌ School Load Error:", err);
-                    // Fallback placeholder
-                    DATA.schools = [{ id: 'school1', name: 'Global Excellence Academy', address: '123 Main St', principal: 'Dr. Smith', session: '2025-2026' }];
-                    renderSelector();
-                    if (DATA.schools.length > 0) switchSchool(DATA.schools[0].id);
+                }
+
+                // 2. Fallback to data file
+                fetch('../../data/schools.json?v=' + Date.now())
+                    .then(res => res.json())
+                    .then(json => {
+                        DATA = json;
+                        saveToCache();
+                        finalizeLoad();
+                    })
+                    .catch(err => {
+                        console.warn("No schools.json found, starting fresh.");
+                        finalizeLoad();
+                    });
+            }
+
+            function finalizeLoad() {
+                renderList();
+                renderSelector();
+
+                if (!DATA.activeSchool && DATA.schools.length > 0) {
+                    DATA.activeSchool = DATA.schools[0].id;
+                }
+
+                if (DATA.activeSchool) {
+                    switchSchool(DATA.activeSchool);
                 }
             }
 
-            function renderSelector() {
-                const selector = document.getElementById('active-school-selector');
-                if (!selector) return;
-
-                selector.innerHTML = '';
-                DATA.schools.forEach(school => {
-                    const option = document.createElement('option');
-                    option.value = school.id;
-                    option.textContent = school.name;
-                    if (school.id === DATA.activeSchool) option.selected = true;
-                    selector.appendChild(option);
-                });
+            function saveToCache() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
             }
 
-            function switchSchool(schoolId) {
-                const school = DATA.schools.find(s => s.id === schoolId);
+            function switchSchool(id) {
+                const school = DATA.schools.find(s => s.id === id);
                 if (!school) return;
 
-                DATA.activeSchool = schoolId;
-                window.ACTIVE_SCHOOL_ID = schoolId;
+                DATA.activeSchool = id;
+                saveToCache();
 
-                // Sync UI: Sidebar Logo
+                const selector = document.getElementById('active-school-selector');
+                if (selector) selector.value = id;
+
+                localStorage.setItem('activeSchoolId', id);
+
+                // Sidebar Logo Sync
                 const logoEl = document.querySelector('.sidebar-logo');
                 if (logoEl) logoEl.innerHTML = `<i class="ph-bold ph-shield-check"></i> ADMIN - ${school.name}`;
 
-                // Sync UI: Selector
-                const selector = document.getElementById('active-school-selector');
-                if (selector) selector.value = schoolId;
-
-                // Sync UI: Profile Grid
+                // Profile Grid Sync
                 const schoolsGrid = document.getElementById('schools-grid');
                 if (schoolsGrid) {
                     schoolsGrid.innerHTML = `
-                        <div class="glass-card" style="padding: 30px; animation: fadeIn 0.4s ease;">
+                        <div class="glass-card" id="school-info-card" style="padding: 30px; animation: fadeIn 0.4s ease;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                                <h3 style="color: var(--primary-color); margin: 0;">${school.name}</h3>
+                                <h3 id="school-display-name" style="color: var(--primary-color); margin: 0;">${school.name}</h3>
                                 <div style="font-size: 0.75rem; color: #888; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 50px;">
                                     ID: ${school.id}
                                 </div>
@@ -3073,72 +2616,104 @@
                             <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
                                 <div>
                                     <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Address</div>
-                                    <p style="font-size: 1.1rem; font-weight: 500;">${school.address || 'Not set'}</p>
+                                    <p id="school-display-address" style="font-size: 1.1rem; font-weight: 500;">${school.address || 'Not set'}</p>
                                 </div>
                                 <div>
                                     <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Principal</div>
-                                    <p style="font-size: 1.1rem; font-weight: 500;">${school.principal || 'Not set'}</p>
+                                    <p id="school-display-principal" style="font-size: 1.1rem; font-weight: 500;">${school.principal || 'Not set'}</p>
                                 </div>
                                 <div>
                                     <div style="color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Active Session</div>
-                                    <p style="font-size: 1.1rem; font-weight: 500; color: var(--primary-color);">${school.session || '2025-2026'}</p>
+                                    <p id="school-display-session" style="font-size: 1.1rem; font-weight: 500; color: var(--primary-color);">${school.session || '2025-2026'}</p>
                                 </div>
+                            </div>
+                            <div style="margin-top: 25px; display: flex; gap: 10px;">
+                                <button class="btn btn-sm btn-primary" id="school-edit-btn" onclick="SchoolManager.editProfile()">
+                                    <i class="ph ph-pencil"></i> Edit Profile
+                                </button>
+                                <button class="btn btn-sm btn-success" id="school-save-btn" style="display: none;" onclick="SchoolManager.saveProfile()">
+                                    <i class="ph ph-check"></i> Save Changes
+                                </button>
+                                <button class="btn btn-sm btn-secondary" id="school-cancel-btn" style="display: none;" onclick="SchoolManager.cancelProfile()">
+                                    <i class="ph ph-x"></i> Cancel
+                                </button>
                             </div>
                         </div>
                     `;
                 }
 
-                window.dispatchEvent(new CustomEvent('schoolChanged', { detail: { schoolId: schoolId, name: school.name } }));
+                window.dispatchEvent(new CustomEvent('schoolChanged', { detail: { schoolId: id, name: school.name } }));
             }
 
-            // --- EDITOR LOGIC ---
-            function openEditor() {
-                const modal = document.getElementById('school-editor');
-                if (modal) {
-                    modal.style.display = 'flex';
-                    renderList();
-                }
+            function editProfile() {
+                const school = DATA.schools.find(s => s.id === DATA.activeSchool);
+                if (!school) return;
+
+                document.getElementById('school-display-name').innerHTML = `<input type="text" id="edit-school-name" value="${school.name}" class="form-input" style="width: 100%; color: var(--primary-color);">`;
+                document.getElementById('school-display-address').innerHTML = `<input type="text" id="edit-school-address" value="${school.address || ''}" class="form-input" style="width: 100%;">`;
+                document.getElementById('school-display-principal').innerHTML = `<input type="text" id="edit-school-principal" value="${school.principal || ''}" class="form-input" style="width: 100%;">`;
+                document.getElementById('school-display-session').innerHTML = `<input type="text" id="edit-school-session" value="${school.session || '2025-2026'}" class="form-input" style="width: 100%;">`;
+
+                document.getElementById('school-edit-btn').style.display = 'none';
+                document.getElementById('school-save-btn').style.display = 'inline-flex';
+                document.getElementById('school-cancel-btn').style.display = 'inline-flex';
             }
 
-            function closeEditor() {
-                const modal = document.getElementById('school-editor');
-                if (modal) modal.style.display = 'none';
+            function saveProfile() {
+                const school = DATA.schools.find(s => s.id === DATA.activeSchool);
+                if (!school) return;
+
+                school.name = document.getElementById('edit-school-name').value.trim() || school.name;
+                school.address = document.getElementById('edit-school-address').value.trim() || 'Not set';
+                school.principal = document.getElementById('edit-school-principal').value.trim() || 'Not set';
+                school.session = document.getElementById('edit-school-session').value.trim() || '2025-2026';
+
+                saveToCache();
+                renderSelector();
+                switchSchool(DATA.activeSchool);
+                alert('School profile updated locally!');
+            }
+
+            function cancelProfile() {
+                switchSchool(DATA.activeSchool);
+            }
+
+            function renderSelector() {
+                const selector = document.getElementById('active-school-selector');
+                if (!selector) return;
+
+                selector.innerHTML = DATA.schools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+                if (DATA.activeSchool) selector.value = DATA.activeSchool;
             }
 
             function renderList() {
-                const ul = document.getElementById('school-list');
+                const ul = document.getElementById('school-manager-list');
                 if (!ul) return;
 
                 ul.innerHTML = DATA.schools.length
                     ? DATA.schools.map(s => `
                         <li style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <span style="font-weight: 500;">${s.name}</span>
-                            <button class="btn btn-mini btn-danger" onclick="SchoolManager.removeSchool('${s.id}')">
-                                <i class="ph ph-trash"></i>
-                            </button>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-mini btn-secondary" onclick="SchoolManager.switchSchool('${s.id}')" title="Set Active"><i class="ph ph-check"></i></button>
+                                <button class="btn btn-mini btn-danger" onclick="SchoolManager.removeSchool('${s.id}')"><i class="ph ph-trash"></i></button>
+                            </div>
                         </li>
                     `).join('')
                     : '<div style="padding: 20px; color: #666; text-align: center;">No schools found.</div>';
             }
 
-            function addSchool() {
-                const input = document.getElementById('school-name-input');
+            function addSchoolFromInput() {
+                const input = document.getElementById('school-manager-name-input');
                 const name = input ? input.value.trim() : '';
                 if (!name) return alert('Please enter a school name.');
 
                 const newId = 'school_' + Date.now();
-                const newSchool = {
-                    id: newId,
-                    name: name,
-                    address: 'Enter address...',
-                    principal: 'Enter principal name...',
-                    session: '2025-2026'
-                };
-
-                DATA.schools.push(newSchool);
+                DATA.schools.push({ id: newId, name: name, address: 'Not set', principal: 'Not set', session: '2025-2026' });
                 DATA.activeSchool = newId;
 
                 input.value = '';
+                saveToCache();
                 renderList();
                 renderSelector();
                 switchSchool(newId);
@@ -3151,6 +2726,7 @@
                     DATA.activeSchool = DATA.schools.length > 0 ? DATA.schools[0].id : null;
                 }
 
+                saveToCache();
                 renderList();
                 renderSelector();
                 if (DATA.activeSchool) {
@@ -3183,10 +2759,9 @@
                         const imported = JSON.parse(e.target.result);
                         if (!imported.schools || !Array.isArray(imported.schools)) throw new Error("Invalid format");
                         DATA = imported;
-                        renderList();
-                        renderSelector();
-                        if (DATA.activeSchool) switchSchool(DATA.activeSchool);
-                        alert('Schools loaded successfully from file!');
+                        saveToCache();
+                        finalizeLoad();
+                        alert('Schools restored from JSON!');
                     } catch (err) {
                         alert("Error loading JSON: " + err.message);
                     }
@@ -3194,75 +2769,265 @@
                 reader.readAsText(file);
             }
 
-            return { load, switchSchool, openEditor, closeEditor, addSchool, removeSchool, downloadJSON, uploadJSON };
+            function openEditor() { document.getElementById('school-editor').style.display = 'flex'; renderList(); }
+            function closeEditor() { document.getElementById('school-editor').style.display = 'none'; }
+
+            return { load, switchSchool, openEditor, closeEditor, addSchoolFromInput, removeSchool, downloadJSON, uploadJSON, editProfile, saveProfile, cancelProfile };
         })();
+
+        /* ===============================
+           RESULTS MANAGEMENT MODULE
+        ================================ */
+        window.ResultsManagement = {
+            syncing: false,
+
+            handleSyncClick() {
+                if (this.syncing) return;
+
+                this.syncing = true;
+
+                const btn = document.getElementById("btn-sync-results");
+                const examsEl = document.getElementById("results-exams-count");
+                const studentsEl = document.getElementById("results-total-count");
+                const lastSyncEl = document.getElementById("results-last-sync");
+
+                if (!btn) {
+                    console.error("Sync button not found");
+                    return;
+                }
+
+                // 🔄 UI: Syncing state
+                btn.innerHTML = `<i class="ph-bold ph-spinner-gap ph-spin"></i> SYNCING...`;
+                btn.style.opacity = "0.7";
+                btn.style.cursor = "not-allowed";
+
+                // 🧠 Simulated preview + sync (STATIC SITE SAFE)
+                setTimeout(() => {
+
+                    // Example dynamic data (replace later with real JSON count)
+                    const publishedExams = Math.floor(Math.random() * 5) + 1;
+                    const totalStudents = Math.floor(Math.random() * 500) + 50;
+                    const now = new Date();
+
+                    if (examsEl) examsEl.textContent = publishedExams;
+                    if (studentsEl) studentsEl.textContent = totalStudents;
+                    if (lastSyncEl) {
+                        lastSyncEl.textContent =
+                            now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+
+                    // ✅ Restore button
+                    btn.innerHTML = `<i class="ph-bold ph-arrows-clockwise"></i> PREVIEW & SYNC`;
+                    btn.style.opacity = "1";
+                    btn.style.cursor = "pointer";
+
+                    this.syncing = false;
+
+                    // Optional feedback
+                    console.log("Results synced successfully");
+
+                }, 1200); // smooth professional delay
+            }
+        };
+
         /* ==============================
            GitHub Deployment Manager 
            ============================== */
         const DeploymentManager = (function () {
-            const REPO = "Sareef6235/muhsinu2";
-            const API_URL = `https://api.github.com/repos/${REPO}`;
+            const STORAGE_KEY = 'mhm_v2_deploy_connections';
+            let DATA = { repos: [], activeIndex: null };
 
             async function init() {
-                console.log('📡 DeploymentManager: Initializing live status...');
+                console.log('📡 DeploymentManager: Initializing...');
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    try {
+                        DATA = JSON.parse(saved);
+                    } catch (e) { console.error("Deployment Cache corrupted:", e); }
+                }
+
+                if (DATA.repos.length === 0) {
+                    // Default repo if none found
+                    DATA.repos.push({ name: "Sareef6235/muhsinu2", branch: "main" });
+                    DATA.activeIndex = 0;
+                    saveToCache();
+                }
+
+                if (DATA.activeIndex === null && DATA.repos.length > 0) DATA.activeIndex = 0;
+
+                renderList();
+                if (DATA.activeIndex !== null) switchRepo(DATA.activeIndex);
+            }
+
+            function saveToCache() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
+            }
+
+            function renderList() {
+                const ul = document.getElementById('repo-list');
+                if (!ul) return;
+
+                ul.innerHTML = DATA.repos.length ? DATA.repos.map((repo, idx) => `
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); ${DATA.activeIndex === idx ? 'background: rgba(0,243,255,0.05);' : ''}">
+                        <div style="cursor: pointer; flex: 1;" onclick="DeploymentManager.switchRepo(${idx})">
+                            <span style="font-weight: 600; color: ${DATA.activeIndex === idx ? 'var(--primary-color)' : '#fff'};">${repo.name}</span>
+                            <span style="font-size: 0.8rem; color: #888; margin-left: 10px;">(${repo.branch})</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-mini btn-secondary" onclick="DeploymentManager.editRepo(${idx})"><i class="ph ph-pencil"></i></button>
+                            <button class="btn btn-mini btn-danger" onclick="DeploymentManager.removeRepo(${idx})"><i class="ph ph-trash"></i></button>
+                        </div>
+                    </li>
+                `).join('') : '<div style="padding: 20px; color: #666; text-align: center;">No connections configured.</div>';
+            }
+
+            function addRepo() {
+                const nameInput = document.getElementById('repo-name-input');
+                const branchInput = document.getElementById('repo-branch-input');
+                const name = nameInput.value.trim();
+                const branch = branchInput.value.trim() || 'main';
+
+                if (!name) return alert("Please enter a repository name (Owner/Repo).");
+
+                DATA.repos.push({ name, branch });
+                nameInput.value = '';
+                branchInput.value = '';
+                saveToCache();
+                renderList();
+                if (DATA.activeIndex === null) switchRepo(0);
+            }
+
+            function removeRepo(idx) {
+                if (!confirm("Remove this connection?")) return;
+                DATA.repos.splice(idx, 1);
+                if (DATA.activeIndex === idx) DATA.activeIndex = DATA.repos.length > 0 ? 0 : null;
+                else if (DATA.activeIndex > idx) DATA.activeIndex--;
+
+                saveToCache();
+                renderList();
+                if (DATA.activeIndex !== null) switchRepo(DATA.activeIndex);
+                else document.getElementById('active-repo-status').style.display = 'none';
+            }
+
+            function editRepo(idx) {
+                const repo = DATA.repos[idx];
+                const newName = prompt("Repository Name (Owner/Repo):", repo.name);
+                if (!newName) return;
+                const newBranch = prompt("Branch:", repo.branch);
+
+                repo.name = newName.trim();
+                repo.branch = (newBranch || 'main').trim();
+
+                saveToCache();
+                renderList();
+                if (DATA.activeIndex === idx) switchRepo(idx);
+            }
+
+            async function switchRepo(idx) {
+                DATA.activeIndex = idx;
+                const repo = DATA.repos[idx];
+                document.getElementById('active-repo-status').style.display = 'block';
+                document.getElementById('status-repo-name').textContent = repo.name;
+                document.getElementById('git-branch-name').textContent = repo.branch;
+
+                saveToCache();
+                renderList();
+                fetchLiveStatus(repo);
+            }
+
+            async function fetchLiveStatus(repo) {
+                const API_URL = `https://api.github.com/repos/${repo.name}`;
+                const statusBadge = document.getElementById('git-status-badge');
+
                 try {
-                    await Promise.all([
-                        fetchRepoInfo(),
-                        fetchLatestCommit()
+                    statusBadge.innerHTML = '<i class="ph ph-circle-notch ph-spin"></i> Connecting...';
+
+                    const [repoRes, commitRes] = await Promise.all([
+                        fetch(API_URL),
+                        fetch(`${API_URL}/commits/${repo.branch}`)
                     ]);
+
+                    if (!repoRes.ok || !commitRes.ok) throw new Error("GitHub API Error");
+
+                    const repoData = await repoRes.json();
+                    const commitData = await commitRes.json();
+
+                    // Update UI
+                    document.getElementById('last-deploy-time').textContent = new Date(commitData.commit.author.date).toLocaleString();
+                    document.getElementById('git-last-commit').textContent = `"${commitData.commit.message.split('\n')[0]}"`;
+                    document.getElementById('git-last-author').textContent = commitData.commit.author.name;
+
+                    const avatarEl = document.getElementById('git-author-avatar');
+                    if (commitData.author) {
+                        avatarEl.innerHTML = `<img src="${commitData.author.avatar_url}" style="width:100%; height:100%; object-fit:cover;">`;
+                    }
+
+                    document.getElementById('btn-view-actions').onclick = () => window.open(`https://github.com/${repo.name}/actions`, '_blank');
+                    document.getElementById('btn-view-repo').onclick = () => window.open(`https://github.com/${repo.name}`, '_blank');
+
+                    renderQuickEditList(repo);
+
+                    statusBadge.innerHTML = '<i class="ph-bold ph-check-circle"></i> Connected';
+                    statusBadge.style.color = '#2ed573';
+                    statusBadge.style.background = 'rgba(46, 213, 115, 0.1)';
                 } catch (err) {
                     console.warn("⚠️ GitHub API Error:", err);
-                    document.getElementById('git-status-badge').innerHTML = '<i class="ph ph-warning-circle"></i> API Offline';
-                    document.getElementById('git-status-badge').style.color = '#ff4757';
-                    document.getElementById('git-status-badge').style.background = 'rgba(255, 71, 87, 0.1)';
+                    statusBadge.innerHTML = '<i class="ph ph-warning-circle"></i> Offline/Private';
+                    statusBadge.style.color = '#ff4757';
+                    statusBadge.style.background = 'rgba(255, 71, 87, 0.1)';
                 }
             }
 
-            async function fetchRepoInfo() {
-                const res = await fetch(API_URL);
-                if (!res.ok) throw new Error("Repo fetch failed");
-                const data = await res.json();
+            function renderQuickEditList(repo) {
+                const files = [
+                    { path: 'data/schools.json', icon: 'ph-file-json' },
+                    { path: 'data/published-results.json', icon: 'ph-file-json' },
+                    { path: 'pages/admin/dashboard.html', icon: 'ph-file-html' }
+                ];
 
-                const repoNameEl = document.getElementById('git-repo-name');
-                if (repoNameEl) repoNameEl.textContent = data.full_name;
-
-                const branchEl = document.getElementById('git-branch-name');
-                if (branchEl) branchEl.innerHTML = `<i class="ph ph-git-branch"></i> ${data.default_branch}`;
+                const ul = document.getElementById('quick-edit-list');
+                ul.innerHTML = files.map(f => `
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <span><i class="ph ${f.icon}"></i> ${f.path}</span>
+                        <button class="btn btn-sm btn-secondary" onclick="window.open('https://github.com/${repo.name}/edit/${repo.branch}/${f.path}', '_blank')">
+                            <i class="ph ph-pencil"></i> Edit
+                        </button>
+                    </li>
+                `).join('');
             }
 
-            async function fetchLatestCommit() {
-                const res = await fetch(`${API_URL}/commits/main`);
-                if (!res.ok) throw new Error("Commit fetch failed");
-                const data = await res.json();
-
-                // 1. Commit Message
-                const commitEl = document.getElementById('git-last-commit');
-                if (commitEl) commitEl.textContent = `"${data.commit.message.split('\n')[0]}"`;
-
-                // 2. Author info
-                const authorEl = document.getElementById('git-last-author');
-                if (authorEl) authorEl.textContent = data.commit.author.name;
-
-                const avatarEl = document.getElementById('git-author-avatar');
-                if (avatarEl && data.author) {
-                    avatarEl.innerHTML = `<img src="${data.author.avatar_url}" style="width:100%; height:100%; object-fit:cover;">`;
-                }
-
-                // 3. Date
-                const dateEl = document.getElementById('last-deploy-time');
-                if (dateEl) {
-                    const commitDate = new Date(data.commit.author.date);
-                    dateEl.textContent = commitDate.toLocaleString();
-                }
-
-                // 4. Status Update
-                const badge = document.getElementById('git-status-badge');
-                if (badge) {
-                    badge.innerHTML = '<i class="ph-bold ph-check-circle"></i> Connected & Syncing';
-                }
+            function toggleQuickEdit() {
+                const el = document.getElementById('github-file-editor-section');
+                el.style.display = el.style.display === 'none' ? 'block' : 'none';
             }
 
-            return { init };
+            function downloadConnections() {
+                const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'deploy-connections.json';
+                a.click();
+            }
+
+            function uploadConnections(input) {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        if (json && Array.isArray(json.repos)) {
+                            DATA = json;
+                            saveToCache();
+                            init();
+                            alert('Connections imported successfully');
+                        }
+                    } catch (err) { alert('Error parsing JSON.'); }
+                };
+                reader.readAsText(file);
+            }
+
+            return { init, addRepo, removeRepo, editRepo, switchRepo, toggleQuickEdit, downloadConnections, uploadConnections };
         })();
 
         // Panel Sync Logic
@@ -3290,575 +3055,11 @@
             }
         });
 
-        /* ==============================
-           RESULTS MANAGEMENT & PUBLISHING
-           ============================== */
-        window.ResultsManagement = {
-            state: {
-                synced: false,
-                syncing: false
-            },
-
-            handleSyncClick: function () {
-                const btn = document.getElementById("btn-sync-results");
-                const statusBox = document.getElementById("results-sync-status");
-                const statusMsg = document.getElementById("results-sync-message");
-
-                if (!btn) return;
-                if (this.state.syncing) return;
-
-                this.state.syncing = true;
-                btn.innerHTML = "<i class='ph-bold ph-spinner-gap ph-spin'></i> Syncing...";
-                btn.style.pointerEvents = "none";
-
-                if (statusBox) statusBox.style.display = "block";
-                if (statusMsg) statusMsg.innerHTML = "<i class='ph-bold ph-info'></i> Processing...";
-
-                setTimeout(() => {
-                    const json = window.PublishedResultsStore ? window.PublishedResultsStore.data : null;
-                    const exams = (json && json.exams) || [];
-                    let studentCount = 0;
-                    exams.forEach(ex => {
-                        studentCount += (ex.results ? ex.results.length : (ex.students ? ex.students.length : 0));
-                    });
-
-                    // Update UI Stats
-                    const examsCountEl = document.getElementById("results-exams-count");
-                    const totalCountEl = document.getElementById("results-total-count");
-                    const lastSyncEl = document.getElementById("results-last-sync");
-
-                    if (examsCountEl) examsCountEl.textContent = exams.length;
-                    if (totalCountEl) totalCountEl.textContent = studentCount;
-                    if (lastSyncEl) lastSyncEl.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-                    if (statusMsg) statusMsg.innerHTML = "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Sync completed successfully.";
-
-                    this.state.synced = true;
-                    this.state.syncing = false;
-
-                    btn.innerHTML = "<i class='ph-bold ph-arrows-clockwise'></i> PREVIEW & SYNC";
-                    btn.style.pointerEvents = "auto";
-                }, 1200);
-            },
-            togglePublish: function () {
-                alert("Results Published Successfully ✅");
-            }
-        };
-
-        /* ==============================
-           STATIC PUBLISH CONTROL
-           ============================== */
-        window.StaticPublisher = {
-            publish: function () {
-                if (!window.ResultsManagement.state.synced) {
-                    alert("Please complete Sync before publishing.");
-                    return;
-                }
-                alert("Static Site Published Successfully ✅");
-            }
-        };
-
         document.addEventListener('DOMContentLoaded', () => {
-            if (window.SchoolManager) SchoolManager.load();
-            if (window.DeploymentManager) DeploymentManager.init();
+            SchoolManager.load();
+            DeploymentManager.init();
         });
-
-        // Creative Studio logic
-
-        window.CreativeStudio = {
-            state: {
-                layers: [],
-                background: { type: 'color', value: '#111111', image: null },
-                size: { width: 1080, height: 1080, label: 'Instagram Post', key: 'post' },
-                selectedId: null,
-                isDragging: false,
-                initialized: false
-            },
-
-            presets: {
-                post: { w: 1080, h: 1080, label: 'Instagram Post' },
-                story: { w: 1080, h: 1920, label: 'Instagram Story' },
-                banner: { w: 1920, h: 600, label: 'Web Banner' },
-                a4: { w: 2480, h: 3508, label: 'A4 Document' }
-            },
-
-            init() {
-                if (this.state.initialized) return;
-                console.log("🎨 CreativeStudio: Initializing...");
-                this.loadDraft();
-                this.setupDragEvents();
-                this.state.initialized = true;
-                this.render();
-
-                // Keep draft updated
-                setInterval(() => this.saveDraft(), 5000);
-            },
-
-            render() {
-                const canvas = document.getElementById('design-canvas');
-                if (!canvas) return;
-
-                // 1. Update Canvas Size
-                const viewport = document.getElementById('canvas-viewport');
-                const vWidth = viewport.clientWidth - 80;
-                const vHeight = viewport.clientHeight - 80;
-                const scale = Math.min(vWidth / this.state.size.width, vHeight / this.state.size.height, 1);
-
-                canvas.style.width = this.state.size.width + 'px';
-                canvas.style.height = this.state.size.height + 'px';
-                canvas.style.transform = `scale(${scale})`;
-                canvas.style.background = this.state.background.type === 'color' ? this.state.background.value : 'none';
-
-                if (this.state.background.image) {
-                    canvas.style.backgroundImage = `url(${this.state.background.image})`;
-                    canvas.style.backgroundSize = 'cover';
-                    canvas.style.backgroundPosition = 'center';
-                } else {
-                    canvas.style.backgroundImage = 'none';
-                }
-
-                // 2. Render Layers
-                canvas.innerHTML = '';
-                this.state.layers.forEach(layer => {
-                    const el = document.createElement('div');
-                    el.className = `canvas-element ${this.state.selectedId === layer.id ? 'selected' : ''}`;
-                    el.id = `layer-${layer.id}`;
-                    el.style.left = layer.x + 'px';
-                    el.style.top = layer.y + 'px';
-                    el.style.zIndex = layer.zIndex;
-                    el.style.color = layer.color || '#fff';
-                    el.style.fontSize = (layer.fontSize || 40) + 'px';
-                    el.style.textAlign = layer.textAlign || 'center';
-                    el.style.opacity = layer.opacity !== undefined ? layer.opacity : 1;
-
-                    if (layer.type === 'text') {
-                        el.innerText = layer.content;
-                    } else if (layer.type === 'image') {
-                        const img = document.createElement('img');
-                        img.src = layer.content;
-                        img.style.width = layer.width + 'px';
-                        img.style.pointerEvents = 'none';
-                        el.appendChild(img);
-                    }
-
-                    // Handles
-                    if (this.state.selectedId === layer.id) {
-                        const controls = document.createElement('div');
-                        controls.className = 'element-controls';
-                        controls.innerHTML = `
-            <button onclick="CreativeStudio.moveLayer('up')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-arrow-up"></i></button>
-            <button onclick="CreativeStudio.deleteElement('${layer.id}')" style="color:#000; background:none; border:none; cursor:pointer;"><i class="ph ph-trash"></i></button>
-            `;
-                        el.appendChild(controls);
-
-                        if (layer.type === 'image') {
-                            const resize = document.createElement('div');
-                            resize.className = 'resize-handle';
-                            resize.onmousedown = (e) => this.startResize(e, layer.id);
-                            el.appendChild(resize);
-                        }
-                    }
-
-                    el.onmousedown = (e) => {
-                        if (e.target.className.includes('resize-handle')) return;
-                        this.selectElement(layer.id);
-                        this.startDrag(e, layer.id);
-                    };
-
-                    canvas.appendChild(el);
-                });
-
-                this.updatePropertiesPanel();
-            },
-
-            addText() {
-                const id = 'text_' + Date.now();
-                this.state.layers.push({
-                    id, type: 'text', content: 'Double click to edit',
-                    x: 50, y: 50, zIndex: this.state.layers.length + 1,
-                    fontSize: 40, color: '#ffffff', textAlign: 'center'
-                });
-                this.state.selectedId = id;
-                this.render();
-            },
-
-            handleLogoUpload(input) {
-                const file = input.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const id = 'img_' + Date.now();
-                    this.state.layers.push({
-                        id, type: 'image', content: e.target.result,
-                        x: 100, y: 100, width: 200, zIndex: this.state.layers.length + 1
-                    });
-                    this.state.selectedId = id;
-                    this.render();
-                };
-                reader.readAsDataURL(file);
-            },
-
-            handleBgUpload(input) {
-                const file = input.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.state.background.image = e.target.result;
-                    this.render();
-                };
-                reader.readAsDataURL(file);
-            },
-
-            updateBgColor(val) {
-                this.state.background.type = 'color';
-                this.state.background.value = val;
-                this.render();
-            },
-
-            setPreset(key) {
-                const preset = this.presets[key];
-                if (!preset) return;
-                this.state.size = { ...preset, key };
-                document.getElementById('canvas-size-indicator').innerText = `${preset.w} x ${preset.h} (${preset.label})`;
-                this.render();
-            },
-
-            selectElement(id) {
-                this.state.selectedId = id;
-                this.render();
-            },
-
-            updateSelected(prop, val) {
-                const layer = this.state.layers.find(l => l.id === this.state.selectedId);
-                if (layer) {
-                    layer[prop] = prop === 'fontSize' || prop === 'width' ? parseInt(val) : val;
-                    this.render();
-                }
-            },
-
-            deleteElement(id) {
-                this.state.layers = this.state.layers.filter(l => l.id !== id);
-                this.state.selectedId = null;
-                this.render();
-            },
-
-            moveLayer(dir) {
-                const idx = this.state.layers.findIndex(l => l.id === this.state.selectedId);
-                if (idx === -1) return;
-                if (dir === 'up' && idx < this.state.layers.length - 1) {
-                    [this.state.layers[idx], this.state.layers[idx + 1]] = [this.state.layers[idx + 1], this.state.layers[idx]];
-                } else if (dir === 'down' && idx > 0) {
-                    [this.state.layers[idx], this.state.layers[idx - 1]] = [this.state.layers[idx - 1], this.state.layers[idx]];
-                }
-                this.render();
-            },
-
-            updatePropertiesPanel() {
-                const layer = this.state.layers.find(l => l.id === this.state.selectedId);
-                const noSel = document.getElementById('no-selection-msg');
-                const textProps = document.getElementById('text-properties');
-                const imgProps = document.getElementById('image-properties');
-
-                if (!layer) {
-                    noSel.style.display = 'block';
-                    textProps.style.display = 'none';
-                    imgProps.style.display = 'none';
-                    return;
-                }
-
-                noSel.style.display = 'none';
-                if (layer.type === 'text') {
-                    textProps.style.display = 'block';
-                    imgProps.style.display = 'none';
-                    document.getElementById('prop-text-content').value = layer.content;
-                    document.getElementById('prop-text-size').value = layer.fontSize;
-                    document.getElementById('prop-text-color').value = layer.color;
-                } else {
-                    textProps.style.display = 'none';
-                    imgProps.style.display = 'block';
-                    document.getElementById('prop-img-opacity').value = layer.opacity || 1;
-                }
-            },
-
-            // --- Interaction Logic ---
-            setupDragEvents() {
-                window.onmousemove = (e) => {
-                    if (this.state.draggingId) {
-                        const layer = this.state.layers.find(l => l.id === this.state.draggingId);
-                        const canvas = document.getElementById('design-canvas');
-                        const rect = canvas.getBoundingClientRect();
-                        const scale = canvas.offsetWidth / this.state.size.width;
-
-                        layer.x = (e.clientX - rect.left) / scale - this.state.dragOffset.x;
-                        layer.y = (e.clientY - rect.top) / scale - this.state.dragOffset.y;
-
-                        const el = document.getElementById(`layer-${layer.id}`);
-                        el.style.left = layer.x + 'px';
-                        el.style.top = layer.y + 'px';
-                    }
-                    if (this.state.resizingId) {
-                        const layer = this.state.layers.find(l => l.id === this.state.resizingId);
-                        const canvas = document.getElementById('design-canvas');
-                        const scale = canvas.offsetWidth / this.state.size.width;
-                        layer.width += (e.movementX / scale);
-                        this.render();
-                    }
-                };
-                window.onmouseup = () => {
-                    this.state.draggingId = null;
-                    this.state.resizingId = null;
-                };
-            },
-
-            startDrag(e, id) {
-                const layer = this.state.layers.find(l => l.id === id);
-                const canvas = document.getElementById('design-canvas');
-                const rect = canvas.getBoundingClientRect();
-                const scale = canvas.offsetWidth / this.state.size.width;
-
-                this.state.draggingId = id;
-                this.state.dragOffset = {
-                    x: (e.clientX - rect.left) / scale - layer.x,
-                    y: (e.clientY - rect.top) / scale - layer.y
-                };
-            },
-
-            startResize(e, id) {
-                e.stopPropagation();
-                this.state.resizingId = id;
-            },
-
-            // --- Features ---
-            generateAIHeadline() {
-                const headlines = [
-                    "Empowering Future Leaders Today",
-                    "Admissions Open: Journey to Excellence",
-                    "Celebrate Our Annual Achievement Night",
-                    "New Semester, New Opportunities",
-                    "Excellence in Education Since 1995"
-                ];
-                const text = headlines[Math.floor(Math.random() * headlines.length)];
-                const layer = this.state.layers.find(l => l.id === this.state.selectedId && l.type === 'text');
-                if (layer) {
-                    layer.content = text;
-                } else {
-                    this.addText();
-                    this.state.layers[this.state.layers.length - 1].content = text;
-                }
-                this.render();
-            },
-
-            applyTemplate(type) {
-                this.resetCanvas();
-                if (type === 'admission') {
-                    this.state.background.value = '#0a2e5c';
-                    this.state.layers.push(
-                        { id: 't1', type: 'text', content: 'ADMISSIONS OPEN', x: 200, y: 150, fontSize: 80, color: '#00f3ff', textAlign: 'center' },
-                        { id: 't2', type: 'text', content: 'Secure Your Future with MIFTHAHUL HUDA', x: 200, y: 280, fontSize: 35, color: '#fff', textAlign: 'center' },
-                        { id: 't3', type: 'text', content: 'Contact Us: +91 999 000 111', x: 200, y: 800, fontSize: 30, color: '#ffcc00', textAlign: 'center' }
-                    );
-                }
-                this.render();
-            },
-
-            exportPNG() {
-                const canvas = document.getElementById('design-canvas');
-                this.state.selectedId = null;
-                this.render();
-
-                setTimeout(() => {
-                    html2canvas(canvas, {
-                        scale: 2, // High res
-                        backgroundColor: null,
-                        useCORS: true
-                    }).then(canvasExport => {
-                        const link = document.createElement('a');
-                        const date = new Date().toISOString().split('T')[0];
-                        link.download = `creative-studio-${date}.png`;
-                        link.href = canvasExport.toDataURL("image/png");
-                        link.click();
-                        alert("Design Exported Successfully! 🚀");
-                    });
-                }, 100);
-            },
-
-            saveDraft() {
-                const data = {
-                    layers: this.state.layers,
-                    background: this.state.background,
-                    size: this.state.size
-                };
-                localStorage.setItem('creative_studio_draft', JSON.stringify(data));
-            },
-
-            loadDraft() {
-                const saved = localStorage.getItem('creative_studio_draft');
-                if (saved) {
-                    const data = JSON.parse(saved);
-                    this.state.layers = data.layers || [];
-                    this.state.background = data.background || { type: 'color', value: '#111111' };
-                    this.state.size = data.size || this.presets.post;
-                }
-            },
-
-            resetCanvas() {
-                if (!confirm("Clear design and start fresh?")) return;
-                this.state.layers = [];
-                this.state.background = { type: 'color', value: '#111111', image: null };
-                this.state.selectedId = null;
-                this.render();
-            }
-        };
     </script>
-
-    <!-- Admin Access Modal -->
-    <div id="admin-modal"
-        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); align-items:center; justify-content:center; z-index:9999;">
-        <div class="login-card animate-fade-up"
-            style="background:#111; padding:40px; border-radius:15px; width:350px; position:relative; border: 1px solid var(--glass-border);">
-            <h2 style="color:#fff; margin-bottom:25px; text-align: center;">Admin Access</h2>
-            <form id="loginForm">
-                <input type="text" id="admin-username" class="login-input" placeholder="Username" required
-                    style="letter-spacing: normal; margin-bottom: 10px;">
-                <input type="password" id="admin-password" class="login-input" placeholder="Password" required
-                    style="letter-spacing: normal;">
-                <button type="submit" class="btn-login" id="login-btn">Login</button>
-                <p id="error-msg"
-                    style="color:#ff4d4d; margin-top:15px; display:none; text-align: center; font-size: 0.9rem;"></p>
-            </form>
-
-            <!-- Admin Panel -->
-            <div id="admin-panel" style="display:none; margin-top:20px;">
-                <button onclick="AdminAccess.showChangePin()" class="btn-login"
-                    style="margin-bottom:10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border);">Change
-                    PIN</button>
-                <button onclick="AdminAccess.logout()" class="btn-login"
-                    style="background:#ff4444; color: #fff;">Logout</button>
-            </div>
-
-            <!-- Change PIN -->
-            <div id="change-pin-box" style="display:none; margin-top:15px;">
-                <input type="password" id="new-pin" placeholder="New 4-digit PIN" maxlength="4" class="login-input">
-                <button onclick="AdminAccess.changePin()" class="btn-login">Save New PIN</button>
-            </div>
-
-            <button onclick="AdminAccess.close()"
-                style="position:absolute; top:15px; right:15px; background:none; border:none; color:#888; font-size:18px; cursor:pointer;">
-                ✕
-            </button>
-        </div>
-    </div>
-
-    <script>
-        window.AdminAccess = {
-            init() {
-                AuthManager.restoreSession();
-                if (AuthManager.isAdmin()) {
-                    this.showPanel();
-                }
-            },
-
-            open() {
-                document.getElementById("admin-modal").style.display = "flex";
-            },
-
-            close() {
-                document.getElementById("admin-modal").style.display = "none";
-            },
-
-            async login(username, password) {
-                const result = await AuthManager.login(username, password);
-                if (result.success) {
-                    this.showPanel();
-                } else {
-                    const errorMsg = document.getElementById("error-msg");
-                    if (errorMsg) {
-                        errorMsg.innerText = result.message;
-                        errorMsg.style.display = "block";
-                    }
-                }
-            },
-
-            showPanel() {
-                document.getElementById("loginForm").style.display = "none";
-                document.getElementById("admin-panel").style.display = "block";
-                const errorMsg = document.getElementById("error-msg");
-                if (errorMsg) errorMsg.style.display = "none";
-            },
-
-            logout() {
-                AuthManager.logout();
-                document.getElementById("loginForm").style.display = "block";
-                document.getElementById("admin-panel").style.display = "none";
-                document.getElementById("change-pin-box").style.display = "none";
-                document.getElementById("admin-username").value = "";
-                document.getElementById("admin-password").value = "";
-            },
-
-            showChangePin() {
-                document.getElementById("change-pin-box").style.display = "block";
-            },
-
-            changePin() {
-                const newPin = document.getElementById("new-pin").value;
-                if (newPin.length !== 4) {
-                    alert("PIN must be 4 digits");
-                    return;
-                }
-                localStorage.setItem("admin_pin", newPin);
-                alert("PIN updated successfully");
-                document.getElementById("change-pin-box").style.display = "none";
-                document.getElementById("new-pin").value = "";
-            }
-        };
-
-        const loginForm = document.getElementById("loginForm");
-        if (loginForm) {
-            loginForm.addEventListener("submit", function (e) {
-                e.preventDefault();
-                const user = document.getElementById("admin-username").value;
-                const pass = document.getElementById("admin-password").value;
-                AdminAccess.login(user, pass);
-            });
-        }
-
-        window.addEventListener("DOMContentLoaded", () => {
-            AdminAccess.init();
-
-            // Initialize Site Settings when panel is opened
-            if (window.SiteSettings) {
-                SiteSettings.renderHeaderEditor();
-                SiteSettings.renderFooterEditor();
-            }
-        });
-
-        // Tab switching function for Site Settings
-        function switchSettingsTab(tabName, buttonElement) {
-            // Hide all tab contents
-            document.querySelectorAll('.settings-tab-content').forEach(tab => {
-                tab.style.display = 'none';
-            });
-
-            // Remove active class from all buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Show selected tab
-            const targetTab = document.getElementById(`${tabName}-settings-content`);
-            if (targetTab) {
-                targetTab.style.display = 'block';
-            }
-
-            // Add active class to clicked button
-            if (buttonElement) {
-                buttonElement.classList.add('active');
-            }
-        }
-    </script>
-
-    <!-- Site Settings Module -->
-    <script src="../../assets/js/site-settings.js"></script>
 </body>
 
 </html>
