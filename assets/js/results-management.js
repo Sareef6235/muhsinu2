@@ -120,29 +120,93 @@ const ResultsManagement = {
         }
     },
 
-    handleSyncClick: function () {
-        if (state.students && state.students.length > 0) {
+    handleSyncClick: async function () {
+        const examSelect = document.getElementById("results-exam-select");
+        const selectedExamId = examSelect ? examSelect.value : "";
+        const selectedExamName = examSelect ? examSelect.selectedOptions[0].text : "";
+
+        const sheetInput = document.getElementById("results-sheet-id");
+        const sheetId = sheetInput ? sheetInput.value.trim() : "";
+
+        const rollMap = document.getElementById("map-roll").value;
+        const nameMap = document.getElementById("map-name").value;
+
+        if (!selectedExamId) return alert("Mapping Error: Please select an Exam Profile first.");
+        if (!sheetId) return alert("Mapping Error: Please enter a Google Sheet ID.");
+        if (!rollMap || !nameMap) return alert("Mapping Error: Please map at least Roll No and Student Name.");
+
+        const statusMap = document.getElementById("map-status").value;
+        const dobMap = document.getElementById("map-dob") ? document.getElementById("map-dob").value : "";
+        const subjectChecks = document.querySelectorAll("#map-subjects-container input:checked");
+        const subjectMaps = Array.from(subjectChecks).map(cb => cb.value);
+
+        try {
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Sheet not found or not public.");
+
+            const text = await response.text();
+            const jsonStart = text.indexOf('{');
+            const jsonEnd = text.lastIndexOf('}');
+            const json = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
+
+            const headers = json.table.cols.map(col => col.label || "");
+            const rows = json.table.rows;
+
+            const getValue = (row, header) => {
+                const index = headers.indexOf(header);
+                if (index === -1) return "";
+                const cell = row.c[index];
+                if (!cell) return "";
+                return cell.v !== null ? cell.v : (cell.f || "");
+            };
+
+            const students = rows.map(row => {
+                const student = {
+                    roll: String(getValue(row, rollMap)),
+                    name: String(getValue(row, nameMap)),
+                    dob: dobMap ? String(getValue(row, dobMap)) : "",
+                    status: statusMap ? String(getValue(row, statusMap)) : "N/A",
+                    subjects: {}
+                };
+
+                let total = 0;
+                subjectMaps.forEach(sub => {
+                    const score = parseFloat(getValue(row, sub)) || 0;
+                    student.subjects[sub] = score;
+                    total += score;
+                });
+                student.total = total;
+
+                return student;
+            }).filter(s => s.roll && s.name);
+
+            window.GeneratedResults = {
+                examId: selectedExamId,
+                examName: selectedExamName,
+                generatedAt: new Date().toISOString(),
+                students: students
+            };
+
+            // Update local state for UI consistency
+            state.students = students;
+            state.examId = selectedExamId;
+            state.examName = selectedExamName;
             state.lastSynced = new Date();
+
             this.updateStatsUI();
+
             const statusDiv = document.getElementById("results-sync-status");
             const messageDiv = document.getElementById("results-sync-message");
             if (statusDiv) statusDiv.style.display = "block";
-            if (messageDiv) messageDiv.innerHTML = "Sync Verified. " + state.students.length + " records ready to publish.";
-            return;
-        }
+            if (messageDiv) messageDiv.innerHTML = `Preview Ready – ${students.length} Students Synced`;
 
-        if (window.ProExam && window.ProExam.state && window.ProExam.state.students.length > 0) {
-            state.students = window.ProExam.state.students;
-            state.lastSynced = new Date();
-            this.updateStatsUI();
-            const statusDiv = document.getElementById("results-sync-status");
-            const messageDiv = document.getElementById("results-sync-message");
-            if (statusDiv) statusDiv.style.display = "block";
-            if (messageDiv) messageDiv.innerHTML = "Preview Ready. " + state.students.length + " students synced successfully!";
-            return;
-        }
+            alert(`Preview Ready – ${students.length} Students Synced Successfully!`);
 
-        alert("No data found. Please Import from Sheet or Upload JSON.");
+        } catch (e) {
+            console.error(e);
+            alert("Sync Failed: " + e.message);
+        }
     },
 
     updateStatsUI: function () {
@@ -152,65 +216,7 @@ const ResultsManagement = {
 
         if (examsCountEl) examsCountEl.textContent = 1;
         if (totalCountEl) totalCountEl.textContent = state.students ? state.students.length : 0;
-        if (lastSyncEl) lastSyncEl.textContent = state.lastSynced.toLocaleTimeString();
-    },
-
-    importFromSheet: async function () {
-        const sheetInput = document.getElementById("results-sheet-id");
-        const sheetId = sheetInput ? sheetInput.value.trim() : "";
-        if (!sheetId) return alert("Sheet ID missing");
-
-        const rollMap = document.getElementById("map-roll").value;
-        const nameMap = document.getElementById("map-name").value;
-        const statusMap = document.getElementById("map-status").value;
-
-        const subjectChecks = document.querySelectorAll("#map-subjects-container input:checked");
-        const subjectMaps = Array.from(subjectChecks).map(cb => cb.value);
-
-        if (!rollMap || !nameMap || !statusMap) {
-            return alert("Please map at least Register No, Name, and Status fields.");
-        }
-
-        try {
-            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-            const response = await fetch(url);
-            const text = await response.text();
-            const json = JSON.parse(text.substring(47).slice(0, -2));
-
-            const headers = json.table.cols.map(col => col.label);
-            const rows = json.table.rows;
-
-            const getValue = (row, header) => {
-                const index = headers.indexOf(header);
-                if (index === -1) return "";
-                const cell = row.c[index];
-                return cell ? (cell.v || cell.f || "") : "";
-            };
-
-            const students = rows.map(row => {
-                return {
-                    regNo: String(getValue(row, rollMap)),
-                    name: getValue(row, nameMap),
-                    status: getValue(row, statusMap),
-                    subjects: subjectMaps.map(subHeader => ({
-                        name: subHeader,
-                        score: getValue(row, subHeader),
-                        max: 100
-                    }))
-                };
-            }).filter(s => s.regNo);
-
-            state.students = students;
-            state.lastSynced = new Date();
-
-            this.updateStatsUI();
-
-            alert(`Import Successful! ${students.length} students loaded.`);
-
-        } catch (e) {
-            console.error(e);
-            alert("Error importing data: " + e.message);
-        }
+        if (lastSyncEl) lastSyncEl.textContent = state.lastSynced ? state.lastSynced.toLocaleTimeString() : "--:--";
     },
 
     fetchHeaders: async function () {
@@ -218,22 +224,19 @@ const ResultsManagement = {
         const sheetId = sheetInput ? sheetInput.value.trim() : "";
 
         if (!sheetId) {
-            alert("Please enter Google Sheet ID");
+            alert("Error: Please enter Google Sheet ID");
             return;
         }
 
         try {
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
             const response = await fetch(url);
-            if (!response.ok) throw new Error("Network response was not ok");
+            if (!response.ok) throw new Error("Sheet not found or not public.");
 
             const text = await response.text();
             const jsonStart = text.indexOf('{');
             const jsonEnd = text.lastIndexOf('}');
-
-            if (jsonStart === -1 || jsonEnd === -1) {
-                throw new Error("Invalid response format from Google Sheets");
-            }
+            if (jsonStart === -1 || jsonEnd === -1) throw new Error("Invalid response format from Google Sheets");
 
             const jsonString = text.substring(jsonStart, jsonEnd + 1);
             const json = JSON.parse(jsonString);
@@ -241,7 +244,7 @@ const ResultsManagement = {
             const headers = json.table.cols.map(col => col.label).filter(Boolean);
 
             if (!headers.length) {
-                alert("No headers found. Ensure the first row of your sheet contains headers.");
+                alert("No headers found. Ensure the first row of your sheet contains labels.");
                 return;
             }
 
@@ -295,51 +298,56 @@ const ResultsManagement = {
             ], { duration: 300, fill: 'forwards' });
         }
 
-        alert("Headers loaded successfully! Please map the columns below.");
+        alert("Headers loaded! Please map the columns below.");
     }
+
 };
 
 window.ResultsManagement = ResultsManagement;
 
 const StaticPublisher = {
     publish: function () {
-        if (!state.students || state.students.length === 0) {
-            alert("No students available to publish.");
+        if (!window.GeneratedResults || !window.GeneratedResults.students.length) {
+            alert("Safe Error: No generated data found. Please PREVIEW & SYNC first.");
             return;
         }
 
-        if (!state.examId) {
-            alert("Please select exam profile before publishing.");
-            return;
+        try {
+            const exportData = {
+                published: true,
+                lastUpdated: new Date().toISOString(),
+                exams: [
+                    {
+                        examId: window.GeneratedResults.examId,
+                        examName: window.GeneratedResults.examName,
+                        publishedAt: window.GeneratedResults.generatedAt,
+                        students: window.GeneratedResults.students
+                    }
+                ]
+            };
+
+            const jsonString = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "published-results.json";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            alert("Results JSON Downloaded Successfully!\n\nMove this file to /data/results-store.json in your project.");
+
+            if (this.updateUI) this.updateUI(true);
+
+        } catch (error) {
+            console.error(error);
+            alert("Publish Failed: " + error.message);
         }
-
-        const exportData = {
-            published: true,
-            lastUpdated: new Date().toISOString(),
-            exams: [
-                {
-                    examId: state.examId,
-                    examName: state.examName,
-                    publishedAt: new Date().toISOString(),
-                    students: state.students
-                }
-            ]
-        };
-
-        const blob = new Blob(
-            [JSON.stringify(exportData, null, 2)],
-            { type: "application/json" }
-        );
-
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "results-store.json";
-        link.click();
-
-        alert("Results Published Successfully! \n\nACTION REQUIRED:\nMove the downloaded 'results-store.json' to the '/data/' folder in your project root.");
-
-        this.updateUI(true);
     },
+
 
     unpublish: function () {
         const exportData = {
