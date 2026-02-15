@@ -2781,53 +2781,180 @@
         window.ResultsManagement = {
             syncing: false,
 
-            handleSyncClick() {
-                if (this.syncing) return;
+            async handleSyncClick() {
+                const examSelect = document.getElementById('results-exam-select');
+                const sheetIdInput = document.getElementById('results-sheet-id');
+                const examId = examSelect?.value;
+                const examName = examSelect?.options[examSelect.selectedIndex]?.text || "";
 
-                this.syncing = true;
-
-                const btn = document.getElementById("btn-sync-results");
-                const examsEl = document.getElementById("results-exams-count");
-                const studentsEl = document.getElementById("results-total-count");
-                const lastSyncEl = document.getElementById("results-last-sync");
-
-                if (!btn) {
-                    console.error("Sync button not found");
+                // Validation: Exam Selection
+                if (!examId) {
+                    alert("Please select an exam.");
                     return;
                 }
 
-                // 🔄 UI: Syncing state
-                btn.innerHTML = `<i class="ph-bold ph-spinner-gap ph-spin"></i> SYNCING...`;
-                btn.style.opacity = "0.7";
-                btn.style.cursor = "not-allowed";
+                // Validation: Sheet ID
+                const sheetId = sheetIdInput?.value.trim();
+                if (!sheetId) {
+                    alert("Please enter Google Sheet ID.");
+                    return;
+                }
 
-                // 🧠 Simulated preview + sync (STATIC SITE SAFE)
-                setTimeout(() => {
+                // Validation: Column Mapping
+                const rollCol = document.getElementById('map-roll')?.value;
+                const nameCol = document.getElementById('map-name')?.value;
 
-                    // Example dynamic data (replace later with real JSON count)
-                    const publishedExams = Math.floor(Math.random() * 5) + 1;
-                    const totalStudents = Math.floor(Math.random() * 500) + 50;
-                    const now = new Date();
+                if (!rollCol || !nameCol) {
+                    alert("Please map Roll No and Name columns.");
+                    return;
+                }
 
-                    if (examsEl) examsEl.textContent = publishedExams;
-                    if (studentsEl) studentsEl.textContent = totalStudents;
-                    if (lastSyncEl) {
-                        lastSyncEl.textContent =
-                            now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const btn = document.getElementById("btn-sync-results");
+                if (btn) {
+                    btn.innerHTML = `<i class="ph-bold ph-spinner-gap ph-spin"></i> SYNCING...`;
+                    btn.style.opacity = "0.7";
+                    btn.style.cursor = "not-allowed";
+                    btn.disabled = true;
+                }
+
+                try {
+                    // Fetch Google Sheet Data
+                    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+                    const res = await fetch(url);
+
+                    if (!res.ok) {
+                        throw new Error("Failed to fetch sheet. Check Sheet ID and ensure it's publicly accessible.");
                     }
 
-                    // ✅ Restore button
-                    btn.innerHTML = `<i class="ph-bold ph-arrows-clockwise"></i> PREVIEW & SYNC`;
-                    btn.style.opacity = "1";
-                    btn.style.cursor = "pointer";
+                    const text = await res.text();
+                    const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\)/);
 
-                    this.syncing = false;
+                    if (!match) {
+                        throw new Error("Invalid response format from Google Sheets");
+                    }
 
-                    // Optional feedback
-                    console.log("Results synced successfully");
+                    const data = JSON.parse(match[1]);
+                    const cols = data.table.cols.map(c => c.label || "");
 
-                }, 1200); // smooth professional delay
+                    // Transform rows into structured objects
+                    const rows = data.table.rows.map(r => {
+                        const rowObj = {};
+                        r.c.forEach((cell, i) => {
+                            rowObj[cols[i]] = cell?.v !== null && cell?.v !== undefined ? cell.v : "";
+                        });
+                        return rowObj;
+                    });
+
+                    // Get optional mappings
+                    const dobCol = document.getElementById('map-dob')?.value || "";
+                    const statusCol = document.getElementById('map-status')?.value || "";
+
+                    // Get subject columns from checkboxes
+                    const subjectCheckboxes = document.querySelectorAll('#map-subjects-container input[type="checkbox"]:checked');
+                    const subjectCols = Array.from(subjectCheckboxes).map(cb => cb.value);
+
+                    // Build results array
+                    const results = rows.map(row => {
+                        const student = {
+                            roll: String(row[rollCol] || ""),
+                            name: String(row[nameCol] || ""),
+                            dob: dobCol ? String(row[dobCol] || "") : "",
+                            status: statusCol ? String(row[statusCol] || "") : "",
+                            subjects: {}
+                        };
+
+                        // Add subject marks
+                        subjectCols.forEach(subCol => {
+                            const value = row[subCol];
+                            student.subjects[subCol] = value !== null && value !== undefined ? value : "";
+                        });
+
+                        return student;
+                    }).filter(s => s.roll && s.name); // Filter out empty rows
+
+                    // Create final JSON structure
+                    const finalJson = {
+                        exams: [{
+                            examId,
+                            examName,
+                            results
+                        }]
+                    };
+
+                    // Store globally for publish
+                    if (!window.PublishedResultsStore) {
+                        window.PublishedResultsStore = {};
+                    }
+                    window.PublishedResultsStore.data = finalJson;
+                    window.PublishedResultsStore.updatedAt = new Date().toISOString();
+
+                    // Also store in GeneratedResults for compatibility
+                    window.GeneratedResults = {
+                        examId,
+                        examName,
+                        generatedAt: new Date().toISOString(),
+                        students: results
+                    };
+
+                    // Update stats
+                    const examsCountEl = document.getElementById('results-exams-count');
+                    const totalCountEl = document.getElementById('results-total-count');
+                    const lastSyncEl = document.getElementById('results-last-sync');
+
+                    if (examsCountEl) examsCountEl.textContent = finalJson.exams.length;
+                    if (totalCountEl) totalCountEl.textContent = results.length;
+                    if (lastSyncEl) {
+                        lastSyncEl.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+
+                    // Show success message
+                    const msgEl = document.getElementById('results-sync-message');
+                    const statusDiv = document.getElementById('results-sync-status');
+
+                    if (msgEl) {
+                        msgEl.innerHTML = "<i class='ph-bold ph-check-circle' style='color:#00ff88'></i> Preview & Sync completed successfully.";
+                    }
+                    if (statusDiv) {
+                        statusDiv.style.display = 'block';
+                    }
+
+                    // Show column mapping UI if hidden
+                    const mappingUI = document.getElementById('column-mapping-ui');
+                    if (mappingUI) {
+                        mappingUI.style.display = 'block';
+                    }
+
+                    // Show search form if available
+                    if (window.showSearchForm) {
+                        window.showSearchForm();
+                    }
+
+                    console.log("✅ Results synced successfully:", results.length, "students");
+
+                } catch (err) {
+                    console.error("Sync Error:", err);
+                    alert("Failed to fetch or process Sheet data. " + err.message);
+
+                    const msgEl = document.getElementById('results-sync-message');
+                    const statusDiv = document.getElementById('results-sync-status');
+
+                    if (msgEl) {
+                        msgEl.innerHTML = "<i class='ph-bold ph-warning' style='color:#ff4444'></i> Sync failed: " + err.message;
+                    }
+                    if (statusDiv) {
+                        statusDiv.style.display = 'block';
+                    }
+                } finally {
+                    // Restore button
+                    if (btn) {
+                        btn.innerHTML = `<i class="ph-bold ph-arrows-clockwise"></i> PREVIEW & SYNC`;
+                        btn.style.opacity = "1";
+                        btn.style.cursor = "pointer";
+                        btn.disabled = false;
+                    }
+                }
             }
+
         };
 
         /* ==============================
