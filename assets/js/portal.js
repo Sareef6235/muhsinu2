@@ -1,185 +1,119 @@
-import AppState from './state.js';
-import { DataValidator, UIUtils } from './utils.js';
-import ResultsCMS from './results-cms.js';
+let publicData = null;
 
-const ResultsPortal = {
-    data: { exams: [] },
-
-    init() {
-        console.log("ResultsPortal Initialized");
-        this.loadData();
-        this.bindGlobalEvents();
-    },
-
-    bindGlobalEvents() {
-        window.addEventListener('exam-store-updated', () => {
-            console.log("Portal: Store updated, re-syncing...");
-            this.loadData();
-        });
-
-        // Manual upload listener
-        const uploadInput = document.getElementById('manual-upload');
-        if (uploadInput) {
-            uploadInput.addEventListener('change', (e) => this.handleManualUpload(e));
+async function autoLoadPublishedResults() {
+    try {
+        // Check both root and local folder for convenience
+        let response = await fetch("../../published-results.json");
+        if (!response.ok) {
+            response = await fetch("published-results.json");
         }
-    },
 
-    async loadData() {
-        try {
-            // Priority 1: Check ResultsCMS (Admin Synced Data)
-            const cmsExams = ResultsCMS.getVisibleExamList();
-            if (cmsExams.length > 0) {
-                console.log("Portal: Loading from ResultsCMS...");
-                const allResults = ResultsCMS.getAllResults();
+        if (!response.ok) throw new Error("No file found");
 
-                // Construct structure compatible with existing logic
-                this.data = {
-                    exams: ResultsCMS.getVisibleExamList().map(idObj => {
-                        return {
-                            examId: idObj.id,
-                            examName: idObj.displayName,
-                            results: ResultsCMS.getExamResults(idObj.id)
-                        };
-                    })
-                };
-            } else {
-                // Priority 2: Fallback to published JSON file
-                console.log("Portal: No CMS data found, checking published JSON...");
-                const response = await fetch("/data/published-results.json?v=" + Date.now());
-                if (response.ok) {
-                    const json = await response.json();
-                    const validation = DataValidator.validateResults(json);
-                    if (validation.valid) {
-                        this.data = json;
-                    } else {
-                        throw new Error(validation.error);
-                    }
-                }
-            }
+        publicData = await response.json();
+        initializePortal(publicData);
 
-            // Update Global AppState
-            AppState.results.exams = this.data.exams || [];
-            AppState.results.totalStudents = this.countTotalStudents();
+    } catch (err) {
+        console.log("No static file found.");
+    }
+}
 
-            // Set last published timestamp if available (from metadata or current)
-            const lastSync = localStorage.getItem('results_last_sync');
-            AppState.results.lastPublished = lastSync ? new Date(parseInt(lastSync)).toLocaleString() : new Date().toLocaleString();
+window.addEventListener("DOMContentLoaded", autoLoadPublishedResults);
 
-        } catch (error) {
-            console.error("Portal Data Load Error:", error);
-            AppState.results.isOffline = true;
-        } finally {
-            this.updateStatsUI();
-            this.populateDropdowns();
-        }
-    },
-
-    async handleManualUpload(event) {
-        const file = event.target.files[0];
+const uploadEl = document.getElementById("published-results-upload");
+if (uploadEl) {
+    uploadEl.addEventListener("change", function () {
+        const file = this.files[0];
         if (!file) return;
 
-        try {
-            const text = await file.text();
-            const json = JSON.parse(text);
+        const reader = new FileReader();
 
-            const validation = DataValidator.validateResults(json);
-            if (!validation.valid) {
-                UIUtils.showToast("Invalid JSON: " + validation.error, "error");
-                return;
+        reader.onload = function (e) {
+            try {
+                publicData = JSON.parse(e.target.result);
+                initializePortal(publicData);
+
+                const statusEl = document.getElementById("published-results-status");
+                if (statusEl) statusEl.innerHTML = "Results loaded successfully";
+
+            } catch (err) {
+                const statusEl = document.getElementById("published-results-status");
+                if (statusEl) statusEl.innerHTML = "Invalid JSON file";
             }
+        };
 
-            // Load manual data
-            this.data = json;
-            AppState.results.exams = this.data.exams;
-            AppState.results.totalStudents = this.countTotalStudents();
+        reader.readAsText(file);
+    });
+}
 
-            UIUtils.showToast(`Successfully loaded ${this.data.exams.length} exams from file.`, "success");
+function initializePortal(data) {
+    const select = document.getElementById("examSelect");
+    if (!select) return;
 
-            this.updateStatsUI();
-            this.populateDropdowns();
+    select.innerHTML = `<option value="">-- Select Exam --</option>`;
 
-            // Dispatch event for specialized result pages
-            window.dispatchEvent(new CustomEvent('results-manual-loaded', { detail: this.data }));
+    data.exams.forEach(exam => {
+        select.innerHTML += `
+            <option value="${exam.examId}">
+                ${exam.examName}
+            </option>
+        `;
+    });
 
-        } catch (e) {
-            UIUtils.showToast("Failed to parse file. Ensure it is a valid JSON.", "error");
+    select.disabled = false;
+
+    select.addEventListener("change", function () {
+        const submitBtn = document.getElementById("submitBtn");
+        if (submitBtn) {
+            submitBtn.disabled = !this.value;
+            submitBtn.style.opacity = this.value ? "1" : "0.5";
         }
-    },
+    });
 
-    countTotalStudents() {
-        if (!this.data || !this.data.exams) return 0;
-        return this.data.exams.reduce((sum, exam) => sum + (exam.results ? exam.results.length : 0), 0);
-    },
+    // Auto-update stats if elements exist
+    const examCountEl = document.getElementById("results-exams-count");
+    const totalCountEl = document.getElementById("results-total-count");
+    const lastSyncEl = document.getElementById("results-last-sync");
 
-    updateStatsUI() {
-        const examsEl = document.getElementById("results-exams-count");
-        const totalEl = document.getElementById("results-total-count");
-        const syncEl = document.getElementById("results-last-sync");
-
-        if (examsEl) examsEl.textContent = this.data.exams.length;
-        if (totalEl) totalEl.textContent = this.countTotalStudents();
-        if (syncEl) syncEl.textContent = AppState.results.lastPublished || "--:--";
-    },
-
-    populateDropdowns() {
-        const selects = document.querySelectorAll('select[data-exam-source="published"]');
-        selects.forEach(select => {
-            const currentVal = select.value;
-            select.innerHTML = '<option value="">-- Select Exam --</option>';
-            this.data.exams.forEach(exam => {
-                const opt = document.createElement('option');
-                opt.value = exam.examId || exam.id;
-                opt.textContent = exam.examName || exam.name;
-                select.appendChild(opt);
-            });
-            if (currentVal) select.value = currentVal;
-        });
-    },
-
-    // Public Search Logic
-    async searchResult(examId, rollNo) {
-        if (!this.data || !this.data.exams) return { success: false, message: "No results data loaded." };
-
-        const exam = this.data.exams.find(e => (e.examId || e.id) === examId);
-        if (!exam) return { success: false, message: "Examination session not found." };
-
-        const student = exam.results.find(r => String(r.roll).trim() === String(rollNo).trim());
-        if (!student) return { success: false, message: "Result not found for this roll number." };
-
-        return { success: true, data: student, examName: exam.examName || exam.name };
-    },
-
-    // Homepage Quick View
-    async quickSearch(rollNo) {
-        const status = document.getElementById('home-status');
-        const container = document.getElementById('home-result-container');
-        const area = document.getElementById('home-result-area');
-
-        if (!rollNo) return;
-        if (status) status.textContent = "Searching...";
-
-        for (const exam of (this.data.exams || [])) {
-            const student = exam.results.find(r => String(r.roll).trim() === String(rollNo).trim());
-            if (student) {
-                if (status) status.textContent = "Result Found!";
-                if (container) container.style.display = "block";
-                if (area) {
-                    area.innerHTML = `
-                        <div style="text-align: center;">
-                            <h3 style="color: var(--primary-color);">${student.name}</h3>
-                            <div style="font-size: 2.5rem; font-weight: 800; margin: 10px 0;">${student.total}</div>
-                            <p style="color: #888; font-size: 0.8rem;">${exam.examName || exam.name}</p>
-                        </div>
-                    `;
-                }
-                return;
-            }
-        }
-
-        if (status) status.textContent = "No result found for " + rollNo;
-        if (container) container.style.display = "none";
+    if (examCountEl) examCountEl.innerText = data.exams.length;
+    if (totalCountEl) {
+        const totalStudents = data.exams.reduce((sum, ex) => sum + (ex.students ? ex.students.length : 0), 0);
+        totalCountEl.innerText = totalStudents;
     }
-};
+    if (lastSyncEl && data.exams[0]) {
+        lastSyncEl.innerText = new Date(data.exams[0].publishedAt).toLocaleTimeString();
+    }
+}
 
-window.ResultsPortal = ResultsPortal;
-export default ResultsPortal;
+const formEl = document.getElementById("resultsForm");
+if (formEl) {
+    formEl.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const examId = document.getElementById("examSelect").value;
+
+        if (!examId || !publicData) {
+            alert("Please select exam.");
+            return;
+        }
+
+        const exam = publicData.exams.find(e => String(e.examId) === String(examId));
+        const roll = document.getElementById("rollInput").value.trim();
+
+        const student = exam.students.find(s =>
+            String(s.rollNo || s.roll).trim() === roll
+        );
+
+        if (!student) {
+            alert(`Result not found for Roll No: ${roll}`);
+            return;
+        }
+
+        // Use the existing ResultsPortal.renderResult if available, otherwise fallback
+        if (window.ResultsPortal && typeof window.ResultsPortal.renderResult === 'function') {
+            window.ResultsPortal.renderResult(student);
+        } else {
+            alert("Result Found: " + student.name + "\nTotal: " + (student.total || student.totalMarks || 0));
+        }
+    });
+}

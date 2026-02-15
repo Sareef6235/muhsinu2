@@ -4,19 +4,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Gallery | MIFTHAHUL HUDA</title>
-
-    <!-- Unified Assets -->
-    <link rel="stylesheet" href="../../assets/css/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Media Gallery | MIFTHAHUL HUDA MADRASA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
+    <link rel="stylesheet" href="../../assets/css/site-footer.css">
+    <link rel="stylesheet" href="../../assets/css/site-languages.css">
+    <script src="../../assets/js/site-languages.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
     <style>
+        :root {
+            --primary-color: #00f3ff;
+            --secondary-color: #bc13fe;
+            --accent-color: #ff00c1;
+            --bg-dark: #050505;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-dim: #888888;
+            --primary-gradient: linear-gradient(135deg, #00f3ff 0%, #bc13fe 100%);
+            --secondary-gradient: linear-gradient(135deg, #bc13fe 0%, #ff00c1 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animated Background Orbs */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.15;
+            animation: orbFloat 20s infinite alternate ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--primary-color);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--secondary-color);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-color);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-duration: 25s;
+        }
+
+        @keyframes orbFloat {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(50px, 50px) scale(1.1);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
         .gallery-hero {
-            padding: 80px 0 40px;
+            padding: 180px 0 80px;
             text-align: center;
         }
 
+        .gallery-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, var(--primary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gallery-hero p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        /* Tabs Filter */
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            padding: 12px 30px;
+            border-radius: 50px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-btn i {
+            font-size: 1.2rem;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            background: var(--primary-gradient);
+            color: #000;
+            border: none;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Media Grid */
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -25,36 +164,141 @@
         }
 
         .gallery-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
             border-radius: 20px;
             overflow: hidden;
-            transition: 0.4s;
-            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
         }
 
         .gallery-card:hover {
             transform: translateY(-10px);
             border-color: var(--primary-color);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
         }
 
-        .tab-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            padding: 12px 30px;
-            border-radius: 50px;
-            color: #fff;
-            cursor: pointer;
+        .card-media {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+        .gallery-card:hover .card-media img {
+            transform: scale(1.1);
+        }
+
+        .card-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-content p {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 243, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 1.5rem;
+            opacity: 0.8;
             transition: 0.3s;
         }
 
-        .tab-btn.active {
+        .gallery-card:hover .play-overlay {
+            transform: translate(-50%, -50%) scale(1.2);
             background: var(--primary-color);
-            color: #000;
-            font-weight: 700;
-            border-color: var(--primary-color);
+            opacity: 1;
         }
 
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 8px 15px;
+            border-radius: 50px;
+            display: flex;
+            gap: 5px;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 65px;
+            height: 55px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.7rem;
+            transition: 0.3s;
+            border-radius: 15px;
+        }
+
+        .nav-item i {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-book-nav {
+            background: var(--primary-gradient);
+            color: #000;
+            padding: 0 20px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin: 0 5px;
+            transition: 0.3s;
+        }
+
+        /* Lightbox */
         .lightbox {
             position: fixed;
             top: 0;
@@ -66,6 +310,7 @@
             display: none;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
         }
 
         .lightbox.active {
@@ -75,58 +320,271 @@
         .lightbox-content {
             max-width: 90%;
             max-height: 80%;
-            border: 1px solid var(--border);
+            border-radius: 10px;
+            border: 2px solid var(--glass-border);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: #fff;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .lightbox-close:hover {
+            color: var(--primary-color);
+            transform: rotate(90deg);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        @media (max-width: 768px) {
+            .gallery-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-nav {
+                width: 95%;
+                overflow-x: auto;
+                justify-content: flex-start;
+            }
+
+            .nav-item {
+                min-width: 60px;
+            }
         }
     </style>
-
-    <script type="module">
-        import AppState from '../../assets/js/state.js';
-        import NavigationSystem from '../../assets/js/navigation.js';
-        import FooterSystem from '../../assets/js/footer.js';
-
-        document.addEventListener('DOMContentLoaded', () => {
-            AppState.init();
-            NavigationSystem.init(AppState.navigation.menuData);
-            FooterSystem.init();
-            // SiteSettings.init() will handle renderDynamicGallery auto-magically
-        });
-
-        window.openLightbox = (type, src) => {
-            const content = document.getElementById('lightboxMedia');
-            content.innerHTML = type === 'photo' ? `<img src="${src}" class="lightbox-content">` : `<video src="${src}" controls class="lightbox-content"></video>`;
-            document.getElementById('lightbox').classList.add('active');
-        };
-
-        window.closeLightbox = () => document.getElementById('lightbox').classList.remove('active');
-    </script>
 </head>
 
 <body>
-    <header id="site-header"></header>
-    <div id="site-breadcrumbs"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <header id="main-header">
+        <!-- Navigation injected via site-nav.js -->
+    </header>
 
     <main class="container">
-        <section class="gallery-hero">
-            <h1 data-id="gallery-title"
-                style="font-size: 3.5rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                Media Gallery</h1>
-            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
-                <button class="tab-btn active" onclick="loadMedia('all')">All</button>
-                <button class="tab-btn" onclick="loadMedia('photo')">Photos</button>
-                <button class="tab-btn" onclick="loadMedia('video')">Videos</button>
+        <section class="gallery-hero animate">
+            <h1>Moments & Memories</h1>
+            <p>Explore our visual journey. From academic excellence to cultural celebrations at MIFTHAHUL HUDA MADRASA.
+            </p>
+
+            <div class="filter-tabs">
+                <button class="tab-btn active" data-filter="all">
+                    <i class="ph-bold ph-grid-four"></i> All Media
+                </button>
+                <button class="tab-btn" data-filter="photo">
+                    <i class="ph-bold ph-image"></i> Photos
+                </button>
+                <button class="tab-btn" data-filter="video">
+                    <i class="ph-bold ph-video-camera"></i> Videos
+                </button>
+                <button class="tab-btn admin-only" id="btn-admin-panel"
+                    style="display: none; border-color: var(--secondary-color);">
+                    <i class="ph-bold ph-shield-check"></i> Admin Panel
+                </button>
             </div>
         </section>
 
-        <div class="gallery-grid" id="galleryGrid"></div>
+        <!-- Admin Panels (Hidden) -->
+        <section id="admin-upload-panel" class="admin-only" style="display: none; margin-bottom: 50px;">
+            <!-- Content loaded via gallery-admin.js -->
+        </section>
+
+        <section id="admin-menu-settings" class="admin-only" style="display: none; margin-bottom: 50px;">
+            <!-- Content loaded via gallery-admin.js -->
+        </section>
+
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- Media items will be loaded here -->
+        </div>
     </main>
 
-    <div class="lightbox" id="lightbox" onclick="if(event.target === this) closeLightbox()">
-        <span onclick="closeLightbox()"
-            style="position: absolute; top: 30px; right: 30px; font-size: 2.5rem; color: #fff; cursor: pointer;">&times;</span>
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close">&times;</span>
         <div id="lightboxMedia"></div>
     </div>
 
-    <footer id="site-footer"></footer>
+    <!-- Footer -->
+    <footer id="main-footer"></footer>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="../../index.html" class="nav-item">
+            <i class="ph ph-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <i class="ph ph-image"></i>
+            <span>Gallery</span>
+        </a>
+        <a href="../../index.html#booking" class="btn-book-nav">
+            <i class="ph ph-calendar-plus"></i>
+            Book Tuition
+        </a>
+        <a href="../admin/dashboard.html" class="nav-item">
+            <i class="ph ph-user-circle"></i>
+            <span>Portal</span>
+        </a>
+        <a href="../results/index.html" class="nav-item">
+            <i class="ph ph-exam"></i>
+            <span>Result</span>
+        </a>
+    </nav>
+
+    <script>
+        const staticMedia = [
+            { type: 'photo', src: '../../assets/gallery/1920x1080-1.jpg', title: 'Campus View', desc: 'Main school building at sunset' },
+            { type: 'photo', src: '../../assets/gallery/1920x1080-2.jpg', title: 'Classroom Life', desc: 'Students engaging in interactive learning' },
+            { type: 'photo', src: '../../assets/gallery/800-1.jpg', title: 'Meelad Program', desc: 'Highlights from our cultural festival' },
+            { type: 'photo', src: '../../assets/gallery/800-2.jpg', title: 'Sports Day', desc: 'Celebration of athletic spirit' },
+            { type: 'video', src: '../../assets/gallery/videos/WhatsApp Video 2025-11-20 at 11.51.28 AM.mp4', title: 'Event Highlight', desc: 'Short clip from recent celebrations', poster: '../../assets/gallery/1920x1080-1.jpg' },
+            { type: 'photo', src: '../../assets/gallery/800-3 copy.jpg', title: 'Madrasa Activity', desc: 'Student collaboration' },
+            { type: 'photo', src: '../../assets/gallery/800-4.jpg', title: 'Evening Assembly', desc: 'A spiritual start to the day' },
+            { type: 'photo', src: '../../assets/gallery/WhatsApp Image 2025-11-21 at 23.29.40_8ea24adc.jpg', title: 'Notice Board', desc: 'Stay updated with latest news' }
+        ];
+
+        const grid = document.getElementById('galleryGrid');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxMedia = document.getElementById('lightboxMedia');
+        const lightboxClose = document.querySelector('.lightbox-close');
+
+        async function loadMedia(filter = 'all') {
+            grid.innerHTML = '';
+            if (!window.galleryDB?.db) {
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            let uploadedMedia = [];
+            if (window.galleryDB?.db) {
+                uploadedMedia = await window.galleryDB.getAllMedia();
+            }
+
+            const allMedia = [...uploadedMedia.reverse(), ...staticMedia];
+            const filtered = filter === 'all' ? allMedia : allMedia.filter(m => m.type === filter);
+
+            filtered.forEach((media, index) => {
+                const card = document.createElement('div');
+                card.className = 'gallery-card animate';
+                card.style.animationDelay = `${index * 0.1}s`;
+
+                if (media.type === 'photo') {
+                    card.innerHTML = `
+                        <div class="card-media" onclick="openLightbox('photo', '${media.src}')">
+                            <img src="${media.src}" alt="${media.title}" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <h3>${media.title}</h3>
+                            <p>${media.desc}</p>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="card-media" onclick="openLightbox('video', '${media.src}')">
+                            <img src="${media.poster}" alt="${media.title}">
+                            <div class="play-overlay"><i class="ph-fill ph-play"></i></div>
+                        </div>
+                        <div class="card-content">
+                            <h3>${media.title}</h3>
+                            <p>${media.desc}</p>
+                        </div>
+                    `;
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                loadMedia(btn.dataset.filter);
+            });
+        });
+
+        function openLightbox(type, src) {
+            lightboxMedia.innerHTML = '';
+            if (type === 'photo') {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = 'lightbox-content';
+                lightboxMedia.appendChild(img);
+            } else {
+                const video = document.createElement('video');
+                video.src = src;
+                video.controls = true;
+                video.autoplay = true;
+                video.className = 'lightbox-content';
+                lightboxMedia.appendChild(video);
+            }
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        lightboxClose.onclick = () => {
+            lightbox.classList.remove('active');
+            lightboxMedia.innerHTML = '';
+            document.body.style.overflow = 'auto';
+        };
+
+        lightbox.onclick = (e) => {
+            if (e.target === lightbox) lightboxClose.onclick();
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        if (tab === 'photo' || tab === 'video') {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            const activeBtn = Array.from(tabBtns).find(b => b.dataset.filter === tab);
+            if (activeBtn) activeBtn.classList.add('active');
+            loadMedia(tab);
+        } else {
+            loadMedia();
+        }
+
+        window.addEventListener('scroll', () => {
+            const cards = document.querySelectorAll('.gallery-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 100) {
+                    card.classList.add('animate');
+                }
+            });
+        });
+    </script>
+    <script src="../../assets/js/admin-auth.js"></script>
+    <script src="../../assets/js/site-settings.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SiteSettings) SiteSettings.render();
+        });
+    </script>
+    <script src="../../assets/js/gallery-db.js"></script>
+    <script src="../../assets/js/gallery-admin.js"></script>
 </body>
 
 </html>

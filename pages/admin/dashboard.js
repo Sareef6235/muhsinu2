@@ -17,45 +17,6 @@
 
 const StaticPublisher = (() => {
     'use strict';
-const StaticPublisher = {
-
-    publish: function () {
-
-        if (!state.students || state.students.length === 0) {
-            alert("No students available to publish.");
-            return;
-        }
-
-        if (!state.examId) {
-            alert("Please select exam profile before publishing.");
-            return;
-        }
-
-        const exportData = {
-            exams: [
-                {
-                    examId: state.examId,
-                    examName: state.examName,
-                    publishedAt: new Date().toISOString(),
-                    students: state.students
-                }
-            ]
-        };
-
-        const blob = new Blob(
-            [JSON.stringify(exportData, null, 2)],
-            { type: "application/json" }
-        );
-
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "published-results.json";
-        link.click();
-
-        document.getElementById("results-sync-message").innerHTML =
-            "Exam published successfully!";
-    }
-};
 
     /**
      * =====================================================

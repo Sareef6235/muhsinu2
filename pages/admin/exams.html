@@ -5,7 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exams Admin | MIFTHAHUL HUDA</title>
-    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -28,7 +31,7 @@
 
         .glass-panel {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 30px;
             backdrop-filter: blur(10px);
@@ -40,6 +43,10 @@
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
         }
 
         .form-label {
@@ -56,11 +63,10 @@
             width: 100%;
             padding: 12px;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             color: #fff;
             margin-bottom: 15px;
-            outline: none;
         }
 
         .toggle-group {
@@ -82,12 +88,23 @@
             border-radius: 10px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
         }
 
-        .btn-save:hover {
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
-            transform: translateY(-2px);
+        /* Exam List */
+        .exam-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .exam-item:last-child {
+            border: none;
+        }
+
+        .exam-info {
+            flex: 1;
         }
 
         .exam-controls {
@@ -102,11 +119,29 @@
             color: #fff;
             border-radius: 6px;
             cursor: pointer;
-            transition: 0.3s;
         }
 
-        .btn-icon:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .btn-icon.active {
+            color: #00e5ff;
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .status-pill {
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pill.online {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+        }
+
+        .status-pill.offline {
+            background: rgba(255, 61, 61, 0.1);
+            color: #ff3d3d;
         }
     </style>
 </head>

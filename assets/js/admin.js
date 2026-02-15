@@ -89,7 +89,7 @@ const AdminApp = {
                 // ExamManager.init()
                 break;
             case 'results':
-                import('./admin-panels.js').then(m => m.default.init());
+                import('./results-management.js').then(m => m.default.init());
                 break;
             case 'services':
                 if (window.SiteSettings) {

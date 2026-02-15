@@ -5,22 +5,7 @@
 const ExamTypeManager = (function () {
     'use strict';
 
-    const CONFIG_KEY = 'schoolConfig';
-
-    function _getSchoolId() {
-        return localStorage.getItem('activeSchoolId') || 'default';
-    }
-
-    function _getConfig() {
-        let config = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
-        const schoolId = _getSchoolId();
-        if (!config[schoolId]) config[schoolId] = { academicYears: [], examTypes: [] };
-        return config;
-    }
-
-    function _saveConfig(config) {
-        localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-    }
+    const STORAGE_KEY = 'exam_types';
 
     function init() {
         console.log('📝 ExamTypeManager: Initializing...');
@@ -33,20 +18,20 @@ const ExamTypeManager = (function () {
             renderTable();
             refreshDropdowns();
         });
+
+        // Listen for storage updates
+        window.addEventListener(`storage-update-${STORAGE_KEY}`, () => {
+            renderTable();
+            refreshDropdowns();
+        });
     }
 
     function getAll() {
-        const schoolId = _getSchoolId();
-        const config = _getConfig();
-        return config[schoolId].examTypes || [];
+        return StorageManager.get(STORAGE_KEY, []);
     }
 
     function saveAll(types) {
-        const config = _getConfig();
-        const schoolId = _getSchoolId();
-        config[schoolId].examTypes = types;
-        _saveConfig(config);
-
+        StorageManager.set(STORAGE_KEY, types);
         window.dispatchEvent(new CustomEvent('examTypeChanged', { detail: types }));
         refreshDropdowns();
     }

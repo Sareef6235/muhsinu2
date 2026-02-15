@@ -18,14 +18,14 @@
     // ========================================================================
     const DEFAULT_SETTINGS = {
         header: {
-            title: "Mifthahul Huda",
-            tagline: "Official Portal",
+            title: "My School",
+            tagline: "Excellence in Education",
             logo: "",
             showLogo: true,
-            bgColor: "#050505",
+            bgColor: "#1a1a2e",
             textColor: "#ffffff",
             sticky: true,
-            layout: "default",
+            layout: "default", // default | centered | minimal
             announcementBar: {
                 enabled: false,
                 text: ""
@@ -34,18 +34,22 @@
                 { label: "Home", link: "/index.html", enabled: true },
                 { label: "About", link: "/pages/about/index.html", enabled: true },
                 { label: "Exams", link: "/pages/results/index.html", enabled: true },
-                { label: "Booking", link: "/pages/booking/index.html", enabled: true }
+                { label: "News", link: "/pages/news/index.html", enabled: true },
+                { label: "Booking", link: "/pages/booking/index.html", enabled: true },
+                { label: "Services", link: "/pages/services/index.html", enabled: true },
+                { label: "Gallery", link: "/pages/gallery/index.html", enabled: true },
+                { label: "Contact", link: "#contact", enabled: true }
             ]
         },
         footer: {
-            description: "Empowering students through quality education.",
-            address: "Mifthahul Huda Madrassa",
-            phone: "+91 0000 000 000",
-            email: "info@mifthahulhuda.com",
-            copyright: "© 2026 MIFTHAHUL HUDA. All rights reserved.",
-            bgColor: "#0a0a0a",
-            textColor: "#888888",
-            layout: "3column",
+            description: "Empowering students to achieve their full potential through quality education.",
+            address: "123 School Street, City, State 12345",
+            phone: "+1 (555) 123-4567",
+            email: "info@myschool.edu",
+            copyright: "© 2026 My School. All rights reserved.",
+            bgColor: "#0f0f1e",
+            textColor: "#cccccc",
+            layout: "3column", // 3column | centered | minimal
             showSocial: true,
             social: {
                 facebook: "",
@@ -54,60 +58,7 @@
             }
         },
         theme: {
-            mode: "dark",
-            primaryColor: "#00f3ff",
-            secondaryColor: "#bc13fe",
-            accentColor: "#ff00c1",
-            headingFont: "Outfit",
-            bodyFont: "Outfit",
-            spacing: "relaxed" // compact | normal | relaxed
-        },
-        visibility: {
-            hero: true,
-            results: true,
-            services: true,
-            gallery: true,
-            footer: true
-        },
-        pages: [
-            { id: 'p1', path: '/index.html', title: 'Home', visible: true },
-            { id: 'p2', path: '/pages/about/index.html', title: 'About Us', visible: true },
-            { id: 'p3', path: '/pages/results/index.html', title: 'Results Portal', visible: true }
-        ],
-        content: {
-            hero: {
-                headline: "Excellence in Education",
-                subheadline: "Providing quality learning experiences for the next generation.",
-                ctaText: "Explore More",
-                ctaLink: "#about",
-                bgImage: "" // URL to background image
-            },
-            about: {
-                title: "About Mifthahul Huda",
-                description: "Mifthahul Huda Madrassa is dedicated to imparting authentic knowledge and values. Our curriculum blends spiritual growth with academic excellence.",
-                imageUrl: ""
-            },
-            services: {
-                title: "Our Specialized Services",
-                items: [
-                    { id: 's1', icon: 'ph-book-open', title: 'Quality Education', desc: 'Comprehensive curriculum tailored for student growth.' },
-                    { id: 's2', icon: 'ph-users', title: 'Expert Faculty', desc: 'Learn from highly qualified and dedicated educators.' },
-                    { id: 's3', icon: 'ph-trophy', title: 'Achievement Focused', desc: 'Empowering students to reach their full potential.' }
-                ]
-            },
-            contact: {
-                address: "Mifthahul Huda Madrassa, Kerala, India",
-                phone: "+91 0000 000 000",
-                email: "info@mifthahulhuda.com",
-                mapEmbed: ""
-            },
-            gallery: {
-                title: "Media Gallery",
-                items: [
-                    { type: 'photo', src: '/assets/gallery/1920x1080-1.jpg', title: 'Campus View', desc: 'Main school building' },
-                    { type: 'photo', src: '/assets/gallery/1920x1080-2.jpg', title: 'Interactive Learning', desc: 'Students in classroom' }
-                ]
-            }
+            mode: "light" // light | dark
         }
     };
 
@@ -129,18 +80,12 @@
         // INITIALIZATION
         // ====================================================================
         init() {
+            console.log('[SiteSettings] Initializing...');
             this.load();
-            this.applyAll();
-            console.log("SiteSettings Initialized & Applied");
-        },
-
-        applyAll() {
             this.applyTheme();
-            this.applyVisibility();
-            this.applyContent();
             this.renderHeader();
             this.renderFooter();
-            this.renderBreadcrumbs();
+            console.log('[SiteSettings] Initialized successfully');
         },
 
         // ====================================================================
@@ -167,12 +112,11 @@
                 <div class="tab-scroller" style="margin-bottom: 25px; overflow-x: auto; white-space: nowrap; display: flex; gap: 10px; padding: 5px; border-bottom: 1px solid var(--glass-border);">
                     <button class="btn btn-mini tab-btn active" onclick="SiteSettings.switchTab('header', this)"><i class="ph-bold ph-browser"></i> Header</button>
                     <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('footer', this)"><i class="ph-bold ph-layout"></i> Footer</button>
-                    <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('pages', this)"><i class="ph-bold ph-files"></i> Pages</button>
-                    <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('theme', this)"><i class="ph-bold ph-palette"></i> Theme</button>
-                    <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('visibility', this)"><i class="ph-bold ph-eye"></i> Visibility</button>
-                    <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('content', this)"><i class="ph-bold ph-pencil-line"></i> Content</button>
+                    <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('dragdrop', this)"><i class="ph-bold ph-cursor-click"></i> Drag & Drop</button>
                     <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('advanced', this)"><i class="ph-bold ph-sliders"></i> Advanced</button>
-                    <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('json', this)"><i class="ph-bold ph-code"></i> JSON View</button>
+                    <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('dashboard-verify', this)"><i class="ph-bold ph-check-square"></i> Dash Verify</button>
+                    <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('merit', this)"><i class="ph-bold ph-calculator"></i> Merit Logic</button>
+                    <button class="btn btn-mini tab-btn" onclick="SiteSettings.switchTab('json', this)"><i class="ph-bold ph-code"></i> JSON Data</button>
                 </div>
 
                 <!-- Tab Content Container -->
@@ -196,13 +140,12 @@
 
             // Render Content
             switch (tabName) {
-                case 'header': this.renderMenuManager(container); break;
+                case 'header': this.renderHeaderSettings(container); break;
                 case 'footer': this.renderFooterSettings(container); break;
-                case 'pages': this.renderPageManager(container); break;
-                case 'theme': this.renderThemeCustomizer(container); break;
-                case 'visibility': this.renderVisibilityToggles(container); break;
-                case 'content': this.renderContentEditor(container); break;
+                case 'dragdrop': this.renderDragDropTest(container); break;
                 case 'advanced': this.renderAdvancedFeatures(container); break;
+                case 'dashboard-verify': this.renderDashboardVerification(container); break;
+                case 'merit': this.renderMeritLogicTester(container); break;
                 case 'json': this.renderSettingsViewer(container); break;
                 default: container.innerHTML = '<p>Tab not found.</p>';
             }
@@ -243,7 +186,9 @@
             if (confirm('Reset all settings to defaults? This cannot be undone.')) {
                 this._settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
                 this.save();
-                this.applyAll(); // Call applyAll to update everything
+                this.applyTheme();
+                this.renderHeader();
+                this.renderFooter();
                 this.renderHeaderEditor();
                 this.renderFooterEditor();
                 alert('Settings reset to defaults');
@@ -298,20 +243,9 @@
         // THEME MANAGEMENT
         // ====================================================================
         applyTheme() {
-            const t = this._settings.theme;
-            const root = document.documentElement;
-
-            // Apply Colors
-            root.style.setProperty('--primary-color', t.primaryColor);
-            root.style.setProperty('--secondary-color', t.secondaryColor);
-
-            // Apply Mode
-            document.body.classList.remove('theme-dark', 'theme-light');
-            document.body.classList.add(`theme-${t.mode}`);
-            document.body.setAttribute('data-theme', t.mode);
-
-            // Apply Fonts
-            root.style.setProperty('--font-main', `'${t.bodyFont}', sans-serif`);
+            const mode = this._settings.theme.mode;
+            document.body.classList.remove('theme-light', 'theme-dark');
+            document.body.classList.add(`theme-${mode}`);
         },
 
         toggleTheme() {
@@ -455,111 +389,31 @@
                 ">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                         <h2 style="margin: 0; font-size: 1.5rem;">Menu</h2>
-            `;
-
-            header.innerHTML = html;
-
-            // Mobile Menu Overlay (rendered separately to allow for dynamic content)
-            const mobileMenu = document.createElement('div');
-            mobileMenu.id = 'ss-mobile-menu';
-            mobileMenu.className = 'mobile-menu-overlay';
-            mobileMenu.style.cssText = `
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100vh;
-                background: ${settings.bgColor};
-                z-index: 2000;
-                overflow-y: auto;
-                color: ${settings.textColor};
-            `;
-
-            mobileMenu.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
-                    <h2 style="margin: 0; font-size: 1.5rem;">Menu</h2>
-                    <button onclick="SiteSettings.toggleMobileMenu()" style="
-                        background: none; 
-                        border: none; 
-                        color: ${settings.textColor}; 
-                        font-size: 2rem;
-                        cursor: pointer;
-                    "><i class="ph-bold ph-x"></i></button>
-                </div>
-                <!-- Mobile Menu Content -->
-                <div class="mobile-menu-content" style="padding: 30px 20px;">
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <button onclick="SiteSettings.toggleMobileMenu()" style="
+                            background: none; 
+                            border: none; 
+                            color: ${settings.textColor}; 
+                            font-size: 2rem;
+                            cursor: pointer;
+                        "><i class="ph-bold ph-x"></i></button>
+                    </div>
+                    <nav style="display: flex; flex-direction: column; gap: 20px; font-size: 1.2rem;">
                         ${settings.menu.filter(item => item.enabled).map(item => `
                             <a href="${this.sanitize(item.link)}" onclick="SiteSettings.toggleMobileMenu()" style="
                                 color: ${settings.textColor};
                                 text-decoration: none;
-                                font-size: 1.2rem;
-                                font-weight: 600;
+                                font-weight: 500;
+                                border-bottom: 1px solid rgba(255,255,255,0.1);
+                                padding-bottom: 15px;
                             ">
                                 ${this.sanitize(item.label)}
                             </a>
                         `).join('')}
-                    </div>
+                    </nav>
                 </div>
             `;
 
-            header.appendChild(mobileMenu);
-        },
-
-        // ====================================================================
-        // BREADCRUMBS RENDERING
-        // ====================================================================
-        renderBreadcrumbs() {
-            const container = document.getElementById('site-breadcrumbs');
-            if (!container) return;
-
-            const path = window.location.pathname;
-            const crumbs = this.getBreadcrumbs(path);
-
-            container.innerHTML = `
-                <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 15px 20px;">
-                    <div class="breadcrumbs" style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem; opacity: 0.7;">
-                        <a href="/index.html" style="text-decoration: none; color: inherit;"><i class="ph ph-house"></i> Home</a>
-                        ${crumbs.map(crumb => `
-                            <i class="ph ph-caret-right" style="font-size: 0.8rem;"></i>
-                            ${crumb.active ?
-                    `<span class="active" style="font-weight: 600; color: var(--primary-color);">${crumb.label}</span>` :
-                    `<a href="${crumb.link}" style="text-decoration: none; color: inherit;">${crumb.label}</a>`
-                }
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        },
-
-        getBreadcrumbs(path) {
-            if (!this._settings.pages) return [];
-
-            const crumbs = [];
-            const parts = path.split('/').filter(s => s);
-            let currentPath = '';
-
-            parts.forEach((seg, i) => {
-                // Handle cases where the path might be deeper than root
-                currentPath += '/' + seg;
-
-                const match = this._settings.pages.find(p =>
-                    p.path === currentPath ||
-                    p.path === currentPath + '/index.html' ||
-                    (seg.endsWith('.html') && p.path === currentPath)
-                );
-
-                if (match) {
-                    crumbs.push({
-                        label: match.title,
-                        link: match.path,
-                        active: i === parts.length - 1
-                    });
-                }
-            });
-
-            return crumbs;
+            header.innerHTML = html;
         },
 
         toggleMobileMenu() {
@@ -596,16 +450,16 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 30px;">
                         <div>
                             <h3 style="margin-top: 0; color: ${settings.textColor};">About Us</h3>
-                            <p class="footer-description" style="opacity: 0.9; line-height: 1.6;">
+                            <p style="opacity: 0.9; line-height: 1.6;">
                                 ${this.sanitize(settings.description)}
                             </p>
                         </div>
                         <div>
                             <h3 style="margin-top: 0; color: ${settings.textColor};">Contact</h3>
                             <p style="opacity: 0.9; line-height: 1.8; margin: 0;">
-                                ${settings.address ? `📍 <span class="address-text">${this.sanitize(settings.address)}</span><br>` : ''}
-                                ${settings.phone ? `📞 <span class="phone-text">${this.sanitize(settings.phone)}</span><br>` : ''}
-                                ${settings.email ? `✉️ <span class="email-text">${this.sanitize(settings.email)}</span>` : ''}
+                                ${settings.address ? `📍 ${this.sanitize(settings.address)}<br>` : ''}
+                                ${settings.phone ? `📞 ${this.sanitize(settings.phone)}<br>` : ''}
+                                ${settings.email ? `✉️ ${this.sanitize(settings.email)}` : ''}
                             </p>
                         </div>
                         ${settings.showSocial ? `
@@ -623,13 +477,13 @@
             } else if (settings.layout === 'centered') {
                 html += `
                     <div style="text-align: center; margin-bottom: 30px;">
-                        <p class="footer-description" style="opacity: 0.9; line-height: 1.6; max-width: 600px; margin: 0 auto 20px;">
+                        <p style="opacity: 0.9; line-height: 1.6; max-width: 600px; margin: 0 auto 20px;">
                             ${this.sanitize(settings.description)}
                         </p>
                         <p style="opacity: 0.9; line-height: 1.8;">
-                            ${settings.address ? `<span class="address-text">${this.sanitize(settings.address)}</span><br>` : ''}
-                            ${settings.phone ? `<span class="phone-text">${this.sanitize(settings.phone)}</span> | ` : ''}
-                            ${settings.email ? `<span class="email-text">${this.sanitize(settings.email)}</span>` : ''}
+                            ${settings.address ? `${this.sanitize(settings.address)}<br>` : ''}
+                            ${settings.phone ? `${this.sanitize(settings.phone)} | ` : ''}
+                            ${settings.email ? this.sanitize(settings.email) : ''}
                         </p>
                         ${settings.showSocial ? `
                             <div style="display: flex; gap: 15px; font-size: 1.5rem; justify-content: center; margin-top: 15px;">
@@ -683,7 +537,9 @@
                     if (imported.header && imported.footer && imported.theme) {
                         this._settings = imported;
                         this.save();
-                        this.applyAll(); // Call applyAll to update everything
+                        this.applyTheme();
+                        this.renderHeader();
+                        this.renderFooter();
                         this.renderHeaderEditor();
                         this.renderFooterEditor();
                         alert('Settings imported successfully!');
@@ -851,7 +707,6 @@
             s.announcementBar.enabled = document.getElementById('ss-announcement-enabled')?.checked || false;
             s.announcementBar.text = document.getElementById('ss-announcement-text')?.value || '';
             this.save();
-            this.renderHeader(); // Re-render the actual header
         },
 
         updateHeaderPreview() {
@@ -1012,8 +867,6 @@
             s.textColor = document.getElementById('ss-footer-text-color')?.value || '#cccccc';
             s.layout = document.getElementById('ss-footer-layout')?.value || '3column';
             this.save();
-            this.renderFooter(); // Re-render the actual footer
-            this.applyContent(); // Update contact info in content
         },
 
         updateFooterPreview() {
@@ -1475,494 +1328,6 @@
             this.renderMenuManager();
             this.renderHeader();
             this.updateHeaderPreview();
-        },
-
-        // ====================================================================
-        // PAGE MANAGER
-        // ====================================================================
-        renderPageManager(container) {
-            const pages = this._settings.pages || [];
-            container.innerHTML = `
-                <div class="glass-card" style="padding: 24px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h4 style="margin: 0;"><i class="ph-bold ph-files"></i> Page Manager</h4>
-                        <button class="btn btn-sm btn-primary" onclick="SiteSettings.addNewPage()">
-                            <i class="ph-bold ph-plus"></i> Add New Page
-                        </button>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Path</th>
-                                    <th>Visibility</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${pages.map(page => `
-                                    <tr>
-                                        <td><input type="text" class="form-input btn-sm" value="${this.sanitize(page.title)}" onchange="SiteSettings.updatePage('${page.id}', 'title', this.value)"></td>
-                                        <td><input type="text" class="form-input btn-sm" value="${this.sanitize(page.path)}" onchange="SiteSettings.updatePage('${page.id}', 'path', this.value)"></td>
-                                        <td>
-                                            <label class="status-badge ${page.visible ? 'approved' : 'pending'}" style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                                                <input type="checkbox" ${page.visible ? 'checked' : ''} onchange="SiteSettings.updatePage('${page.id}', 'visible', this.checked)">
-                                                ${page.visible ? 'Visible' : 'Hidden'}
-                                            </label>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-mini btn-danger" onclick="SiteSettings.removePage('${page.id}')"><i class="ph-bold ph-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
-        },
-
-        addNewPage() {
-            const id = 'p' + Date.now();
-            if (!this._settings.pages) this._settings.pages = [];
-            this._settings.pages.push({ id, path: '/pages/new-page.html', title: 'New Page', visible: true });
-            this.save();
-            this.switchTab('pages');
-        },
-
-        updatePage(id, field, value) {
-            const page = this._settings.pages.find(p => p.id === id);
-            if (page) {
-                page[field] = value;
-                this.save();
-                this.switchTab('pages');
-            }
-        },
-
-        removePage(id) {
-            if (confirm('Delete this page record?')) {
-                this._settings.pages = this._settings.pages.filter(p => p.id !== id);
-                this.save();
-                this.switchTab('pages');
-            }
-        },
-
-        // ====================================================================
-        // THEME CUSTOMIZER
-        // ====================================================================
-        renderThemeCustomizer(container) {
-            const t = this._settings.theme;
-            container.innerHTML = `
-                <div class="glass-card" style="padding: 24px;">
-                    <h4 style="margin-top: 0;"><i class="ph-bold ph-palette"></i> Theme Customizer</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                        <div class="form-group">
-                            <label class="form-label">Primary Color</label>
-                            <input type="color" class="form-input" style="height: 50px; padding: 5px;" value="${t.primaryColor}" onchange="SiteSettings.updateTheme('primaryColor', this.value)">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Secondary Color</label>
-                            <input type="color" class="form-input" style="height: 50px; padding: 5px;" value="${t.secondaryColor}" onchange="SiteSettings.updateTheme('secondaryColor', this.value)">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Mode</label>
-                            <select class="form-input" onchange="SiteSettings.updateTheme('mode', this.value)">
-                                <option value="dark" ${t.mode === 'dark' ? 'selected' : ''}>Dark Mode</option>
-                                <option value="light" ${t.mode === 'light' ? 'selected' : ''}>Light Mode</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Body Font</label>
-                            <select class="form-input" onchange="SiteSettings.updateTheme('bodyFont', this.value)">
-                                <option value="Outfit" ${t.bodyFont === 'Outfit' ? 'selected' : ''}>Outfit (Modern)</option>
-                                <option value="Inter" ${t.bodyFont === 'Inter' ? 'selected' : ''}>Inter (Professional)</option>
-                                <option value="Roboto" ${t.bodyFont === 'Roboto' ? 'selected' : ''}>Roboto (Classic)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            `;
-        },
-
-        updateTheme(field, value) {
-            this._settings.theme[field] = value;
-            this.save();
-            this.applyTheme();
-        },
-
-        // ====================================================================
-        // VISIBILITY TOGGLES
-        // ====================================================================
-        renderVisibilityToggles(container) {
-            const v = this._settings.visibility;
-            container.innerHTML = `
-                <div class="glass-card" style="padding: 24px;">
-                    <h4 style="margin-top: 0;"><i class="ph-bold ph-eye"></i> Section Visibility</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        ${Object.keys(v).map(key => `
-                            <label class="glass-card" style="display: flex; align-items: center; gap: 15px; padding: 15px; cursor: pointer; border-color: ${v[key] ? 'var(--primary-color)' : 'var(--glass-border)'}">
-                                <input type="checkbox" ${v[key] ? 'checked' : ''} onchange="SiteSettings.updateVisibility('${key}', this.checked)">
-                                <span style="text-transform: capitalize; font-weight: 600;">${key} Section</span>
-                            </label>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        },
-
-        updateVisibility(key, value) {
-            this._settings.visibility[key] = value;
-            this.save();
-            this.applyVisibility(); // Apply visibility changes immediately
-            this.switchTab('visibility');
-        },
-
-        applyVisibility() {
-            const v = this._settings.visibility;
-            Object.keys(v).forEach(key => {
-                const section = document.querySelector(`section#${key}`) || document.querySelector(`.${key}-section`);
-                if (section) {
-                    section.style.display = v[key] ? 'block' : 'none';
-                }
-            });
-        },
-
-        // ====================================================================
-        // MENU MANAGER (REFACTORED)
-        // ====================================================================
-        renderMenuManager(container) {
-            const menu = this._settings.header.menu || [];
-            container.innerHTML = `
-                <div class="glass-card" style="padding: 24px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h4 style="margin: 0;"><i class="ph-bold ph-list"></i> Menu Management</h4>
-                        <button class="btn btn-sm btn-primary" onclick="SiteSettings.addMenuItem()">
-                            <i class="ph-bold ph-plus"></i> Add Item
-                        </button>
-                    </div>
-                    <div class="menu-list-container" style="display: grid; gap: 10px;">
-                        ${menu.map((item, index) => `
-                            <div class="menu-item-card glass-card" draggable="true" data-index="${index}" 
-                                 style="padding: 15px; display: flex; align-items: center; gap: 15px; cursor: grab;">
-                                <i class="ph ph-dots-six-vertical" style="opacity: 0.5;"></i>
-                                <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <input type="text" class="form-input btn-sm" value="${this.sanitize(item.label)}" placeholder="Label" onchange="SiteSettings.updateMenuItem(${index}, 'label', this.value)">
-                                    <input type="text" class="form-input btn-sm" value="${this.sanitize(item.link)}" placeholder="Link" onchange="SiteSettings.updateMenuItem(${index}, 'link', this.value)">
-                                </div>
-                                <button class="btn btn-mini btn-subtle" onclick="SiteSettings.toggleMenuItem(${index})">
-                                    <i class="ph-bold ${item.enabled ? 'ph-eye' : 'ph-eye-slash'}"></i>
-                                </button>
-                                <button class="btn btn-mini btn-danger" onclick="SiteSettings.deleteMenuItem(${index})">
-                                    <i class="ph-bold ph-trash"></i>
-                                </button>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <p style="margin-top: 15px; font-size: 0.8rem; color: #888; font-style: italic;">
-                        <i class="ph ph-info"></i> Drag items to reorder the navigation menu.
-                    </p>
-                </div>
-            `;
-            this.enableMenuDragDrop();
-        },
-
-        addMenuItem() {
-            this._settings.header.menu.push({ label: 'New Link', link: '#', enabled: true });
-            this.save();
-            this.switchTab('header');
-        },
-
-        updateMenuItem(index, field, value) {
-            this._settings.header.menu[index][field] = value;
-            this.save();
-            this.renderHeader();
-        },
-
-        enableMenuDragDrop() {
-            const cards = document.querySelectorAll('.menu-item-card');
-            cards.forEach(card => {
-                card.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', card.dataset.index);
-                    card.style.opacity = '0.5';
-                });
-                card.addEventListener('dragend', () => card.style.opacity = '1');
-                card.addEventListener('dragover', (e) => e.preventDefault());
-                card.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
-                    const toIdx = parseInt(card.dataset.index);
-                    if (fromIdx !== toIdx) {
-                        this.reorderMenu(fromIdx, toIdx);
-                    }
-                });
-            });
-        },
-
-        // ====================================================================
-        // CONTENT EDITOR (EXTENDED)
-        // ====================================================================
-        renderContentEditor(container) {
-            const c = this._settings.content;
-            container.innerHTML = `
-                <div style="display: grid; gap: 30px;">
-                    <!-- Hero Section Editor -->
-                    <div class="glass-card" style="padding: 24px;">
-                        <h4 style="margin-top: 0;"><i class="ph-bold ph-megaphone"></i> Hero Section</h4>
-                        <div style="display: grid; gap: 15px;">
-                            <div class="form-group">
-                                <label class="form-label">Main Headline</label>
-                                <input type="text" class="form-input" value="${this.sanitize(c.hero.headline)}" onchange="SiteSettings.updateContent('hero.headline', this.value)">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Subheadline (Support Text)</label>
-                                <textarea class="form-input" rows="2" onchange="SiteSettings.updateContent('hero.subheadline', this.value)">${this.sanitize(c.hero.subheadline)}</textarea>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                <div class="form-group">
-                                    <label class="form-label">CTA Button Text</label>
-                                    <input type="text" class="form-input" value="${this.sanitize(c.hero.ctaText)}" onchange="SiteSettings.updateContent('hero.ctaText', this.value)">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">CTA Link (URL or #ID)</label>
-                                    <input type="text" class="form-input" value="${this.sanitize(c.hero.ctaLink)}" onchange="SiteSettings.updateContent('hero.ctaLink', this.value)">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Hero Background Image URL</label>
-                                <div style="display: flex; gap: 10px;">
-                                    <input type="text" class="form-input" id="hero-bg-input" value="${this.sanitize(c.hero.bgImage)}" onchange="SiteSettings.updateContent('hero.bgImage', this.value)">
-                                    <button class="btn btn-secondary" onclick="SiteSettings.simulateImageUpload('hero.bgImage', 'hero-bg-input')">
-                                        <i class="ph ph-upload"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Services Editor -->
-                    <div class="glass-card" style="padding: 24px;">
-                        <h4 style="margin-top: 0;"><i class="ph-bold ph-sketch-logo"></i> Services Section</h4>
-                        <div class="form-group" style="margin-bottom: 20px;">
-                            <label class="form-label">Section Title</label>
-                            <input type="text" class="form-input" value="${this.sanitize(c.services.title)}" onchange="SiteSettings.updateContent('services.title', this.value)">
-                        </div>
-                        <div style="display: grid; gap: 15px;">
-                            ${c.services.items.map((item, idx) => `
-                                <div class="glass-card" style="padding: 15px; border-color: rgba(255,255,255,0.05);">
-                                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-                                        <i class="ph ${item.icon}" style="font-size: 1.5rem; color: var(--primary-color);"></i>
-                                        <input type="text" class="form-input btn-sm" value="${this.sanitize(item.title)}" placeholder="Title" onchange="SiteSettings.updateServiceItem(${idx}, 'title', this.value)">
-                                        <button class="btn btn-mini btn-danger" onclick="SiteSettings.removeServiceItem(${idx})"><i class="ph ph-trash"></i></button>
-                                    </div>
-                                    <input type="text" class="form-input btn-sm" style="margin-bottom:10px;" value="${this.sanitize(item.icon)}" placeholder="Icon class (ph-xxx)" onchange="SiteSettings.updateServiceItem(${idx}, 'icon', this.value)">
-                                    <textarea class="form-input btn-sm" rows="2" onchange="SiteSettings.updateServiceItem(${idx}, 'desc', this.value)">${this.sanitize(item.desc)}</textarea>
-                                </div>
-                            `).join('')}
-                            <button class="btn btn-sm btn-secondary" onclick="SiteSettings.addServiceItem()">
-                                <i class="ph ph-plus"></i> Add Service
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- About Page Editor -->
-                    <div class="glass-card" style="padding: 24px;">
-                        <h4 style="margin-top: 0;"><i class="ph-bold ph-info"></i> About Page Content</h4>
-                        <div style="display: grid; gap: 15px;">
-                            <div class="form-group">
-                                <label class="form-label">Page Title</label>
-                                <input type="text" class="form-input" value="${this.sanitize(c.about.title)}" onchange="SiteSettings.updateContent('about.title', this.value)">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Detailed Description</label>
-                                <textarea class="form-input" rows="5" onchange="SiteSettings.updateContent('about.description', this.value)">${this.sanitize(c.about.description)}</textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contact Details -->
-                    <div class="glass-card" style="padding: 24px;">
-                        <h4 style="margin-top: 0;"><i class="ph-bold ph-address-book"></i> Contact Information</h4>
-                        <div style="display: grid; gap: 15px;">
-                            <div class="form-group">
-                                <label class="form-label">Physical Address</label>
-                                <input type="text" class="form-input" value="${this.sanitize(c.contact.address)}" onchange="SiteSettings.updateContent('contact.address', this.value)">
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                <div class="form-group">
-                                    <label class="form-label">Phone Number</label>
-                                    <input type="text" class="form-input" value="${this.sanitize(c.contact.phone)}" onchange="SiteSettings.updateContent('contact.phone', this.value)">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Official Email</label>
-                                    <input type="text" class="form-input" value="${this.sanitize(c.contact.email)}" onchange="SiteSettings.updateContent('contact.email', this.value)">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Gallery Editor -->
-                    <div class="glass-card" style="padding: 24px;">
-                        <h4 style="margin-top: 0;"><i class="ph-bold ph-image"></i> Gallery Management</h4>
-                        <div class="form-group" style="margin-bottom: 20px;">
-                            <label class="form-label">Gallery Title</label>
-                            <input type="text" class="form-input" value="${this.sanitize(c.gallery.title)}" onchange="SiteSettings.updateContent('gallery.title', this.value)">
-                        </div>
-                        <div style="display: grid; gap: 15px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-                            ${c.gallery.items.map((item, idx) => `
-                                <div class="glass-card" style="padding: 15px; border-color: rgba(255,255,255,0.05);">
-                                    <img src="${item.src}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
-                                    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                                        <input type="text" id="gallery-item-${idx}" class="form-input btn-sm" value="${this.sanitize(item.src)}" placeholder="Image URL" onchange="SiteSettings.updateGalleryItem(${idx}, 'src', this.value)">
-                                         <button class="btn btn-mini btn-secondary" onclick="SiteSettings.simulateImageUpload('gallery.items.${idx}.src', 'gallery-item-${idx}')">
-                                            <i class="ph ph-upload"></i>
-                                        </button>
-                                    </div>
-                                    <input type="text" class="form-input btn-sm" style="margin-bottom:10px;" value="${this.sanitize(item.title)}" placeholder="Title" onchange="SiteSettings.updateGalleryItem(${idx}, 'title', this.value)">
-                                    <div style="display: flex; gap: 10px;">
-                                        <button class="btn btn-mini btn-danger" onclick="SiteSettings.removeGalleryItem(${idx})"><i class="ph ph-trash"></i> Delete</button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button class="btn btn-sm btn-primary" style="margin-top: 20px;" onclick="SiteSettings.addGalleryItem()">
-                            <i class="ph ph-plus"></i> Add Image
-                        </button>
-                    </div>
-                </div>
-            `;
-        },
-
-        updateContent(path, value) {
-            const keys = path.split('.');
-            let current = this._settings.content;
-
-            for (let i = 0; i < keys.length - 1; i++) {
-                if (!current[keys[i]]) current[keys[i]] = {};
-                current = current[keys[i]];
-            }
-
-            current[keys[keys.length - 1]] = value;
-            this.save();
-            this.applyContent();
-        },
-
-        applyContent() {
-            const c = this._settings.content;
-
-            // Hero
-            const hTitle = document.getElementById('hero-title');
-            if (hTitle) hTitle.textContent = c.hero.headline;
-
-            const hDesc = document.getElementById('hero-desc');
-            if (hDesc) hDesc.textContent = c.hero.subheadline;
-
-            const hCta = document.getElementById('hero-cta');
-            if (hCta) {
-                hCta.textContent = c.hero.ctaText;
-                hCta.href = c.hero.ctaLink;
-            }
-
-            const heroSec = document.querySelector('.hero-section');
-            if (heroSec && c.hero.bgImage) {
-                heroSec.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${c.hero.bgImage}')`;
-                heroSec.style.backgroundSize = 'cover';
-                heroSec.style.backgroundPosition = 'center';
-            }
-
-            document.querySelectorAll('.address-text').forEach(el => el.textContent = c.contact.address);
-            document.querySelectorAll('.phone-text').forEach(el => el.textContent = c.contact.phone);
-            document.querySelectorAll('.email-text').forEach(el => el.textContent = c.contact.email);
-
-            // About Page
-            const aboutTitle = document.querySelector('[data-id="about-title"]');
-            if (aboutTitle) aboutTitle.textContent = c.about.title;
-            const aboutDesc = document.querySelector('[data-id="about-description"]');
-            if (aboutDesc) aboutDesc.textContent = c.about.description;
-
-            // Services Grid (if it exists on the page)
-            const sGrid = document.getElementById('services-grid');
-            if (sGrid) this.renderDynamicServices(sGrid);
-
-            // Gallery Grid (if it exists on the page)
-            const gGrid = document.getElementById('galleryGrid');
-            if (gGrid) this.renderDynamicGallery(gGrid);
-        },
-
-        renderDynamicGallery(container) {
-            const items = this._settings.content.gallery.items;
-            container.innerHTML = items.map((m, idx) => `
-                <div class="gallery-card animate-fade-up" style="animation-delay: ${idx * 0.1}s" onclick="openLightbox('${m.type}', '${m.src}')">
-                    <div style="height: 200px; overflow: hidden;">
-                        <img src="${m.src}" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <div style="padding: 20px;">
-                        <h3>${this.sanitize(m.title)}</h3>
-                        <p style="color: #666; font-size: 0.85rem;">${this.sanitize(m.desc || '')}</p>
-                    </div>
-                </div>
-            `).join('');
-        },
-
-        addGalleryItem() {
-            this._settings.content.gallery.items.push({ type: 'photo', src: 'https://images.unsplash.com/photo-1546410531-bb4caa1b424d?auto=format&fit=crop&q=80&w=800', title: 'New Image', desc: '' });
-            this.save();
-            this.switchTab('content');
-        },
-
-        removeGalleryItem(index) {
-            if (confirm('Remove this image?')) {
-                this._settings.content.gallery.items.splice(index, 1);
-                this.save();
-                this.switchTab('content');
-            }
-        },
-
-        updateGalleryItem(index, field, value) {
-            this._settings.content.gallery.items[index][field] = value;
-            this.save();
-        },
-
-        renderDynamicServices(container) {
-            const items = this._settings.content.services.items;
-            container.innerHTML = items.map(s => `
-                <div class="service-card animate-fade-up">
-                    <div class="service-icon"><i class="ph ${s.icon || 'ph-briefcase'}"></i></div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 15px;">${this.sanitize(s.title)}</h3>
-                    <p style="color: #888; line-height: 1.6;">${this.sanitize(s.desc)}</p>
-                    <a href="/pages/booking/index.html" class="btn btn-primary" style="margin-top: 25px; padding: 10px 20px; display: inline-block;">Enquire Now</a>
-                </div>
-            `).join('');
-        },
-
-        addServiceItem() {
-            this._settings.content.services.items.push({ id: 's' + Date.now(), icon: 'ph-star', title: 'New Service', desc: 'Description of service.' });
-            this.save();
-            this.switchTab('content');
-        },
-
-        removeServiceItem(index) {
-            if (confirm('Remove this service?')) {
-                this._settings.content.services.items.splice(index, 1);
-                this.save();
-                this.switchTab('content');
-            }
-        },
-
-        updateServiceItem(index, field, value) {
-            this._settings.content.services.items[index][field] = value;
-            this.save();
-        },
-
-        simulateImageUpload(path, inputId) {
-            const randomId = Math.floor(Math.random() * 1000);
-            const mockUrl = `https://images.unsplash.com/photo-${randomId}?auto=format&fit=crop&q=80&w=1920`;
-
-            this.updateContent(path, mockUrl);
-            const input = document.getElementById(inputId);
-            if (input) input.value = mockUrl;
-
-            alert('Image simulated successfully! In production, this would open a file picker and upload to cloud storage.');
         }
     };
 

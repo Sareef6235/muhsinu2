@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login | MIFTHAHUL HUDA</title>
-    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -29,7 +30,6 @@
             text-align: center;
             max-width: 450px;
             width: 100%;
-            border: 1px solid var(--glass-border);
         }
 
         .login-input {
@@ -40,13 +40,6 @@
             border-radius: 12px;
             color: #fff;
             margin-bottom: 20px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .login-input:focus {
-            border-color: #00f3ff;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
         }
 
         .btn-login {
@@ -58,21 +51,13 @@
             color: #000;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);
         }
     </style>
 </head>
 
 <body>
     <div class="login-card animate-fade-up">
-        <h1
-            style="color: #fff; margin-bottom: 30px; background: linear-gradient(to right, #fff, #00f3ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-            Admin Access</h1>
+        <h1 style="color: #fff; margin-bottom: 30px;">Admin Access</h1>
         <form id="loginForm">
             <input type="password" id="admin-pin" class="login-input" placeholder="Enter Access PIN" required
                 maxlength="4">
@@ -82,15 +67,18 @@
     </div>
 
     <script type="module">
-        import AuthManager from '../../assets/js/auth-manager.js';
+        import LocalAuth from '../../assets/js/local-auth.js';
 
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('login-btn');
         const errorMsg = document.getElementById('error-msg');
 
         async function initAuth() {
+            // Initial PIN if not set (Default: 2026)
+            await LocalAuth.init('2026');
+
             // Auto-redirect if already logged in
-            if (AuthManager.isAuthenticated()) {
+            if (LocalAuth.isAuthenticated()) {
                 window.location.href = 'dashboard.html';
             }
         }
@@ -107,8 +95,8 @@
             const pin = document.getElementById('admin-pin').value;
 
             try {
-                // AuthManager uses PIN-only for this simple login
-                const success = await AuthManager.login('admin', pin);
+                // Hashing + Validation
+                const success = await LocalAuth.login(pin);
 
                 if (success) {
                     window.location.href = 'dashboard.html';

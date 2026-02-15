@@ -4,22 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fee Payment Portal | MIFTHAHUL HUDA</title>
-
-    <!-- Unified Assets -->
-    <link rel="stylesheet" href="../../assets/css/main.css">
+    <title>Fee Payment Portal - MHMV 2026</title>
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <link rel="stylesheet" href="../../assets/css/modern-nav.css">
+    <link rel="stylesheet" href="../../assets/css/site-footer.css">
+    <link rel="stylesheet" href="../../assets/css/site-languages.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
     <style>
         .creative-hero {
-            padding: 80px 0 40px;
+            padding: 120px 0 60px;
             text-align: center;
+            background: radial-gradient(circle at top, rgba(0, 243, 255, 0.05), transparent);
         }
 
         .step-container {
             max-width: 600px;
-            margin: 0 auto 100px;
+            margin: 0 auto;
+            position: relative;
         }
 
         .step-indicator {
@@ -36,7 +38,7 @@
             left: 0;
             width: 100%;
             height: 2px;
-            background: var(--border);
+            background: var(--glass-border);
             z-index: 1;
         }
 
@@ -44,14 +46,14 @@
             width: 40px;
             height: 40px;
             background: #111;
-            border: 2px solid var(--border);
+            border: 2px solid var(--glass-border);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2;
             font-weight: 700;
-            transition: 0.4s;
+            transition: all 0.4s ease;
             color: #444;
         }
 
@@ -59,6 +61,7 @@
             border-color: var(--primary-color);
             color: var(--primary-color);
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            background: rgba(0, 243, 255, 0.1);
         }
 
         .step-dot.completed {
@@ -69,26 +72,79 @@
 
         .form-step {
             display: none;
+            animation: slideUp 0.5s forwards;
         }
 
         .form-step.active {
             display: block;
-            animation: fadeUp 0.5s forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .upload-area {
-            border: 2px dashed var(--border);
+            border: 2px dashed var(--glass-border);
             padding: 40px;
             border-radius: 20px;
             text-align: center;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.02);
+            margin: 20px 0;
         }
 
-        .upload-area:hover {
+        .upload-area:hover,
+        .upload-area.dragover {
             border-color: var(--primary-color);
             background: rgba(0, 243, 255, 0.05);
+        }
+
+        #preview-img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+            border: 1px solid var(--glass-border);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .btn-nav-group {
@@ -96,110 +152,231 @@
             gap: 15px;
             margin-top: 30px;
         }
+
+        .btn-nav-group .btn {
+            flex: 1;
+        }
     </style>
+</head>
+
+<body>
+    <header id="main-header"></header>
+
+    <main>
+        <section class="creative-hero">
+            <div class="container">
+                <h1 class="animate-fade-up">💳 Fee Payment Portal</h1>
+                <p class="animate-fade-up delay-1">Securely submit your madrasa fee receipts online</p>
+            </div>
+        </section>
+
+        <section class="container" style="padding-bottom: 100px;">
+            <div class="step-container">
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step-dot active" id="dot-1">1</div>
+                    <div class="step-dot" id="dot-2">2</div>
+                    <div class="step-dot" id="dot-3">3</div>
+                </div>
+
+                <!-- Form Card -->
+                <div class="glass-mhm"
+                    style="padding: 40px; border-radius: 30px; border: 1px solid var(--glass-border);">
+                    <form id="fee-form">
+                        <!-- Step 1: Student Identity -->
+                        <div class="form-step active" id="step-1">
+                            <h2 style="margin-bottom: 25px;">Student Information</h2>
+                            <div class="input-group">
+                                <label>Full Name</label>
+                                <input type="text" id="student_name" placeholder="Enter student's full name" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Register Number</label>
+                                <input type="text" id="reg_no" placeholder="e.g. 1024" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Class</label>
+                                <select id="student_class">
+                                    <option value="1">Class 1</option>
+                                    <option value="2">Class 2</option>
+                                    <option value="3">Class 3</option>
+                                    <option value="4">Class 4</option>
+                                    <option value="5">Class 5</option>
+                                    <option value="6">Class 6</option>
+                                    <option value="7">Class 7</option>
+                                    <option value="8">Class 8</option>
+                                    <option value="9">Class 9</option>
+                                    <option value="10">Class 10</option>
+                                    <option value="+1">+1 (Senior)</option>
+                                    <option value="+2">+2 (Senior)</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" style="width: 100%;"
+                                onclick="nextStep(2)">Continue <i class="ph-bold ph-arrow-right"></i></button>
+                        </div>
+
+                        <!-- Step 2: Payment Details -->
+                        <div class="form-step" id="step-2">
+                            <h2 style="margin-bottom: 25px;">Payment Details</h2>
+                            <div class="input-group">
+                                <label>Fee Month</label>
+                                <select id="fee_month">
+                                    <option value="January">January</option>
+                                    <option value="February">February</option>
+                                    <option value="March">March</option>
+                                    <option value="April">April</option>
+                                    <option value="May">May</option>
+                                    <option value="June">June</option>
+                                    <option value="July">July</option>
+                                    <option value="August">August</option>
+                                    <option value="September">September</option>
+                                    <option value="October">October</option>
+                                    <option value="November">November</option>
+                                    <option value="December">December</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Amount Paid (₹)</label>
+                                <input type="number" id="fee_amount" placeholder="e.g. 500" required>
+                            </div>
+                            <div class="btn-nav-group">
+                                <button type="button" class="btn btn-secondary" onclick="nextStep(1)">Back</button>
+                                <button type="button" class="btn btn-primary" onclick="nextStep(3)">Continue</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Receipt Upload -->
+                        <div class="form-step" id="step-3">
+                            <h2 style="margin-bottom: 25px;">Upload Receipt</h2>
+                            <p style="color: #666; font-size: 0.9rem;">Please upload a photo of the bank/UPI receipt or
+                                hand receipt.</p>
+
+                            <div class="upload-area" id="drop-zone"
+                                onclick="document.getElementById('file-input').click()">
+                                <i class="ph ph-cloud-arrow-up"
+                                    style="font-size: 3rem; color: var(--primary-color);"></i>
+                                <p style="margin-top: 15px;">Click or Drag & Drop Photo Here</p>
+                                <input type="file" id="file-input" hidden accept="image/*">
+                                <img id="preview-img" src="#" alt="Preview">
+                            </div>
+
+                            <div class="btn-nav-group">
+                                <button type="button" class="btn btn-secondary" onclick="nextStep(2)">Back</button>
+                                <button type="submit" class="btn btn-primary" id="submit-btn">Submit Payment
+                                    Record</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="main-footer"></footer>
 
     <script type="module">
-        import AppState from '../../assets/js/state.js';
-        import NavigationSystem from '../../assets/js/navigation.js';
-        import FooterSystem from '../../assets/js/footer.js';
         import StorageManager from '../../assets/js/storage-manager.js';
-
-        document.addEventListener('DOMContentLoaded', () => {
-            AppState.init();
-            NavigationSystem.init(AppState.navigation.menuData);
-            FooterSystem.init();
-        });
+        import MediaOptimizer from '../../assets/js/media-optimizer.js';
 
         let currentStep = 1;
+        let selectedFile = null;
+
         window.nextStep = (step) => {
             if (step > currentStep) {
-                if (currentStep === 1 && (!document.getElementById('student_name').value || !document.getElementById('reg_no').value)) {
-                    alert("Please fill student details."); return;
+                // Validate current step
+                if (currentStep === 1) {
+                    if (!document.getElementById('student_name').value || !document.getElementById('reg_no').value) {
+                        alert("Please fill all identity fields.");
+                        return;
+                    }
+                }
+                if (currentStep === 2) {
+                    if (!document.getElementById('fee_amount').value) {
+                        alert("Please enter the amount paid.");
+                        return;
+                    }
                 }
             }
+
             document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
             document.getElementById(`step-${step}`).classList.add('active');
+
+            // Update dots
             document.querySelectorAll('.step-dot').forEach((dot, idx) => {
                 const dotNum = idx + 1;
                 dot.classList.toggle('active', dotNum === step);
                 dot.classList.toggle('completed', dotNum < step);
             });
+
             currentStep = step;
         };
 
-        window.submitForm = (e) => {
+        // File handling
+        const fileInput = document.getElementById('file-input');
+        const previewImg = document.getElementById('preview-img');
+        const dropZone = document.getElementById('drop-zone');
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        });
+
+        async function processFile(file) {
+            try {
+                const optimized = await MediaOptimizer.compressImage(file);
+                selectedFile = optimized;
+                previewImg.src = optimized;
+                previewImg.style.display = 'block';
+                dropZone.querySelector('p').innerText = "Receipt Captured ✅";
+            } catch (err) {
+                console.error(err);
+                alert("Failed to process image.");
+            }
+        }
+
+        // Form Submit
+        document.getElementById('fee-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            alert("Payment record submitted successfully (Simulated)");
-            window.location.href = '../../index.html';
-        };
+            const btn = document.getElementById('submit-btn');
+
+            if (!selectedFile) {
+                alert("Please upload a receipt photo first.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Submitting...';
+
+            const submission = {
+                id: 'FEE_' + Date.now(),
+                student: document.getElementById('student_name').value,
+                regNo: document.getElementById('reg_no').value,
+                class: document.getElementById('student_class').value,
+                month: document.getElementById('fee_month').value,
+                amount: document.getElementById('fee_amount').value,
+                receipt: selectedFile,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+
+            // Save to Local Vault
+            StorageManager.push('fee_submissions', submission);
+
+            setTimeout(() => {
+                alert("✅ Payment Record Submitted Successfully! Our admin will verify it soon.");
+                window.location.href = '../../index.html';
+            }, 1000);
+        });
     </script>
-</head>
 
-<body>
-    <header id="site-header"></header>
-    <div id="site-breadcrumbs"></div>
-
-    <main class="container">
-        <section class="creative-hero">
-            <h1
-                style="font-size: 3.5rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-                Fee Payment Portal</h1>
-            <p style="color: #888; font-size: 1.2rem;">Securely submit your madrasa fee receipts online.</p>
-        </section>
-
-        <section class="step-container">
-            <div class="step-indicator">
-                <div class="step-dot active" id="dot-1">1</div>
-                <div class="step-dot" id="dot-2">2</div>
-                <div class="step-dot" id="dot-3">3</div>
-            </div>
-
-            <div class="glass-card animate-fade-up" style="padding: 40px;">
-                <form id="fee-form" onsubmit="submitForm(event)">
-                    <div class="form-step active" id="step-1">
-                        <h2 style="margin-bottom: 25px;">Student Information</h2>
-                        <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" id="student_name" class="form-input"
-                                placeholder="Enter student's full name" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Register Number</label>
-                            <input type="text" id="reg_no" class="form-input" placeholder="e.g. 1024" required>
-                        </div>
-                        <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 20px;"
-                            onclick="nextStep(2)">Continue</button>
-                    </div>
-
-                    <div class="form-step" id="step-2">
-                        <h2 style="margin-bottom: 25px;">Payment Details</h2>
-                        <div class="form-group">
-                            <label class="form-label">Amount Paid (₹)</label>
-                            <input type="number" id="fee_amount" class="form-input" placeholder="e.g. 500" required>
-                        </div>
-                        <div class="btn-nav-group">
-                            <button type="button" class="btn btn-secondary" onclick="nextStep(1)">Back</button>
-                            <button type="button" class="btn btn-primary" onclick="nextStep(3)">Continue</button>
-                        </div>
-                    </div>
-
-                    <div class="form-step" id="step-3">
-                        <h2 style="margin-bottom: 25px;">Upload Receipt</h2>
-                        <div class="upload-area" onclick="alert('File choice simulated')">
-                            <i class="ph ph-cloud-arrow-up" style="font-size: 3rem; color: var(--primary-color);"></i>
-                            <p style="margin-top: 15px;">Click to select photo</p>
-                        </div>
-                        <div class="btn-nav-group">
-                            <button type="button" class="btn btn-secondary" onclick="nextStep(2)">Back</button>
-                            <button type="submit" class="btn btn-primary">Submit Record</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </section>
-    </main>
-
-    <footer id="site-footer"></footer>
+    <script src="../../assets/js/site-settings.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SiteSettings) SiteSettings.render();
+        });
+    </script>
 </body>
 
 </html>

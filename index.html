@@ -4,147 +4,928 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public Portal | MIFTHAHUL HUDA</title>
+    <title>MIFTHAHUL HUDA MADRASA</title>
+    <meta name="description" content="Portfolio of MIFTHAHUL HUDA MADRASA. Exploring technology and sharing knowledge.">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/site-languages.css">
 
-    <!-- Unified Assets -->
-    <link rel="stylesheet" href="assets/css/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Global Navigation & Footer -->
+    <link rel="stylesheet" href="assets/css/navigation-system.css">
+    <link rel="stylesheet" href="assets/css/footer-system.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- Initialization Script -->
+    <!-- Critical Scripts (Optimized) -->
+    <script src="assets/js/utils/performance.js" defer></script>
+    <script src="assets/js/site-languages.js" defer></script>
+    <script src="assets/js/subject-storage.js" defer></script>
     <script type="module">
-        import AppState from './assets/js/state.js';
-        import NavigationSystem from './assets/js/navigation.js';
-        import FooterSystem from './assets/js/footer.js';
-        import ResultsPortal from './assets/js/portal.js';
+        import StorageManager from './assets/js/storage-manager.js';
+        import ServicesEngine from './assets/js/services-engine.js';
+        import ResultManager from './assets/js/result-system.js';
+        import NewsService from './assets/js/news-service.js';
 
-        document.addEventListener('DOMContentLoaded', () => {
-            AppState.init();
-            NavigationSystem.init(AppState.navigation.menuData);
-            FooterSystem.init();
-            ResultsPortal.init();
+        // Auto-Init Global Access
+        window.StorageManager = StorageManager;
+        window.ServicesEngine = ServicesEngine;
+        window.ResultManager = ResultManager;
+        window.NewsService = NewsService;
 
-            // Homepage specific logic
-            const searchBtn = document.getElementById('home-search-btn');
-            const searchInput = document.getElementById('home-regno');
-
-            if (searchBtn && searchInput) {
-                searchBtn.addEventListener('click', () => {
-                    ResultsPortal.quickSearch(searchInput.value);
-                });
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') ResultsPortal.quickSearch(searchInput.value);
-                });
-            }
-        });
+        ServicesEngine.init();
+        ResultManager.init();
     </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 
 <body data-page-id="home">
     <header id="site-header"></header>
-    <div id="site-breadcrumbs"></div>
 
     <main>
-        <!-- Dynamic Hero Section -->
-        <section class="hero-section"
-            style="min-height: 80vh; display: flex; align-items: center; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);">
-            <div class="container animate-fade-up" style="text-align: center;">
-                <h2 style="color: var(--primary-color); font-size: 1.5rem; margin-bottom: 10px;">Welcome to</h2>
-                <h1 id="hero-title" style="font-size: 4rem; margin-bottom: 20px; font-weight: 800;">MIFTHAHUL HUDA
-                    MADRASA</h1>
-                <p id="hero-desc" style="max-width: 700px; margin: 0 auto 40px; color: #888; font-size: 1.15rem;">
-                    Excellence in education, character building, and community service.
-                    Empowering students with knowledge and values for a brighter future.
+        <section id="hero"
+            style="position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden;">
+            <!-- Hero Background Circles -->
+            <div class="hero-bg">
+                <div class="circle circle-1"></div>
+                <div class="circle circle-2"></div>
+            </div>
+
+            <!-- Three.js Animated Background -->
+            <canvas id="hero-canvas"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
+
+
+            <!-- Content overlay -->
+            <div class="container hero-content" style="position: relative; z-index: 1;">
+                <h2 class="animate-fade-up" data-t="welcome_to">Welcome to</h2>
+                <h1 class="animate-fade-up delay-1" data-t="mhmv_title">MIFTHAHUL HUDA MADRASA</h1>
+                <h3 class="animate-fade-up delay-2" data-t="address_vengara">Vengara S S Road</h3>
+                <p class="animate-fade-up delay-3" data-t="hero_cta_text">
+                    A simple reminder that consistent effort and dedication in learning today pave the way for
+                    achievement and success in the future.
                 </p>
-                <div class="cta-group">
-                    <a href="/pages/results/index.html" class="nav-link"
-                        style="background: var(--primary-color); color: #000; font-weight: 700;">Check Results</a>
-                    <a id="hero-cta" href="#about" class="nav-link" style="border: 1px solid var(--border);">Learn
-                        More</a>
+                <div class="cta-group animate-fade-up delay-4">
+                    <a href="pages/students/creation_receipt.html" class="btn btn-primary"
+                        data-t="btn_receipt">Receipt</a>
+                    <a href="pages/gallery/index.html?tab=photo" class="btn btn-secondary"
+                        style="border-color: var(--primary-color); color: var(--primary-color);"
+                        data-t="btn_gallery">View Gallery</a>
+                    <a href="#contact" class="btn btn-secondary" data-t="btn_contact">Contact Us</a>
                 </div>
             </div>
+
         </section>
 
-        <!-- Stats Bar -->
-        <section class="stats-bar"
-            style="background: rgba(255,255,255,0.02); padding: 40px 0; border-bottom: 1px solid var(--border);">
+        <section id="about">
             <div class="container">
-                <div class="footer-grid" style="margin-bottom: 0; text-align: center;">
-                    <div class="footer-col">
-                        <div id="results-exams-count"
-                            style="font-size: 2.5rem; font-weight: 800; color: var(--primary-color);">0</div>
-                        <div style="text-transform: uppercase; font-size: 0.75rem; color: #666; letter-spacing: 2px;">
-                            Exams Published</div>
-                    </div>
-                    <div class="footer-col">
-                        <div id="results-total-count" style="font-size: 2.5rem; font-weight: 800;">0</div>
-                        <div style="text-transform: uppercase; font-size: 0.75rem; color: #666; letter-spacing: 2px;">
-                            Total Students</div>
-                    </div>
-                    <div class="footer-col">
-                        <div id="results-last-sync" style="font-size: 1.1rem; padding-top: 15px; color: #888;">--:--
+                <div class="about-grid overhaul-content">
+                    <div class="about-text">
+                        <h2 class="section-title" data-t="results_title">Student Results</h2>
+                        <p data-t="results_desc">
+                            Verify student performance directly from our official examination database.
+                            Enter your Register Number below to view immediate results and standigs.
+                        </p>
+
+                        <!-- Premium Search Box for Homepage -->
+                        <div class="search-premium" style="margin-top: 30px; margin-bottom: 40px; max-width: 500px;">
+                            <div class="home-search-box"
+                                style="display: flex; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 5px; transition: all 0.3s ease;">
+                                <input type="text" id="home-regno" placeholder="Enter Register No (e.g. 101)"
+                                    style="flex: 1; background: none; border: none; font-family: inherit; padding: 12px 20px; color: #fff; font-size: 1rem; outline: none;">
+                                <button onclick="fetchHomeResult()"
+                                    style="background: var(--primary-color); border: none; padding: 0 25px; border-radius: 8px; color: #000; font-weight: 700; cursor: pointer; transition: 0.3s; height: 45px;">View</button>
+                            </div>
+                            <div id="home-status"
+                                style="margin-top: 10px; font-size: 0.85rem; color: #888; text-align: center; height: 20px;">
+                            </div>
                         </div>
-                        <div
-                            style="text-transform: uppercase; font-size: 0.75rem; color: #666; letter-spacing: 2px; margin-top: 5px;">
-                            Last Updated</div>
+
+                        <!-- Result Modal/Overlay (Simple version for homepage) -->
+                        <div id="home-result-container"
+                            style="display: none; background: rgba(0, 243, 255, 0.03); border: 1px solid rgba(0, 243, 255, 0.2); padding: 25px; border-radius: 15px; margin-top: 20px; animation: fadeIn 0.5s ease;">
+                            <div id="home-result-area"></div>
+                            <a href="pages/results/index.html" class="btn-link"
+                                style="display: inline-block; margin-top: 15px; color: var(--primary-color);">View Full
+                                Transcript →</a>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Quick Search Section -->
-        <section id="search" style="padding: 80px 0;">
-            <div class="container" style="max-width: 600px;">
-                <div class="glass-card" style="padding: 40px; text-align: center; border-radius: 30px;">
-                    <h2 style="margin-bottom: 10px;">Student Results</h2>
-                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 30px;">Enter your register number for
-                        immediate status</p>
+                    <div class="about-text">
+                        <h2 class="section-title" data-t="programs_title">Educational Programs</h2>
+                        <p data-t="programs_desc">
+                            Our Madrasa offers a range of structured educational programs designed to develop both
+                            religious and
+                            academic knowledge. These include Qur’an memorization classes, Tajweed and Arabic language
+                            lessons,
+                            Islamic studies, and age‑based learning tracks that are updated regularly. Each program is
+                            tailored
+                            to help students grow in knowledge, character, and spiritual understanding.
+                        </p>
 
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <input type="text" id="home-regno" placeholder="Roll Number (e.g. 101)"
-                            style="flex: 1; padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-family: inherit;">
-                        <button id="home-search-btn"
-                            style="padding: 0 30px; background: var(--primary-color); border: none; border-radius: 12px; color: #000; font-weight: 700; cursor: pointer;">View</button>
-                    </div>
-                    <div id="home-status" style="font-size: 0.85rem; color: #888; min-height: 20px;"></div>
+                        <h2 class="section-title" style="margin-top: 30px;">Our Core Skills</h2>
+                        <div class="skills-wrapper">
+                            <div class="skills-grid">
+                                <div class="skill-card">
+                                    <span class="icon">📖</span>
+                                    <h3>Qur'an Recitation</h3>
+                                    <p>Advanced Tajweed and rhythmic recitation techniques.</p>
+                                </div>
+                                <div class="skill-card">
+                                    <span class="icon">✍️</span>
+                                    <h3>Calligraphy</h3>
+                                    <p>Traditional Arabic script and modern artistic styles.</p>
+                                </div>
+                                <div class="skill-card">
+                                    <span class="icon">🤝</span>
+                                    <h3>Ethics & Morality</h3>
+                                    <p>Developing character and social responsibility.</p>
+                                </div>
+                                <div class="skill-card">
+                                    <span class="icon">🎤</span>
+                                    <h3>Public Speaking</h3>
+                                    <p>Confidence building through student presentations.</p>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div id="home-result-container"
-                        style="display: none; margin-top: 30px; padding: 30px; background: rgba(0, 243, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.1); border-radius: 20px;">
-                        <div id="home-result-area"></div>
-                        <a href="/pages/results/index.html"
-                            style="display: inline-block; margin-top: 20px; color: var(--primary-color); font-size: 0.9rem; font-weight: 600;">View
-                            Full Transcript →</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- About Preview -->
-        <section id="about" style="padding: 80px 0; background: #080808;">
-            <div class="container">
-                <div class="footer-grid">
-                    <div class="footer-col" style="grid-column: span 2;">
-                        <h2 class="section-title">Established Traditions</h2>
-                        <p style="color: #aaa; font-size: 1.1rem; line-height: 1.8;">
-                            MIFTHAHUL HUDA MADRASA has been a cornerstone of local education for decades.
-                            Our programs combine traditional Islamic teachings with modern pedagogical methods to ensure
-                            our students excel in all walks of life.
+                        <h2 class="section-title" style="margin-top: 30px;">Meetings & Community Engagement</h2>
+                        <p>
+                            Regular meetings are held with students, parents, and faculty to discuss progress reports,
+                            upcoming
+                            events, and educational goals. These gatherings help build strong communication between home
+                            and
+                            school and ensure that everyone works together to support student success. Meetings are
+                            documented
+                            with minutes and action points so key decisions and follow‑ups are clear and actionable.
                         </p>
                     </div>
-                    <div class="footer-col">
-                        <div class="glass-card"
-                            style="padding: 30px; border-radius: 20px; border-color: var(--secondary-color);">
-                            <h3 style="color: var(--secondary-color); margin-bottom: 10px;">Our Vision</h3>
-                            <p style="font-size: 0.9rem; color: #888;">To be a global leader in nurturing
-                                character-driven individuals who serve humanity through knowledge.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" style="padding: 0; margin-top: -100px;"></section>
+        <!-- NEWS & UPDATES SECTION -->
+        <section id="news" class="section" style="position: relative; overflow: hidden;">
+            <!-- Cosmic Accents -->
+            <div class="cosmic-accent accent-1"></div>
+            <div class="cosmic-accent accent-2"></div>
+            <div class="cosmic-accent accent-3"></div>
+
+            <div class="container" style="text-align: center; position: relative; z-index: 2;">
+                <div class="section-badge animate-fade-up">Updates</div>
+                <h2 class="section-title animate-fade-up" style="margin-bottom: 25px;">Latest News & Notices</h2>
+
+                <!-- Language Toggle -->
+                <div class="lang-toggle-wrapper animate-fade-up">
+                    <button class="lang-btn active" onclick="setNewsLang('en')">EN</button>
+                    <button class="lang-btn" onclick="setNewsLang('ml')">ML</button>
+                    <button class="lang-btn" onclick="setNewsLang('ar')">AR</button>
+                </div>
+
+                <div id="home-news-grid" class="grid"
+                    style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; text-align: left;">
+                    <!-- Filled dynamically by JS -->
+                    <p style="color: #666; text-align: center; width: 100%;">Loading news...</p>
+                </div>
+
+                <a href="pages/news/index.html" class="btn-primary animate-fade-up"
+                    style="margin-top: 40px; display: none;" id="view-all-news-btn">View All Updates</a>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="section" style="background: rgba(10, 10, 10, 0.5);">
+            <div class="container">
+                <h2 class="section-title">Our Services</h2>
+                <div class="services-grid" id="services-grid-home">
+                    <!-- Cards rendered dynamically via JS -->
+                </div>
+
+                <script type="module">
+                    const grid = document.getElementById('services-grid-home');
+                    if (grid) {
+                        const allServices = window.ServicesEngine.getActive();
+                        grid.innerHTML = allServices.slice(0, 4).map(service => `
+                            <a href="pages/services/index.html#${service.id}" class="service-card animate-fade-up">
+                                <i class="ph-bold ${service.icon} service-icon"></i>
+                                <h3>${service.title}</h3>
+                                <p>${service.desc.substring(0, 100)}...</p>
+                                <ul class="service-list">
+                                    <li>Professional Guidance</li>
+                                    <li>Premium Material</li>
+                                </ul>
+                            </a>
+                        `).join('');
+                    }
+                </script>
+            </div>
+        </section>
+
+
+        <!-- News & Notice Section -->
+        <section id="news-notice">
+            <div class="container">
+                <h2 class="section-title">News & Notice</h2>
+                <div class="news-container">
+                    <p>Stay updated with our latest announcements, schedule changes, and achievements.</p>
+                    <div id="notice-content" class="animate-fade-up">
+                        <div
+                            style="background: rgba(0,243,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid var(--primary-color);">
+                            <h4 style="color: var(--primary-color);">Admission Open 2026</h4>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">We are now accepting registrations for the
+                                new academic session. Book your seat today!</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+
+        <!-- Latest Sessions Section -->
+        <section id="latest-sessions">
+            <div class="container">
+                <h2 class="section-title">Latest Sessions</h2>
+                <div id="pdf-list" class="sessions-list">
+                    <!-- Dynamic PDFs will load here -->
+                    <div class="no-sessions">Loading official documents...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upcoming Events Section -->
+        <section id="events">
+            <div class="container">
+                <h2 class="section-title">Upcoming Events</h2>
+                <div class="events-grid">
+                    <div class="event-card">
+                        <div class="event-date">MAR 15, 2026</div>
+                        <h3>Annual Day 2026</h3>
+                        <p>Join us for our grand annual celebration featuring student performances and awards.</p>
+                        <span class="event-tag">Institutional</span>
+                    </div>
+                    <div class="event-card">
+                        <div class="event-date">APR 02, 2026</div>
+                        <h3>Islamic Quiz Competition</h3>
+                        <p>Testing the knowledge of our students in a healthy and engaging environment.</p>
+                        <span class="event-tag">Academic</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects & Achievements Section -->
+        <section id="projects">
+            <div class="container">
+                <h2 class="section-title">Major Projects</h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div class="project-image">
+                            <div class="img-placeholder"
+                                style="background: linear-gradient(45deg, var(--bg-color), var(--primary-color)); opacity: 0.3;">
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Smart Classroom Initiative</h3>
+                            <p>Integrating digital tools into Islamic education for interactive learning.</p>
+                            <div class="tech-stack">
+                                <span>Digital</span>
+                                <span>EdTech</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-image">
+                            <div class="img-placeholder"
+                                style="background: linear-gradient(45deg, var(--bg-color), var(--secondary-color)); opacity: 0.3;">
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Community Outreach</h3>
+                            <p>Students participating in local social welfare and environmental programs.</p>
+                            <div class="tech-stack">
+                                <span>Social</span>
+                                <span>Service</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Gallery Section -->
+        <section id="video-gallery">
+            <div class="container">
+                <h2 class="section-title">Video Gallery</h2>
+                <div id="video-list" class="video-grid">
+                    <!-- Dynamic Videos will load here -->
+                    <div class="video-item">
+                        <video controls poster="assets/refont_calligraphic (4).png"
+                            style="width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <source src="assets/gallery/videos/WhatsApp Video 2025-11-20 at 11.51.28 AM.mp4"
+                                type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Creations Section -->
+        <section id="creations">
+            <div class="container">
+                <h2 class="section-title">Student Creations</h2>
+                <div id="creations-grid" class="creations-grid">
+                    <div class="creation-card drawing">
+                        <div class="drawing-frame" style="height: 250px; overflow: hidden; border-radius: 12px;">
+                            <img src="assets/refont_calligraphic (4).png" alt="Student Drawing"
+                                style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="creation-info" style="padding: 20px;">
+                            <h3>Islamic Calligraphy</h3>
+                            <p>By Muhsin U2 - Class 10</p>
+                        </div>
+                    </div>
+                    <div class="creation-card story"
+                        style="padding: 30px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border);">
+                        <div class="story-content">
+                            <h3>The Path of Knowledge</h3>
+                            <p style="font-style: italic; color: #888; margin-top: 10px;">"A short story about the
+                                journey of a young student seeking wisdom..."</p>
+                            <a href="pages/students/creations.html" class="btn-link"
+                                style="color: var(--secondary-color); font-weight: 600; display: inline-block; margin-top: 15px;">Read
+                                Full Story →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="dialog-message dialog-lightbox-message" style="display: none;">
+            <div data-elementor-type="popup" data-elementor-id="748"
+                class="elementor elementor-748 elementor-location-popup"
+                data-elementor-settings="{&quot;prevent_scroll&quot;:&quot;yes&quot;,&quot;a11y_navigation&quot;:&quot;yes&quot;,&quot;triggers&quot;:{&quot;inactivity_time&quot;:5,&quot;inactivity&quot;:&quot;yes&quot;},&quot;timing&quot;:[]}"
+                data-elementor-post-type="elementor_library" style="display: block;">
+                <div class="elementor-element elementor-element-32902fd e-flex e-con-boxed e-con e-parent"
+                    data-id="32902fd" data-element_type="container">
+                    <div class="e-con-inner">
+                        <div class="elementor-element elementor-element-4379674 elementor-widget elementor-widget-heading"
+                            data-id="4379674" data-element_type="widget" data-widget_type="heading.default">
+                            <form class="booking-form" id="tuition-form"
+                                action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfzhjNS8F_8_BvbwYFFZMxqfmdJqMTJx2rik6C29szqPPc9EA/formResponse"
+                                method="POST" target="hidden_iframe">
+                                <!-- Google Form Internal Hidden Fields -->
+                                <input type="hidden" name="fvv" value="1">
+                                <input type="hidden" name="fbzx" value="-5401259598252436307">
+                                <input type="hidden" name="pageHistory" value="0">
+                                <input type="hidden" name="entry.202934602" value="Option 1">
+                                <input type="hidden" name="entry.202934602_sentinel" value="">
+                                <input type="hidden" name="entry.63709490_sentinel" value="">
+                                <input type="hidden" name="entry.9885691_sentinel" value="">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="fname">First Name</label>
+                                        <input type="text" name="entry.819151435" id="fname" placeholder="First Name"
+                                            required="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lname">Last Name</label>
+                                        <input type="text" name="entry.1242527177" id="lname" placeholder="Last Name"
+                                            required="">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" name="entry.1739343054" id="email" placeholder="Your Email"
+                                        required="">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Subject (Max 8)</label>
+                                    <!-- Hidden inputs for granular Google Form mapping -->
+                                    <input type="hidden" name="entry.63709490" id="booking-subjects-hidden" value="">
+                                    <input type="hidden" name="entry.9885691" id="booking-class-hidden" value="">
+                                    <input type="hidden" name="entry.116107118" id="booking-price-hidden" value="">
+
+                                    <div class="checkbox-grid" id="subject-checkboxes">
+                                        Loading subjects...
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Class</label>
+                                    <div class="radio-group classes-grid" id="class-radios">
+                                        <label class="radio-label"><input type="radio" name="class" value="1"
+                                                required="" data-multiplier="1"> 1</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="2"
+                                                data-multiplier="1">
+                                            2</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="3"
+                                                data-multiplier="1">
+                                            3</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="4"
+                                                data-multiplier="1">
+                                            4</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="5"
+                                                data-multiplier="1">
+                                            5</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="6"
+                                                data-multiplier="1">
+                                            6</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="7"
+                                                data-multiplier="1">
+                                            7</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="8"
+                                                data-multiplier="1">
+                                            8</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="9"
+                                                data-multiplier="1">
+                                            9</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="10"
+                                                data-multiplier="1">
+                                            10</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="11"
+                                                data-multiplier="1">
+                                            +1</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="12"
+                                                data-multiplier="1">
+                                            +2</label>
+                                    </div>
+                                </div>
+
+                                <div class="price-box">
+                                    <h3>Total Price: <span id="total-price">₹0</span></h3>
+                                </div>
+
+                                <div class="form-group"
+                                    style="margin-top: 25px; display: flex; flex-direction: column; gap: 10px;">
+                                    <button type="submit" class="btn btn-primary" style="width: 100%;">Book Now</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                </section>
+
+                <section id="contact">
+                    <div class="container">
+                        <div class="contact-content">
+                            <h2 class="section-title">Get In Touch</h2>
+                            <p>Interested in collaborating or having me speak at your event? Let's connect.</p>
+
+                            <!-- Form Submission Feedback -->
+                            <script type="text/javascript">var submitted = false;</script>
+                            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"
+                                onload="if(submitted) {document.getElementById('contact-status').innerHTML = 'Message Sent Successfully!'; document.getElementById('contact-form-el').reset(); submitted=false;}"></iframe>
+
+                            <form class="contact-form" id="contact-form-el"
+                                action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfq5PjEIs83m4gq7_-ihVbqAWJa_KNKgtQ2huzvKCQSfesDYQ/formResponse"
+                                method="POST" target="hidden_iframe" onsubmit="submitted=true;">
+                                <div class="form-group">
+                                    <input type="text" name="entry.456300294" placeholder="Your Name" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" name="entry.1582502936" placeholder="Your Email" required>
+                                </div>
+                                <div class="form-group">
+                                    <textarea name="entry.1231984071" placeholder="Your Message" rows="5"
+                                        required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Send Message</button>
+                                <div id="contact-status"
+                                    style="margin-top: 15px; color: var(--primary-color); font-weight: 600; min-height: 24px;">
+                                </div>
+                            </form>
+
+                            <div class="contact-info">
+                                <p>WhatsApp: <a href="https://wa.me/916235989198">+91 6235989198</a></p>
+                                <div class="social-links-large">
+                                    <a href="https://github.com/sareef6235" class="social-icon">GitHub</a>
+                                    <a href="https://wa.me/916235989198" class="social-icon">WhatsApp</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
     </main>
 
     <footer id="site-footer"></footer>
+
+    <script src="assets/js/navigation-system.js"></script>
+    <script src="assets/js/footer-system.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuData = {
+                headerMenu: [
+                    { label: "Home", link: "/index.html", enabled: true, children: [] },
+                    { label: "About", link: "/pages/about/index.html", enabled: true, children: [] },
+                    {
+                        label: "Exams", link: "#", enabled: true,
+                        children: [
+                            { label: "Check Results", link: "/pages/results/index.html", enabled: true },
+                            { label: "Archive", link: "/pages/results/archive.html", enabled: true }
+                        ]
+                    },
+                    { label: "News", link: "/pages/news/index.html", enabled: true, children: [] },
+                    { label: "Booking", link: "/pages/booking/index.html", enabled: true, children: [] },
+                    { label: "Services", link: "/pages/services/index.html", enabled: true, children: [] },
+                    { label: "Gallery", link: "/pages/gallery/index.html", enabled: true, children: [] },
+                    { label: "Contact", link: "#contact", enabled: true, children: [] },
+                    { label: "Admin", link: "/pages/admin/dashboard.html", enabled: true, children: [] }
+                ]
+            };
+
+            if (window.NavigationSystem) window.NavigationSystem.init(menuData);
+            if (window.FooterSystem) window.FooterSystem.init();
+        });
+    </script>
+    <script src="assets/js/script.js"></script>
+
+
+    <!-- Three.js Background Animation -->
+    <!-- Three.js Background Animation -->
+    <script>
+        // Defer 3D animation until browser is idle
+        const initThreeJS = () => {
+            const canvas = document.getElementById('hero-canvas');
+            if (!canvas) return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            camera.position.z = 5;
+
+            // Create particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            // Create material with cyan color
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.015,
+                color: 0x00f3ff,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            // Animation
+            let mouseX = 0;
+            let mouseY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Rotate particles
+                particlesMesh.rotation.y += 0.0005;
+                particlesMesh.rotation.x += 0.0003;
+
+                // Mouse interaction
+                particlesMesh.rotation.y += mouseX * 0.0002;
+                particlesMesh.rotation.x += mouseY * 0.0002;
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            // Handle resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        if (window.Perf) {
+            window.Perf.runIdle(initThreeJS, 1000);
+        } else {
+            // Fallback if Perf is not loaded (shouldn't happen if head script works)
+            setTimeout(initThreeJS, 1000);
+        }
+    </script>
+
+    </nav>
+
+    <!-- Booking Confirmation Modal -->
+    <div id="booking-modal" class="modal-overlay">
+        <div class="modal-content animate-fade-up">
+            <div class="modal-icon">
+                <i class="ph ph-check-circle"></i>
+            </div>
+            <h2>Booking Summary</h2>
+            <div class="modal-body">
+                <p>Hello <span id="modal-name"></span>,</p>
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin: 15px 0;">
+                    <p style="margin: 0; color: #888; font-size: 0.85rem;">Subjects:</p>
+                    <p id="modal-subjects" style="color: #fff; font-weight: 600;"></p>
+                    <div style="height: 1px; background: var(--glass-border); margin: 10px 0;"></div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #888;">Class: <strong id="modal-class" style="color: #fff;"></strong></span>
+                        <span style="color: #888;">Total: <strong id="modal-price"
+                                style="color: var(--primary-color);"></strong></span>
+                    </div>
+                </div>
+
+                <!-- UPI QR Code Section -->
+                <div class="modal-qr-section"
+                    style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--glass-border);">
+                    <p style="margin-bottom: 15px; color: #bbb; font-size: 0.9rem;">Scan to Pay via UPI</p>
+                    <div class="modal-qr-container"
+                        style="background: white; padding: 15px; border-radius: 15px; display: inline-block;">
+                        <img src="assets/upi-qr.jpeg" alt="UPI QR Code" class="modal-qr-img"
+                            style="max-width: 180px; width: 100%; display: block; height: auto; border-radius: 8px;">
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <p style="font-size: 0.9rem; color: #fff; margin-bottom: 5px;">UPI ID: <b>mmuhsinu2-1@okaxis</b>
+                        </p>
+                        <p style="font-size: 0.8rem; color: #888;">Name: Mo Mhn</p>
+                    </div>
+                </div>
+
+                <p class="modal-note">Click "Proceed to Pay" to visit your UPI app and confirm the booking.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="modal-pay-btn" style="width: 100; padding: 15px;">Proceed to
+                    Pay</button>
+                <button onclick="closeBookingModal()"
+                    style="margin-top: 15px; background: none; border: none; color: #666; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { NewsService } from './assets/js/news-service.js';
+
+        // 0. Initialize Systems
+        window.NewsService = NewsService;
+
+        const subjectContainer = document.getElementById('subject-checkboxes');
+        const totalPriceEl = document.getElementById('total-price');
+
+        // 1. Local Subject Loader (Replacing Firebase)
+        function updateTotalPrice() {
+            let total = 0;
+            document.querySelectorAll('#subject-checkboxes input:checked').forEach(cb => {
+                total += Number(cb.dataset.price);
+            });
+            if (totalPriceEl) totalPriceEl.textContent = `₹${total}`;
+            const hiddenPrice = document.getElementById('booking-price-hidden');
+            if (hiddenPrice) hiddenPrice.value = total;
+        }
+
+        async function initSubjects() {
+            if (!subjectContainer) return;
+
+            // Check if SubjectStorage is available
+            if (typeof SubjectStorage === 'undefined') {
+                console.error("SubjectStorage not found");
+                return;
+            }
+
+            const activeSubjects = SubjectStorage.getActive();
+            subjectContainer.innerHTML = "";
+
+            if (activeSubjects.length === 0) {
+                subjectContainer.innerHTML = "<p style='color: #666; font-size: 0.9rem;'>No subjects available.</p>";
+                return;
+            }
+
+            activeSubjects.forEach(s => {
+                const label = document.createElement('label');
+                if (s.rtl) label.dir = 'rtl';
+                label.innerHTML = `
+                    <input type="checkbox" name="subject[]" value="${s.name} (₹${s.price})" data-price="${s.price}">
+                    ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
+                `;
+                const input = label.querySelector('input');
+                input.addEventListener('change', () => {
+                    updateTotalPrice();
+                    const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
+                        .map(c => c.value).join(', ');
+                    const hiddenSub = document.getElementById('booking-subjects-hidden');
+                    if (hiddenSub) hiddenSub.value = selected;
+                });
+                subjectContainer.appendChild(label);
+            });
+        }
+
+        // Run on load
+        initSubjects();
+
+        // 2. Local Notice System (Listen for storage events if needed, or static for now)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'mhm_site_notice') {
+                const notice = JSON.parse(e.newValue);
+                if (notice && notice.active) {
+                    // Handle local notice
+                }
+            }
+        });
+
+        // 3. GitHub Media Sync
+        const galleryList = document.getElementById('gallery-list');
+        const videoList = document.getElementById('video-list');
+        const downloadIcon = `<svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+
+        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallery")
+            .then(res => res.json())
+            .then(files => {
+                if (Array.isArray(files) && galleryList) {
+                    // Dynamic loading logic if needed
+                }
+            }).catch(err => console.error("Image sync failed:", err));
+
+        // 4. PDF Sync
+        const pdfList = document.getElementById('pdf-list');
+        function addPdfToSessions(name, url) {
+            const item = document.createElement("div");
+            item.className = "session-card pdf-card animate-fade-up";
+            item.innerHTML = `
+                <div class="pdf-info">
+                    <i class="ph ph-file-pdf" style="font-size: 2rem; color: #ff4d4d;"></i>
+                    <div>
+                        <h4>${name.replace(/\.pdf$/i, '')}</h4>
+                        <p>Official Document / Certificate</p>
+                    </div>
+                </div>
+                <a href="${url}" target="_blank" class="btn-pdf">View Document</a>
+            `;
+            if (pdfList) pdfList.appendChild(item);
+        }
+
+        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/pdfs")
+            .then(res => res.json())
+            .then(files => {
+                if (Array.isArray(files)) {
+                    const hasPdfs = files.some(f => f.name.match(/\.(pdf)$/i));
+                    if (hasPdfs && pdfList) pdfList.innerHTML = '';
+                    files.forEach(file => {
+                        if (file.type === "file" && file.name.match(/\.(pdf)$/i)) {
+                            addPdfToSessions(file.name, file.download_url);
+                        }
+                    });
+                }
+            }).catch(err => console.error("PDF sync failed:", err));
+
+        // 5. Exam Result Logic
+        const RESULT_SHEET_ID = "1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU";
+        const RESULT_TAB_NAME = "class1";
+
+        window.fetchHomeResult = async function () {
+            const regnoInput = document.getElementById('home-regno');
+            const regno = regnoInput.value.trim();
+            const status = document.getElementById('home-status');
+            const container = document.getElementById('home-result-container');
+            const area = document.getElementById('home-result-area');
+
+            if (!regno) return;
+            status.innerHTML = "🔍 Fetching from local vault...";
+            container.style.display = "none";
+
+            setTimeout(() => {
+                const result = window.ResultManager.lookup(regno, '2010-01-01', '1'); // Default Public Category
+                if (result) {
+                    status.innerHTML = "✅ Record Found";
+                    area.innerHTML = `
+                        <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">${result.name}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px;">
+                            <span style="color: #888; font-size: 0.9rem;">Status: <b style="color:#00ff88">PASS</b></span>
+                            <span style="color: #fff; font-weight: 700;">Score: ${result.score}</span>
+                        </div>
+                    `;
+                    container.style.display = "block";
+                } else {
+                    status.innerHTML = "❌ ID not found in local records.";
+                }
+            }, 500);
+        };
+
+        document.getElementById('home-regno')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') window.fetchHomeResult();
+        });
+
+        // --- ADVANCED NEWS SYSTEM ---
+        let currentNewsLang = 'en';
+
+        window.setNewsLang = (lang) => {
+            currentNewsLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.toggle('active', b.innerText.toLowerCase() === lang);
+            });
+            window.loadNews();
+        };
+
+        window.loadNews = async () => {
+            try {
+                const newsGrid = document.getElementById('home-news-grid');
+                if (!newsGrid || !window.NewsService) return;
+
+                const latestNews = window.NewsService.getPublishedNews().slice(0, 3);
+                const currentLang = document.documentElement.lang || 'en';
+                const t = (window.LanguageSystem && window.LanguageSystem.dictionary[currentLang]) || { news_no_updates: "No updates at the moment.", read_more: "Read More" };
+
+                if (latestNews.length === 0) {
+                    newsGrid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                            <p style="color: #666;">${t.news_no_updates}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                newsGrid.innerHTML = latestNews.map((item, index) => `
+                    <article class="news-card-premium animate-fade-up" style="animation-delay: ${index * 0.1}s;">
+                        <div class="img-wrapper" style="height:200px; background:rgba(255,255,255,0.02); display:flex; align-items:center; justify-content:center">
+                            ${item.image ? `<img src="${item.image}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover">` : `<i class="ph ph-newspaper" style="font-size:3rem; color:#222"></i>`}
+                        </div>
+                        <div style="padding: 25px;">
+                            <span class="badge" style="background:var(--primary-color); color:#000; font-size:0.75rem">${item.category}</span>
+                            <h3 style="margin: 15px 0; color:#fff">${item.title}</h3>
+                            <p style="color:#888; font-size:0.9rem; margin-bottom:20px">${item.desc.substring(0, 120)}...</p>
+                            <a href="pages/news/index.html?id=${item.id}" style="color:var(--primary-color); text-decoration:none; font-weight:700">${t.read_more} →</a>
+                        </div>
+                    </article>
+                `).join('');
+            } catch (e) { console.error("News load error", e); }
+        };
+
+        // Badge & Sync Logic
+        window.updateBadges = () => {
+            const count = parseInt(localStorage.getItem('mhm_unread_news') || '0');
+            const badges = [document.getElementById('news-badge-nav'), document.getElementById('news-badge-mobile')];
+            badges.forEach(b => {
+                if (b) {
+                    b.innerText = count > 9 ? '9+' : count;
+                    b.style.display = count > 0 ? 'flex' : 'none';
+                }
+            });
+        };
+
+        window.addEventListener('news-updated', window.updateBadges);
+        window.addEventListener('DOMContentLoaded', () => {
+            window.loadNews();
+            window.updateBadges();
+        });
+
+        // Clear badge when visiting news section
+        const newsSection = document.getElementById('news');
+        if (newsSection) {
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    localStorage.setItem('mhm_unread_news', '0');
+                    window.updateBadges();
+                }
+            }, { threshold: 0.5 });
+            observer.observe(newsSection);
+        }
+    </script>
+
+
+    <!-- Global Footer -->
+    <div id="global-footer"></div>
+
+    <footer id="main-footer"></footer>
+
+    <!-- WhatsApp Floating Button -->
+    <div class="whatsapp-float-wrapper">
+        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp"
+            data-t="whatsapp_aria">
+            <i class="ph-fill ph-whatsapp-logo"></i>
+        </a>
+    </div>
+
+    <!-- Dynamic Site Settings & Renderer -->
+    <script src="assets/js/site-settings.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SiteSettings) SiteSettings.render();
+        });
+    </script>
+
+    <!-- Existing Scripts -->
+    <script src="assets/js/script.js" defer></script>
+    <script type="module" src="assets/js/auth-nav-guard.js" defer></script>
 </body>
 
 </html>

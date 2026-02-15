@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Management - Quick Start Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .card p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #555;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .warning strong {
+            color: #856404;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+
+        .flow {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .flow-step {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            margin: 5px;
+            font-weight: 600;
+        }
+
+        .arrow {
+            display: inline-block;
+            margin: 0 10px;
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎓 Subject Management System</h1>
+        <p class="subtitle">LocalStorage-Based Tuition Booking System - Quick Start Guide</p>
+
+        <div class="section">
+            <h2>📋 What's New</h2>
+            <div class="card">
+                <h3>✅ Firebase Completely Removed</h3>
+                <p>No external dependencies, no internet required after page load. Everything runs locally in your
+                    browser using localStorage.</p>
+            </div>
+            <div class="card">
+                <h3>🔐 Simple Admin Protection</h3>
+                <p>Password-based admin access. First-time setup will prompt you to create an admin password.</p>
+            </div>
+            <div class="card">
+                <h3>📊 Real-Time Updates</h3>
+                <p>Subject changes in admin panel instantly reflect on the booking page. Price calculations update as
+                    students select subjects.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🚀 Getting Started</h2>
+
+            <div class="card">
+                <h3>For Administrators</h3>
+                <ol style="padding-left: 20px; color: #555; line-height: 1.8;">
+                    <li>Click "Admin Panel" below</li>
+                    <li>Set your admin password (first-time only)</li>
+                    <li>Navigate to "Tuition Subjects"</li>
+                    <li>Click "Add New Subject"</li>
+                    <li>Enter subject name and monthly price</li>
+                    <li>Click "Save Subject"</li>
+                </ol>
+                <a href="admin/dashboard.html" class="btn">🔧 Open Admin Panel</a>
+            </div>
+
+            <div class="card">
+                <h3>For Students</h3>
+                <ol style="padding-left: 20px; color: #555; line-height: 1.8;">
+                    <li>Click "Booking Page" below</li>
+                    <li>Enter your name and select your class</li>
+                    <li>Check the subjects you want to study</li>
+                    <li>Watch the total price update automatically</li>
+                    <li>Click "Finalize Booking"</li>
+                </ol>
+                <a href="booking.html" class="btn btn-secondary">📚 Open Booking Page</a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔄 Data Flow</h2>
+            <div class="flow">
+                <div class="flow-step">Admin Creates Subject</div>
+                <span class="arrow">→</span>
+                <div class="flow-step">Saved to localStorage</div>
+                <span class="arrow">→</span>
+                <div class="flow-step">Students See It</div>
+                <span class="arrow">→</span>
+                <div class="flow-step">Booking Submitted</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>✨ Features</h2>
+            <ul class="feature-list">
+                <li>Create, edit, and delete subjects</li>
+                <li>Toggle subjects active/inactive (controls student visibility)</li>
+                <li>Real-time price calculation on booking page</li>
+                <li>Mobile-responsive design</li>
+                <li>Data persists in browser localStorage</li>
+                <li>No server or database required</li>
+                <li>Simple admin authentication</li>
+                <li>Clean, modern UI with glassmorphism design</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>⚠️ Important Notes</h2>
+            <div class="warning">
+                <strong>Data Storage:</strong> All data is stored in your browser's localStorage. If you clear browser
+                data or switch devices, the subjects and bookings will be lost. Consider implementing export/import
+                functionality for backup.
+            </div>
+            <div class="warning">
+                <strong>Admin Password:</strong> The admin authentication uses a simple hash function for demonstration
+                purposes. For production use, implement proper server-side authentication.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📁 Files Created</h2>
+            <ul class="feature-list">
+                <li><code>subject-storage.js</code> - Subject CRUD utility</li>
+                <li><code>admin-auth.js</code> - Admin authentication</li>
+                <li><code>admin/dashboard.html</code> - Updated (Firebase removed)</li>
+                <li><code>booking.html</code> - Updated (Firebase removed)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Quick Actions</h2>
+            <a href="admin/dashboard.html" class="btn">🔧 Admin Panel</a>
+            <a href="booking.html" class="btn btn-secondary">📚 Booking Page</a>
+            <a href="index.html" class="btn" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">🏠
+                Home</a>
+        </div>
+    </div>
+</body>
+
+</html>

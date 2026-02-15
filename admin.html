@@ -240,15 +240,54 @@
             <div class="glass-card" style="margin-top: 30px; padding: 30px;">
                 <p style="margin-bottom: 20px; color: #888;">Manage the conversion of database records into highly
                     optimized static JSON files for the public portal.</p>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; margin-bottom: 10px;">Select Exam Profile:</label>
+                    <select id="results-exam-select"
+                        style="background:#222; color:#fff; padding:10px; border:1px solid #444; width:100%;">
+                        <option value="">-- Select Exam --</option>
+                        <option value="exam1">Mid-Term 2024</option>
+                        <option value="exam2">Finals 2024</option>
+                        <option value="exam3">Entrance Exam</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; margin-bottom: 10px;">Upload Existing Results JSON (Optional):</label>
+                    <input type="file" id="published-results-upload" accept=".json"
+                        style="background:#222; color:#fff; padding:10px; border:1px solid #444; width:100%;">
+                    <div id="published-results-status" style="margin-top:5px; font-size:0.9em;"></div>
+                </div>
+
                 <div style="display: flex; gap: 15px;">
                     <button id="btn-sync-results" class="nav-link"
                         style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
-                        <i class="ph ph-arrows-clockwise"></i> SYNC FROM DATABASE
+                        <i class="ph ph-arrows-clockwise"></i> SYNC / PREVIEW
                     </button>
-                    <button id="btn-publish-results" class="nav-link"
+                    <button id="btn-publish-results" class="nav-link" onclick="StaticPublisher.publish()"
                         style="background: var(--primary-color); color: #000; font-weight: 700;">
-                        PUBLISH FOR STATIC SITE
+                        PUBLISH STATIC JSON
                     </button>
+                </div>
+
+                <div id="results-sync-status"
+                    style="display:none; margin-top:20px; padding:15px; background:rgba(0,255,0,0.1); border:1px solid #00ff00;">
+                    <div id="results-sync-message"></div>
+                </div>
+
+                <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <div class="stat-card">
+                        <h3>Synced Exams</h3>
+                        <p id="results-exams-count">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Students</h3>
+                        <p id="results-total-count">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Last Sync</h3>
+                        <p id="results-last-sync">Never</p>
+                    </div>
                 </div>
             </div>
         </div>
