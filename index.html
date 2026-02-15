@@ -521,18 +521,12 @@
             const menuData = {
                 headerMenu: [
                     { label: "Home", link: "/index.html", enabled: true, children: [] },
-                    { label: "About", link: "/pages/about/index.html", enabled: true, children: [] },
-                    {
-                        label: "Exams", link: "#", enabled: true,
-                        children: [
-                            { label: "Check Results", link: "/pages/results/index.html", enabled: true },
-                            { label: "Archive", link: "/pages/results/archive.html", enabled: true }
-                        ]
-                    },
+                    { label: "Results", link: "/pages/results/index.html", enabled: true, children: [] },
                     { label: "News", link: "/pages/news/index.html", enabled: true, children: [] },
                     { label: "Booking", link: "/pages/booking/index.html", enabled: true, children: [] },
                     { label: "Services", link: "/pages/services/index.html", enabled: true, children: [] },
                     { label: "Gallery", link: "/pages/gallery/index.html", enabled: true, children: [] },
+                    { label: "About", link: "/pages/about/index.html", enabled: true, children: [] },
                     { label: "Contact", link: "#contact", enabled: true, children: [] },
                     { label: "Admin", link: "/pages/admin/dashboard.html", enabled: true, children: [] }
                 ]
@@ -799,27 +793,76 @@
             const container = document.getElementById('home-result-container');
             const area = document.getElementById('home-result-area');
 
-            if (!regno) return;
-            status.innerHTML = "🔍 Fetching from local vault...";
-            container.style.display = "none";
+            if (!regno) {
+                status.innerText = "Please enter a register number.";
+                status.style.color = "orange";
+                return;
+            }
 
-            setTimeout(() => {
-                const result = window.ResultManager.lookup(regno, '2010-01-01', '1'); // Default Public Category
-                if (result) {
-                    status.innerHTML = "✅ Record Found";
+            status.innerText = "Searching database...";
+            status.style.color = "#888";
+
+            try {
+                // Fetch from Central Store
+                const response = await fetch('data/results-store.json?t=' + Date.now());
+                if (!response.ok) throw new Error("Database offline");
+
+                const store = await response.json();
+
+                if (!store.published || !store.exams) {
+                    throw new Error("Results are not published yet.");
+                }
+
+                // Search across all exams (or latest)
+                let student = null;
+                let foundExam = null;
+
+                // Sort exams by date desc to get latest first
+                const exams = store.exams.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+
+                for (const exam of exams) {
+                    const s = exam.students.find(stu => String(stu.roll || stu.rollNo) === String(regno));
+                    if (s) {
+                        student = s;
+                        foundExam = exam;
+                        break;
+                    }
+                }
+
+                if (student) {
+                    status.innerText = "Result Found!";
+                    status.style.color = "#00ff88";
+                    container.style.display = "block";
+
                     area.innerHTML = `
-                        <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">${result.name}</div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px;">
-                            <span style="color: #888; font-size: 0.9rem;">Status: <b style="color:#00ff88">PASS</b></span>
-                            <span style="color: #fff; font-weight: 700;">Score: ${result.score}</span>
+                        <h3 style="margin:0; color:var(--primary-color)">${student.name}</h3>
+                        <p style="margin:5px 0; color:#ccc;">${foundExam.examName}</p>
+                        <div style="margin-top:15px; display:flex; gap:15px; align-items:center;">
+                            <div style="font-size:2rem; font-weight:700; color:#fff">${student.total || 'N/A'}</div>
+                            <div style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px;">
+                                Status: <span style="color:${String(student.status).toLowerCase() === 'pass' ? '#00ff88' : '#ff4d4d'}">${student.status}</span>
+                            </div>
                         </div>
                     `;
-                    container.style.display = "block";
+
+                    // Update "View Full Transcript" link to point to specific result
+                    const fullLink = container.querySelector('.btn-link');
+                    if (fullLink) fullLink.href = `pages/results/index.html?exam=${foundExam.examId}&roll=${student.roll || student.rollNo}`;
+
                 } else {
-                    status.innerHTML = "❌ ID not found in local records.";
+                    status.innerText = "No result found for Roll No: " + regno;
+                    status.style.color = "#ff4d4d";
+                    container.style.display = "none";
                 }
-            }, 500);
+
+            } catch (err) {
+                console.error(err);
+                status.innerText = "System currently offline or updating.";
+                status.style.color = "orange";
+            }
         };
+
+
 
         document.getElementById('home-regno')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') window.fetchHomeResult();

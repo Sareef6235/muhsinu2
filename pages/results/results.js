@@ -28,14 +28,41 @@ window.ResultsPortal = (function () {
 
     let data = null;
 
-    function init() {
+    async function init() {
+        console.log("Initializing Results Portal...");
 
+        // 1. Try fetching central store
+        try {
+            const response = await fetch('../../data/results-store.json?t=' + new Date().getTime());
+            if (response.ok) {
+                const store = await response.json();
+                if (store.published && store.exams && store.exams.length > 0) {
+                    // Normalize structure: store might have { exams: [...] }
+                    data = store;
+                    activatePortal();
+                    console.log("Loaded results from central store.");
+
+                    // Show last updated time
+                    const lastSyncEl = document.getElementById("results-last-sync");
+                    if (lastSyncEl && store.lastUpdated) {
+                        lastSyncEl.innerText = new Date(store.lastUpdated).toLocaleString();
+                    }
+                    return; // Success
+                } else {
+                    console.warn("Central store found but not published or empty.");
+                }
+            }
+        } catch (err) {
+            console.warn("Failed to fetch central results store:", err);
+        }
+
+        // 2. Fallback to LocalStorage (Legacy/Manual Upload)
         const saved = localStorage.getItem("published-results");
-
         if (saved) {
             try {
                 data = JSON.parse(saved);
                 activatePortal();
+                console.log("Loaded results from LocalStorage.");
             } catch (e) {
                 console.error("Invalid saved data");
                 showOfflineWarning();
@@ -47,6 +74,32 @@ window.ResultsPortal = (function () {
         bindUpload();
         bindSearch();
         updateAuthUI();
+
+        // Check for URL params to auto-search
+        handleUrlParams();
+    }
+
+    function handleUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const examId = urlParams.get('exam');
+        const roll = urlParams.get('roll');
+
+        if (examId && data && data.exams) {
+            const select = document.getElementById("examSelect");
+            if (select) {
+                select.value = examId;
+                select.dispatchEvent(new Event('change'));
+
+                if (roll) {
+                    document.getElementById("rollInput").value = roll;
+                    // Slight delay to allow UI to settle
+                    setTimeout(() => {
+                        const submitBtn = document.getElementById("submitBtn");
+                        if (submitBtn && !submitBtn.disabled) submitBtn.click();
+                    }, 500);
+                }
+            }
+        }
     }
 
     function bindUpload() {

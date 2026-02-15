@@ -259,15 +259,36 @@
                     <div id="published-results-status" style="margin-top:5px; font-size:0.9em;"></div>
                 </div>
 
-                <div style="display: flex; gap: 15px;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                    <div id="results-publish-status" class="status-badge pending">Offline</div>
+
                     <button id="btn-sync-results" class="nav-link"
                         style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
                         <i class="ph ph-arrows-clockwise"></i> SYNC / PREVIEW
                     </button>
+
                     <button id="btn-publish-results" class="nav-link" onclick="StaticPublisher.publish()"
                         style="background: var(--primary-color); color: #000; font-weight: 700;">
-                        PUBLISH STATIC JSON
+                        <i class="ph ph-upload-simple"></i> PUBLISH
                     </button>
+
+                    <button id="btn-unpublish-results" class="nav-link" onclick="StaticPublisher.unpublish()"
+                        style="background: rgba(255, 61, 61, 0.2); color: #ff3d3d; border: 1px solid rgba(255, 61, 61, 0.3);">
+                        <i class="ph ph-trash"></i> UNPUBLISH
+                    </button>
+                </div>
+
+                <div id="public-link-container"
+                    style="margin-top: 20px; display: none; padding: 15px; background: rgba(0,255,136,0.1); border: 1px solid #00ff88; border-radius: 8px;">
+                    <label style="display: block; font-size: 0.8em; color: #00ff88; margin-bottom: 5px;">PUBLIC RESULT
+                        LINK (AUTO-GENERATED)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="public-link-input" readonly onclick="this.select()"
+                            style="flex: 1; background: #000; color: #fff; border: none; padding: 8px;">
+                        <button
+                            onclick="navigator.clipboard.writeText(document.getElementById('public-link-input').value)"
+                            style="background: #00ff88; color: #000; border: none; padding: 0 15px; font-weight: bold; cursor: pointer;">COPY</button>
+                    </div>
                 </div>
 
                 <div id="results-sync-status"

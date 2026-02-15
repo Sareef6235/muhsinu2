@@ -16,6 +16,42 @@ const ResultsManagement = {
     init: function () {
         console.log("Results Management Initialized");
         this.bindEvents();
+        this.fetchCurrentStatus();
+    },
+
+    fetchCurrentStatus: async function () {
+        try {
+            const response = await fetch('../../data/results-store.json?t=' + Date.now());
+            if (response.ok) {
+                const store = await response.json();
+
+                // Update Badge
+                this.updateUI(store.published);
+
+                // Update Stats if published
+                if (store.published && store.exams) {
+                    state.lastSynced = new Date(store.lastUpdated);
+
+                    const examsCount = store.exams.length;
+                    const totalStudents = store.exams.reduce((sum, ex) => sum + (ex.students ? ex.students.length : 0), 0);
+
+                    const examsCountEl = document.getElementById("results-exams-count");
+                    const totalCountEl = document.getElementById("results-total-count");
+                    const lastSyncEl = document.getElementById("results-last-sync");
+
+                    if (examsCountEl) examsCountEl.textContent = examsCount;
+                    if (totalCountEl) totalCountEl.textContent = totalStudents;
+                    if (lastSyncEl) lastSyncEl.textContent = state.lastSynced.toLocaleTimeString();
+
+                    // Restore state logic if needed (optional, as we prioritize new uploads)
+                    // state.students = ... 
+                    // Note: We don't fully restore state.students to avoid confusion with new uploads.
+                    // We only show the "Live" stats.
+                }
+            }
+        } catch (e) {
+            console.log("No existing results store found.");
+        }
     },
 
     bindEvents: function () {
@@ -127,7 +163,10 @@ const StaticPublisher = {
             return;
         }
 
+        // Structure matches /data/results-store.json
         const exportData = {
+            published: true,
+            lastUpdated: new Date().toISOString(),
             exams: [
                 {
                     examId: state.examId,
@@ -145,10 +184,54 @@ const StaticPublisher = {
 
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = "published-results.json";
+        link.download = "results-store.json"; // Changed filename
         link.click();
 
-        alert("Results Published Successfully! Download the 'published-results.json' file and place it in the root folder.");
+        alert("Results Published Successfully! \n\nACTION REQUIRED:\nMove the downloaded 'results-store.json' to the '/data/' folder in your project root.");
+
+        // Update UI
+        this.updateUI(true);
+    },
+
+    unpublish: function () {
+        const exportData = {
+            published: false,
+            lastUpdated: new Date().toISOString(),
+            exams: []
+        };
+        const blob = new Blob(
+            [JSON.stringify(exportData, null, 2)],
+            { type: "application/json" }
+        );
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "results-store.json";
+        link.click();
+
+        alert("Results Unpublished. \n\nACTION REQUIRED:\nReplace 'results-store.json' in '/data/' with this file to hide results.");
+        this.updateUI(false);
+    },
+
+    updateUI: function (isPublished) {
+        const statusEl = document.getElementById("results-publish-status");
+        if (statusEl) {
+            statusEl.textContent = isPublished ? "Live" : "Offline";
+            statusEl.className = isPublished ? "status-badge approved" : "status-badge pending";
+        }
+
+        const linkContainer = document.getElementById("public-link-container");
+        const linkInput = document.getElementById("public-link-input");
+
+        if (isPublished && state.examId && linkContainer && linkInput) {
+            linkContainer.style.display = "block";
+            // Construct absolute URL based on current location
+            const baseUrl = window.location.origin + window.location.pathname.replace('/admin.html', '').replace('/pages/admin', '');
+            const publicUrl = `${baseUrl}/pages/results/index.html?exam=${state.examId}`;
+            linkInput.value = publicUrl;
+        } else if (linkContainer) {
+            linkContainer.style.display = "none";
+        }
     }
 };
 

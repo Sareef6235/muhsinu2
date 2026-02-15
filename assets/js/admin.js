@@ -17,9 +17,8 @@ const AdminApp = {
 
     checkAuth() {
         if (!AppState.user.isLoggedIn || AppState.user.role === 'public') {
-            // In a real app, redirect to login. For now, we simulate.
-            console.warn("User not authorized. Redirecting to login (simulated)");
-            // window.location.href = '/login.html';
+            console.warn("User not authorized. Redirecting to login.");
+            window.location.href = 'index.html';
         }
     },
 
