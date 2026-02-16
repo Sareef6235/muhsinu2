@@ -296,14 +296,20 @@
 
             /* ---------------- SEARCH ---------------- */
 
-            search() {
+            search: function () {
+
                 if (!this.state.tokenData) {
-                    alert("Data Not Loaded. Use a valid portal link.");
+                    alert("No Result Data Loaded.\nOpen using generated secure link.");
                     return;
                 }
 
-                const roll = document.getElementById("rollInput").value;
+                const roll = document.getElementById("rollInput").value.trim();
                 const lang = document.getElementById("langSelect").value;
+
+                if (!roll) {
+                    alert("Enter Roll Number");
+                    return;
+                }
 
                 let found = null;
 
@@ -324,6 +330,7 @@
 
                 this.renderCertificate(found, lang);
                 this.trackAnalytics(roll);
+
             },
 
             /* ---------------- CERTIFICATE ---------------- */
@@ -375,10 +382,18 @@
                 localStorage.setItem("analytics", JSON.stringify(logs));
             },
 
-            showAnalytics() {
+            showAnalytics: function () {
+
                 const logs = JSON.parse(localStorage.getItem("analytics") || "[]");
+
+                if (logs.length === 0) {
+                    alert("No Analytics Data Found");
+                    return;
+                }
+
                 console.table(logs);
-                alert("Check Console for Analytics Data");
+                alert("Analytics shown in Console (Press F12)");
+
             }
 
         };
@@ -386,8 +401,8 @@
         window.onload = () => {
             App.loadSecure();
         };
-    </script>
 
+    </script>
 </body>
 
 </html>
