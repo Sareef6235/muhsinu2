@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Secure Result System - THR</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #6366f1;
+            --bg: #f1f5f9;
+            --card: #fff;
+            --border: #e2e8f0;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 800;
+            margin-bottom: 30px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fee2e2;
+        }
+
+        .btn-danger:hover {
+            background: #fee2e2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #certificateArea {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        #certificateArea.active {
+            display: flex;
+        }
+
+        #certificate {
+            background: #fff;
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .cert-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 15px;
+        }
+
+        .school-name {
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .exam-title {
+            font-size: 16px;
+            color: gray;
+            margin-top: 5px;
+        }
+
+        #certContent p {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--bg);
+            padding: 8px 0;
+            margin: 5px 0;
+        }
+
+        #certContent strong {
+            color: gray;
+        }
+
+        #qrcode {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #resultMsg {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎓 Secure Result Portal (THR)</h1>
+
+        <!-- ADMIN PANEL -->
+        <div class="card">
+            <h2>🔐 Administrative Access</h2>
+            <input type="password" id="adminPass" class="input" placeholder="Authorization Key">
+            <button class="btn btn-primary" onclick="App.adminLogin()">Login</button>
+            <div id="adminArea" class="hidden">
+                <hr style="margin:20px 0;border:0;border-top:1px solid var(--border);">
+                <h3>Upload Source Pattern</h3>
+                <input type="file" accept=".json" class="input" onchange="App.uploadJSON(this)">
+                <div id="jsonStatus" style="font-size:0.9rem;color:gray;">Ready for data injection.</div>
+                <hr style="margin:20px 0;border:0;border-top:1px solid var(--border);">
+                <h3>OR Sync Google Sheet</h3>
+                <input type="text" id="sheetIdInput" class="input" placeholder="Google Sheet ID">
+                <button class="btn btn-primary" onclick="App.loadFromSheet()">Sync From Cloud</button>
+                <div id="sheetStatus" style="font-size:0.9rem;color:gray;margin-top:5px;"></div>
+                <hr style="margin:20px 0;border:0;border-top:1px solid var(--border);">
+                <h3>Deployment Link</h3>
+                <button class="btn btn-primary" onclick="App.generateLink()">Construct Secure Link</button>
+                <div id="generatedLink" style="margin-top:10px;word-break:break-all;"></div>
+                <hr style="margin:20px 0;border:0;border-top:1px solid var(--border);">
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn-danger" onclick="App.showAnalytics()">Intelligence Logs</button>
+                    <button class="btn btn-danger" onclick="location.reload()">Terminate</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH SECTION -->
+        <div class="card" id="searchSection">
+            <h2>🔍 Records Retrieval</h2>
+            <p id="portalStatus" style="font-size:0.9rem;color:var(--success);">Status: Waiting for initialization...
+            </p>
+            <label style="font-size:0.85rem;font-weight:600;">Identification Code (Roll):</label>
+            <input type="text" id="rollInput" class="input" placeholder="Enter Roll Number">
+            <label style="font-size:0.85rem;font-weight:600;">Protocol Language:</label>
+            <select id="langSelect" class="input">
+                <option value="en">English (Intl)</option>
+                <option value="ml">Malayalam (Regional)</option>
+            </select>
+            <button class="btn btn-primary" onclick="App.search()" style="width:100%;">Execute Scan</button>
+            <div id="resultMsg"></div>
+        </div>
+
+        <!-- CERTIFICATE -->
+        <div id="certificateArea">
+            <div id="certificate">
+                <div class="cert-header">
+                    <div class="school-name" id="certSchool"></div>
+                    <div class="exam-title" id="certExam"></div>
+                </div>
+                <div id="certContent"></div>
+                <div id="qrcode"></div>
+                <div style="margin-top:30px;display:flex;gap:10px;">
+                    <button class="btn btn-primary" onclick="App.downloadPDF()" style="flex:1;">Download PDF</button>
+                    <button class="btn btn-danger" onclick="App.closeCert()">Close</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const App = {
+            state: { data: null },
+
+            adminLogin() {
+                const pass = document.getElementById("adminPass").value;
+                if (pass === "1234") { document.getElementById("adminArea").classList.remove("hidden"); }
+                else alert("Unauthorized Access Detected.");
+            },
+
+            uploadJSON(input) {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    try {
+                        this.state.data = JSON.parse(e.target.result);
+                        document.getElementById("jsonStatus").innerText = "JSON Source Integrated.";
+                        document.getElementById("portalStatus").innerText = "Records Active: Data Uploaded.";
+                    } catch (err) { alert("Corruption Detected in Source."); }
+                };
+                reader.readAsText(file);
+            },
+
+            loadFromSheet() {
+                const sheetId = document.getElementById("sheetIdInput").value.trim();
+                if (!sheetId) { alert("Sheet ID missing."); return; }
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
+                fetch(csvUrl)
+                    .then(res => res.text())
+                    .then(csv => {
+                        const lines = csv.split("\n").filter(l => l.trim() !== "");
+                        const headers = lines[0].split(",");
+                        const jsonData = lines.slice(1).map(l => {
+                            const vals = l.split(",");
+                            let obj = {};
+                            headers.forEach((h, i) => obj[h.trim()] = vals[i]?.trim());
+                            return obj;
+                        });
+                        this.state.data = jsonData;
+                        document.getElementById("sheetStatus").innerText = `Cloud Records: ${jsonData.length} found.`;
+                        document.getElementById("portalStatus").innerText = "Records Active: Cloud Sync Active.";
+                        alert("Cloud Synchronization Successful.");
+                    })
+                    .catch(err => { console.error(err); alert("Cloud connection failed. Ensure Public permission."); });
+            },
+
+            generateLink() {
+                if (!this.state.data) { alert("No data available for deployment."); return; }
+                const payload = { data: this.state.data, time: Date.now() };
+                const token = btoa(JSON.stringify(payload)).replace(/=/g, "");
+                const url = window.location.origin + window.location.pathname + "?token=" + token;
+                document.getElementById("generatedLink").innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+            },
+
+            search() {
+                if (!this.state.data) { document.getElementById("resultMsg").innerText = "No session active. Load source."; return; }
+                const roll = document.getElementById("rollInput").value.trim();
+                if (!roll) { alert("Identification number required."); return; }
+
+                let found = null;
+                if (Array.isArray(this.state.data)) {
+                    const st = this.state.data.find(s => s.Roll == roll || s.roll == roll);
+                    if (st) found = { school: st.School || st.school || "Institution", exam: st.Exam || st.exam || "Examination", student: st };
+                } else if (this.state.data.schools) {
+                    this.state.data.schools.forEach(s => {
+                        s.exams.forEach(e => {
+                            e.students.forEach(st => { if (st.roll == roll) found = { school: s.name, exam: e.name, student: st }; });
+                        });
+                    });
+                }
+
+                if (!found) {
+                    document.getElementById("resultMsg").innerText = "No matching record found.";
+                    document.getElementById("resultMsg").style.color = "var(--danger)";
+                    return;
+                }
+                document.getElementById("resultMsg").innerText = ""; // Clear error
+                this.trackAnalytics(roll);
+                this.renderCertificate(found);
+            },
+
+            renderCertificate(obj) {
+                document.getElementById("certificateArea").classList.add("active");
+                document.getElementById("certSchool").innerText = obj.school;
+                document.getElementById("certExam").innerText = obj.exam;
+                const st = obj.student;
+                const lang = document.getElementById("langSelect").value;
+                const i18n = { en: { name: "Name", roll: "Roll", total: "Total", status: "Status" }, ml: { name: "പേര്", roll: "റോൾ", total: "മൊത്തം", status: "സ്റ്റാറ്റസ്" } };
+                const t = i18n[lang] || i18n.en;
+                document.getElementById("certContent").innerHTML = `
+<p><strong>${t.name}:</strong> ${st.Name || st.name}</p>
+<p><strong>${t.roll}:</strong> ${st.Roll || st.roll}</p>
+<p><strong>${t.total}:</strong> ${st.Total || st.total}</p>
+<p><strong>${t.status}:</strong> <span style="font-weight:700; color:${(st.Status || st.status).toLowerCase() === 'pass' ? 'var(--success)' : 'var(--danger)'}">${st.Status || st.status}</span></p>`;
+                document.getElementById("qrcode").innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), { text: window.location.href + "&roll=" + (st.Roll || st.roll), width: 120, height: 120 });
+            },
+
+            closeCert() { document.getElementById("certificateArea").classList.remove("active"); },
+
+            downloadPDF() { html2pdf().from(document.getElementById("certificate")).save("Record_Scan.pdf"); },
+
+            trackAnalytics(roll) {
+                let logs = JSON.parse(localStorage.getItem("analytics") || "[]");
+                logs.push({ roll, time: new Date().toLocaleString() });
+                localStorage.setItem("analytics", JSON.stringify(logs));
+            },
+
+            showAnalytics() {
+                const logs = JSON.parse(localStorage.getItem("analytics") || "[]");
+                if (logs.length === 0) { alert("No Intelligence Data Found."); return; }
+                console.table(logs); alert("Intelligence logs sent to Console Protocol.");
+            },
+
+            loadSecure() {
+                const params = new URLSearchParams(window.location.search);
+                let token = params.get("token");
+                if (token) {
+                    try {
+                        while (token.length % 4 !== 0) { token += "="; }
+                        const decoded = JSON.parse(atob(token));
+                        this.state.data = decoded.data;
+                        document.getElementById("portalStatus").innerText = "Records Active: Satellite Link Established.";
+                    } catch (err) { console.error(err); }
+                }
+            }
+
+        };
+        window.onload = () => { App.loadSecure(); }
+    </script>
+</body>
+
+</html>
