@@ -287,22 +287,22 @@
 
             loadFromSheet() {
                 const sheetId = document.getElementById("sheetIdInput").value.trim();
-                const apiKey = "AIzaSyCI5VYCvr8P4HOUsOpcXq-28GFp_Qbx8Cg"; // Restricted API Key
+                const apiKey = "YOUR_GOOGLE_API_KEY"; // 🔴 REPLACE WITH YOUR SECURE API KEY
+                const sheetName = "Sheet1";
 
                 if (!sheetId) {
                     alert("Input Required: Google Sheet ID missing.");
                     return;
                 }
 
-                const range = "Sheet1"; // Default range
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
                 document.getElementById("sheetStatus").innerText = "Connecting to Google Cloud... ";
 
                 fetch(url)
                     .then(res => res.json())
                     .then(data => {
                         if (!data.values) {
-                            alert("Sync Failure: No data found. Check Sheet Name/Permissions.");
+                            alert("Sync Failure: Invalid Sheet ID or Sheet Name.");
                             return;
                         }
 
@@ -311,7 +311,7 @@
                         const jsonData = rows.slice(1).map(row => {
                             let obj = {};
                             headers.forEach((h, i) => {
-                                obj[h] = row[i];
+                                obj[h] = row[i] || "";
                             });
                             return obj;
                         });
@@ -321,65 +321,16 @@
                         document.getElementById("sheetStatus").style.color = "var(--success)";
                         document.getElementById("portalStatus").innerText = "Records Active: Google API Connected.";
                         document.getElementById("portalStatus").style.color = "var(--success)";
-                        alert("Intelligence Source Synced via Google API.");
+                        alert("Live Google Sheet Connected Successfully!");
                     })
                     .catch(err => {
                         console.error("API Error:", err);
-                        alert("Connection Terminated: API synchronization failed.");
+                        alert("Connection Terminated: Google API sync failed.");
                         document.getElementById("sheetStatus").innerText = "Sync Terminated.";
                         document.getElementById("sheetStatus").style.color = "var(--danger)";
                     });
             },
 
-
-            loadFromSheet() {
-
-                const sheetId = document.getElementById("sheetIdInput").value.trim();
-                const apiKey = "AIzaSyCI5VYCvr8P4HOUsOpcXq-28GFp_Qbx8Cg"; // <-- replace
-
-                if (!sheetId) {
-                    alert("Enter Google Sheet ID!");
-                    return;
-                }
-
-                const range = "Sheet1"; // change if sheet name different
-
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
-
-                fetch(url)
-                    .then(res => res.json())
-                    .then(data => {
-
-                        if (!data.values) {
-                            alert("No Data Found. Check Sheet Name.");
-                            return;
-                        }
-
-                        const rows = data.values;
-                        const headers = rows[0];
-
-                        const jsonData = rows.slice(1).map(row => {
-                            let obj = {};
-                            headers.forEach((h, i) => {
-                                obj[h] = row[i];
-                            });
-                            return obj;
-                        });
-
-                        App.state.data = jsonData;
-
-                        document.getElementById("sheetStatus").innerText =
-                            "API Sync Success: " + jsonData.length + " records loaded.";
-
-                        document.getElementById("portalStatus").innerText =
-                            "Records Active: Google API Connected.";
-
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert("API Connection Failed.");
-                    });
-            },
 
 
 

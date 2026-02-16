@@ -8,6 +8,8 @@ export default async function handler(req, res) {
 
     try {
         const dataDir = path.join(process.cwd(), "data");
+
+        // Ensure data directory exists for local/serverless persistence
         if (!fs.existsSync(dataDir)) {
             fs.mkdirSync(dataDir, { recursive: true });
         }
@@ -15,9 +17,15 @@ export default async function handler(req, res) {
         const filePath = path.join(dataDir, "published-results.json");
         fs.writeFileSync(filePath, JSON.stringify(req.body, null, 2));
 
-        return res.status(200).json({ success: true, message: "Deployment Success: Cloud Source Updated." });
+        return res.status(200).json({
+            success: true,
+            message: "Deployment Success: Cloud Source Updated."
+        });
     } catch (err) {
         console.error("API Error:", err);
-        return res.status(500).json({ success: false, message: "Internal System Failure." });
+        return res.status(500).json({
+            success: false,
+            message: "Internal System Failure: Synchronization Interrupted."
+        });
     }
 }
