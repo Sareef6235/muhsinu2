@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Military Secure Result System</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #4f46e5;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --danger: #dc2626;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, sans-serif;
+            background: var(--bg);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #certificateArea {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #certificateArea.active {
+            display: flex;
+        }
+
+        #certificate {
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            width: 700px;
+        }
+
+        .cert-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .school-name {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .exam-title {
+            color: gray;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🛡 Military Grade Secure Result System</h1>
+
+        <!-- ADMIN PANEL -->
+        <div class="card">
+            <h2>🔐 Admin Panel</h2>
+
+            <input type="password" id="adminPass" class="input" placeholder="Enter Admin Password">
+
+            <button class="btn btn-primary" onclick="App.adminLogin()">Login</button>
+
+            <div id="adminArea" class="hidden">
+
+                <hr>
+
+                <h3>Upload JSON (Multi School + Multi Exam)</h3>
+                <input type="file" accept=".json" class="input" onchange="App.uploadJSON(this)">
+
+                <div id="jsonStatus"></div>
+
+                <hr>
+
+                <h3>Generate Encrypted Expiring Link (24h)</h3>
+                <button class="btn btn-primary" onclick="App.generateLink()">Generate Secure Link</button>
+
+                <div id="generatedLink"></div>
+
+                <hr>
+
+                <button class="btn btn-danger" onclick="App.showAnalytics()">View Analytics</button>
+
+            </div>
+        </div>
+
+        <!-- PUBLIC SEARCH -->
+        <div class="card">
+            <h2>📄 Public Result Search</h2>
+
+            <input type="text" id="rollInput" class="input" placeholder="Enter Roll Number">
+
+            <select id="langSelect" class="input">
+                <option value="en">English</option>
+                <option value="ml">Malayalam</option>
+            </select>
+
+            <button class="btn btn-primary" onclick="App.search()">View Result</button>
+
+            <div id="resultMsg"></div>
+        </div>
+
+    </div>
+
+    <!-- CERTIFICATE -->
+    <div id="certificateArea">
+        <div id="certificate">
+
+            <div class="cert-header">
+                <div class="school-name" id="certSchool"></div>
+                <div class="exam-title" id="certExam"></div>
+            </div>
+
+            <div id="certContent"></div>
+            <div id="qrcode"></div>
+
+            <br>
+            <button class="btn btn-primary" onclick="App.downloadPDF()">Download PDF</button>
+
+            <button class="btn btn-danger" onclick="App.closeCert()">Close</button>
+
+        </div>
+    </div>
+
+    <script>
+        const App = {
+
+            state: {
+                data: null,
+                tokenData: null,
+                secretKey: "ULTRA_MILITARY_SECRET_2026"
+            },
+
+            /* ---------------- ADMIN ---------------- */
+
+            adminLogin() {
+                if (document.getElementById("adminPass").value === "enterprise123") {
+                    document.getElementById("adminArea").classList.remove("hidden");
+                } else alert("Wrong Password");
+            },
+
+            uploadJSON(input) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    this.state.data = JSON.parse(e.target.result);
+                    document.getElementById("jsonStatus").innerText = "Data Loaded";
+                };
+                reader.readAsText(input.files[0]);
+            },
+
+            /* ---------------- ENCRYPTION ---------------- */
+
+            async generateLink() {
+
+                if (!this.state.data) {
+                    alert("Upload JSON First");
+                    return;
+                }
+
+                const payload = {
+                    data: this.state.data,
+                    exp: Date.now() + 86400000
+                };
+
+                const encrypted = await this.encrypt(JSON.stringify(payload));
+
+                const url = window.location.origin +
+                    window.location.pathname +
+                    "?secure=" + encrypted;
+
+                document.getElementById("generatedLink")
+                    .innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+            },
+
+            async encrypt(text) {
+                const enc = new TextEncoder();
+                const key = await crypto.subtle.importKey(
+                    "raw",
+                    enc.encode(this.state.secretKey),
+                    { name: "AES-GCM" },
+                    false,
+                    ["encrypt"]
+                );
+
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+
+                const cipher = await crypto.subtle.encrypt(
+                    { name: "AES-GCM", iv },
+                    key,
+                    enc.encode(text)
+                );
+
+                return btoa(JSON.stringify({
+                    iv: Array.from(iv),
+                    data: Array.from(new Uint8Array(cipher))
+                }));
+            },
+
+            async decrypt(token) {
+                const obj = JSON.parse(atob(token));
+                const enc = new TextEncoder();
+
+                const key = await crypto.subtle.importKey(
+                    "raw",
+                    enc.encode(this.state.secretKey),
+                    { name: "AES-GCM" },
+                    false,
+                    ["decrypt"]
+                );
+
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: new Uint8Array(obj.iv) },
+                    key,
+                    new Uint8Array(obj.data)
+                );
+
+                return new TextDecoder().decode(decrypted);
+            },
+
+            /* ---------------- LOAD TOKEN ---------------- */
+
+            async loadSecure() {
+                const params = new URLSearchParams(window.location.search);
+                const token = params.get("secure");
+                if (!token) return;
+
+                try {
+                    const decoded = await this.decrypt(token);
+                    const parsed = JSON.parse(decoded);
+
+                    if (Date.now() > parsed.exp) {
+                        alert("Link Expired");
+                        return;
+                    }
+
+                    this.state.tokenData = parsed.data;
+
+                } catch {
+                    alert("Invalid or Tampered Link");
+                }
+            },
+
+            /* ---------------- SEARCH ---------------- */
+
+            search() {
+
+                if (!this.state.tokenData) {
+                    alert("Secure Data Not Loaded");
+                    return;
+                }
+
+                const roll = document.getElementById("rollInput").value;
+                const lang = document.getElementById("langSelect").value;
+
+                let found = null;
+
+                this.state.tokenData.schools.forEach(s => {
+                    s.exams.forEach(e => {
+                        e.students.forEach(st => {
+                            if (st.roll == roll) {
+                                found = { school: s.name, exam: e.name, student: st };
+                            }
+                        });
+                    });
+                });
+
+                if (!found) {
+                    document.getElementById("resultMsg").innerText = "Result Not Found";
+                    return;
+                }
+
+                this.renderCertificate(found, lang);
+                this.trackAnalytics(roll);
+            },
+
+            /* ---------------- CERTIFICATE ---------------- */
+
+            renderCertificate(obj, lang) {
+
+                const text = {
+                    en: { name: "Name", roll: "Roll", total: "Total", status: "Status" },
+                    ml: { name: "പേര്", roll: "റോള്", total: "മൊത്തം", status: "ഫലം" }
+                };
+
+                const t = text[lang];
+
+                document.getElementById("certificateArea").classList.add("active");
+
+                document.getElementById("certSchool").innerText = obj.school;
+                document.getElementById("certExam").innerText = obj.exam;
+
+                document.getElementById("certContent").innerHTML = `
+  <p><strong>${t.name}:</strong> ${obj.student.name}</p>
+  <p><strong>${t.roll}:</strong> ${obj.student.roll}</p>
+  <p><strong>${t.total}:</strong> ${obj.student.total}</p>
+  <p><strong>${t.status}:</strong> ${obj.student.status}</p>
+ `;
+
+                document.getElementById("qrcode").innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), {
+                    text: window.location.href,
+                    width: 100,
+                    height: 100
+                });
+            },
+
+            closeCert() {
+                document.getElementById("certificateArea")
+                    .classList.remove("active");
+            },
+
+            downloadPDF() {
+                html2pdf().from(
+                    document.getElementById("certificate")
+                ).save("Secure_Result.pdf");
+            },
+
+            /* ---------------- ANALYTICS ---------------- */
+
+            trackAnalytics(roll) {
+                let logs = JSON.parse(localStorage.getItem("analytics") || "[]");
+                logs.push({ roll, time: new Date().toLocaleString() });
+                localStorage.setItem("analytics", JSON.stringify(logs));
+            },
+
+            showAnalytics() {
+                const logs = JSON.parse(localStorage.getItem("analytics") || "[]");
+                console.table(logs);
+                alert("Check Console for Analytics Data");
+            }
+
+        };
+
+        window.onload = () => {
+            App.loadSecure();
+        };
+    </script>
+
+</body>
+
+</html>
