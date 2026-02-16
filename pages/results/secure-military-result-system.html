@@ -13,70 +13,153 @@
         :root {
             --primary: #0f172a;
             --accent: #4f46e5;
-            --bg: #f1f5f9;
+            --bg: #f8fafc;
             --card: #ffffff;
             --border: #e2e8f0;
-            --success: #16a34a;
-            --danger: #dc2626;
+            --success: #10b981;
+            --danger: #ef4444;
+            --glass: rgba(255, 255, 255, 0.8);
         }
 
         body {
             margin: 0;
-            font-family: Inter, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--bg);
+            color: var(--primary);
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 1100px;
-            margin: auto;
-            padding: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .card {
             background: var(--card);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            margin-bottom: 25px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .btn {
-            padding: 10px 16px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-primary {
             background: var(--accent);
-            color: #fff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
         .btn-danger {
-            background: var(--danger);
-            color: #fff;
+            background: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fee2e2;
+        }
+
+        .btn-danger:hover {
+            background: #fee2e2;
         }
 
         .input {
             width: 100%;
-            padding: 10px;
+            padding: 12px 16px;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin: 25px 0;
         }
 
         .hidden {
             display: none;
         }
 
+        #jsonStatus {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+
+        #generatedLink {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 10px;
+            word-break: break-all;
+            margin-top: 15px;
+            border: 1px dashed var(--border);
+        }
+
+        #generatedLink a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Certificate Overlay */
         #certificateArea {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
             align-items: center;
+            z-index: 1000;
+            padding: 20px;
         }
 
         #certificateArea.active {
@@ -85,23 +168,72 @@
 
         #certificate {
             background: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            width: 700px;
+            padding: 50px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         .cert-header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 20px;
         }
 
         .school-name {
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
         }
 
         .exam-title {
-            color: gray;
+            font-size: 18px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        #certContent {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        #certContent p {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--bg);
+            padding-bottom: 8px;
+        }
+
+        #certContent strong {
+            color: #64748b;
+        }
+
+        #qrcode {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .cert-actions {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            #certificate {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
@@ -109,197 +241,181 @@
 <body>
 
     <div class="container">
+        <header>
+            <h1>🛡 Secure Result Portal</h1>
+            <p style="color: #64748b;">Enterprise Military-Grade Distribution System</p>
+        </header>
 
-        <h1>🛡 Military Grade Secure Result System</h1>
-
-        <!-- ADMIN PANEL -->
-        <div class="card">
-            <h2>🔐 Admin Panel</h2>
-
-            <input type="password" id="adminPass" class="input" placeholder="Enter Admin Password">
-
-            <button class="btn btn-primary" onclick="App.adminLogin()">Login</button>
-
-            <div id="adminArea" class="hidden">
-
-                <hr>
-
-                <h3>Upload JSON (Multi School + Multi Exam)</h3>
-                <input type="file" accept=".json" class="input" onchange="App.uploadJSON(this)">
-
-                <div id="jsonStatus"></div>
-
-                <hr>
-
-                <h3>Generate Secure Portal Link</h3>
-                <button class="btn btn-primary" onclick="App.generateLink()">Generate Link</button>
-
-                <div id="generatedLink"></div>
-
-                <hr>
-
-                <button class="btn btn-danger" onclick="App.showAnalytics()">View Analytics</button>
-
-            </div>
+        <!-- ADMIN LOGIN SECTION -->
+        <div id="loginSection" class="card">
+            <h2>🔐 Administrative Access</h2>
+            <input type="password" id="adminPass" class="input" placeholder="Enter Administrative Password">
+            <button class="btn btn-primary" onclick="App.adminLogin()">Verify & Unlock</button>
         </div>
 
-        <!-- PUBLIC SEARCH -->
-        <div class="card">
-            <h2>📄 Public Result Search</h2>
+        <!-- ADMIN PANEL SECTION -->
+        <div id="adminArea" class="card hidden">
+            <h2>⚙️ System Control Center</h2>
 
+            <label style="font-weight: 500; font-size: 0.9rem;">Distribution Source (JSON)</label>
+            <input type="file" id="jsonInput" accept=".json" class="input" onchange="App.uploadJSON(this)">
+            <div id="jsonStatus">Ready for deployment</div>
+
+            <hr>
+
+            <h3>Station Deployment</h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">
+                Generates a unique, persistent session link using localized storage for high-speed delivery.
+            </p>
+            <button class="btn btn-primary" onclick="App.generateLink()">Deploy Secure Link</button>
+            <div id="generatedLink" class="hidden"></div>
+
+            <hr>
+
+            <h3>Intelligence Operations</h3>
+            <button class="btn btn-danger" onclick="App.showAnalytics()">Access Activity Logs</button>
+            <button class="btn btn-danger" onclick="App.logout()">Terminate Session</button>
+        </div>
+
+        <!-- PUBLIC SEARCH SECTION -->
+        <div id="searchSection" class="card">
+            <h2>🔍 Personal Records Search</h2>
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;" id="portalStatus">
+                Please access the portal via a secure deployment link to view results.
+            </p>
+
+            <label style="font-weight: 500; font-size: 0.9rem;">Roll Identification</label>
             <input type="text" id="rollInput" class="input" placeholder="Enter Roll Number">
 
+            <label style="font-weight: 500; font-size: 0.9rem;">Language Protocol</label>
             <select id="langSelect" class="input">
-                <option value="en">English</option>
-                <option value="ml">Malayalam</option>
+                <option value="en">English (Primary)</option>
+                <option value="ml">Malayalam (Native)</option>
             </select>
 
-            <button class="btn btn-primary" onclick="App.search()">View Result</button>
-
-            <div id="resultMsg"></div>
+            <button class="btn btn-primary" onclick="App.search()" style="width: 100%;">Execute Search</button>
+            <div id="resultMsg" style="text-align: center; margin-top: 15px; font-weight: 500;"></div>
         </div>
-
     </div>
 
-    <!-- CERTIFICATE -->
+    <!-- CERTIFICATE OVERLAY -->
     <div id="certificateArea">
         <div id="certificate">
-
             <div class="cert-header">
-                <div class="school-name" id="certSchool"></div>
-                <div class="exam-title" id="certExam"></div>
+                <div class="school-name" id="certSchool">INSTITUTION NAME</div>
+                <div class="exam-title" id="certExam">EXAMINATION TITLE</div>
             </div>
 
-            <div id="certContent"></div>
+            <div id="certContent">
+                <!-- Dynamic Content -->
+            </div>
+
             <div id="qrcode"></div>
 
-            <br>
-            <button class="btn btn-primary" onclick="App.downloadPDF()">Download PDF</button>
-
-            <button class="btn btn-danger" onclick="App.closeCert()">Close</button>
-
+            <div class="cert-actions">
+                <button class="btn btn-primary" onclick="App.downloadPDF()">Export as PDF</button>
+                <button class="btn btn-danger" onclick="App.closeCert()">Close Records</button>
+            </div>
         </div>
     </div>
 
     <script>
         const App = {
-
             state: {
                 data: null,
                 tokenData: null,
-                secretKey: "12345678901234567890123456789012"
+                secretKey: "12345678901234567890123456789012" // Reference for legacy encrypted links
             },
 
-            /* ---------------- ADMIN ---------------- */
+            /* ---------------- AUTHENTICATION ---------------- */
 
             adminLogin() {
-                if (document.getElementById("adminPass").value === "1234") {
+                const pass = document.getElementById("adminPass").value;
+                if (pass === "1234") {
+                    document.getElementById("loginSection").classList.add("hidden");
                     document.getElementById("adminArea").classList.remove("hidden");
-                } else alert("Wrong Password");
+                } else {
+                    alert("Authentication Failed: Access Denied");
+                }
             },
+
+            logout() {
+                document.getElementById("adminArea").classList.add("hidden");
+                document.getElementById("loginSection").classList.remove("hidden");
+                document.getElementById("adminPass").value = "";
+            },
+
+            /* ---------------- DATA MANAGEMENT ---------------- */
 
             uploadJSON(input) {
+                const file = input.files[0];
+                if (!file) return;
+
                 const reader = new FileReader();
                 reader.onload = e => {
-                    this.state.data = JSON.parse(e.target.result);
-                    document.getElementById("jsonStatus").innerText = "Data Loaded";
+                    try {
+                        this.state.data = JSON.parse(e.target.result);
+                        document.getElementById("jsonStatus").innerText = "Records Loaded Successfully (" + this.state.data.schools.length + " Institutions)";
+                        document.getElementById("jsonStatus").style.color = "var(--success)";
+                    } catch (err) {
+                        alert("Invalid JSON structure detected.");
+                        console.error(err);
+                    }
                 };
-                reader.readAsText(input.files[0]);
+                reader.readAsText(file);
             },
 
-            generateLink: function () {
+            generateLink() {
                 if (!this.state.data) {
-                    alert("Upload JSON First");
+                    alert("Error: No data loaded for deployment.");
                     return;
                 }
 
-                // Create unique exam ID
-                const examId = "exam-" + Date.now();
+                // Create unique exam persistence ID
+                const examToken = "mil-exam-" + Date.now();
 
-                // Save JSON locally (simulate publish)
-                localStorage.setItem(examId, JSON.stringify(this.state.data));
+                // Store in persistence layer
+                localStorage.setItem(examToken, JSON.stringify(this.state.data));
 
-                const url = window.location.origin +
-                    window.location.pathname +
-                    "?exam=" + examId;
+                const url = window.location.origin + window.location.pathname + "?exam=" + examToken;
 
-                document.getElementById("generatedLink").innerHTML =
-                    `<a href="${url}" target="_blank">${url}</a>`;
+                const linkEl = document.getElementById("generatedLink");
+                linkEl.classList.remove("hidden");
+                linkEl.innerHTML = `<strong>Deployment Success:</strong><br><a href="${url}" target="_blank">${url}</a>`;
+
+                alert("Secure Deployment Link Generated Successfully");
             },
 
-            /* ---------------- ENCRYPTION (Legacy/Reference) ---------------- */
+            /* ---------------- DATA LOADING ---------------- */
 
-            encrypt: async function (text) {
-                const encoder = new TextEncoder();
-                const keyData = encoder.encode(this.state.secretKey);
-
-                const cryptoKey = await crypto.subtle.importKey(
-                    "raw",
-                    keyData,
-                    { name: "AES-GCM" },
-                    false,
-                    ["encrypt"]
-                );
-
-                const iv = crypto.getRandomValues(new Uint8Array(12));
-
-                const encrypted = await crypto.subtle.encrypt(
-                    { name: "AES-GCM", iv: iv },
-                    cryptoKey,
-                    encoder.encode(text)
-                );
-
-                return btoa(JSON.stringify({
-                    iv: Array.from(iv),
-                    data: Array.from(new Uint8Array(encrypted))
-                }));
-            },
-
-            async decrypt(token) {
-                const obj = JSON.parse(atob(token));
-                const enc = new TextEncoder();
-
-                const key = await crypto.subtle.importKey(
-                    "raw",
-                    enc.encode(this.state.secretKey),
-                    { name: "AES-GCM" },
-                    false,
-                    ["decrypt"]
-                );
-
-                const decrypted = await crypto.subtle.decrypt(
-                    { name: "AES-GCM", iv: new Uint8Array(obj.iv) },
-                    key,
-                    new Uint8Array(obj.data)
-                );
-
-                return new TextDecoder().decode(decrypted);
-            },
-
-            /* ---------------- LOAD DATA ---------------- */
-
-            loadSecure: function () {
+            loadContext() {
                 const params = new URLSearchParams(window.location.search);
-                const examId = params.get("exam");
+                const examToken = params.get("exam");
 
-                if (!examId) return;
-
-                const stored = localStorage.getItem(examId);
-
-                if (!stored) {
-                    alert("Invalid or Expired Link");
-                    return;
+                if (examToken) {
+                    const stored = localStorage.getItem(examToken);
+                    if (stored) {
+                        try {
+                            this.state.tokenData = JSON.parse(stored);
+                            document.getElementById("portalStatus").innerText = "Records Active: Connection Established.";
+                            document.getElementById("portalStatus").style.color = "var(--success)";
+                            console.log("Portal Initialized with Token:", examToken);
+                        } catch (e) {
+                            console.error("Token Corruption:", e);
+                            document.getElementById("portalStatus").innerText = "Error: Transmission Corruption detected.";
+                        }
+                    } else {
+                        document.getElementById("portalStatus").innerText = "Error: Link Expired or Invalid Protocol.";
+                        document.getElementById("portalStatus").style.color = "var(--danger)";
+                    }
                 }
-
-                this.state.tokenData = JSON.parse(stored);
             },
 
-            /* ---------------- SEARCH ---------------- */
+            /* ---------------- SEARCH & RETRIEVAL ---------------- */
 
-            search: function () {
-
+            search() {
                 if (!this.state.tokenData) {
-                    alert("No Result Data Loaded.\nOpen using generated secure link.");
+                    alert("Operation Blocked: No record session active. Please use a secure link.");
                     return;
                 }
 
@@ -307,101 +423,112 @@
                 const lang = document.getElementById("langSelect").value;
 
                 if (!roll) {
-                    alert("Enter Roll Number");
+                    alert("Input Required: Roll Identification is empty.");
                     return;
                 }
 
-                let found = null;
+                let result = null;
 
-                this.state.tokenData.schools.forEach(s => {
-                    s.exams.forEach(e => {
-                        e.students.forEach(st => {
-                            if (st.roll == roll) {
-                                found = { school: s.name, exam: e.name, student: st };
+                // Search Algorithm
+                this.state.tokenData.schools.forEach(school => {
+                    school.exams.forEach(exam => {
+                        exam.students.forEach(student => {
+                            if (student.roll.toString() === roll) {
+                                result = {
+                                    school: school.name,
+                                    exam: exam.name,
+                                    student: student
+                                };
                             }
                         });
                     });
                 });
 
-                if (!found) {
-                    document.getElementById("resultMsg").innerText = "Result Not Found";
+                if (!result) {
+                    document.getElementById("resultMsg").innerText = "Status: Record Not Found in Active Session.";
+                    document.getElementById("resultMsg").style.color = "var(--danger)";
                     return;
                 }
 
-                this.renderCertificate(found, lang);
+                document.getElementById("resultMsg").innerText = "";
+                this.renderCertificate(result, lang);
                 this.trackAnalytics(roll);
-
             },
 
-            /* ---------------- CERTIFICATE ---------------- */
-
-            renderCertificate(obj, lang) {
-                const text = {
-                    en: { name: "Name", roll: "Roll", total: "Total", status: "Status" },
-                    ml: { name: "പേര്", roll: "റോള്", total: "മൊത്തം", status: "ഫലം" }
+            renderCertificate(obj, lang = 'en') {
+                const i18n = {
+                    en: { name: "Full Name", roll: "Roll ID", total: "Total Score", status: "Evaluation Status" },
+                    ml: { name: "പേര്", roll: "റോള് നമ്പര്‍", total: "ആകെ മാര്‍ക്ക്", status: "ഫലം" }
                 };
 
-                const t = text[lang];
+                const t = i18n[lang] || i18n.en;
 
                 document.getElementById("certificateArea").classList.add("active");
-
                 document.getElementById("certSchool").innerText = obj.school;
                 document.getElementById("certExam").innerText = obj.exam;
 
                 document.getElementById("certContent").innerHTML = `
-                  <p><strong>${t.name}:</strong> ${obj.student.name}</p>
-                  <p><strong>${t.roll}:</strong> ${obj.student.roll}</p>
-                  <p><strong>${t.total}:</strong> ${obj.student.total}</p>
-                  <p><strong>${t.status}:</strong> ${obj.student.status}</p>
-                 `;
+                    <p><strong>${t.name}</strong> <span>${obj.student.name}</span></p>
+                    <p><strong>${t.roll}</strong> <span>${obj.student.roll}</span></p>
+                    <p><strong>${t.total}</strong> <span>${obj.student.total}</span></p>
+                    <p><strong>${t.status}</strong> <span style="font-weight:700; color:${obj.student.status.toLowerCase() === 'pass' ? 'var(--success)' : 'var(--danger)'}">${obj.student.status}</span></p>
+                `;
 
+                // Update QR Code
                 document.getElementById("qrcode").innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), {
                     text: window.location.href,
-                    width: 100,
-                    height: 100
+                    width: 120,
+                    height: 120,
+                    colorDark: "#0f172a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
                 });
             },
 
             closeCert() {
-                document.getElementById("certificateArea")
-                    .classList.remove("active");
+                document.getElementById("certificateArea").classList.remove("active");
             },
 
             downloadPDF() {
-                html2pdf().from(
-                    document.getElementById("certificate")
-                ).save("Result.pdf");
+                const element = document.getElementById("certificate");
+                const opt = {
+                    margin: 0,
+                    filename: 'Secure_Result_Record.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(element).save();
             },
 
-            /* ---------------- ANALYTICS ---------------- */
+            /* ---------------- ANALYTICS & LOGS ---------------- */
 
             trackAnalytics(roll) {
                 let logs = JSON.parse(localStorage.getItem("analytics") || "[]");
-                logs.push({ roll, time: new Date().toLocaleString() });
+                logs.push({
+                    roll: roll,
+                    timestamp: new Date().toISOString(),
+                    user_agent: navigator.userAgent.substring(0, 50)
+                });
                 localStorage.setItem("analytics", JSON.stringify(logs));
             },
 
-            showAnalytics: function () {
-
+            showAnalytics() {
                 const logs = JSON.parse(localStorage.getItem("analytics") || "[]");
-
                 if (logs.length === 0) {
-                    alert("No Analytics Data Found");
+                    alert("Intelligence Report: No access attempts recorded.");
                     return;
                 }
-
                 console.table(logs);
-                alert("Analytics shown in Console (Press F12)");
-
+                alert("Protocol Check: Activity logs sent to System Console (F12).");
             }
-
         };
 
+        // Initialize Application Context
         window.onload = () => {
-            App.loadSecure();
+            App.loadContext();
         };
-
     </script>
 </body>
 
