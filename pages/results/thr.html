@@ -279,52 +279,68 @@
 
 
             loadFromSheet() {
+
                 const sheetId = document.getElementById("sheetIdInput").value.trim();
-                const apiKey = "YOUR_GOOGLE_API_KEY"; // 🔴 REPLACE WITH YOUR SECURE API KEY
-                const sheetName = "Sheet1";
+                const apiKey = "AIzaSyCI5VYCvr8P4HOUsOpcXq-28GFp_Qbx8Cg";  // 🔴 PUT YOUR KEY HERE
+                const sheetName = "Sheet1"; // 🔴 Change if needed
 
                 if (!sheetId) {
-                    alert("Input Required: Google Sheet ID missing.");
+                    alert("Enter Google Sheet ID!");
                     return;
                 }
 
                 const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
-                document.getElementById("sheetStatus").innerText = "Connecting to Google Cloud... ";
 
                 fetch(url)
-                    .then(res => res.json())
+                    .then(async response => {
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(errorText);
+                        }
+
+                        return response.json();
+                    })
                     .then(data => {
-                        if (!data.values) {
-                            alert("Sync Failure: Invalid Sheet ID or Sheet Name.");
+
+                        if (!data.values || data.values.length === 0) {
+                            alert("Sheet is empty or wrong sheet name.");
                             return;
                         }
 
                         const rows = data.values;
                         const headers = rows[0];
+
                         const jsonData = rows.slice(1).map(row => {
                             let obj = {};
                             headers.forEach((h, i) => {
-                                obj[h] = row[i] || "";
+                                obj[h.trim()] = row[i] ? row[i].trim() : "";
                             });
                             return obj;
                         });
 
-                        this.state.data = jsonData;
-                        document.getElementById("sheetStatus").innerText = `API Sync Success: ${jsonData.length} records retrieved.`;
-                        document.getElementById("sheetStatus").style.color = "var(--success)";
-                        document.getElementById("portalStatus").innerText = "Records Active: Google API Connected.";
-                        document.getElementById("portalStatus").style.color = "var(--success)";
-                        alert("Live Google Sheet Connected Successfully!");
+                        App.state.data = jsonData;
+
+                        document.getElementById("sheetStatus").innerText =
+                            "Google API Sync Success: " + jsonData.length + " records loaded.";
+
+                        document.getElementById("portalStatus").innerText =
+                            "Records Active: Live Google Connection.";
+
+                        alert("Google API Connected Successfully!");
+
                     })
-                    .catch(err => {
-                        console.error("API Error:", err);
-                        alert("Connection Terminated: Google API sync failed.");
-                        document.getElementById("sheetStatus").innerText = "Sync Terminated.";
-                        document.getElementById("sheetStatus").style.color = "var(--danger)";
+                    .catch(error => {
+
+                        console.error("API Error:", error);
+
+                        document.getElementById("sheetStatus").innerText =
+                            "Connection Terminated: Google API sync failed.";
+
+                        alert("Google API Connection Failed.\n\nCheck:\n1) API Key\n2) Sheet Public\n3) Sheet Name\n4) Sheets API Enabled");
+
                     });
-            },
-
-
+            }
 
 
 
