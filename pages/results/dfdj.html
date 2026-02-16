@@ -172,16 +172,22 @@
 
                 uploadJSON(input) {
                     const file = input.files[0];
+                    if (!file) return;
                     const reader = new FileReader();
                     reader.onload = e => {
-                        this.state.data = JSON.parse(e.target.result);
-                        document.getElementById("jsonStatus").innerText = "Data Loaded!";
-                        document.getElementById("statusText").innerText = "Data Loaded! Ready for search.";
+                        try {
+                            this.state.data = JSON.parse(e.target.result);
+                            document.getElementById("jsonStatus").innerText = "Data Loaded!";
+                            document.getElementById("statusText").innerText = "Data Loaded! Ready for search.";
+                        } catch (err) {
+                            alert("Invalid JSON File");
+                            document.getElementById("jsonStatus").innerText = "Error Loading Data";
+                        }
                     };
                     reader.readAsText(file);
                 },
 
-                // SHORT SECURE TOKEN
+                // SHORT SECURE TOKEN (No Padding)
                 generateLink() {
                     if (!this.state.data) { alert("Upload JSON First"); return; }
                     const payload = { data: this.state.data, time: Date.now() };
@@ -238,14 +244,21 @@
                     alert("Analytics shown in Console (Press F12)");
                 },
 
-                // Load token if exists
+                // Load token if exists (Handles missing padding)
                 loadSecure() {
                     const params = new URLSearchParams(window.location.search);
-                    const token = params.get("token");
+                    let token = params.get("token");
                     if (token) {
-                        const decoded = JSON.parse(atob(token));
-                        this.state.tokenData = decoded.data;
-                        document.getElementById("statusText").innerText = "Data Loaded via Secure Token!";
+                        try {
+                            // Pad base64 if needed
+                            while (token.length % 4 !== 0) { token += '='; }
+                            const decoded = JSON.parse(atob(token));
+                            this.state.tokenData = decoded.data;
+                            document.getElementById("statusText").innerText = "Data Loaded via Secure Token!";
+                        } catch (err) {
+                            console.error("Token Decode Error:", err);
+                            document.getElementById("statusText").innerText = "Invalid Search Token.";
+                        }
                     }
                 }
             };
