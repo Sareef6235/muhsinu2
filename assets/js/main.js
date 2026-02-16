@@ -1,8 +1,5 @@
 // List of JSON files
-const jsonFiles = [
-    '../../assets/data/students.json',
-    '../../assets/data/other-data.json'
-];
+
 
 const container = document.getElementById('results');
 

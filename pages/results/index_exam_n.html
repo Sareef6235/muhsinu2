@@ -491,43 +491,162 @@
                 margin: 0;
             }
         }
+
+        /* ================================
+   PUBLIC RESULT LANDING DESIGN
+================================ */
+
+        #public-view-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #eef2f7, #f8fafc);
+            padding: 20px;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            padding: 40px 30px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            animation: fadeUp 0.4s ease;
+        }
+
+        .login-box h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .login-box p {
+            font-size: 0.95rem;
+        }
+
+        .login-box .card {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .login-box .card strong {
+            color: #1a237e;
+        }
+
+        .login-box i {
+            color: #1a237e;
+            opacity: 0.8;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #1a237e;
+            color: #fff;
+            border-color: #1a237e;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(26, 35, 126, 0.2);
+        }
+
+        /* Small button */
+        .btn-sm {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+        }
+
+        /* Animation */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 30px 20px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- ================= PUBLIC VIEW ================= -->
+
+    <!-- PUBLIC VIEW -->
     <div id="public-view">
+
+        <!-- PUBLIC VIEW -->
+        <div id="public-view-section">
+            <!-- ADMIN VIEW (Hidden by default) -->
+            <div id="admin-view-section" style="display:none;"></div>
+
+            <script src="../../assets/js/exam_secure_portal.js"></script>
+
+
+        </div>
+
+
+
         <div class="login-box">
-            <div style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;">
+            <div style="font-size:3rem;color:#1a237e;margin-bottom:20px;">
                 <i class="ph-bold ph-student"></i>
             </div>
-            <h2 style="margin-bottom: 5px;">Result Portal</h2>
-            <p style="color: var(--text-light); margin-bottom: 30px;">Enter your details to view result</p>
+            <h2>Result Portal</h2>
+            <p style="color:#777;margin-bottom:25px;">
+                Enter Register Number to view result
+            </p>
 
-            <div class="card" style="text-align: left;">
-                <label
-                    style="font-size: 0.8rem; font-weight: bold; color: #666; display: block; margin-bottom: 5px;">Register/Roll
-                    Number</label>
-                <input type="text" id="publicRegInput" class="form-control" placeholder="e.g. 4029">
-                <button class="btn btn-primary"
-                    style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;"
-                    onclick="proExamApp.publicSearch()">
-                    View Result
-                </button>
-            </div>
+            <input type="text" id="publicRegInput" class="form-control" placeholder="Register Number">
 
-            <div id="public-msg" style="margin-top: 15px; color: var(--danger);"></div>
-
-            <button class="btn btn-secondary btn-sm" style="margin-top: 40px;" onclick="proExamApp.toggleAdminLogin()">
-                <i class="ph-bold ph-lock-key"></i> Admin Login
+            <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px;"
+                onclick="proExamApp.publicSearch()">
+                View Result
             </button>
 
-            <div id="admin-login-form" class="card hidden" style="margin-top: 15px; text-align: left;">
-                <label>Admin Password</label>
-                <input type="password" id="adminPassInput" class="form-control" placeholder="Default: admin123"
-                    onkeydown="if(event.key==='Enter') proExamApp.adminLogin()">
-                <button class="btn btn-primary btn-sm" onclick="proExamApp.adminLogin()">Login</button>
+            <div id="public-msg" style="margin-top:15px;color:var(--danger);"></div>
+
+            <button class="btn btn-secondary btn-sm" style="margin-top:25px;" onclick="proExamApp.showAdminLogin()">
+                <i class="ph-bold ph-lock"></i> Admin Login
+            </button>
+
+            <!-- Admin Login Box -->
+            <div id="admin-login-box" class="hidden" style="margin-top:15px;">
+                <input type="password" id="adminPassInput" class="form-control" placeholder="Admin Password">
+                <button class="btn btn-primary" style="width:100%;justify-content:center;"
+                    onclick="proExamApp.adminLogin()">
+                    Login
+                </button>
             </div>
         </div>
     </div>
@@ -706,76 +825,78 @@
 
 
     <!-- ================= CERTIFICATE OVERLAY ================= -->
-    <div id="certificate-area">
-        <div style="position: absolute; top: 10px; right: 20px; z-index: 2001; display: flex; gap: 10px;">
-            <button class="btn btn-secondary" onclick="proExamApp.closeCert()">Close</button>
-            <button class="btn btn-primary" onclick="proExamApp.downloadPDF()">Download PDF</button>
-        </div>
+    <div id="certificate-area"></div>
 
-        <div class="cert-container" id="printable-cert">
-            <div class="cert-border">
-                <div class="corner-ornament co-tl"></div>
-                <div class="corner-ornament co-tr"></div>
-                <div class="corner-ornament co-bl"></div>
-                <div class="corner-ornament co-br"></div>
 
-                <div class="cert-header">
-                    <div class="inst-name" id="c-school"></div>
-                    <div class="cert-title" id="c-title"></div>
-                    <div class="session-text" id="c-session"></div>
+    <div style="position: absolute; top: 10px; right: 20px; z-index: 2001; display: flex; gap: 10px;">
+        <button class="btn btn-secondary" onclick="proExamApp.closeCert()">Close</button>
+        <button class="btn btn-primary" onclick="proExamApp.downloadPDF()">Download PDF</button>
+    </div>
+
+    <div class="cert-container" id="printable-cert">
+        <div class="cert-border">
+            <div class="corner-ornament co-tl"></div>
+            <div class="corner-ornament co-tr"></div>
+            <div class="corner-ornament co-bl"></div>
+            <div class="corner-ornament co-br"></div>
+
+            <div class="cert-header">
+                <div class="inst-name" id="c-school"></div>
+                <div class="cert-title" id="c-title"></div>
+                <div class="session-text" id="c-session"></div>
+            </div>
+
+            <div class="candidate-box">
+                <div class="candidate-info">
+                    <p><span class="lbl-name">Name</span>: <strong id="c-name"></strong></p>
+                    <p><span class="lbl-roll">Reg No</span>: <strong id="c-roll"></strong></p>
                 </div>
+                <img id="c-photo" class="candidate-photo" src="">
+            </div>
 
-                <div class="candidate-box">
-                    <div class="candidate-info">
-                        <p><span class="lbl-name">Name</span>: <strong id="c-name"></strong></p>
-                        <p><span class="lbl-roll">Reg No</span>: <strong id="c-roll"></strong></p>
-                    </div>
-                    <img id="c-photo" class="candidate-photo" src="">
+            <table class="marks-table">
+                <thead>
+                    <tr>
+                        <th class="lbl-sub">Subject</th>
+                        <th class="lbl-max">Max</th>
+                        <th class="lbl-obt">Obtained</th>
+                        <th class="lbl-stat">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="c-tbody"></tbody>
+            </table>
+
+            <div class="summary-grid">
+                <div class="sum-item">
+                    <div class="sum-label lbl-tot">Total</div>
+                    <div class="sum-val" id="c-total"></div>
                 </div>
-
-                <table class="marks-table">
-                    <thead>
-                        <tr>
-                            <th class="lbl-sub">Subject</th>
-                            <th class="lbl-max">Max</th>
-                            <th class="lbl-obt">Obtained</th>
-                            <th class="lbl-stat">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="c-tbody"></tbody>
-                </table>
-
-                <div class="summary-grid">
-                    <div class="sum-item">
-                        <div class="sum-label lbl-tot">Total</div>
-                        <div class="sum-val" id="c-total"></div>
-                    </div>
-                    <div class="sum-item">
-                        <div class="sum-label lbl-perc">Percent</div>
-                        <div class="sum-val" id="c-perc"></div>
-                    </div>
-                    <div class="sum-item">
-                        <div class="sum-label lbl-grd">Grade</div>
-                        <div class="sum-val" id="c-grade"></div>
-                    </div>
-                    <div class="sum-item">
-                        <div class="sum-label lbl-res">Result</div>
-                        <div class="sum-val" id="c-result"></div>
-                    </div>
+                <div class="sum-item">
+                    <div class="sum-label lbl-perc">Percent</div>
+                    <div class="sum-val" id="c-perc"></div>
                 </div>
+                <div class="sum-item">
+                    <div class="sum-label lbl-grd">Grade</div>
+                    <div class="sum-val" id="c-grade"></div>
+                </div>
+                <div class="sum-item">
+                    <div class="sum-label lbl-res">Result</div>
+                    <div class="sum-val" id="c-result"></div>
+                </div>
+            </div>
 
-                <div class="cert-footer">
-                    <div class="qr-box">
-                        <div id="qrcode"></div>
-                        <small style="font-size: 7pt; color: #888;">Scan to Verify</small>
-                    </div>
-                    <div class="sign-box">
-                        <img id="c-sign" class="sign-img hidden" src="">
-                        <div class="sign-line lbl-sign">Principal Signature</div>
-                    </div>
+            <div class="cert-footer">
+                <div class="qr-box">
+                    <div id="qrcode"></div>
+                    <small style="font-size: 7pt; color: #888;">Scan to Verify</small>
+                </div>
+                <div class="sign-box">
+                    <img id="c-sign" class="sign-img hidden" src="">
+                    <div class="sign-line lbl-sign">Principal Signature</div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <script>
@@ -1094,25 +1215,130 @@
                 this.renderPreview();
             },
 
-            async fetchPublishedData() {
+            let publicData = null;
+
+            async function autoLoadPublishedResults() {
                 try {
-                    const response = await fetch('../../data/published-results.json');
-                    if (!response.ok) throw new Error("No data found");
-                    const json = await response.json();
+                    const response = await fetch("published-results.json");
+        if (!response.ok) throw new Error("No file found");
 
-                    if (json.meta) this.state.meta = json.meta;
-                    if (json.signature) this.state.signature = json.signature;
+        publicData = await response.json();
+        initializePortal(publicData);
 
-                    if (json.data && json.data.exams) {
-                        let allStudents = [];
-                        json.data.exams.forEach(ex => allStudents.push(...ex.results));
-                        this.state.students = allStudents;
-                        console.log(`Loaded ${allStudents.length} published records.`);
+    } catch (err) {
+            console.log("No static file found.");
+        }
+}
+
+        window.addEventListener("DOMContentLoaded", autoLoadPublishedResults);
+
+        document.getElementById("published-results-upload")
+            .addEventListener("change", function () {
+
+                const file = this.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    try {
+                        publicData = JSON.parse(e.target.result);
+                        initializePortal(publicData);
+
+                        document.getElementById("published-results-status")
+                            .innerHTML = "Results loaded successfully";
+
+                    } catch (err) {
+                        document.getElementById("published-results-status")
+                            .innerHTML = "Invalid JSON file";
                     }
-                } catch (err) {
-                    console.log("Static Data Fetch Skip:", err.message);
+                };
+
+                reader.readAsText(file);
+            });
+
+        function initializePortal(data) {
+
+            const select = document.getElementById("examSelect");
+            select.innerHTML = `<option value="">-- Select Exam --</option>`;
+
+            data.exams.forEach(exam => {
+                select.innerHTML += `
+            <option value="${exam.examId}">
+                ${exam.examName}
+            </option>
+        `;
+            });
+
+            select.disabled = false;
+
+            select.addEventListener("change", function () {
+                document.getElementById("submitBtn").disabled =
+                    !this.value;
+
+                document.getElementById("submitBtn").style.opacity =
+                    this.value ? "1" : "0.5";
+            });
+        }
+
+        document.getElementById("resultsForm")
+            .addEventListener("submit", function (e) {
+
+                e.preventDefault();
+
+                const examId =
+                    document.getElementById("examSelect").value;
+
+                if (!examId || !publicData) {
+                    alert("Please select exam.");
+                    return;
                 }
+
+                const exam =
+                    publicData.exams.find(e => e.examId === examId);
+
+                const roll =
+                    document.getElementById("rollInput").value.trim();
+
+                const student =
+                    exam.students.find(s =>
+                        String(s.rollNo).trim() === roll
+                    );
+
+                if (!student) {
+                    alert(`Result not found for Roll No: ${roll}`);
+                    return;
+                }
+
+                alert("Result Found: " + student.name);
+            });
+
+
+
+
+
+
+
+
+            async fetchPublishedData() {
+            try {
+                const response = await fetch('../../data/published-results.json');
+                if (!response.ok) throw new Error("No data found");
+                const json = await response.json();
+
+                if (json.meta) this.state.meta = json.meta;
+                if (json.signature) this.state.signature = json.signature;
+
+                if (json.data && json.data.exams) {
+                    let allStudents = [];
+                    json.data.exams.forEach(ex => allStudents.push(...ex.results));
+                    this.state.students = allStudents;
+                    console.log(`Loaded ${allStudents.length} published records.`);
+                }
+            } catch (err) {
+                console.log("Static Data Fetch Skip:", err.message);
             }
+        }
         };
 
         // Initialize App
@@ -1120,6 +1346,7 @@
             proExamApp.init();
         });
     </script>
+    <script src="../../assets/js/exam-app.js"></script>
 
 </body>
 

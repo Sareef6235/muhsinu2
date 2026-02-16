@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Result Portal</title>
+
+<!-- Icons -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<!-- PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+<style>
+:root{
+    --primary:#1a237e;
+    --bg:#f4f6f8;
+    --surface:#fff;
+    --border:#e0e0e0;
+    --danger:#c0392b;
+}
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:var(--bg);
+}
+
+/* Utility */
+.hidden{display:none!important;}
+
+.btn{
+    padding:10px 15px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:500;
+}
+
+.btn-primary{
+    background:var(--primary);
+    color:#fff;
+}
+
+.btn-secondary{
+    background:#fff;
+    border:1px solid var(--border);
+}
+
+.form-control{
+    width:100%;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    margin-bottom:10px;
+}
+
+/* PUBLIC */
+#public-view{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+}
+
+.login-box{
+    width:100%;
+    max-width:400px;
+    background:#fff;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.05);
+    text-align:center;
+}
+
+/* ADMIN */
+#admin-layout{
+    display:flex;
+}
+
+.sidebar{
+    width:240px;
+    background:#fff;
+    height:100vh;
+    border-right:1px solid var(--border);
+    padding:20px;
+}
+
+.nav-item{
+    padding:10px;
+    cursor:pointer;
+    margin-bottom:5px;
+}
+
+.nav-item.active{
+    background:#e8eaf6;
+    font-weight:bold;
+}
+
+.admin-content{
+    flex:1;
+    padding:30px;
+}
+
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* CERTIFICATE MODAL */
+#certificate-area{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.8);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+#certificate-area.visible{
+    display:flex;
+}
+
+.cert-container{
+    background:#fff;
+    padding:40px;
+    width:600px;
+    border-radius:8px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- PUBLIC VIEW -->
+<div id="public-view">
+    <div class="login-box">
+
+        <div style="font-size:3rem;color:var(--primary);margin-bottom:15px;">
+            <i class="ph-bold ph-student"></i>
+        </div>
+
+        <h2>Result Portal</h2>
+        <p style="margin-bottom:20px;">Enter Register Number</p>
+
+        <input type="text" id="publicRegInput"
+            class="form-control"
+            placeholder="Register Number">
+
+        <button class="btn btn-primary"
+            style="width:100%;"
+            onclick="proExamApp.publicSearch()">
+            View Result
+        </button>
+
+        <div id="public-msg"
+            style="margin-top:10px;color:var(--danger);"></div>
+
+        <button class="btn btn-secondary"
+            style="margin-top:20px;"
+            onclick="proExamApp.toggleAdminLogin()">
+            Admin Login
+        </button>
+
+        <div id="admin-login-form" class="hidden">
+            <input type="password"
+                id="adminPassInput"
+                class="form-control"
+                placeholder="Admin Password">
+
+            <button class="btn btn-primary"
+                style="width:100%;"
+                onclick="proExamApp.adminLogin()">
+                Login
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-layout" class="hidden">
+
+    <div class="sidebar">
+        <div class="nav-item active"
+            onclick="proExamApp.nav('dashboard',this)">
+            Dashboard
+        </div>
+
+        <div class="nav-item"
+            onclick="proExamApp.nav('upload',this)">
+            Upload Results
+        </div>
+
+        <div class="nav-item"
+            onclick="proExamApp.logout()"
+            style="color:red;">
+            Logout
+        </div>
+    </div>
+
+    <div class="admin-content">
+
+        <div id="panel-dashboard" class="panel active">
+            <h2>Dashboard</h2>
+            <p>Total Students: <span id="d-total">0</span></p>
+        </div>
+
+        <div id="panel-upload" class="panel">
+            <h2>Upload JSON</h2>
+            <input type="file"
+                accept=".json"
+                class="form-control"
+                onchange="proExamApp.handleJsonUpload(this)">
+            <p id="upload-status"></p>
+        </div>
+
+    </div>
+</div>
+
+<!-- CERTIFICATE -->
+<div id="certificate-area">
+    <div class="cert-container" id="printable-cert">
+        <h2>Result Certificate</h2>
+        <div id="cert-content"></div>
+        <br>
+        <button class="btn btn-secondary"
+            onclick="proExamApp.closeCert()">
+            Close
+        </button>
+        <button class="btn btn-primary"
+            onclick="proExamApp.downloadPDF()">
+            Download PDF
+        </button>
+    </div>
+</div>
+
+<script>
+const proExamApp = {
+
+state:{
+    students:[]
+},
+
+toggleAdminLogin(){
+    document.getElementById('admin-login-form')
+        .classList.toggle('hidden');
+},
+
+adminLogin(){
+    if(document.getElementById('adminPassInput').value==="admin123"){
+        document.getElementById('public-view').classList.add('hidden');
+        document.getElementById('admin-layout').classList.remove('hidden');
+    }else{
+        alert("Wrong Password");
+    }
+},
+
+logout(){
+    document.getElementById('admin-layout').classList.add('hidden');
+    document.getElementById('public-view').classList.remove('hidden');
+},
+
+nav(panel,el){
+    document.querySelectorAll('.panel')
+        .forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+panel)
+        .classList.add('active');
+
+    document.querySelectorAll('.nav-item')
+        .forEach(n=>n.classList.remove('active'));
+    el.classList.add('active');
+},
+
+handleJsonUpload(input){
+    const file=input.files[0];
+    const reader=new FileReader();
+
+    reader.onload=e=>{
+        this.state.students=JSON.parse(e.target.result);
+        document.getElementById('d-total')
+            .textContent=this.state.students.length;
+        document.getElementById('upload-status')
+            .innerText="Loaded "+this.state.students.length+" records";
+    };
+
+    reader.readAsText(file);
+},
+
+publicSearch(){
+    const reg=document.getElementById('publicRegInput').value;
+    const student=this.state.students.find(s=>s.roll==reg);
+
+    if(!student){
+        document.getElementById('public-msg')
+            .innerText="Result Not Found";
+        return;
+    }
+
+    document.getElementById('cert-content')
+        .innerHTML=`<p>Name: ${student.name}</p>
+                    <p>Total: ${student.total}</p>`;
+
+    document.getElementById('certificate-area')
+        .classList.add('visible');
+},
+
+closeCert(){
+    document.getElementById('certificate-area')
+        .classList.remove('visible');
+},
+
+downloadPDF(){
+    html2pdf().from(
+        document.getElementById('printable-cert')
+    ).save("Result.pdf");
+}
+
+};
+</script>
+
+</body>
+</html>
