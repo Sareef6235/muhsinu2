@@ -131,8 +131,8 @@
 
                 <hr>
 
-                <h3>Generate Encrypted Expiring Link (24h)</h3>
-                <button class="btn btn-primary" onclick="App.generateLink()">Generate Secure Link</button>
+                <h3>Generate Secure Portal Link</h3>
+                <button class="btn btn-primary" onclick="App.generateLink()">Generate Link</button>
 
                 <div id="generatedLink"></div>
 
@@ -190,65 +190,6 @@
                 secretKey: "12345678901234567890123456789012"
             },
 
-            generateLink: async function () {
-
-                if (!this.state.data) {
-                    alert("Upload JSON First");
-                    return;
-                }
-
-                try {
-
-                    const payload = {
-                        data: this.state.data,
-                        exp: Date.now() + 86400000
-                    };
-
-                    const encrypted = await this.encrypt(JSON.stringify(payload));
-
-                    const url = window.location.origin +
-                        window.location.pathname +
-                        "?secure=" + encrypted;
-
-                    document.getElementById("generatedLink").innerHTML =
-                        `<a href="${url}" target="_blank">${url}</a>`;
-
-                } catch (err) {
-                    console.error(err);
-                    alert("Error generating secure link. Check console.");
-                }
-
-            },
-
-            encrypt: async function (text) {
-
-                const encoder = new TextEncoder();
-                const keyData = encoder.encode(this.state.secretKey);
-
-                const cryptoKey = await crypto.subtle.importKey(
-                    "raw",
-                    keyData,
-                    { name: "AES-GCM" },
-                    false,
-                    ["encrypt"]
-                );
-
-                const iv = crypto.getRandomValues(new Uint8Array(12));
-
-                const encrypted = await crypto.subtle.encrypt(
-                    { name: "AES-GCM", iv: iv },
-                    cryptoKey,
-                    encoder.encode(text)
-                );
-
-                return btoa(JSON.stringify({
-                    iv: Array.from(iv),
-                    data: Array.from(new Uint8Array(encrypted))
-                }));
-
-            },
-
-
             /* ---------------- ADMIN ---------------- */
 
             adminLogin() {
@@ -266,40 +207,29 @@
                 reader.readAsText(input.files[0]);
             },
 
-            /* ---------------- ENCRYPTION ---------------- */
-
-            generateLink: async function () {
-
+            generateLink: function () {
                 if (!this.state.data) {
-                    alert("Please upload JSON first");
+                    alert("Upload JSON First");
                     return;
                 }
 
-                const payload = {
-                    data: this.state.data,
-                    exp: Date.now() + 86400000 // 24 hours expiry
-                };
+                // Create unique exam ID
+                const examId = "exam-" + Date.now();
 
-                try {
+                // Save JSON locally (simulate publish)
+                localStorage.setItem(examId, JSON.stringify(this.state.data));
 
-                    const encrypted = await this.encrypt(JSON.stringify(payload));
+                const url = window.location.origin +
+                    window.location.pathname +
+                    "?exam=" + examId;
 
-                    const url = window.location.origin +
-                        window.location.pathname +
-                        "?secure=" + encrypted;
-
-                    document.getElementById("generatedLink").innerHTML =
-                        `<a href="${url}" target="_blank">${url}</a>`;
-
-                } catch (err) {
-                    alert("Error generating secure link");
-                    console.error(err);
-                }
-
+                document.getElementById("generatedLink").innerHTML =
+                    `<a href="${url}" target="_blank">${url}</a>`;
             },
 
-            encrypt: async function (text) {
+            /* ---------------- ENCRYPTION (Legacy/Reference) ---------------- */
 
+            encrypt: async function (text) {
                 const encoder = new TextEncoder();
                 const keyData = encoder.encode(this.state.secretKey);
 
@@ -323,9 +253,7 @@
                     iv: Array.from(iv),
                     data: Array.from(new Uint8Array(encrypted))
                 }));
-
             },
-
 
             async decrypt(token) {
                 const obj = JSON.parse(atob(token));
@@ -348,35 +276,29 @@
                 return new TextDecoder().decode(decrypted);
             },
 
-            /* ---------------- LOAD TOKEN ---------------- */
+            /* ---------------- LOAD DATA ---------------- */
 
-            async loadSecure() {
+            loadSecure: function () {
                 const params = new URLSearchParams(window.location.search);
-                const token = params.get("secure");
-                if (!token) return;
+                const examId = params.get("exam");
 
-                try {
-                    const decoded = await this.decrypt(token);
-                    const parsed = JSON.parse(decoded);
+                if (!examId) return;
 
-                    if (Date.now() > parsed.exp) {
-                        alert("Link Expired");
-                        return;
-                    }
+                const stored = localStorage.getItem(examId);
 
-                    this.state.tokenData = parsed.data;
-
-                } catch {
-                    alert("Invalid or Tampered Link");
+                if (!stored) {
+                    alert("Invalid or Expired Link");
+                    return;
                 }
+
+                this.state.tokenData = JSON.parse(stored);
             },
 
             /* ---------------- SEARCH ---------------- */
 
             search() {
-
                 if (!this.state.tokenData) {
-                    alert("Secure Data Not Loaded");
+                    alert("Data Not Loaded. Use a valid portal link.");
                     return;
                 }
 
@@ -407,7 +329,6 @@
             /* ---------------- CERTIFICATE ---------------- */
 
             renderCertificate(obj, lang) {
-
                 const text = {
                     en: { name: "Name", roll: "Roll", total: "Total", status: "Status" },
                     ml: { name: "പേര്", roll: "റോള്", total: "മൊത്തം", status: "ഫലം" }
@@ -421,11 +342,11 @@
                 document.getElementById("certExam").innerText = obj.exam;
 
                 document.getElementById("certContent").innerHTML = `
-  <p><strong>${t.name}:</strong> ${obj.student.name}</p>
-  <p><strong>${t.roll}:</strong> ${obj.student.roll}</p>
-  <p><strong>${t.total}:</strong> ${obj.student.total}</p>
-  <p><strong>${t.status}:</strong> ${obj.student.status}</p>
- `;
+                  <p><strong>${t.name}:</strong> ${obj.student.name}</p>
+                  <p><strong>${t.roll}:</strong> ${obj.student.roll}</p>
+                  <p><strong>${t.total}:</strong> ${obj.student.total}</p>
+                  <p><strong>${t.status}:</strong> ${obj.student.status}</p>
+                 `;
 
                 document.getElementById("qrcode").innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), {
@@ -443,7 +364,7 @@
             downloadPDF() {
                 html2pdf().from(
                     document.getElementById("certificate")
-                ).save("Secure_Result.pdf");
+                ).save("Result.pdf");
             },
 
             /* ---------------- ANALYTICS ---------------- */
