@@ -187,13 +187,72 @@
             state: {
                 data: null,
                 tokenData: null,
-                secretKey: "ULTRA_MILITARY_SECRET_2026"
+                secretKey: "12345678901234567890123456789012"
             },
+
+            generateLink: async function () {
+
+                if (!this.state.data) {
+                    alert("Upload JSON First");
+                    return;
+                }
+
+                try {
+
+                    const payload = {
+                        data: this.state.data,
+                        exp: Date.now() + 86400000
+                    };
+
+                    const encrypted = await this.encrypt(JSON.stringify(payload));
+
+                    const url = window.location.origin +
+                        window.location.pathname +
+                        "?secure=" + encrypted;
+
+                    document.getElementById("generatedLink").innerHTML =
+                        `<a href="${url}" target="_blank">${url}</a>`;
+
+                } catch (err) {
+                    console.error(err);
+                    alert("Error generating secure link. Check console.");
+                }
+
+            },
+
+            encrypt: async function (text) {
+
+                const encoder = new TextEncoder();
+                const keyData = encoder.encode(this.state.secretKey);
+
+                const cryptoKey = await crypto.subtle.importKey(
+                    "raw",
+                    keyData,
+                    { name: "AES-GCM" },
+                    false,
+                    ["encrypt"]
+                );
+
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+
+                const encrypted = await crypto.subtle.encrypt(
+                    { name: "AES-GCM", iv: iv },
+                    cryptoKey,
+                    encoder.encode(text)
+                );
+
+                return btoa(JSON.stringify({
+                    iv: Array.from(iv),
+                    data: Array.from(new Uint8Array(encrypted))
+                }));
+
+            },
+
 
             /* ---------------- ADMIN ---------------- */
 
             adminLogin() {
-                if (document.getElementById("adminPass").value === "enterprise123") {
+                if (document.getElementById("adminPass").value === "1234") {
                     document.getElementById("adminArea").classList.remove("hidden");
                 } else alert("Wrong Password");
             },
@@ -241,11 +300,12 @@
 
             encrypt: async function (text) {
 
-                const enc = new TextEncoder();
+                const encoder = new TextEncoder();
+                const keyData = encoder.encode(this.state.secretKey);
 
-                const key = await crypto.subtle.importKey(
+                const cryptoKey = await crypto.subtle.importKey(
                     "raw",
-                    enc.encode(this.state.secretKey),
+                    keyData,
                     { name: "AES-GCM" },
                     false,
                     ["encrypt"]
@@ -253,18 +313,19 @@
 
                 const iv = crypto.getRandomValues(new Uint8Array(12));
 
-                const cipher = await crypto.subtle.encrypt(
+                const encrypted = await crypto.subtle.encrypt(
                     { name: "AES-GCM", iv: iv },
-                    key,
-                    enc.encode(text)
+                    cryptoKey,
+                    encoder.encode(text)
                 );
 
                 return btoa(JSON.stringify({
                     iv: Array.from(iv),
-                    data: Array.from(new Uint8Array(cipher))
+                    data: Array.from(new Uint8Array(encrypted))
                 }));
 
             },
+
 
             async decrypt(token) {
                 const obj = JSON.parse(atob(token));
