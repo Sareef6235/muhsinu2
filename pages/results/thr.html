@@ -244,40 +244,33 @@
                 else alert("Unauthorized Access Detected.");
             },
 
-            async uploadJSON(input) {
+            uploadJSON(input) {
                 const file = input.files[0];
                 if (!file) return;
 
                 const reader = new FileReader();
-                reader.onload = async e => {
+                reader.onload = e => {
                     try {
                         const jsonData = JSON.parse(e.target.result);
                         this.state.data = jsonData;
-                        document.getElementById("jsonStatus").innerText = "Analyzing Source... ";
 
-                        // Server-Side Deployment (API Sync)
-                        const res = await fetch('/api/upload', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(jsonData)
-                        });
+                        // Local Persistence Protocol
+                        localStorage.setItem("publishedResults", JSON.stringify(jsonData));
 
-                        if (res.ok) {
-                            document.getElementById("jsonStatus").innerText = "Success: Server Source Updated!";
-                            document.getElementById("jsonStatus").style.color = "var(--success)";
-                            document.getElementById("portalStatus").innerText = "Records Active: Sync Complete.";
-                        } else {
-                            throw new Error("API Failure");
-                        }
+                        document.getElementById("jsonStatus").innerText = "Data Loaded Successfully (Local Mode)";
+                        document.getElementById("jsonStatus").style.color = "var(--success)";
+                        document.getElementById("portalStatus").innerText = "Records Active: Local Secure Session.";
+                        document.getElementById("portalStatus").style.color = "var(--success)";
                     } catch (err) {
-                        console.error("Upload/API Error:", err);
-                        alert("Sync Failure: Local session active but server save failed.");
-                        document.getElementById("jsonStatus").innerText = "Sync Terminated.";
+                        console.error("Restoration/Upload Error:", err);
+                        alert("Invalid JSON Source: Intelligence injection aborted.");
+                        document.getElementById("jsonStatus").innerText = "Source Failure.";
                         document.getElementById("jsonStatus").style.color = "var(--danger)";
                     }
                 };
                 reader.readAsText(file);
             },
+
             terminate() {
                 localStorage.removeItem("analytics");   // clear logs (optional)
                 sessionStorage.clear();                 // clear session
@@ -437,7 +430,22 @@
             }
 
         };
-        window.onload = () => { App.loadSecure(); }
+        window.onload = () => {
+            const savedData = localStorage.getItem("publishedResults");
+            if (savedData) {
+                try {
+                    App.state.data = JSON.parse(savedData);
+                    document.getElementById("portalStatus").innerText = "Records Active: Restored From Local Storage.";
+                    document.getElementById("portalStatus").style.color = "var(--success)";
+                    document.getElementById("jsonStatus").innerText = "Source: Persistent Local Sync.";
+                } catch (err) {
+                    console.error("Session Restoration Error:", err);
+                    localStorage.removeItem("publishedResults");
+                }
+            }
+            App.loadSecure();
+        };
+
     </script>
 </body>
 
