@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Secure Result System</title>
+
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #6366f1;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, sans-serif;
+            background: var(--bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Certificate */
+        #certificate {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .cert-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .school-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .exam-title {
+            font-size: 18px;
+            color: gray;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎓 Enterprise Secure Result System</h1>
+
+        <!-- ADMIN PANEL -->
+        <div class="card">
+            <h2>🔐 Admin Panel</h2>
+            <input type="password" id="adminPass" class="input" placeholder="Enter Admin Password">
+            <button class="btn btn-primary" onclick="App.adminLogin()">Login</button>
+
+            <div id="adminArea" class="hidden">
+                <hr>
+                <h3>Upload JSON (Multi School + Multi Exam)</h3>
+                <input type="file" accept=".json" class="input" onchange="App.uploadJSON(this)">
+                <div id="jsonStatus">No data loaded</div>
+                <hr>
+                <h3>Generate Secure Portal Link</h3>
+                <button class="btn btn-primary" onclick="App.generateLink()">Generate Secure Link</button>
+                <div id="generatedLink"></div>
+                <hr>
+                <button class="btn btn-danger" onclick="App.showAnalytics()">View Analytics</button>
+            </div>
+        </div>
+
+        <!-- DIRECT SEARCH -->
+        <div id="searchSection" class="card">
+            <h2>🔍 Personal Records Search</h2>
+            <p style="font-size:0.9rem; color:var(--success);" id="portalStatus">
+                Records Active: <span id="statusText">No data loaded</span>
+            </p>
+            <label style="font-weight:500; font-size:0.9rem;">Roll Identification</label>
+            <input type="text" id="rollInput" class="input" placeholder="Enter Roll Number">
+            <label style="font-weight:500; font-size:0.9rem;">Language Protocol</label>
+            <select id="langSelect" class="input">
+                <option value="en">English</option>
+                <option value="ml">Malayalam</option>
+            </select>
+            <button class="btn btn-primary" onclick="App.searchDirect()" style="width:100%;">Execute Search</button>
+            <div id="resultMsg" style="text-align:center; margin-top:15px; font-weight:500;"></div>
+        </div>
+
+        <!-- CERTIFICATE -->
+        <div id="certificateArea" class="hidden">
+            <div id="certificate">
+                <div class="cert-header">
+                    <div class="school-name" id="certSchool"></div>
+                    <div class="exam-title" id="certExam"></div>
+                </div>
+                <div id="certContent"></div>
+                <button class="btn btn-primary" onclick="App.downloadPDF()">Download PDF</button>
+            </div>
+        </div>
+
+        <script>
+            const App = {
+                state: { data: null, tokenData: null },
+
+                adminLogin() {
+                    const pass = document.getElementById("adminPass").value;
+                    if (pass === "1234") {
+                        document.getElementById("adminArea").classList.remove("hidden");
+                    } else alert("Wrong Password");
+                },
+
+                uploadJSON(input) {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        this.state.data = JSON.parse(e.target.result);
+                        document.getElementById("jsonStatus").innerText = "Data Loaded!";
+                        document.getElementById("statusText").innerText = "Data Loaded! Ready for search.";
+                    };
+                    reader.readAsText(file);
+                },
+
+                // SHORT SECURE TOKEN
+                generateLink() {
+                    if (!this.state.data) { alert("Upload JSON First"); return; }
+                    const payload = { data: this.state.data, time: Date.now() };
+                    const token = btoa(JSON.stringify(payload)).replace(/=/g, "");
+                    const url = window.location.origin + window.location.pathname + "?token=" + token;
+                    document.getElementById("generatedLink").innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+                },
+
+                // DIRECT SEARCH WITHOUT TOKEN
+                searchDirect() {
+                    let data = this.state.data || this.state.tokenData;
+                    if (!data) { document.getElementById("resultMsg").innerText = "No data loaded. Please upload JSON first."; return; }
+                    const roll = document.getElementById("rollInput").value.trim();
+                    if (!roll) { document.getElementById("resultMsg").innerText = "Enter a Roll Number!"; return; }
+                    let found = null;
+                    data.schools.forEach(s => { s.exams.forEach(e => { e.students.forEach(st => { if (st.roll == roll) { found = { school: s.name, exam: e.name, student: st }; } }); }); });
+                    if (!found) { document.getElementById("resultMsg").innerText = "Result Not Found"; return; }
+                    this.trackAnalytics(roll);
+                    this.renderCertificate(found);
+                },
+
+                renderCertificate(obj) {
+                    document.getElementById("certificateArea").classList.remove("hidden");
+                    document.getElementById("certSchool").innerText = obj.school;
+                    document.getElementById("certExam").innerText = obj.exam;
+                    const lang = document.getElementById("langSelect").value;
+                    let content = "";
+                    if (lang === "ml") {
+                        content = `<p><strong>പേര്:</strong> ${obj.student.name}</p>
+           <p><strong>റോൾ:</strong> ${obj.student.roll}</p>
+           <p><strong>മൊത്തം:</strong> ${obj.student.total}</p>
+           <p><strong>സ്റ്റാറ്റസ്:</strong> ${obj.student.status}</p>`;
+                    } else {
+                        content = `<p><strong>Name:</strong> ${obj.student.name}</p>
+           <p><strong>Roll:</strong> ${obj.student.roll}</p>
+           <p><strong>Total:</strong> ${obj.student.total}</p>
+           <p><strong>Status:</strong> ${obj.student.status}</p>`;
+                    }
+                    document.getElementById("certContent").innerHTML = content;
+                },
+
+                downloadPDF() { html2pdf().from(document.getElementById("certificate")).save("Result.pdf"); },
+
+                trackAnalytics(roll) {
+                    let logs = JSON.parse(localStorage.getItem("analytics") || "[]");
+                    logs.push({ roll, time: new Date().toLocaleString() });
+                    localStorage.setItem("analytics", JSON.stringify(logs));
+                },
+
+                showAnalytics() {
+                    const logs = JSON.parse(localStorage.getItem("analytics") || "[]");
+                    if (logs.length === 0) { alert("No Analytics Data Found"); return; }
+                    console.table(logs);
+                    alert("Analytics shown in Console (Press F12)");
+                },
+
+                // Load token if exists
+                loadSecure() {
+                    const params = new URLSearchParams(window.location.search);
+                    const token = params.get("token");
+                    if (token) {
+                        const decoded = JSON.parse(atob(token));
+                        this.state.tokenData = decoded.data;
+                        document.getElementById("statusText").innerText = "Data Loaded via Secure Token!";
+                    }
+                }
+            };
+
+            window.onload = () => { App.loadSecure(); };
+        </script>
+</body>
+
+</html>
