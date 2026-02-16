@@ -195,7 +195,7 @@
                 <hr style="margin:20px 0;border:0;border-top:1px solid var(--border);">
                 <div style="display:flex;gap:10px;">
                     <button class="btn btn-danger" onclick="App.showAnalytics()">Intelligence Logs</button>
-                    <button class="btn btn-danger" onclick="location.reload()">Terminate</button>
+                    <button class="btn btn-danger" onclick="App.terminate()">Terminate</button>
                 </div>
             </div>
         </div>
@@ -278,6 +278,11 @@
                 };
                 reader.readAsText(file);
             },
+            terminate() {
+                localStorage.removeItem("analytics");   // clear logs (optional)
+                sessionStorage.clear();                 // clear session
+                location.reload();
+            },
 
 
             loadFromSheet() {
@@ -355,21 +360,41 @@
                 new QRCode(document.getElementById("qrcode"), { text: window.location.href + "&roll=" + (st.Roll || st.roll), width: 120, height: 120 });
             },
 
-            closeCert() { document.getElementById("certificateArea").classList.remove("active"); },
+            closeCert() {
+                document.getElementById("certificateArea").classList.remove("active");
+            },
 
-            downloadPDF() { html2pdf().from(document.getElementById("certificate")).save("Record_Scan.pdf"); },
+            downloadPDF() {
+                const element = document.getElementById("certificate");
+                const opt = {
+                    margin: 0,
+                    filename: 'Record_Scan.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(element).save();
+            },
 
             trackAnalytics(roll) {
                 let logs = JSON.parse(localStorage.getItem("analytics") || "[]");
-                logs.push({ roll, time: new Date().toLocaleString() });
+                logs.push({
+                    roll: roll,
+                    time: new Date().toLocaleString()
+                });
                 localStorage.setItem("analytics", JSON.stringify(logs));
             },
 
             showAnalytics() {
                 const logs = JSON.parse(localStorage.getItem("analytics") || "[]");
-                if (logs.length === 0) { alert("No Intelligence Data Found."); return; }
-                console.table(logs); alert("Intelligence logs sent to Console Protocol.");
+                if (logs.length === 0) {
+                    alert("No Intelligence Logs Found");
+                    return;
+                }
+                console.table(logs);
+                alert("Logs displayed in Console (Press F12)");
             },
+
 
             loadSecure() {
                 const params = new URLSearchParams(window.location.search);
