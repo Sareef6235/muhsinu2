@@ -280,8 +280,8 @@
         <!-- PUBLIC SEARCH SECTION -->
         <div id="searchSection" class="card">
             <h2>🔍 Personal Records Search</h2>
-            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;" id="portalStatus">
-                Please access the portal via a secure deployment link to view results.
+            <p style="font-size: 0.9rem; color: var(--success); margin-bottom: 20px;" id="portalStatus">
+                Records Active: Waiting for secure token...
             </p>
 
             <label style="font-weight: 500; font-size: 0.9rem;">Roll Identification</label>
@@ -323,8 +323,7 @@
         const App = {
             state: {
                 data: null,
-                tokenData: null,
-                secretKey: "12345678901234567890123456789012" // Reference for legacy encrypted links
+                tokenData: null
             },
 
             /* ---------------- AUTHENTICATION ---------------- */
@@ -371,14 +370,10 @@
                     return;
                 }
 
-                // Create unique exam persistence ID
                 const examToken = "mil-exam-" + Date.now();
-
-                // Store in persistence layer
                 localStorage.setItem(examToken, JSON.stringify(this.state.data));
 
                 const url = window.location.origin + window.location.pathname + "?exam=" + examToken;
-
                 const linkEl = document.getElementById("generatedLink");
                 linkEl.classList.remove("hidden");
                 linkEl.innerHTML = `<strong>Deployment Success:</strong><br><a href="${url}" target="_blank">${url}</a>`;
@@ -388,26 +383,49 @@
 
             /* ---------------- DATA LOADING ---------------- */
 
-            loadContext() {
+            loadSecure() {
                 const params = new URLSearchParams(window.location.search);
-                const examToken = params.get("exam");
+                const token = params.get("exam");
 
-                if (examToken) {
-                    const stored = localStorage.getItem(examToken);
-                    if (stored) {
-                        try {
-                            this.state.tokenData = JSON.parse(stored);
-                            document.getElementById("portalStatus").innerText = "Records Active: Connection Established.";
-                            document.getElementById("portalStatus").style.color = "var(--success)";
-                            console.log("Portal Initialized with Token:", examToken);
-                        } catch (e) {
-                            console.error("Token Corruption:", e);
-                            document.getElementById("portalStatus").innerText = "Error: Transmission Corruption detected.";
-                        }
-                    } else {
-                        document.getElementById("portalStatus").innerText = "Error: Link Expired or Invalid Protocol.";
-                        document.getElementById("portalStatus").style.color = "var(--danger)";
+                if (!token) {
+                    document.getElementById("portalStatus").innerText = "Records Active: Waiting for secure token...";
+                    document.getElementById("resultMsg").innerText = "Please open via secure link.";
+                    return;
+                }
+
+                // Retrieve from persistence
+                const stored = localStorage.getItem(token);
+                if (stored) {
+                    try {
+                        this.state.tokenData = JSON.parse(stored);
+                        document.getElementById("portalStatus").innerText = "Records Active: Secure Connection Established.";
+                        document.getElementById("portalStatus").style.color = "var(--success)";
+                        document.getElementById("resultMsg").innerText = "Identification scan required.";
+                    } catch (e) {
+                        console.error("Token Error:", e);
+                        document.getElementById("portalStatus").innerText = "Error: Transmission Integrity Failure.";
                     }
+                } else {
+                    // Fallback to simulation/testing data as requested
+                    console.warn("Token not found. Engaging simulation mode.");
+                    this.state.tokenData = {
+                        "schools": [
+                            {
+                                "name": "Sunrise Public School",
+                                "exams": [
+                                    {
+                                        "name": "mil-exam-simulated",
+                                        "students": [
+                                            { "roll": "101", "name": "Alice Kumar", "total": 450, "status": "Pass" },
+                                            { "roll": "102", "name": "Bob Joseph", "total": 390, "status": "Pass" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    };
+                    document.getElementById("portalStatus").innerText = "Records Active: Simulation Data Initialized.";
+                    document.getElementById("portalStatus").style.color = "var(--success)";
                 }
             },
 
@@ -415,57 +433,55 @@
 
             search() {
                 if (!this.state.tokenData) {
-                    document.getElementById("resultMsg").innerText = "No Result Data Loaded. Open using generated secure link.";
+                    document.getElementById("resultMsg").innerText = "Operation Blocked: No active record session.";
                     return;
                 }
 
                 const roll = document.getElementById("rollInput").value.trim();
                 if (!roll) {
-                    document.getElementById("resultMsg").innerText = "Please enter Roll Number";
+                    document.getElementById("resultMsg").innerText = "Input Required: Identification missing.";
                     return;
                 }
 
                 let found = null;
-
-                // Loop through schools & exams
                 this.state.tokenData.schools.forEach(school => {
                     school.exams.forEach(exam => {
                         exam.students.forEach(student => {
                             if (student.roll == roll) {
-                                found = { school: school.name, exam: exam.name, student };
+                                found = { school: school.name, exam: exam.name, student: student };
                             }
                         });
                     });
                 });
 
                 if (!found) {
-                    document.getElementById("resultMsg").innerText = "Result Not Found";
+                    document.getElementById("resultMsg").innerText = "Status: Identification Not Found.";
+                    document.getElementById("resultMsg").style.color = "var(--danger)";
                     return;
                 }
 
-                // Show result
-                document.getElementById("resultMsg").innerHTML = `
-        <p><strong>Name:</strong> ${found.student.name}</p>
-        <p><strong>Roll:</strong> ${found.student.roll}</p>
-        <p><strong>Total:</strong> ${found.student.total}</p>
-        <p><strong>Status:</strong> ${found.student.status}</p>
-    `;
-
-                // Track analytics
+                // Execution
                 this.trackAnalytics(roll);
 
-                // Render certificate
+                // Result Summary
+                document.getElementById("resultMsg").style.color = "var(--primary)";
+                document.getElementById("resultMsg").innerHTML = `
+                    <div style="background: var(--bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px;">
+                        <strong>${found.student.name}</strong><br>
+                        ID: ${found.student.roll} | Evaluation: <span style="color:${found.student.status.toLowerCase() === 'pass' ? 'var(--success)' : 'var(--danger)'}">${found.student.status}</span>
+                    </div>
+                `;
+
+                // Certificate Rendering
                 const lang = document.getElementById("langSelect").value;
                 this.renderCertificate(found, lang);
             },
-
 
             renderCertificate(obj, lang = 'en') {
                 const i18n = {
                     en: { name: "Full Name", roll: "Roll ID", total: "Total Score", status: "Evaluation Status" },
                     ml: { name: "പേര്", roll: "റോള് നമ്പര്‍", total: "ആകെ മാര്‍ക്ക്", status: "ഫലം" }
                 };
-
                 const t = i18n[lang] || i18n.en;
 
                 document.getElementById("certificateArea").classList.add("active");
@@ -479,7 +495,6 @@
                     <p><strong>${t.status}</strong> <span style="font-weight:700; color:${obj.student.status.toLowerCase() === 'pass' ? 'var(--success)' : 'var(--danger)'}">${obj.student.status}</span></p>
                 `;
 
-                // Update QR Code
                 document.getElementById("qrcode").innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), {
                     text: window.location.href,
@@ -507,8 +522,6 @@
                 html2pdf().set(opt).from(element).save();
             },
 
-            /* ---------------- ANALYTICS & LOGS ---------------- */
-
             trackAnalytics(roll) {
                 let logs = JSON.parse(localStorage.getItem("analytics") || "[]");
                 logs.push({
@@ -530,28 +543,9 @@
             }
         };
 
-        // Initialize Application Context
-        // On page load, try to load data from URL token or localStorage
         window.onload = () => {
-            const params = new URLSearchParams(window.location.search);
-            const examToken = params.get("exam");  // ?exam=exam-xxxx
-
-            if (examToken) {
-                const storedData = localStorage.getItem(examToken);
-                if (storedData) {
-                    App.state.tokenData = JSON.parse(storedData);
-                    document.getElementById("portalStatus").innerText = "Records Active: Connection Established.";
-                    document.getElementById("portalStatus").style.color = "var(--success)";
-                    console.log("Token data loaded for search:", App.state.tokenData);
-                } else {
-                    document.getElementById("portalStatus").innerText = "Error: Link Expired or Invalid Protocol.";
-                    document.getElementById("portalStatus").style.color = "var(--danger)";
-                }
-            } else {
-                document.getElementById("portalStatus").innerText = "Records Active: No token provided.";
-            }
+            App.loadSecure();
         };
-
     </script>
 </body>
 
