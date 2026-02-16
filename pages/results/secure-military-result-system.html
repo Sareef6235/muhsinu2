@@ -272,6 +272,16 @@
 
             <hr>
 
+            <h3>Intelligence Sync (Google Sheets)</h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">
+                Securely pull target data directly from an encrypted cloud spread-medium.
+            </p>
+            <input type="text" id="sheetIdInput" class="input" placeholder="Google Sheet ID">
+            <button class="btn btn-primary" onclick="App.loadFromSheet()">Sync Cloud Data</button>
+            <div id="sheetStatus"></div>
+
+            <hr>
+
             <h3>Intelligence Operations</h3>
             <button class="btn btn-danger" onclick="App.showAnalytics()">Access Activity Logs</button>
             <button class="btn btn-danger" onclick="App.logout()">Terminate Session</button>
@@ -319,6 +329,88 @@
         </div>
     </div>
 
+
+    <div class="card" id="googleSheetSection">
+        <h2>📄 Load Marks from Google Sheet</h2>
+
+        <label>Google Sheet ID:</label>
+        <input type="text" id="sheetIdInput" class="input" placeholder="Enter Sheet ID">
+
+        <button class="btn btn-primary" onclick="App.loadFromSheet()">Load Sheet</button>
+        <div id="sheetStatus" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card" id="searchSection">
+        <h2>🔍 Personal Records Search</h2>
+        <label>Roll Number:</label>
+        <input type="text" id="rollInput" class="input" placeholder="Enter Roll Number">
+
+        <button class="btn btn-primary" onclick="App.search()">Search</button>
+        <div id="resultMsg" style="margin-top:10px;"></div>
+    </div>
+
+    <script>
+        const App = {
+            state: {
+                data: null
+            },
+
+            loadFromSheet() {
+                const sheetId = document.getElementById("sheetIdInput").value.trim();
+                if (!sheetId) {
+                    alert("Enter Google Sheet ID!");
+                    return;
+                }
+
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
+
+                fetch(csvUrl)
+                    .then(res => res.text())
+                    .then(csvText => {
+                        // Parse CSV to JSON
+                        const lines = csvText.split("\n").filter(l => l.trim() !== "");
+                        const headers = lines[0].split(",");
+                        const jsonData = lines.slice(1).map(line => {
+                            const values = line.split(",");
+                            let obj = {};
+                            headers.forEach((h, i) => obj[h.trim()] = values[i].trim());
+                            return obj;
+                        });
+
+                        this.state.data = jsonData;
+                        document.getElementById("sheetStatus").innerText = `Sheet Loaded: ${jsonData.length} records.`;
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Error loading sheet. Make sure it's published to web.");
+                    });
+            },
+
+            search() {
+                if (!this.state.data) {
+                    document.getElementById("resultMsg").innerText = "Load sheet first!";
+                    return;
+                }
+
+                const roll = document.getElementById("rollInput").value.trim();
+                const student = this.state.data.find(s => s.Roll === roll);
+                if (!student) {
+                    document.getElementById("resultMsg").innerText = "Result Not Found!";
+                    return;
+                }
+
+                document.getElementById("resultMsg").innerHTML = `
+      <strong>${student.Name}</strong><br>
+      Roll: ${student.Roll}<br>
+      Total: ${student.Total}<br>
+      Status: ${student.Status}
+    `;
+            }
+        };
+    </script>
+
+
+
     <script>
         const App = {
             state: {
@@ -362,6 +454,37 @@
                     }
                 };
                 reader.readAsText(file);
+            },
+
+            loadFromSheet() {
+                const sheetId = document.getElementById("sheetIdInput").value.trim();
+                if (!sheetId) { alert("Input Required: Sheet ID missing."); return; }
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
+                document.getElementById("sheetStatus").innerText = "Connecting to Satellite... ";
+
+                fetch(csvUrl)
+                    .then(res => res.text())
+                    .then(csvText => {
+                        const lines = csvText.split("\n").filter(l => l.trim() !== "");
+                        const headers = lines[0].split(",");
+                        const jsonData = lines.slice(1).map(line => {
+                            const values = line.split(",");
+                            let obj = {};
+                            headers.forEach((h, i) => obj[h.trim()] = values[i].trim());
+                            return obj;
+                        });
+                        this.state.data = jsonData;
+                        document.getElementById("sheetStatus").innerText = `Sync Complete: ${jsonData.length} records retrieved.`;
+                        document.getElementById("sheetStatus").style.color = "var(--success)";
+                        document.getElementById("portalStatus").innerText = "Records Active: Cloud Sync Successful.";
+                        document.getElementById("portalStatus").style.color = "var(--success)";
+                        alert("Intelligence Data Synced via Cloud.");
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Sync Failure: Ensure sheet is 'Published to Web' as CSV.");
+                        document.getElementById("sheetStatus").innerText = "Sync Terminated.";
+                    });
             },
 
             generateLink() {
@@ -444,15 +567,21 @@
                 }
 
                 let found = null;
-                this.state.tokenData.schools.forEach(school => {
-                    school.exams.forEach(exam => {
-                        exam.students.forEach(student => {
-                            if (student.roll == roll) {
-                                found = { school: school.name, exam: exam.name, student: student };
-                            }
+                // Intelligence Algorithm (Handles Multi-School JSON & Flat Spreadsheet Data)
+                if (Array.isArray(this.state.tokenData)) {
+                    const st = this.state.tokenData.find(s => s.Roll == roll || s.roll == roll);
+                    if (st) found = { school: st.School || st.school || "Field Unit", exam: st.Exam || st.exam || "Active Op", student: st };
+                } else if (this.state.tokenData.schools) {
+                    this.state.tokenData.schools.forEach(school => {
+                        school.exams.forEach(exam => {
+                            exam.students.forEach(student => {
+                                if (student.roll == roll) {
+                                    found = { school: school.name, exam: exam.name, student: student };
+                                }
+                            });
                         });
                     });
-                });
+                }
 
                 if (!found) {
                     document.getElementById("resultMsg").innerText = "Status: Identification Not Found.";
@@ -489,10 +618,10 @@
                 document.getElementById("certExam").innerText = obj.exam;
 
                 document.getElementById("certContent").innerHTML = `
-                    <p><strong>${t.name}</strong> <span>${obj.student.name}</span></p>
-                    <p><strong>${t.roll}</strong> <span>${obj.student.roll}</span></p>
-                    <p><strong>${t.total}</strong> <span>${obj.student.total}</span></p>
-                    <p><strong>${t.status}</strong> <span style="font-weight:700; color:${obj.student.status.toLowerCase() === 'pass' ? 'var(--success)' : 'var(--danger)'}">${obj.student.status}</span></p>
+                    <p><strong>${t.name}</strong> <span>${obj.student.Name || obj.student.name}</span></p>
+                    <p><strong>${t.roll}</strong> <span>${obj.student.Roll || obj.student.roll}</span></p>
+                    <p><strong>${t.total}</strong> <span>${obj.student.Total || obj.student.total}</span></p>
+                    <p><strong>${t.status}</strong> <span style="font-weight:700; color:${(obj.student.Status || obj.student.status).toLowerCase() === 'pass' ? 'var(--success)' : 'var(--danger)'}">${obj.student.Status || obj.student.status}</span></p>
                 `;
 
                 document.getElementById("qrcode").innerHTML = "";
