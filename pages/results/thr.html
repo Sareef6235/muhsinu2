@@ -244,19 +244,41 @@
                 else alert("Unauthorized Access Detected.");
             },
 
-            uploadJSON(input) {
+            async uploadJSON(input) {
                 const file = input.files[0];
                 if (!file) return;
+
                 const reader = new FileReader();
-                reader.onload = e => {
+                reader.onload = async e => {
                     try {
-                        this.state.data = JSON.parse(e.target.result);
-                        document.getElementById("jsonStatus").innerText = "JSON Source Integrated.";
-                        document.getElementById("portalStatus").innerText = "Records Active: Data Uploaded.";
-                    } catch (err) { alert("Corruption Detected in Source."); }
+                        const jsonData = JSON.parse(e.target.result);
+                        this.state.data = jsonData;
+                        document.getElementById("jsonStatus").innerText = "Analyzing Source... ";
+
+                        // Server-Side Deployment (API Sync)
+                        const res = await fetch('/api/upload', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(jsonData)
+                        });
+
+                        if (res.ok) {
+                            document.getElementById("jsonStatus").innerText = "Success: Server Source Updated!";
+                            document.getElementById("jsonStatus").style.color = "var(--success)";
+                            document.getElementById("portalStatus").innerText = "Records Active: Sync Complete.";
+                        } else {
+                            throw new Error("API Failure");
+                        }
+                    } catch (err) {
+                        console.error("Upload/API Error:", err);
+                        alert("Sync Failure: Local session active but server save failed.");
+                        document.getElementById("jsonStatus").innerText = "Sync Terminated.";
+                        document.getElementById("jsonStatus").style.color = "var(--danger)";
+                    }
                 };
                 reader.readAsText(file);
             },
+
 
             loadFromSheet() {
                 const sheetId = document.getElementById("sheetIdInput").value.trim();
