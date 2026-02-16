@@ -329,88 +329,6 @@
         </div>
     </div>
 
-
-    <div class="card" id="googleSheetSection">
-        <h2>📄 Load Marks from Google Sheet</h2>
-
-        <label>Google Sheet ID:</label>
-        <input type="text" id="sheetIdInput" class="input" placeholder="Enter Sheet ID">
-
-        <button class="btn btn-primary" onclick="App.loadFromSheet()">Load Sheet</button>
-        <div id="sheetStatus" style="margin-top:10px;"></div>
-    </div>
-
-    <div class="card" id="searchSection">
-        <h2>🔍 Personal Records Search</h2>
-        <label>Roll Number:</label>
-        <input type="text" id="rollInput" class="input" placeholder="Enter Roll Number">
-
-        <button class="btn btn-primary" onclick="App.search()">Search</button>
-        <div id="resultMsg" style="margin-top:10px;"></div>
-    </div>
-
-    <script>
-        const App = {
-            state: {
-                data: null
-            },
-
-            loadFromSheet() {
-                const sheetId = document.getElementById("sheetIdInput").value.trim();
-                if (!sheetId) {
-                    alert("Enter Google Sheet ID!");
-                    return;
-                }
-
-                const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
-
-                fetch(csvUrl)
-                    .then(res => res.text())
-                    .then(csvText => {
-                        // Parse CSV to JSON
-                        const lines = csvText.split("\n").filter(l => l.trim() !== "");
-                        const headers = lines[0].split(",");
-                        const jsonData = lines.slice(1).map(line => {
-                            const values = line.split(",");
-                            let obj = {};
-                            headers.forEach((h, i) => obj[h.trim()] = values[i].trim());
-                            return obj;
-                        });
-
-                        this.state.data = jsonData;
-                        document.getElementById("sheetStatus").innerText = `Sheet Loaded: ${jsonData.length} records.`;
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert("Error loading sheet. Make sure it's published to web.");
-                    });
-            },
-
-            search() {
-                if (!this.state.data) {
-                    document.getElementById("resultMsg").innerText = "Load sheet first!";
-                    return;
-                }
-
-                const roll = document.getElementById("rollInput").value.trim();
-                const student = this.state.data.find(s => s.Roll === roll);
-                if (!student) {
-                    document.getElementById("resultMsg").innerText = "Result Not Found!";
-                    return;
-                }
-
-                document.getElementById("resultMsg").innerHTML = `
-      <strong>${student.Name}</strong><br>
-      Roll: ${student.Roll}<br>
-      Total: ${student.Total}<br>
-      Status: ${student.Status}
-    `;
-            }
-        };
-    </script>
-
-
-
     <script>
         const App = {
             state: {
@@ -463,14 +381,17 @@
                 document.getElementById("sheetStatus").innerText = "Connecting to Satellite... ";
 
                 fetch(csvUrl)
-                    .then(res => res.text())
+                    .then(res => {
+                        if (!res.ok) throw new Error("Cannot fetch CSV. Ensure synchronization is active.");
+                        return res.text();
+                    })
                     .then(csvText => {
                         const lines = csvText.split("\n").filter(l => l.trim() !== "");
                         const headers = lines[0].split(",");
                         const jsonData = lines.slice(1).map(line => {
                             const values = line.split(",");
                             let obj = {};
-                            headers.forEach((h, i) => obj[h.trim()] = values[i].trim());
+                            headers.forEach((h, i) => obj[h.trim()] = values[i]?.trim());
                             return obj;
                         });
                         this.state.data = jsonData;
@@ -481,9 +402,10 @@
                         alert("Intelligence Data Synced via Cloud.");
                     })
                     .catch(err => {
-                        console.error(err);
-                        alert("Sync Failure: Ensure sheet is 'Published to Web' as CSV.");
+                        console.error("Sync Error:", err);
+                        alert("Sync Failure: Ensure sheet is 'Published to Web' and ID is correct.");
                         document.getElementById("sheetStatus").innerText = "Sync Terminated.";
+                        document.getElementById("sheetStatus").style.color = "var(--danger)";
                     });
             },
 
