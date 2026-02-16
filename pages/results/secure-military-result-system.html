@@ -415,45 +415,50 @@
 
             search() {
                 if (!this.state.tokenData) {
-                    alert("Operation Blocked: No record session active. Please use a secure link.");
+                    document.getElementById("resultMsg").innerText = "No Result Data Loaded. Open using generated secure link.";
                     return;
                 }
 
                 const roll = document.getElementById("rollInput").value.trim();
-                const lang = document.getElementById("langSelect").value;
-
                 if (!roll) {
-                    alert("Input Required: Roll Identification is empty.");
+                    document.getElementById("resultMsg").innerText = "Please enter Roll Number";
                     return;
                 }
 
-                let result = null;
+                let found = null;
 
-                // Search Algorithm
+                // Loop through schools & exams
                 this.state.tokenData.schools.forEach(school => {
                     school.exams.forEach(exam => {
                         exam.students.forEach(student => {
-                            if (student.roll.toString() === roll) {
-                                result = {
-                                    school: school.name,
-                                    exam: exam.name,
-                                    student: student
-                                };
+                            if (student.roll == roll) {
+                                found = { school: school.name, exam: exam.name, student };
                             }
                         });
                     });
                 });
 
-                if (!result) {
-                    document.getElementById("resultMsg").innerText = "Status: Record Not Found in Active Session.";
-                    document.getElementById("resultMsg").style.color = "var(--danger)";
+                if (!found) {
+                    document.getElementById("resultMsg").innerText = "Result Not Found";
                     return;
                 }
 
-                document.getElementById("resultMsg").innerText = "";
-                this.renderCertificate(result, lang);
+                // Show result
+                document.getElementById("resultMsg").innerHTML = `
+        <p><strong>Name:</strong> ${found.student.name}</p>
+        <p><strong>Roll:</strong> ${found.student.roll}</p>
+        <p><strong>Total:</strong> ${found.student.total}</p>
+        <p><strong>Status:</strong> ${found.student.status}</p>
+    `;
+
+                // Track analytics
                 this.trackAnalytics(roll);
+
+                // Render certificate
+                const lang = document.getElementById("langSelect").value;
+                this.renderCertificate(found, lang);
             },
+
 
             renderCertificate(obj, lang = 'en') {
                 const i18n = {
@@ -526,9 +531,27 @@
         };
 
         // Initialize Application Context
+        // On page load, try to load data from URL token or localStorage
         window.onload = () => {
-            App.loadContext();
+            const params = new URLSearchParams(window.location.search);
+            const examToken = params.get("exam");  // ?exam=exam-xxxx
+
+            if (examToken) {
+                const storedData = localStorage.getItem(examToken);
+                if (storedData) {
+                    App.state.tokenData = JSON.parse(storedData);
+                    document.getElementById("portalStatus").innerText = "Records Active: Connection Established.";
+                    document.getElementById("portalStatus").style.color = "var(--success)";
+                    console.log("Token data loaded for search:", App.state.tokenData);
+                } else {
+                    document.getElementById("portalStatus").innerText = "Error: Link Expired or Invalid Protocol.";
+                    document.getElementById("portalStatus").style.color = "var(--danger)";
+                }
+            } else {
+                document.getElementById("portalStatus").innerText = "Records Active: No token provided.";
+            }
         };
+
     </script>
 </body>
 
