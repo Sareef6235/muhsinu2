@@ -265,7 +265,7 @@
 
             <h3>Station Deployment</h3>
             <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">
-                Generates a unique, persistent session link using localized storage for high-speed delivery.
+                Generates a unique, persistent session link utilizing advanced Base64 tokenization.
             </p>
             <button class="btn btn-primary" onclick="App.generateLink()">Deploy Secure Link</button>
             <div id="generatedLink" class="hidden"></div>
@@ -354,7 +354,7 @@
                 document.getElementById("adminPass").value = "";
             },
 
-            /* ---------------- JSON UPLOAD (SYNC TO SERVER) ---------------- */
+            /* ---------------- HYBRID DATA MANAGEMENT (LOCAL + SERVER) ---------------- */
 
             uploadJSON(input) {
                 const file = input.files[0];
@@ -363,24 +363,37 @@
                 const reader = new FileReader();
                 reader.onload = async e => {
                     try {
-                        const data = JSON.parse(e.target.result);
-                        this.state.data = this.normalizeData(data);
+                        const raw = JSON.parse(e.target.result);
+                        const finalData = this.normalizeData(raw);
 
+                        // 1. Update State & Local Persistence
+                        this.state.data = finalData;
+                        localStorage.setItem("persistentData", JSON.stringify(finalData));
+
+                        // 2. Sync to Server (Enterprise Cloud Backup)
                         await fetch("/api/save-json", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(this.state.data)
+                            body: JSON.stringify(finalData)
                         });
 
-                        alert("Saved to Server File Successfully!");
-                        const status = document.getElementById("jsonStatus");
-                        if (status) {
-                            status.innerText = "Deployment Success (" + this.state.data.length + " Records)";
-                            status.style.color = "var(--success)";
+                        alert("Intelligence Synchronized: Local Cache & Cloud Updated.");
+
+                        const jsonStatus = document.getElementById("jsonStatus");
+                        if (jsonStatus) {
+                            jsonStatus.innerText = "Deployment Success (" + finalData.length + " Records)";
+                            jsonStatus.style.color = "var(--success)";
+                        }
+
+                        const portalStatus = document.getElementById("portalStatus");
+                        if (portalStatus) {
+                            portalStatus.innerText = "Records Active: Hybrid Secure Mode";
+                            portalStatus.style.color = "var(--success)";
                         }
 
                     } catch (err) {
-                        alert("Invalid JSON Block Detected.");
+                        alert("Invalid JSON structure detected.");
+                        console.error(err);
                     }
                 };
                 reader.readAsText(file);
@@ -423,7 +436,7 @@
                     });
             },
 
-            /* ---------------- NORMALIZER ---------------- */
+            /* ---------------- DATA NORMALIZER ---------------- */
 
             normalizeData(data) {
                 if (Array.isArray(data)) return data;
@@ -460,9 +473,10 @@
 
                     const url = window.location.origin + window.location.pathname + "?secure=" + token;
                     const box = document.getElementById("generatedLink");
-                    box.classList.remove("hidden");
-                    box.innerHTML = `<input class="input" value="${url}" readonly onclick="this.select()" style="font-size:0.8rem; height:auto; padding:8px;">`;
-
+                    if (box) {
+                        box.classList.remove("hidden");
+                        box.innerHTML = `<input class="input" value="${url}" readonly onclick="this.select()" style="font-size:0.8rem; height:auto; padding:8px;">`;
+                    }
                     alert("Secure Deployment Link Constructed.");
                 } catch (err) {
                     console.error(err);
@@ -470,7 +484,7 @@
                 }
             },
 
-            /* ---------------- DATA LOADING (REMOTE + SECURE) ---------------- */
+            /* ---------------- SECURE TOKEN PROCESSING (Triple-Check) ---------------- */
 
             loadSecure() {
                 const params = new URLSearchParams(window.location.search);
@@ -526,8 +540,10 @@
 
                 if (!found) {
                     const resMsg = document.getElementById("resultMsg");
-                    resMsg.innerText = "Status: Identification Not Found.";
-                    resMsg.style.color = "var(--danger)";
+                    if (resMsg) {
+                        resMsg.innerText = "Status: Identification Not Found.";
+                        resMsg.style.color = "var(--danger)";
+                    }
                     return;
                 }
 
@@ -562,7 +578,17 @@
             },
 
             downloadPDF() {
-                html2pdf().from(document.getElementById("certificate")).save("Secure_Record.pdf");
+                const element = document.getElementById("certificate");
+                if (element) {
+                    const opt = {
+                        margin: 0,
+                        filename: 'Military_Record.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true },
+                        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                    };
+                    html2pdf().set(opt).from(element).save();
+                }
             },
 
             trackAnalytics(roll) {
@@ -580,21 +606,44 @@
         };
 
         window.onload = async () => {
-            if (!App.loadSecure()) {
-                try {
-                    const res = await fetch("/api/get-json");
-                    const data = await res.json();
-                    if (data && (Array.isArray(data) || typeof data === 'object' && Object.keys(data).length > 0)) {
-                        App.state.data = data;
-                        const ps = document.getElementById("portalStatus");
-                        if (ps) {
-                            ps.innerText = "Server Intelligence Active";
-                            ps.style.color = "var(--success)";
-                        }
-                    }
-                } catch (err) {
-                    console.error("Satellite Load Error:", err);
+            // Triple-Check Data Loading Priority:
+
+            // 1. Portable Link (Highly Portable/Shareable)
+            if (App.loadSecure()) return;
+
+            // 2. Local Cache (User Persistence)
+            const stored = localStorage.getItem("persistentData");
+            if (stored) {
+                App.state.data = JSON.parse(stored);
+
+                const jsonStatus = document.getElementById("jsonStatus");
+                if (jsonStatus) {
+                    jsonStatus.innerText = "Deployment Success (" + App.state.data.length + " Records)";
+                    jsonStatus.style.color = "var(--success)";
                 }
+
+                const portalStatus = document.getElementById("portalStatus");
+                if (portalStatus) {
+                    portalStatus.innerText = "Records Restored From Local Cache";
+                    portalStatus.style.color = "var(--success)";
+                }
+                return;
+            }
+
+            // 3. Remote Server (Enterprise Backup Sync)
+            try {
+                const res = await fetch("/api/get-json");
+                const data = await res.json();
+                if (data && (Array.isArray(data) || (typeof data === 'object' && Object.keys(data).length > 0))) {
+                    App.state.data = data;
+                    const ps = document.getElementById("portalStatus");
+                    if (ps) {
+                        ps.innerText = "Records Synchronized from Cloud Backbone";
+                        ps.style.color = "var(--accent)";
+                    }
+                }
+            } catch (err) {
+                console.error("Cloud Sync Failure:", err);
             }
         };
     </script>
