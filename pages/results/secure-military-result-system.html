@@ -129,9 +129,10 @@
 
         #jsonStatus {
             font-size: 0.875rem;
-            color: #64748b;
-            margin-top: -10px;
+            color: var(--success);
+            margin-top: 10px;
             margin-bottom: 15px;
+            font-weight: 600;
         }
 
         #generatedLink {
@@ -143,10 +144,31 @@
             border: 1px dashed var(--border);
         }
 
-        #generatedLink a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
+        #resultsContainer {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        #resultsContainer table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #resultsContainer th,
+        #resultsContainer td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        #resultsContainer th {
+            background: #f1f5f9;
+            font-weight: 700;
+            color: #475569;
         }
 
         /* Certificate Overlay */
@@ -259,15 +281,14 @@
 
             <label style="font-weight: 500; font-size: 0.9rem;">Distribution Source (JSON)</label>
             <input type="file" id="jsonInput" accept=".json" class="input" onchange="App.uploadJSON(this)">
-            <div id="jsonStatus">Ready for deployment</div>
 
-            <hr>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn btn-primary" onclick="App.generateLink()">Deploy Secure Link</button>
+                <button class="btn btn-danger" onclick="App.showAnalytics()">Activity Logs</button>
+                <button class="btn btn-danger" onclick="App.logout()">Logout</button>
+            </div>
 
-            <h3>Station Deployment</h3>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">
-                Generates a unique, persistent session link utilizing advanced Base64 tokenization.
-            </p>
-            <button class="btn btn-primary" onclick="App.generateLink()">Deploy Secure Link</button>
+            <div id="jsonStatus"></div>
             <div id="generatedLink" class="hidden"></div>
 
             <hr>
@@ -282,9 +303,8 @@
 
             <hr>
 
-            <h3>Intelligence Operations</h3>
-            <button class="btn btn-danger" onclick="App.showAnalytics()">Access Activity Logs</button>
-            <button class="btn btn-danger" onclick="App.logout()">Terminate Session</button>
+            <h3>Executive Overview</h3>
+            <div id="resultsContainer"></div>
         </div>
 
         <!-- PUBLIC SEARCH SECTION -->
@@ -370,19 +390,20 @@
                         this.state.data = finalData;
                         localStorage.setItem("persistentData", JSON.stringify(finalData));
 
-                        // 2. Sync to Server (Enterprise Cloud Backup)
+                        // 2. Render Overview Table
+                        this.renderResults(finalData);
+
+                        // 3. Sync to Server (Enterprise Cloud Backup)
                         await fetch("/api/save-json", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(finalData)
                         });
 
-                        alert("Intelligence Synchronized: Local Cache & Cloud Updated.");
-
-                        const jsonStatus = document.getElementById("jsonStatus");
-                        if (jsonStatus) {
-                            jsonStatus.innerText = "Deployment Success (" + finalData.length + " Records)";
-                            jsonStatus.style.color = "var(--success)";
+                        const statusEl = document.getElementById("jsonStatus");
+                        if (statusEl) {
+                            statusEl.innerText = `Deployment Success (${finalData.length} Records Synchronized)`;
+                            statusEl.style.color = "var(--success)";
                         }
 
                         const portalStatus = document.getElementById("portalStatus");
@@ -397,6 +418,55 @@
                     }
                 };
                 reader.readAsText(file);
+            },
+
+            /* ---------------- TABLE VIEW DASHBOARD ---------------- */
+
+            renderResults(data) {
+                const container = document.getElementById("resultsContainer");
+                if (!container) return;
+                container.innerHTML = "";
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = "<p>No results distributed.</p>";
+                    return;
+                }
+
+                const table = document.createElement("table");
+                const headers = Object.keys(data[0]);
+
+                // Create Header
+                const thead = document.createElement("thead");
+                const headerRow = document.createElement("tr");
+                headers.forEach(h => {
+                    const th = document.createElement("th");
+                    th.innerText = h;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // Create Body
+                const tbody = document.createElement("tbody");
+                data.slice(0, 100).forEach(row => { // Limit to first 100 for performance
+                    const tr = document.createElement("tr");
+                    headers.forEach(h => {
+                        const td = document.createElement("td");
+                        td.innerText = row[h] || "";
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+
+                container.appendChild(table);
+                if (data.length > 100) {
+                    const tip = document.createElement("p");
+                    tip.style.fontSize = "0.75rem";
+                    tip.style.marginTop = "10px";
+                    tip.innerText = `Showing first 100 of ${data.length} records. All records available via secure search.`;
+                    container.appendChild(tip);
+                }
             },
 
             /* ---------------- SHEET SYNC (FULLY DYNAMIC) ---------------- */
@@ -419,9 +489,12 @@
                             headers.forEach((h, i) => obj[h.trim()] = values[i]?.trim());
                             return obj;
                         });
-                        this.state.data = this.normalizeData(jsonData);
+                        const finalData = this.normalizeData(jsonData);
+                        this.state.data = finalData;
+                        this.renderResults(finalData);
+
                         if (statusEl) {
-                            statusEl.innerText = `Sync Complete: ${this.state.data.length} records retrieved.`;
+                            statusEl.innerText = `Sync Complete: ${finalData.length} records retrieved.`;
                             statusEl.style.color = "var(--success)";
                         }
                         const ps = document.getElementById("portalStatus");
@@ -454,20 +527,21 @@
                 return [];
             },
 
-            /* ---------------- PORTABLE LINK GENERATOR ---------------- */
+            /* ---------------- PORTABLE LINK (UTF-8 SAFE + 24H) ---------------- */
 
             generateLink() {
                 if (!this.state.data || this.state.data.length === 0) {
-                    alert("No data loaded for deployment.");
+                    alert("Operation Blocked: No data loaded for deployment.");
                     return;
                 }
 
                 try {
                     const payload = {
                         data: this.state.data,
-                        exp: Date.now() + (24 * 60 * 60 * 1000) // 24-hour session
+                        exp: Date.now() + (24 * 60 * 60 * 1000) // 24-hour mission session
                     };
 
+                    // UTF-8 Safe Base64 Encoding
                     let token = btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
                         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
@@ -475,12 +549,16 @@
                     const box = document.getElementById("generatedLink");
                     if (box) {
                         box.classList.remove("hidden");
-                        box.innerHTML = `<input class="input" value="${url}" readonly onclick="this.select()" style="font-size:0.8rem; height:auto; padding:8px;">`;
+                        box.innerHTML = `<input class="input" value="${url}" readonly onclick="this.select()" style="font-size:0.8rem; height:auto; padding:8px; margin-bottom:0;">`;
+
+                        // Copy to clipboard pro-actively
+                        navigator.clipboard.writeText(url).then(() => {
+                            alert("Secure Deployment Link copied to clipboard!");
+                        });
                     }
-                    alert("Secure Deployment Link Constructed.");
                 } catch (err) {
-                    console.error(err);
-                    alert("Link Construction Failed.");
+                    console.error("Link Construction Error:", err);
+                    alert("Failure: Link Construction Protocol interrupted.");
                 }
             },
 
@@ -488,37 +566,40 @@
 
             loadSecure() {
                 const params = new URLSearchParams(window.location.search);
-                let secure = params.get("secure") || params.get("exam");
+                // Support both 'secure' and 'data' (user manual edit) parameters
+                let secure = params.get("secure") || params.get("data") || params.get("exam");
 
                 if (!secure) return false;
 
-                if (secure.length > 50) {
-                    try {
-                        let base64 = secure.replace(/-/g, '+').replace(/_/g, '/');
-                        while (base64.length % 4 !== 0) { base64 += '='; }
-                        const decoded = JSON.parse(decodeURIComponent(escape(atob(base64))));
+                try {
+                    // Normalize Base64 URL for standard atob
+                    let base64 = secure.replace(/-/g, '+').replace(/_/g, '/');
+                    while (base64.length % 4 !== 0) { base64 += '='; }
 
-                        if (decoded.exp && Date.now() > decoded.exp) {
-                            alert("Secure Link Expired.");
-                            document.getElementById("portalStatus").innerText = "Protocol Error: Session Expired.";
-                            return true;
-                        }
+                    // UTF-8 Safe Decoding
+                    const decoded = JSON.parse(decodeURIComponent(escape(atob(base64))));
 
-                        this.state.tokenData = decoded.data;
-                        const ps = document.getElementById("portalStatus");
-                        if (ps) {
-                            ps.innerText = "Secure Satellite Link Established";
-                            ps.style.color = "var(--success)";
-                        }
+                    // Check Expiration
+                    if (decoded.exp && Date.now() > decoded.exp) {
+                        alert("Protocol Warning: Secure Link has Expired.");
+                        document.getElementById("portalStatus").innerText = "Protocol Error: Session Expired.";
                         return true;
-                    } catch (err) {
-                        console.error("Decryption Error:", err);
                     }
+
+                    this.state.tokenData = decoded.data || decoded.exams || decoded; // Flexible schema support
+                    const ps = document.getElementById("portalStatus");
+                    if (ps) {
+                        ps.innerText = "Secure Satellite Link Established";
+                        ps.style.color = "var(--success)";
+                    }
+                    return true;
+                } catch (err) {
+                    console.error("Decryption Protocol Error:", err);
+                    return false;
                 }
-                return false;
             },
 
-            /* ---------------- SEARCH (RESOLVED SHADOWING BUG) ---------------- */
+            /* ---------------- SEARCH ---------------- */
 
             search() {
                 const dataset = this.state.tokenData || this.state.data;
@@ -527,6 +608,10 @@
                     return;
                 }
 
+                // Handle both flat array and student results format
+                let records = dataset;
+                if (dataset.exams && dataset.exams[0]?.results) records = dataset.exams[0].results;
+
                 const rollVal = document.getElementById("rollInput").value.trim();
                 if (!rollVal) {
                     alert("Identification number required.");
@@ -534,7 +619,7 @@
                 }
 
                 const rollKeys = ["roll", "Roll", "ID", "RegNo", "regno", "Admission", "admission"];
-                let found = dataset.find(record =>
+                let found = records.find(record =>
                     Object.keys(record).some(k => rollKeys.includes(k) && record[k] == rollVal)
                 );
 
@@ -552,7 +637,7 @@
                 this.trackAnalytics(rollVal);
             },
 
-            /* ---------------- FULLY DYNAMIC CERTIFICATE ---------------- */
+            /* ---------------- DYNAMIC CERTIFICATE ---------------- */
 
             renderCertificate(record) {
                 document.getElementById("certificateArea").classList.add("active");
@@ -562,7 +647,16 @@
                 let html = "";
                 Object.keys(record).forEach(key => {
                     if (!record[key] || ["school", "exam"].includes(key.toLowerCase())) return;
-                    html += `<p><strong>${key}:</strong> <span>${record[key]}</span></p>`;
+
+                    if (typeof record[key] === 'object') {
+                        // Nested subjects support
+                        html += `<div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;"><strong style="color:var(--accent)">${key}:</strong></div>`;
+                        Object.entries(record[key]).forEach(([sub, val]) => {
+                            html += `<p><strong>${sub}:</strong> <span>${val}</span></p>`;
+                        });
+                    } else {
+                        html += `<p><strong>${key}:</strong> <span>${record[key]}</span></p>`;
+                    }
                 });
 
                 document.getElementById("certContent").innerHTML = html;
@@ -602,50 +696,49 @@
                 if (!logs.length) { alert("Intelligence Report: No access attempts recorded."); return; }
                 console.table(logs);
                 alert("Protocol Check: Activity logs sent to System Console (F12).");
+            },
+
+            init() {
+                // Triple-Check Data Loading Priority:
+
+                // 1. Sharing Link (Highest Priority)
+                if (this.loadSecure()) return;
+
+                // 2. Local Cache (Persistence)
+                const stored = localStorage.getItem("persistentData") || localStorage.getItem("examData");
+                if (stored) {
+                    try {
+                        const data = JSON.parse(stored);
+                        this.state.data = this.normalizeData(data);
+                        this.renderResults(this.state.data);
+
+                        const statusEl = document.getElementById("jsonStatus");
+                        if (statusEl) {
+                            statusEl.innerText = `Records Restored From Local Cache (${this.state.data.length})`;
+                            statusEl.style.color = "var(--success)";
+                        }
+                    } catch (e) { console.error("Local Cache Corrupt"); }
+                }
+
+                // 3. Remote Server (Global Backup)
+                fetch("/api/get-json")
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && !this.state.tokenData && !this.state.data) {
+                            this.state.data = this.normalizeData(data);
+                            this.renderResults(this.state.data);
+                            const ps = document.getElementById("portalStatus");
+                            if (ps) {
+                                ps.innerText = "Records Synchronized from Cloud Backbone";
+                                ps.style.color = "var(--accent)";
+                            }
+                        }
+                    })
+                    .catch(e => console.error("Cloud Sync Offline"));
             }
         };
 
-        window.onload = async () => {
-            // Triple-Check Data Loading Priority:
-
-            // 1. Portable Link (Highly Portable/Shareable)
-            if (App.loadSecure()) return;
-
-            // 2. Local Cache (User Persistence)
-            const stored = localStorage.getItem("persistentData");
-            if (stored) {
-                App.state.data = JSON.parse(stored);
-
-                const jsonStatus = document.getElementById("jsonStatus");
-                if (jsonStatus) {
-                    jsonStatus.innerText = "Deployment Success (" + App.state.data.length + " Records)";
-                    jsonStatus.style.color = "var(--success)";
-                }
-
-                const portalStatus = document.getElementById("portalStatus");
-                if (portalStatus) {
-                    portalStatus.innerText = "Records Restored From Local Cache";
-                    portalStatus.style.color = "var(--success)";
-                }
-                return;
-            }
-
-            // 3. Remote Server (Enterprise Backup Sync)
-            try {
-                const res = await fetch("/api/get-json");
-                const data = await res.json();
-                if (data && (Array.isArray(data) || (typeof data === 'object' && Object.keys(data).length > 0))) {
-                    App.state.data = data;
-                    const ps = document.getElementById("portalStatus");
-                    if (ps) {
-                        ps.innerText = "Records Synchronized from Cloud Backbone";
-                        ps.style.color = "var(--accent)";
-                    }
-                }
-            } catch (err) {
-                console.error("Cloud Sync Failure:", err);
-            }
-        };
+        window.onload = () => App.init();
     </script>
 
 </body>
