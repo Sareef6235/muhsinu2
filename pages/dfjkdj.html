@@ -449,27 +449,43 @@
           <p><strong>Name:</strong> <span>${record.Name || record["Student Name"] || ""}</span></p>
         `;
 
-        if (record.Subjects && Array.isArray(record.Subjects)) {
+        // Handling Dual Format Subjects (Object vs Array)
+        let subjectData = null;
+        let isObjectFormat = false;
+
+        if (record.subjects && typeof record.subjects === "object" && !Array.isArray(record.subjects)) {
+          subjectData = Object.entries(record.subjects);
+          isObjectFormat = true;
+        } else if (record.Subjects && Array.isArray(record.Subjects)) {
+          subjectData = record.Subjects;
+        }
+
+        if (subjectData) {
           html += `
-            <table style="width:100%; margin-top:20px; border-collapse:collapse; font-size: 0.9rem;">
+            <table style="width:100%; margin-top:20px; border-collapse:collapse; font-size: 0.95rem;">
               <thead>
                 <tr style="background:#f1f5f9;">
-                  <th style="padding:10px; border: 1px solid #e2e8f0; text-align: left;">Subject</th>
-                  <th style="padding:10px; border: 1px solid #e2e8f0; text-align: center;">Marks</th>
-                  <th style="padding:10px; border: 1px solid #e2e8f0; text-align: center;">Grade</th>
+                  <th style="padding:10px; border:1px solid #e2e8f0; text-align:left;">Subject</th>
+                  <th style="padding:10px; border:1px solid #e2e8f0; text-align:center;">Marks</th>
+                  ${!isObjectFormat ? '<th style="padding:10px; border:1px solid #e2e8f0; text-align:center;">Grade</th>' : ''}
                 </tr>
               </thead>
               <tbody>
           `;
 
           let total = 0;
-          record.Subjects.forEach(sub => {
-            total += Number(sub.Marks) || 0;
+          subjectData.forEach(item => {
+            const subject = isObjectFormat ? item[0] : item.Subject;
+            const marks = isObjectFormat ? item[1] : item.Marks;
+            const grade = isObjectFormat ? null : (item.Grade || "-");
+
+            total += Number(marks) || 0;
+
             html += `
               <tr>
-                <td style="padding:10px; border: 1px solid #e2e8f0;">${sub.Subject}</td>
-                <td style="padding:10px; border: 1px solid #e2e8f0; text-align: center;">${sub.Marks}</td>
-                <td style="padding:10px; border: 1px solid #e2e8f0; text-align: center;">${sub.Grade || "-"}</td>
+                <td style="padding:10px; border:1px solid #e2e8f0;">${subject.toString().trim()}</td>
+                <td style="padding:10px; border:1px solid #e2e8f0; text-align:center;">${marks}</td>
+                ${!isObjectFormat ? `<td style="padding:10px; border:1px solid #e2e8f0; text-align:center;">${grade}</td>` : ''}
               </tr>
             `;
           });
@@ -477,14 +493,15 @@
           html += `
               </tbody>
             </table>
-            <div style="margin-top:20px; font-weight:800; display: flex; justify-content: space-between; font-size: 1.1rem;">
-              <span>AGGREGATE TOTAL:</span>
-              <span>${total}</span>
+            <div style="margin-top:20px; font-weight:800; display:flex; justify-content:space-between; font-size:1.1rem;">
+              <span>TOTAL MARKS:</span>
+              <span>${record.total || total}</span>
             </div>
           `;
         } else {
+          // Fallback for flat records
           Object.keys(record).forEach(k => {
-            if (["school", "exam", "roll", "name", "subjects"].includes(k.toLowerCase())) return;
+            if (["school", "exam", "roll", "name", "subjects", "total"].includes(k.toLowerCase())) return;
             html += `<p><strong>${k}:</strong> <span>${record[k]}</span></p>`;
           });
         }
