@@ -331,13 +331,12 @@
 
     <script>
         const App = {
-
             state: {
                 data: null,
                 tokenData: null
             },
 
-            /* ---------------- AUTH ---------------- */
+            /* ---------------- AUTHENTICATION ---------------- */
 
             adminLogin() {
                 const pass = document.getElementById("adminPass").value;
@@ -345,7 +344,7 @@
                     document.getElementById("loginSection").classList.add("hidden");
                     document.getElementById("adminArea").classList.remove("hidden");
                 } else {
-                    alert("Access Denied");
+                    alert("Authentication Failed: Access Denied");
                 }
             },
 
@@ -355,24 +354,33 @@
                 document.getElementById("adminPass").value = "";
             },
 
-            /* ---------------- JSON UPLOAD ---------------- */
+            /* ---------------- JSON UPLOAD (SYNC TO SERVER) ---------------- */
 
             uploadJSON(input) {
                 const file = input.files[0];
                 if (!file) return;
 
                 const reader = new FileReader();
-                reader.onload = e => {
+                reader.onload = async e => {
                     try {
-                        const parsed = JSON.parse(e.target.result);
-                        this.state.data = this.normalizeData(parsed);
+                        const data = JSON.parse(e.target.result);
+                        this.state.data = this.normalizeData(data);
 
-                        document.getElementById("jsonStatus").innerText =
-                            "Dynamic JSON Loaded (" + this.state.data.length + " Records)";
-                        document.getElementById("jsonStatus").style.color = "var(--success)";
+                        await fetch("/api/save-json", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(this.state.data)
+                        });
+
+                        alert("Saved to Server File Successfully!");
+                        const status = document.getElementById("jsonStatus");
+                        if (status) {
+                            status.innerText = "Deployment Success (" + this.state.data.length + " Records)";
+                            status.style.color = "var(--success)";
+                        }
 
                     } catch (err) {
-                        alert("Invalid JSON structure.");
+                        alert("Invalid JSON Block Detected.");
                     }
                 };
                 reader.readAsText(file);
@@ -382,78 +390,60 @@
 
             loadFromSheet() {
                 const sheetId = document.getElementById("sheetIdInput").value.trim();
-                if (!sheetId) {
-                    alert("Sheet ID Required");
-                    return;
-                }
-
-                const csvUrl =
-                    `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
-
-                document.getElementById("sheetStatus").innerText = "Connecting...";
+                if (!sheetId) { alert("Input Required: Sheet ID missing."); return; }
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
+                const statusEl = document.getElementById("sheetStatus");
+                if (statusEl) statusEl.innerText = "Connecting to Satellite...";
 
                 fetch(csvUrl)
                     .then(res => res.text())
                     .then(csv => {
-
-                        const rows = csv.split("\n").filter(r => r.trim() !== "");
-                        const headers = rows[0].split(",").map(h => h.trim());
-
-                        const json = rows.slice(1).map(row => {
-                            const cols = row.split(",");
+                        const lines = csv.split("\n").filter(l => l.trim() !== "");
+                        const headers = lines[0].split(",");
+                        const jsonData = lines.slice(1).map(line => {
+                            const values = line.split(",");
                             let obj = {};
-                            headers.forEach((h, i) => {
-                                obj[h] = cols[i] ? cols[i].trim() : "";
-                            });
+                            headers.forEach((h, i) => obj[h.trim()] = values[i]?.trim());
                             return obj;
                         });
-
-                        this.state.data = this.normalizeData(json);
-
-                        document.getElementById("sheetStatus").innerText =
-                            "Cloud Sync Success (" + this.state.data.length + " Records)";
-                        document.getElementById("sheetStatus").style.color = "var(--success)";
-                        document.getElementById("portalStatus").innerText = "Records Active: Cloud Mode";
-                        document.getElementById("portalStatus").style.color = "var(--success)";
-
+                        this.state.data = this.normalizeData(jsonData);
+                        if (statusEl) {
+                            statusEl.innerText = `Sync Complete: ${this.state.data.length} records retrieved.`;
+                            statusEl.style.color = "var(--success)";
+                        }
+                        const ps = document.getElementById("portalStatus");
+                        if (ps) {
+                            ps.innerText = "Records Active: Cloud Sync Successful.";
+                            ps.style.color = "var(--success)";
+                        }
                     })
-                    .catch(() => {
-                        document.getElementById("sheetStatus").innerText = "Sync Failed";
-                        document.getElementById("sheetStatus").style.color = "var(--danger)";
+                    .catch(err => {
+                        console.error("Sync Error:", err);
+                        alert("Sync Failure: Ensure sheet is 'Published to Web'.");
                     });
             },
 
             /* ---------------- NORMALIZER ---------------- */
 
             normalizeData(data) {
-
-                // Case 1: Flat Array
                 if (Array.isArray(data)) return data;
-
-                // Case 2: schools structure
                 if (data.schools) {
                     let flat = [];
                     data.schools.forEach(s =>
                         s.exams?.forEach(e =>
                             e.students?.forEach(st => {
-                                flat.push({
-                                    School: s.name,
-                                    Exam: e.name,
-                                    ...st
-                                });
+                                flat.push({ School: s.name, Exam: e.name, ...st });
                             })
                         )
                     );
                     return flat;
                 }
-
                 return [];
             },
 
             /* ---------------- PORTABLE LINK GENERATOR ---------------- */
 
             generateLink() {
-
                 if (!this.state.data || this.state.data.length === 0) {
                     alert("No data loaded for deployment.");
                     return;
@@ -462,40 +452,32 @@
                 try {
                     const payload = {
                         data: this.state.data,
-                        exp: Date.now() + (24 * 60 * 60 * 1000) // 24-hour expiry
+                        exp: Date.now() + (24 * 60 * 60 * 1000) // 24-hour session
                     };
 
-                    // Portable UTF-8 Safe Encoding
                     let token = btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
-                        .replace(/\+/g, '-')
-                        .replace(/\//g, '_')
-                        .replace(/=+$/, '');
+                        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
-                    const url =
-                        window.location.origin +
-                        window.location.pathname +
-                        "?secure=" + token;
-
+                    const url = window.location.origin + window.location.pathname + "?secure=" + token;
                     const box = document.getElementById("generatedLink");
                     box.classList.remove("hidden");
                     box.innerHTML = `<input class="input" value="${url}" readonly onclick="this.select()" style="font-size:0.8rem; height:auto; padding:8px;">`;
 
-                    alert("Secure Deployment Link Constructed Successfully");
+                    alert("Secure Deployment Link Constructed.");
                 } catch (err) {
                     console.error(err);
                     alert("Link Construction Failed.");
                 }
             },
 
-            /* ---------------- PORTABLE TOKEN LOAD ---------------- */
+            /* ---------------- DATA LOADING (REMOTE + SECURE) ---------------- */
 
             loadSecure() {
-                const params = new URLSearchParams(location.search);
+                const params = new URLSearchParams(window.location.search);
                 let secure = params.get("secure") || params.get("exam");
 
-                if (!secure) return;
+                if (!secure) return false;
 
-                // Check if it's the new portable format or legacy localStorage token
                 if (secure.length > 50) {
                     try {
                         let base64 = secure.replace(/-/g, '+').replace(/_/g, '/');
@@ -505,30 +487,26 @@
                         if (decoded.exp && Date.now() > decoded.exp) {
                             alert("Secure Link Expired.");
                             document.getElementById("portalStatus").innerText = "Protocol Error: Session Expired.";
-                            return;
+                            return true;
                         }
 
                         this.state.tokenData = decoded.data;
-                        document.getElementById("portalStatus").innerText = "Secure Satellite Link Established";
-                        document.getElementById("portalStatus").style.color = "var(--success)";
+                        const ps = document.getElementById("portalStatus");
+                        if (ps) {
+                            ps.innerText = "Secure Satellite Link Established";
+                            ps.style.color = "var(--success)";
+                        }
+                        return true;
                     } catch (err) {
                         console.error("Decryption Error:", err);
                     }
-                } else {
-                    // Legacy LocalStorage fallback for internal testing
-                    const stored = localStorage.getItem(secure);
-                    if (stored) {
-                        this.state.tokenData = JSON.parse(stored);
-                        document.getElementById("portalStatus").innerText = "Local Secure Session Active";
-                        document.getElementById("portalStatus").style.color = "var(--success)";
-                    }
                 }
+                return false;
             },
 
-            /* ---------------- SEARCH (AUTO DETECT ROLL) ---------------- */
+            /* ---------------- SEARCH (RESOLVED SHADOWING BUG) ---------------- */
 
             search() {
-
                 const dataset = this.state.tokenData || this.state.data;
                 if (!dataset) {
                     document.getElementById("resultMsg").innerText = "No active data session.";
@@ -537,23 +515,19 @@
 
                 const rollVal = document.getElementById("rollInput").value.trim();
                 if (!rollVal) {
-                    alert("Enter Roll Number");
+                    alert("Identification number required.");
                     return;
                 }
 
-                const rollKeys =
-                    ["roll", "Roll", "ID", "RegNo", "regno", "Admission", "admission"];
-
+                const rollKeys = ["roll", "Roll", "ID", "RegNo", "regno", "Admission", "admission"];
                 let found = dataset.find(record =>
-                    Object.keys(record).some(k =>
-                        rollKeys.includes(k) &&
-                        record[k] == rollVal
-                    )
+                    Object.keys(record).some(k => rollKeys.includes(k) && record[k] == rollVal)
                 );
 
                 if (!found) {
-                    document.getElementById("resultMsg").innerText = "Record Not Found";
-                    document.getElementById("resultMsg").style.color = "var(--danger)";
+                    const resMsg = document.getElementById("resultMsg");
+                    resMsg.innerText = "Status: Identification Not Found.";
+                    resMsg.style.color = "var(--danger)";
                     return;
                 }
 
@@ -565,35 +539,21 @@
             /* ---------------- FULLY DYNAMIC CERTIFICATE ---------------- */
 
             renderCertificate(record) {
-
                 document.getElementById("certificateArea").classList.add("active");
-
-                document.getElementById("certSchool").innerText =
-                    record.School || record.school || "Institution";
-
-                document.getElementById("certExam").innerText =
-                    record.Exam || record.exam || "Examination";
+                document.getElementById("certSchool").innerText = record.School || record.school || "Field Unit";
+                document.getElementById("certExam").innerText = record.Exam || record.exam || "Active Operation";
 
                 let html = "";
-
                 Object.keys(record).forEach(key => {
                     if (!record[key] || ["school", "exam"].includes(key.toLowerCase())) return;
-
-                    html += `
-                <p>
-                    <strong>${key}</strong>
-                    <span>${record[key]}</span>
-                </p>
-            `;
+                    html += `<p><strong>${key}:</strong> <span>${record[key]}</span></p>`;
                 });
 
                 document.getElementById("certContent").innerHTML = html;
-
                 document.getElementById("qrcode").innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), {
                     text: location.origin + location.pathname + "?secure_ref=" + (record.Roll || record.roll || "GEN"),
-                    width: 120,
-                    height: 120
+                    width: 120, height: 120
                 });
             },
 
@@ -602,8 +562,7 @@
             },
 
             downloadPDF() {
-                const element = document.getElementById("certificate");
-                html2pdf().from(element).save("Result_Record.pdf");
+                html2pdf().from(document.getElementById("certificate")).save("Secure_Record.pdf");
             },
 
             trackAnalytics(roll) {
@@ -613,20 +572,31 @@
             },
 
             showAnalytics() {
-                const logs =
-                    JSON.parse(localStorage.getItem("analytics") || "[]");
-
-                if (!logs.length) {
-                    alert("No logs available.");
-                    return;
-                }
-
+                const logs = JSON.parse(localStorage.getItem("analytics") || "[]");
+                if (!logs.length) { alert("Intelligence Report: No access attempts recorded."); return; }
                 console.table(logs);
-                alert("Logs displayed in console (F12)");
+                alert("Protocol Check: Activity logs sent to System Console (F12).");
             }
         };
 
-        window.onload = () => App.loadSecure();
+        window.onload = async () => {
+            if (!App.loadSecure()) {
+                try {
+                    const res = await fetch("/api/get-json");
+                    const data = await res.json();
+                    if (data && (Array.isArray(data) || typeof data === 'object' && Object.keys(data).length > 0)) {
+                        App.state.data = data;
+                        const ps = document.getElementById("portalStatus");
+                        if (ps) {
+                            ps.innerText = "Server Intelligence Active";
+                            ps.style.color = "var(--success)";
+                        }
+                    }
+                } catch (err) {
+                    console.error("Satellite Load Error:", err);
+                }
+            }
+        };
     </script>
 
 </body>
