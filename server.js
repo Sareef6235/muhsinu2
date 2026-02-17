@@ -1,46 +1,36 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const bodyParser = require("body-parser");
 
 const app = express();
-app.use(bodyParser.json());
-app.use(express.static(".")); // Serve project files for local testing
+app.use(express.json());
+app.use(express.static("public"));
 
-const filePath = path.join(__dirname, "pages/results/published-results.json");
+const filePath = "C:/Users/User/Documents/muhsin2/pages/results/published-results.json";
 
-// API to save JSON
-app.post("/save-json", (req, res) => {
-    const data = req.body;
+// Save JSON
+app.post("/deploy", (req, res) => {
+  const data = req.body;
 
-    fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send({ success: false, message: "Failed to save JSON" });
-        }
-        res.send({ success: true, message: "JSON saved successfully" });
-    });
-});
-
-// API to load JSON
-app.get("/get-json", (req, res) => {
-    if (!fs.existsSync(filePath)) {
-        return res.send([]);
+  fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
+    if (err) {
+      console.log(err);
+      return res.json({ success: false });
     }
-    fs.readFile(filePath, "utf8", (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send({ success: false, message: "Failed to load JSON" });
-        }
-        try {
-            res.send(JSON.parse(data));
-        } catch (e) {
-            res.send([]);
-        }
-    });
+    res.json({ success: true });
+  });
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+// Get JSON (for search page)
+app.get("/results", (req, res) => {
+  if (fs.existsSync(filePath)) {
+    const data = fs.readFileSync(filePath);
+    res.json(JSON.parse(data));
+  } else {
+    res.json({ exams: [] });
+  }
+});
+
+app.listen(3000, () => {
+  console.log("Server running → http://localhost:3000");
 });

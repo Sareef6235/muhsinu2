@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Secure Result System | DFJKDJ</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #4f46e5;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --danger: #ef4444;
+      --glass: rgba(255, 255, 255, 0.8);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--primary);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      margin-bottom: 30px;
+      border: 1px solid var(--border);
+      transition: transform 0.2s;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: #fef2f2;
+      color: var(--danger);
+      border: 1px solid #fee2e2;
+    }
+
+    .btn-danger:hover {
+      background: #fee2e2;
+    }
+
+    .input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 25px 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #jsonStatus {
+      font-size: 0.875rem;
+      color: var(--success);
+      margin-top: 10px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    #generatedLink {
+      background: #f1f5f9;
+      padding: 15px;
+      border-radius: 10px;
+      word-break: break-all;
+      margin-top: 15px;
+      border: 1px dashed var(--border);
+    }
+
+    #resultsContainer {
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+
+    #resultsContainer table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    #resultsContainer th,
+    #resultsContainer td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #resultsContainer th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    /* Certificate Overlay */
+    #certificateArea {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    #certificateArea.active {
+      display: flex;
+    }
+
+    #certificate {
+      background: #fff;
+      padding: 50px;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 800px;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .cert-header {
+      text-align: center;
+      margin-bottom: 40px;
+      border-bottom: 2px solid var(--bg);
+      padding-bottom: 20px;
+    }
+
+    .school-name {
+      font-size: 28px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+    }
+
+    .exam-title {
+      font-size: 18px;
+      color: #64748b;
+      margin-top: 5px;
+    }
+
+    #certContent {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+
+    #certContent p {
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--bg);
+      padding-bottom: 8px;
+    }
+
+    #certContent strong {
+      color: #64748b;
+    }
+
+    #qrcode {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      background: white;
+      border-radius: 12px;
+    }
+
+    .cert-actions {
+      margin-top: 40px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    @media (max-width: 600px) {
+      #certificate {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <header>
+      <h1>🛡 Secure Result Portal</h1>
+      <p style="color: #64748b;">Enterprise Military-Grade Distribution System | Variant: DFJKDJ</p>
+    </header>
+
+    <!-- ADMIN LOGIN SECTION -->
+    <div id="loginSection" class="card">
+      <h2>🔐 Administrative Access</h2>
+      <input type="password" id="adminPass" class="input" placeholder="Enter Administrative Password">
+      <button class="btn btn-primary" onclick="App.adminLogin()">Verify & Unlock</button>
+    </div>
+
+    <!-- ADMIN PANEL SECTION -->
+    <div id="adminArea" class="card hidden">
+      <h2>⚙️ System Control Center</h2>
+
+      <label style="font-weight: 500; font-size: 0.9rem;">Distribution Source (JSON)</label>
+      <input type="file" id="jsonInput" accept=".json" class="input" onchange="App.uploadJSON(this)">
+
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button class="btn btn-primary" onclick="App.deployToServer()">Deploy to Cloud</button>
+        <button class="btn btn-primary" onclick="App.generateLink()">Secure Link</button>
+        <button class="btn btn-danger" onclick="App.showAnalytics()">Activity Logs</button>
+        <button class="btn btn-danger" onclick="App.logout()">Logout</button>
+      </div>
+
+      <div id="jsonStatus"></div>
+      <div id="generatedLink" class="hidden"></div>
+
+      <hr>
+
+      <h3>Executive Overview</h3>
+      <div id="resultsContainer"></div>
+    </div>
+
+    <!-- PUBLIC SEARCH SECTION -->
+    <div id="searchSection" class="card">
+      <h2>🔍 Personal Records Search</h2>
+      <p style="font-size: 0.9rem; color: var(--success); margin-bottom: 20px;" id="portalStatus">
+        Records Active: Waiting for secure token...
+      </p>
+
+      <label style="font-weight: 500; font-size: 0.9rem;">Roll Identification</label>
+      <input type="text" id="rollInput" class="input" placeholder="Enter Roll Number">
+
+      <label style="font-weight: 500; font-size: 0.9rem;">Language Protocol</label>
+      <select id="langSelect" class="input">
+        <option value="en">English (Primary)</option>
+        <option value="ml">Malayalam (Native)</option>
+      </select>
+
+      <button class="btn btn-primary" onclick="App.search()" style="width: 100%;">Execute Search</button>
+      <div id="resultMsg" style="text-align: center; margin-top: 15px; font-weight: 500;"></div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATE OVERLAY -->
+  <div id="certificateArea">
+    <div id="certificate">
+      <div class="cert-header">
+        <div class="school-name" id="certSchool">INSTITUTION NAME</div>
+        <div class="exam-title" id="certExam">EXAMINATION TITLE</div>
+      </div>
+
+      <div id="certContent">
+        <!-- Dynamic Content -->
+      </div>
+
+      <div id="qrcode"></div>
+
+      <div class="cert-actions">
+        <button class="btn btn-primary" onclick="App.downloadPDF()">Export as PDF</button>
+        <button class="btn btn-danger" onclick="App.closeCert()">Close Records</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const App = {
+      state: {
+        data: null,
+        tokenData: null
+      },
+
+      adminLogin() {
+        const pass = document.getElementById("adminPass").value;
+        if (pass === "1234") {
+          document.getElementById("loginSection").classList.add("hidden");
+          document.getElementById("adminArea").classList.remove("hidden");
+        } else {
+          alert("Authentication Failed: Access Denied");
+        }
+      },
+
+      logout() {
+        localStorage.clear();
+        alert("Logged Out Successfully ✅");
+        location.reload();
+      },
+
+      uploadJSON(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async e => {
+          try {
+            const raw = JSON.parse(e.target.result);
+            this.state.data = this.normalizeData(raw);
+            localStorage.setItem("examData", JSON.stringify(this.state.data));
+            localStorage.setItem("persistentData", JSON.stringify(this.state.data));
+            this.renderResults(this.state.data);
+            document.getElementById("jsonStatus").innerText = "Data Localized Successfully.";
+          } catch (err) { alert("Invalid JSON."); }
+        };
+        reader.readAsText(file);
+      },
+
+      async deployToServer() {
+        // Support both user's key and internal state
+        const rawData = localStorage.getItem("examData") || (this.state.data ? JSON.stringify(this.state.data) : null);
+        if (!rawData) return alert("No data to deploy.");
+
+        try {
+          // Normalize data before deployment to ensure it matches the expected structure
+          let data = JSON.parse(rawData);
+          if (Array.isArray(data)) {
+            data = {
+              meta: { generatedAt: new Date().toISOString(), published: true },
+              exams: [{ examId: "dfjkdj_sync", examName: "DFJKDJ Deployment", published: true, results: data }]
+            };
+          }
+
+          const res = await fetch("/deploy", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+          const result = await res.json();
+          if (result.success) alert("Deployment Success ✅");
+          else alert("Deployment Failed ❌");
+        } catch (err) {
+          console.error(err);
+          alert("Server Error ❌");
+        }
+      },
+
+      renderResults(data) {
+        const container = document.getElementById("resultsContainer");
+        if (!container || !data || data.length === 0) return;
+        container.innerHTML = "";
+        const table = document.createElement("table");
+        const headers = Object.keys(data[0]);
+        const thead = document.createElement("thead");
+        const trH = document.createElement("tr");
+        headers.forEach(h => { const th = document.createElement("th"); th.innerText = h; trH.appendChild(th); });
+        thead.appendChild(trH); table.appendChild(thead);
+        const tbody = document.createElement("tbody");
+        data.slice(0, 100).forEach(row => {
+          const tr = document.createElement("tr");
+          headers.forEach(h => { const td = document.createElement("td"); td.innerText = row[h] || ""; tr.appendChild(td); });
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody); container.appendChild(table);
+      },
+
+      normalizeData(data) {
+        if (Array.isArray(data)) return data;
+        if (data.schools) {
+          let flat = [];
+          data.schools.forEach(s => s.exams?.forEach(e => e.students?.forEach(st => flat.push({ School: s.name, Exam: e.name, ...st }))));
+          return flat;
+        }
+        if (data.exams && data.exams[0]?.results) return data.exams[0].results;
+        return [];
+      },
+
+      generateLink() {
+        if (!this.state.data) {
+          // Fallback to basic link
+          const link = window.location.origin + "/results.html";
+          navigator.clipboard.writeText(link);
+          alert("Basic Link Copied ✅");
+          return;
+        }
+        const payload = { data: this.state.data, exp: Date.now() + 86400000 };
+        const token = btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        const url = location.origin + location.pathname + "?secure=" + token;
+        document.getElementById("generatedLink").classList.remove("hidden");
+        document.getElementById("generatedLink").innerHTML = `<input class="input" value="${url}" readonly onclick="this.select()">`;
+        navigator.clipboard.writeText(url).then(() => alert("Secure Link Copied ✅"));
+      },
+
+      loadSecure() {
+        const params = new URLSearchParams(location.search);
+        const secure = params.get("secure") || params.get("token") || params.get("exam");
+        if (!secure) return false;
+        try {
+          let base64 = secure.replace(/-/g, '+').replace(/_/g, '/');
+          while (base64.length % 4 !== 0) { base64 += '='; }
+          const decoded = JSON.parse(decodeURIComponent(escape(atob(base64))));
+          if (decoded.exp && Date.now() > decoded.exp) { alert("Expired."); return true; }
+          this.state.tokenData = decoded.data || decoded.exams || decoded;
+          document.getElementById("portalStatus").innerText = "Secure Connection Established";
+          return true;
+        } catch (e) { return false; }
+      },
+
+      async search() {
+        const roll = document.getElementById("rollInput").value.trim();
+        if (!roll) return alert("Identification number required.");
+
+        // Priority 1: Secure Link / Local State
+        const dataset = this.state.tokenData || this.state.data;
+        if (dataset) {
+          let records = this.normalizeData(dataset);
+          const found = records.find(r => Object.values(r).some(v => v == roll));
+          if (found) {
+            this.renderCertificate(found);
+            return;
+          }
+        }
+
+        // Priority 2: Fetch from /results (User's manual endpoint)
+        try {
+          const res = await fetch("/results");
+          const data = await res.json();
+          const results = this.normalizeData(data);
+          const student = results.find(r => Object.values(r).some(v => v == roll));
+          if (student) {
+            this.renderCertificate(student);
+          } else {
+            document.getElementById("resultMsg").innerText = "No Result Found ❌";
+            document.getElementById("resultMsg").style.color = "var(--danger)";
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById("resultMsg").innerText = "Search Error ❌";
+        }
+      },
+
+      renderCertificate(record) {
+        document.getElementById("certificateArea").classList.add("active");
+        document.getElementById("certSchool").innerText = record.School || "Institution";
+        document.getElementById("certExam").innerText = record.Exam || "Result";
+        let html = "";
+        Object.keys(record).forEach(k => {
+          if (["school", "exam"].includes(k.toLowerCase())) return;
+          html += `<p><strong>${k}:</strong> <span>${record[k]}</span></p>`;
+        });
+        document.getElementById("certContent").innerHTML = html;
+        document.getElementById("qrcode").innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), { text: location.href, width: 100, height: 100 });
+      },
+
+      closeCert() { document.getElementById("certificateArea").classList.remove("active"); },
+      downloadPDF() { html2pdf().from(document.getElementById("certificate")).save("Result.pdf"); },
+      showAnalytics() {
+        const logs = JSON.parse(localStorage.getItem("analytics") || "[]");
+        if (logs.length === 0) {
+          alert("Activity Logs Coming Soon");
+        } else {
+          console.table(logs);
+          alert("Analytics shown in Console (F12)");
+        }
+      },
+
+      init() {
+        if (this.loadSecure()) return;
+
+        // Restore from both aliases
+        const stored = localStorage.getItem("examData") || localStorage.getItem("persistentData");
+        if (stored) {
+          this.state.data = JSON.parse(stored);
+          this.renderResults(this.state.data);
+        }
+
+        // Sync with cloud
+        fetch("/results").then(r => r.json()).then(d => {
+          if (d && !this.state.data) {
+            this.state.data = this.normalizeData(d);
+            this.renderResults(this.state.data);
+          }
+        }).catch(() => { });
+      }
+    };
+    window.onload = () => App.init();
+  </script>
+</body>
+
+</html>
