@@ -46,6 +46,7 @@
       margin-bottom: 10px;
       background: linear-gradient(135deg, var(--primary), var(--accent));
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -298,6 +299,7 @@
       <div id="resultsContainer"></div>
     </div>
 
+
     <!-- PUBLIC SEARCH SECTION -->
     <div id="searchSection" class="card">
       <h2>🔍 Personal Records Search</h2>
@@ -409,35 +411,75 @@
         }
       },
 
-      renderResults(data) {
-        const container = document.getElementById("resultsContainer");
-        if (!container || !data || data.length === 0) return;
-        container.innerHTML = "";
-        const table = document.createElement("table");
-        const headers = Object.keys(data[0]);
-        const thead = document.createElement("thead");
-        const trH = document.createElement("tr");
-        headers.forEach(h => { const th = document.createElement("th"); th.innerText = h; trH.appendChild(th); });
-        thead.appendChild(trH); table.appendChild(thead);
-        const tbody = document.createElement("tbody");
-        data.slice(0, 100).forEach(row => {
-          const tr = document.createElement("tr");
-          headers.forEach(h => { const td = document.createElement("td"); td.innerText = row[h] || ""; tr.appendChild(td); });
-          tbody.appendChild(tr);
-        });
-        table.appendChild(tbody); container.appendChild(table);
-      },
+      renderCertificate(record) {
+        document.getElementById("certificateArea").classList.add("active");
 
-      normalizeData(data) {
-        if (Array.isArray(data)) return data;
-        if (data.schools) {
-          let flat = [];
-          data.schools.forEach(s => s.exams?.forEach(e => e.students?.forEach(st => flat.push({ School: s.name, Exam: e.name, ...st }))));
-          return flat;
+        document.getElementById("certSchool").innerText =
+          record.School || "INSTITUTION NAME";
+
+        document.getElementById("certExam").innerText =
+          record.Exam || "OFFICIAL EXAMINATION RESULT";
+
+        let html = `
+    <p><strong>Roll Number:</strong> <span>${record.Roll || ""}</span></p>
+    <p><strong>Name:</strong> <span>${record.Name || ""}</span></p>
+  `;
+
+        // Subject Table
+        if (record.Subjects && Array.isArray(record.Subjects)) {
+          html += `
+      <table style="width:100%; margin-top:20px; border-collapse:collapse;">
+        <thead>
+          <tr style="background:#f1f5f9;">
+            <th style="padding:8px;">Subject</th>
+            <th style="padding:8px;">Marks</th>
+            <th style="padding:8px;">Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+          let total = 0;
+
+          record.Subjects.forEach(sub => {
+            total += Number(sub.Marks) || 0;
+            html += `
+        <tr>
+          <td style="padding:8px; border-bottom:1px solid #eee;">${sub.Subject}</td>
+          <td style="padding:8px; border-bottom:1px solid #eee;">${sub.Marks}</td>
+          <td style="padding:8px; border-bottom:1px solid #eee;">${sub.Grade || "-"}</td>
+        </tr>
+      `;
+          });
+
+          html += `
+        </tbody>
+      </table>
+
+      <div style="margin-top:20px; font-weight:700;">
+        Total Marks: ${total}
+      </div>
+    `;
         }
-        if (data.exams && data.exams[0]?.results) return data.exams[0].results;
-        return [];
-      },
+
+        if (record.Grade) {
+          html += `
+      <div style="margin-top:10px; font-size:18px; color:#10b981; font-weight:800;">
+        Final Grade: ${record.Grade}
+      </div>
+    `;
+        }
+
+        document.getElementById("certContent").innerHTML = html;
+
+        document.getElementById("qrcode").innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), {
+          text: location.href,
+          width: 100,
+          height: 100
+        });
+      }
+
 
       generateLink() {
         if (!this.state.data) {
@@ -505,13 +547,64 @@
 
       renderCertificate(record) {
         document.getElementById("certificateArea").classList.add("active");
-        document.getElementById("certSchool").innerText = record.School || "Institution";
-        document.getElementById("certExam").innerText = record.Exam || "Result";
-        let html = "";
-        Object.keys(record).forEach(k => {
-          if (["school", "exam"].includes(k.toLowerCase())) return;
-          html += `<p><strong>${k}:</strong> <span>${record[k]}</span></p>`;
-        });
+        document.getElementById("certSchool").innerText = record.School || "INSTITUTION NAME";
+        document.getElementById("certExam").innerText = record.Exam || "OFFICIAL EXAMINATION RESULT";
+
+        let html = `
+          <p><strong>Roll Number:</strong> <span>${record.Roll || record["Roll Number"] || ""}</span></p>
+          <p><strong>Name:</strong> <span>${record.Name || record["Student Name"] || ""}</span></p>
+        `;
+
+        // Subject Table Detection
+        if (record.Subjects && Array.isArray(record.Subjects)) {
+          html += `
+            <table style="width:100%; margin-top:20px; border-collapse:collapse; font-size: 0.9rem;">
+              <thead>
+                <tr style="background:#f1f5f9;">
+                  <th style="padding:10px; border: 1px solid #e2e8f0; text-align: left;">Subject</th>
+                  <th style="padding:10px; border: 1px solid #e2e8f0; text-align: center;">Marks</th>
+                  <th style="padding:10px; border: 1px solid #e2e8f0; text-align: center;">Grade</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+
+          let total = 0;
+          record.Subjects.forEach(sub => {
+            total += Number(sub.Marks) || 0;
+            html += `
+              <tr>
+                <td style="padding:10px; border: 1px solid #e2e8f0;">${sub.Subject}</td>
+                <td style="padding:10px; border: 1px solid #e2e8f0; text-align: center;">${sub.Marks}</td>
+                <td style="padding:10px; border: 1px solid #e2e8f0; text-align: center;">${sub.Grade || "-"}</td>
+              </tr>
+            `;
+          });
+
+          html += `
+              </tbody>
+            </table>
+            <div style="margin-top:20px; font-weight:800; display: flex; justify-content: space-between; font-size: 1.1rem;">
+              <span>AGGREGATE TOTAL:</span>
+              <span>${total}</span>
+            </div>
+          `;
+        } else {
+          // Fallback for flat records
+          Object.keys(record).forEach(k => {
+            if (["school", "exam", "roll", "name", "subjects"].includes(k.toLowerCase())) return;
+            html += `<p><strong>${k}:</strong> <span>${record[k]}</span></p>`;
+          });
+        }
+
+        if (record.Grade || record["Final Grade"]) {
+          html += `
+            <div style="margin-top:15px; font-size:1.2rem; color:var(--success); font-weight:900; text-align: center; border-top: 2px dashed var(--bg); padding-top: 15px;">
+              PERFORMANCE RANK: ${record.Grade || record["Final Grade"]}
+            </div>
+          `;
+        }
+
         document.getElementById("certContent").innerHTML = html;
         document.getElementById("qrcode").innerHTML = "";
         new QRCode(document.getElementById("qrcode"), { text: location.href, width: 100, height: 100 });
