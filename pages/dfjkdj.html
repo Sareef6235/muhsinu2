@@ -273,7 +273,7 @@
     <div id="loginSection" class="card">
       <h2>🔐 Administrative Access</h2>
       <input type="password" id="adminPass" class="input" placeholder="Enter Administrative Password">
-      <button class="btn btn-primary" onclick="App.adminLogin()">Verify & Unlock</button>
+      <button class="btn btn-primary" id="loginBtn">Verify & Unlock</button>
     </div>
 
     <!-- ADMIN PANEL SECTION -->
@@ -383,12 +383,10 @@
       },
 
       async deployToServer() {
-        // Support both user's key and internal state
         const rawData = localStorage.getItem("examData") || (this.state.data ? JSON.stringify(this.state.data) : null);
         if (!rawData) return alert("No data to deploy.");
 
         try {
-          // Normalize data before deployment to ensure it matches the expected structure
           let data = JSON.parse(rawData);
           if (Array.isArray(data)) {
             data = {
@@ -411,138 +409,34 @@
         }
       },
 
-      renderCertificate(record) {
-        document.getElementById("certificateArea").classList.add("active");
-
-        document.getElementById("certSchool").innerText =
-          record.School || "INSTITUTION NAME";
-
-        document.getElementById("certExam").innerText =
-          record.Exam || "OFFICIAL EXAMINATION RESULT";
-
-        let html = `
-    <p><strong>Roll Number:</strong> <span>${record.Roll || ""}</span></p>
-    <p><strong>Name:</strong> <span>${record.Name || ""}</span></p>
-  `;
-
-        // Subject Table
-        if (record.Subjects && Array.isArray(record.Subjects)) {
-          html += `
-      <table style="width:100%; margin-top:20px; border-collapse:collapse;">
-        <thead>
-          <tr style="background:#f1f5f9;">
-            <th style="padding:8px;">Subject</th>
-            <th style="padding:8px;">Marks</th>
-            <th style="padding:8px;">Grade</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-          let total = 0;
-
-          record.Subjects.forEach(sub => {
-            total += Number(sub.Marks) || 0;
-            html += `
-        <tr>
-          <td style="padding:8px; border-bottom:1px solid #eee;">${sub.Subject}</td>
-          <td style="padding:8px; border-bottom:1px solid #eee;">${sub.Marks}</td>
-          <td style="padding:8px; border-bottom:1px solid #eee;">${sub.Grade || "-"}</td>
-        </tr>
-      `;
-          });
-
-          html += `
-        </tbody>
-      </table>
-
-      <div style="margin-top:20px; font-weight:700;">
-        Total Marks: ${total}
-      </div>
-    `;
-        }
-
-        if (record.Grade) {
-          html += `
-      <div style="margin-top:10px; font-size:18px; color:#10b981; font-weight:800;">
-        Final Grade: ${record.Grade}
-      </div>
-    `;
-        }
-
-        document.getElementById("certContent").innerHTML = html;
-
-        document.getElementById("qrcode").innerHTML = "";
-        new QRCode(document.getElementById("qrcode"), {
-          text: location.href,
-          width: 100,
-          height: 100
+      renderResults(data) {
+        const container = document.getElementById("resultsContainer");
+        if (!container || !data || data.length === 0) return;
+        container.innerHTML = "";
+        const table = document.createElement("table");
+        const headers = Object.keys(data[0]);
+        const thead = document.createElement("thead");
+        const trH = document.createElement("tr");
+        headers.forEach(h => { const th = document.createElement("th"); th.innerText = h; trH.appendChild(th); });
+        thead.appendChild(trH); table.appendChild(thead);
+        const tbody = document.createElement("tbody");
+        data.slice(0, 100).forEach(row => {
+          const tr = document.createElement("tr");
+          headers.forEach(h => { const td = document.createElement("td"); td.innerText = row[h] || ""; tr.appendChild(td); });
+          tbody.appendChild(tr);
         });
-      }
-
-
-      generateLink() {
-        if (!this.state.data) {
-          // Fallback to basic link
-          const link = window.location.origin + "/results.html";
-          navigator.clipboard.writeText(link);
-          alert("Basic Link Copied ✅");
-          return;
-        }
-        const payload = { data: this.state.data, exp: Date.now() + 86400000 };
-        const token = btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-        const url = location.origin + location.pathname + "?secure=" + token;
-        document.getElementById("generatedLink").classList.remove("hidden");
-        document.getElementById("generatedLink").innerHTML = `<input class="input" value="${url}" readonly onclick="this.select()">`;
-        navigator.clipboard.writeText(url).then(() => alert("Secure Link Copied ✅"));
+        table.appendChild(tbody); container.appendChild(table);
       },
 
-      loadSecure() {
-        const params = new URLSearchParams(location.search);
-        const secure = params.get("secure") || params.get("token") || params.get("exam");
-        if (!secure) return false;
-        try {
-          let base64 = secure.replace(/-/g, '+').replace(/_/g, '/');
-          while (base64.length % 4 !== 0) { base64 += '='; }
-          const decoded = JSON.parse(decodeURIComponent(escape(atob(base64))));
-          if (decoded.exp && Date.now() > decoded.exp) { alert("Expired."); return true; }
-          this.state.tokenData = decoded.data || decoded.exams || decoded;
-          document.getElementById("portalStatus").innerText = "Secure Connection Established";
-          return true;
-        } catch (e) { return false; }
-      },
-
-      async search() {
-        const roll = document.getElementById("rollInput").value.trim();
-        if (!roll) return alert("Identification number required.");
-
-        // Priority 1: Secure Link / Local State
-        const dataset = this.state.tokenData || this.state.data;
-        if (dataset) {
-          let records = this.normalizeData(dataset);
-          const found = records.find(r => Object.values(r).some(v => v == roll));
-          if (found) {
-            this.renderCertificate(found);
-            return;
-          }
+      normalizeData(data) {
+        if (Array.isArray(data)) return data;
+        if (data.schools) {
+          let flat = [];
+          data.schools.forEach(s => s.exams?.forEach(e => e.students?.forEach(st => flat.push({ School: s.name, Exam: e.name, ...st }))));
+          return flat;
         }
-
-        // Priority 2: Fetch from /results (User's manual endpoint)
-        try {
-          const res = await fetch("/results");
-          const data = await res.json();
-          const results = this.normalizeData(data);
-          const student = results.find(r => Object.values(r).some(v => v == roll));
-          if (student) {
-            this.renderCertificate(student);
-          } else {
-            document.getElementById("resultMsg").innerText = "No Result Found ❌";
-            document.getElementById("resultMsg").style.color = "var(--danger)";
-          }
-        } catch (err) {
-          console.error(err);
-          document.getElementById("resultMsg").innerText = "Search Error ❌";
-        }
+        if (data.exams && data.exams[0]?.results) return data.exams[0].results;
+        return [];
       },
 
       renderCertificate(record) {
@@ -555,7 +449,6 @@
           <p><strong>Name:</strong> <span>${record.Name || record["Student Name"] || ""}</span></p>
         `;
 
-        // Subject Table Detection
         if (record.Subjects && Array.isArray(record.Subjects)) {
           html += `
             <table style="width:100%; margin-top:20px; border-collapse:collapse; font-size: 0.9rem;">
@@ -590,7 +483,6 @@
             </div>
           `;
         } else {
-          // Fallback for flat records
           Object.keys(record).forEach(k => {
             if (["school", "exam", "roll", "name", "subjects"].includes(k.toLowerCase())) return;
             html += `<p><strong>${k}:</strong> <span>${record[k]}</span></p>`;
@@ -612,27 +504,86 @@
 
       closeCert() { document.getElementById("certificateArea").classList.remove("active"); },
       downloadPDF() { html2pdf().from(document.getElementById("certificate")).save("Result.pdf"); },
-      showAnalytics() {
-        const logs = JSON.parse(localStorage.getItem("analytics") || "[]");
-        if (logs.length === 0) {
-          alert("Activity Logs Coming Soon");
-        } else {
-          console.table(logs);
-          alert("Analytics shown in Console (F12)");
+
+      generateLink() {
+        if (!this.state.data) {
+          const link = window.location.origin + window.location.pathname;
+          navigator.clipboard.writeText(link);
+          alert("Basic Link Copied ✅");
+          return;
+        }
+        const payload = { data: this.state.data, exp: Date.now() + 86400000 };
+        const token = btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        const url = location.origin + location.pathname + "?secure=" + token;
+        document.getElementById("generatedLink").classList.remove("hidden");
+        document.getElementById("generatedLink").innerHTML = `<input class="input" value="${url}" readonly onclick="this.select()">`;
+        navigator.clipboard.writeText(url).then(() => alert("Secure Link Copied ✅"));
+      },
+
+      loadSecure() {
+        const params = new URLSearchParams(location.search);
+        const secure = params.get("secure") || params.get("token") || params.get("exam");
+        if (!secure) return false;
+        try {
+          let base64 = secure.replace(/-/g, '+').replace(/_/g, '/');
+          while (base64.length % 4 !== 0) { base64 += '='; }
+          const decoded = JSON.parse(decodeURIComponent(escape(atob(base64))));
+          if (decoded.exp && Date.now() > decoded.exp) { alert("Expired."); return true; }
+          this.state.tokenData = decoded.data || decoded.exams || decoded;
+          document.getElementById("portalStatus").innerText = "Secure Connection Established";
+          return true;
+        } catch (e) { return false; }
+      },
+
+      async search() {
+        const roll = document.getElementById("rollInput").value.trim();
+        if (!roll) return alert("Identification number required.");
+
+        const dataset = this.state.tokenData || this.state.data;
+        if (dataset) {
+          let records = this.normalizeData(dataset);
+          const found = records.find(r => Object.values(r).some(v => v == roll));
+          if (found) {
+            this.renderCertificate(found);
+            return;
+          }
+        }
+
+        try {
+          const res = await fetch("/results");
+          const data = await res.json();
+          const results = this.normalizeData(data);
+          const student = results.find(r => Object.values(r).some(v => v == roll));
+          if (student) {
+            this.renderCertificate(student);
+          } else {
+            document.getElementById("resultMsg").innerText = "No Result Found ❌";
+            document.getElementById("resultMsg").style.color = "var(--danger)";
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById("resultMsg").innerText = "Search Error ❌";
         }
       },
 
+      showAnalytics() {
+        alert("Activity Logs Coming Soon");
+      },
+
       init() {
+        const loginBtn = document.getElementById("loginBtn");
+        if (loginBtn) {
+          loginBtn.addEventListener("click", () => this.adminLogin());
+        }
+
         if (this.loadSecure()) return;
 
-        // Restore from both aliases
         const stored = localStorage.getItem("examData") || localStorage.getItem("persistentData");
         if (stored) {
           this.state.data = JSON.parse(stored);
           this.renderResults(this.state.data);
         }
 
-        // Sync with cloud
         fetch("/results").then(r => r.json()).then(d => {
           if (d && !this.state.data) {
             this.state.data = this.normalizeData(d);
