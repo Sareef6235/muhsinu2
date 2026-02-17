@@ -50,13 +50,12 @@ if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
 // UNIFIED HANDLERS
 // ==========================
 
-// ROBUST DEPLOY HANDLER
+// ROBUST DEPLOY HANDLER (WITH CHUNKED SUPABASE SYNC)
 const deployHandler = async (req, res) => {
     try {
         const data = req.body;
         if (!data) return res.status(400).json({ success: false, message: "No data received" });
 
-        // Extract results safely from various possible structures
         const results = data.exams?.[0]?.results || data.results || (Array.isArray(data) ? data : null);
 
         if (!results || !Array.isArray(results)) {
@@ -75,18 +74,28 @@ const deployHandler = async (req, res) => {
             console.log(" - MongoDB Synced");
         }
 
-        // 2. Supabase Sync
+        // 2. Supabase Sync (Safe Chunked Version)
         if (supabase) {
-            const { error: deleteError } = await supabase.from("results").delete().neq("id", "0");
-            if (deleteError) console.error(" ! Supabase Delete Error:", deleteError.message);
+            const { error: deleteError } = await supabase.from("results").delete().neq("id", 0);
+            if (deleteError) {
+                console.error(" ! Supabase Delete Error:", deleteError.message);
+                throw new Error(deleteError.message);
+            }
 
-            const { error: insertError } = await supabase.from("results").insert(results);
-            if (insertError) console.error(" ! Supabase Insert Error:", insertError.message);
-            else console.log(" - Supabase Synced");
+            // Chunked Insert (500 per batch)
+            const CHUNK_SIZE = 500;
+            for (let i = 0; i < results.length; i += CHUNK_SIZE) {
+                const chunk = results.slice(i, i + CHUNK_SIZE);
+                const { error } = await supabase.from("results").insert(chunk);
+                if (error) {
+                    console.error(" ! Supabase Insert Error:", error.message);
+                    throw new Error(error.message);
+                }
+            }
+            console.log(" - Supabase Synced (Chunked)");
         }
 
         // 3. Local JSON Sync
-        // Ensure data is wrapped properly for local storage if it's a flat array
         const finalData = Array.isArray(data) ? {
             meta: { generatedAt: new Date().toISOString(), published: true },
             exams: [{ examId: "deployed_sync", results: data }]
@@ -111,9 +120,7 @@ const deployHandler = async (req, res) => {
     }
 };
 
-// ROBUST RESULTS HANDLER
 const resultsHandler = async (req, res) => {
-    // Priority 1: MongoDB
     if (mongoose.connection.readyState === 1) {
         try {
             const mongoData = await MongoResult.find({});
@@ -121,7 +128,6 @@ const resultsHandler = async (req, res) => {
         } catch (err) { console.error("Mongo fetch error:", err); }
     }
 
-    // Priority 2: Supabase
     if (supabase) {
         try {
             const { data: supaData, error } = await supabase.from("results").select("*");
@@ -129,7 +135,6 @@ const resultsHandler = async (req, res) => {
         } catch (err) { console.error("Supabase fetch error:", err); }
     }
 
-    // Priority 3: Local JSON fallback
     try {
         if (fs.existsSync(localFilePath)) {
             const raw = fs.readFileSync(localFilePath, "utf8");
@@ -144,14 +149,11 @@ const resultsHandler = async (req, res) => {
 // ROUTES & ALIASES
 // ==========================
 app.post("/deploy", deployHandler);
-app.post("/save-json", deployHandler); // Alias for legacy support
+app.post("/save-json", deployHandler);
 
 app.get("/results", resultsHandler);
-app.get("/get-json", resultsHandler); // Alias for legacy support
+app.get("/get-json", resultsHandler);
 
-// ==========================
-// HEALTH CHECK
-// ==========================
 app.get("/health", (req, res) => res.json({ status: "Operational", node: process.version }));
 
 // ==========================
