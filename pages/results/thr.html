@@ -189,11 +189,8 @@
                 <button class="btn btn-primary" onclick="App.loadFromSheet()">Sync From Cloud</button>
                 <div id="sheetStatus" style="font-size:0.9rem;color:gray;margin-top:5px;"></div>
                 <hr style="margin:20px 0;border:0;border-top:1px solid var(--border);">
-                <h3>Deployment Link</h3>
-                <button class="btn btn-primary" onclick="App.generateLink()">Construct Secure Link</button>
-                <div id="generatedLink" style="margin-top:10px;word-break:break-all;"></div>
-                <hr style="margin:20px 0;border:0;border-top:1px solid var(--border);">
-                <div style="display:flex;gap:10px;">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="App.search()">Retrieve Record</button>
                     <button class="btn btn-danger" onclick="App.showAnalytics()">Intelligence Logs</button>
                     <button class="btn btn-danger" onclick="App.terminate()">Terminate</button>
                 </div>
@@ -212,7 +209,10 @@
                 <option value="en">English (Intl)</option>
                 <option value="ml">Malayalam (Regional)</option>
             </select>
-            <button class="btn btn-primary" onclick="App.search()" style="width:100%;">Execute Scan</button>
+            <button class="btn btn-primary" onclick="App.generateLink()" style="width:100%;">
+                Construct Secure Link
+            </button>
+            <div id="generatedLinkPublic" style="margin-top:10px;"></div>
             <div id="resultMsg"></div>
         </div>
 
@@ -239,9 +239,14 @@
             state: { data: null },
 
             adminLogin() {
-                const pass = document.getElementById("adminPass").value;
-                if (pass === "1234") { document.getElementById("adminArea").classList.remove("hidden"); }
-                else alert("Unauthorized Access Detected.");
+                const pass = document.getElementById("adminPass").value.trim();
+                if (pass === "1234") {
+                    document.getElementById("adminArea").classList.remove("hidden");
+                    document.getElementById("adminPass").value = "";
+                    alert("Administrative Access Granted.");
+                } else {
+                    alert("Unauthorized Access Detected.");
+                }
             },
 
             uploadJSON(input) {
@@ -279,10 +284,9 @@
 
 
             loadFromSheet() {
-
                 const sheetId = document.getElementById("sheetIdInput").value.trim();
-                const apiKey = "AIzaSyCI5VYCvr8P4HOUsOpcXq-28GFp_Qbx8Cg";  // 🔴 PUT YOUR KEY HERE
-                const sheetName = "Sheet1"; // 🔴 Change if needed
+                const apiKey = "AIzaSyCI5VYCvr8P4HOUsOpcXq-28GFp_Qbx8Cg"; // 🔴 REPLACE IF EXPIRED
+                const sheetName = "Sheet1";
 
                 if (!sheetId) {
                     alert("Enter Google Sheet ID!");
@@ -292,57 +296,31 @@
                 const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
 
                 fetch(url)
-                    .then(async response => {
-
-                        if (!response.ok) {
-                            const errorText = await response.text();
-                            throw new Error(errorText);
-                        }
-
-                        return response.json();
-                    })
+                    .then(res => res.json())
                     .then(data => {
-
                         if (!data.values || data.values.length === 0) {
-                            alert("Sheet is empty or wrong sheet name.");
+                            alert("Sheet empty or invalid.");
                             return;
                         }
-
-                        const rows = data.values;
-                        const headers = rows[0];
-
-                        const jsonData = rows.slice(1).map(row => {
+                        const headers = data.values[0];
+                        const jsonData = data.values.slice(1).map(row => {
                             let obj = {};
                             headers.forEach((h, i) => {
-                                obj[h.trim()] = row[i] ? row[i].trim() : "";
+                                obj[h.trim()] = row[i] || "";
                             });
                             return obj;
                         });
 
-                        App.state.data = jsonData;
-
-                        document.getElementById("sheetStatus").innerText =
-                            "Google API Sync Success: " + jsonData.length + " records loaded.";
-
-                        document.getElementById("portalStatus").innerText =
-                            "Records Active: Live Google Connection.";
-
+                        this.state.data = jsonData;
+                        document.getElementById("sheetStatus").innerText = "Dynamic Sheet Loaded: " + jsonData.length + " records.";
+                        document.getElementById("portalStatus").innerText = "Records Active: Smart Column Mode.";
                         alert("Google API Connected Successfully!");
-
                     })
                     .catch(error => {
-
                         console.error("API Error:", error);
-
-                        document.getElementById("sheetStatus").innerText =
-                            "Connection Terminated: Google API sync failed.";
-
-                        alert("Google API Connection Failed.\n\nCheck:\n1) API Key\n2) Sheet Public\n3) Sheet Name\n4) Sheets API Enabled");
-
+                        alert("Google API Sync Failed");
                     });
-            }
-
-
+            },
 
             generateLink() {
                 if (!this.state.data || (Array.isArray(this.state.data) && this.state.data.length === 0)) {
@@ -359,30 +337,42 @@
                         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
                     const secureURL = window.location.origin + window.location.pathname + "?secure=" + token;
-                    document.getElementById("generatedLink").innerHTML = `<a href="${secureURL}" target="_blank">${secureURL}</a>`;
+                    const outputDiv = document.getElementById("generatedLinkPublic") || document.getElementById("generatedLink");
+                    outputDiv.innerHTML = `<input class="input" value="${secureURL}" readonly onclick="this.select()" style="font-size:0.8rem; height:auto; padding:8px;">`;
                     alert("Secure Intelligence Link Constructed!");
                 } catch (err) {
                     console.error("Construction Error:", err);
-                    alert("Link Construction Failed: Algorithm mismatch.");
+                    alert("Link Construction Failed.");
                 }
             },
 
-
             search() {
-                if (!this.state.data) { document.getElementById("resultMsg").innerText = "No session active. Load source."; return; }
+                if (!this.state.data) {
+                    document.getElementById("resultMsg").innerText = "No session active. Load source.";
+                    return;
+                }
                 const roll = document.getElementById("rollInput").value.trim();
-                if (!roll) { alert("Identification number required."); return; }
+                if (!roll) {
+                    alert("Identification number required.");
+                    return;
+                }
 
+                // 🔎 Auto detect roll column
+                const rollKeys = ["roll", "Roll", "regno", "RegNo", "id", "ID", "admission", "Admission"];
                 let found = null;
+
                 if (Array.isArray(this.state.data)) {
-                    const st = this.state.data.find(s => s.Roll == roll || s.roll == roll);
-                    if (st) found = { school: st.School || st.school || "Institution", exam: st.Exam || st.exam || "Examination", student: st };
-                } else if (this.state.data.schools) {
-                    this.state.data.schools.forEach(s => {
-                        s.exams.forEach(e => {
-                            e.students.forEach(st => { if (st.roll == roll) found = { school: s.name, exam: e.name, student: st }; });
-                        });
+                    found = this.state.data.find(record => {
+                        return Object.keys(record).some(k => rollKeys.includes(k) && record[k] == roll);
                     });
+
+                    if (found) {
+                        found = {
+                            school: found.School || found.school || "Institution",
+                            exam: found.Exam || found.exam || "Examination",
+                            student: found
+                        };
+                    }
                 }
 
                 if (!found) {
@@ -390,27 +380,38 @@
                     document.getElementById("resultMsg").style.color = "var(--danger)";
                     return;
                 }
-                document.getElementById("resultMsg").innerText = ""; // Clear error
+
+                document.getElementById("resultMsg").innerText = "";
                 this.trackAnalytics(roll);
-                this.renderCertificate(found);
+                this.renderDynamicCertificate(found);
             },
 
-            renderCertificate(obj) {
+            renderDynamicCertificate(obj) {
                 document.getElementById("certificateArea").classList.add("active");
                 document.getElementById("certSchool").innerText = obj.school;
                 document.getElementById("certExam").innerText = obj.exam;
                 const st = obj.student;
                 const lang = document.getElementById("langSelect").value;
-                const i18n = { en: { name: "Name", roll: "Roll", total: "Total", status: "Status" }, ml: { name: "പേര്", roll: "റോൾ", total: "മൊത്തം", status: "സ്റ്റാറ്റസ്" } };
+                const i18n = {
+                    en: { meta: "Details" },
+                    ml: { meta: "വിവരങ്ങൾ" }
+                };
                 const t = i18n[lang] || i18n.en;
-                document.getElementById("certContent").innerHTML = `
-<p><strong>${t.name}:</strong> ${st.Name || st.name}</p>
-<p><strong>${t.roll}:</strong> ${st.Roll || st.roll}</p>
-<p><strong>${t.total}:</strong> ${st.Total || st.total}</p>
-<p><strong>${t.status}:</strong> <span style="font-weight:700; color:${(st.Status || st.status).toLowerCase() === 'pass' ? 'var(--success)' : 'var(--danger)'}">${st.Status || st.status}</span></p>`;
+
+                let contentHtml = "";
+                Object.keys(st).forEach(key => {
+                    if (["school", "exam"].includes(key.toLowerCase())) return;
+                    contentHtml += `<p><strong>${key}:</strong> <span>${st[key]}</span></p>`;
+                });
+
+                document.getElementById("certContent").innerHTML = contentHtml;
                 document.getElementById("qrcode").innerHTML = "";
-                new QRCode(document.getElementById("qrcode"), { text: window.location.href + "&roll=" + (st.Roll || st.roll), width: 120, height: 120 });
+                new QRCode(document.getElementById("qrcode"), {
+                    text: window.location.href.split('?')[0] + "?secure_ref=" + (st.Roll || st.roll || "GEN"),
+                    width: 120, height: 120
+                });
             },
+
 
             closeCert() {
                 document.getElementById("certificateArea").classList.remove("active");
