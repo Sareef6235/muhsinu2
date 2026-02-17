@@ -331,12 +331,13 @@
 
     <script>
         const App = {
+
             state: {
                 data: null,
                 tokenData: null
             },
 
-            /* ---------------- AUTHENTICATION ---------------- */
+            /* ---------------- AUTH ---------------- */
 
             adminLogin() {
                 const pass = document.getElementById("adminPass").value;
@@ -344,7 +345,7 @@
                     document.getElementById("loginSection").classList.add("hidden");
                     document.getElementById("adminArea").classList.remove("hidden");
                 } else {
-                    alert("Authentication Failed: Access Denied");
+                    alert("Access Denied");
                 }
             },
 
@@ -354,7 +355,7 @@
                 document.getElementById("adminPass").value = "";
             },
 
-            /* ---------------- DATA MANAGEMENT ---------------- */
+            /* ---------------- JSON UPLOAD ---------------- */
 
             uploadJSON(input) {
                 const file = input.files[0];
@@ -363,197 +364,236 @@
                 const reader = new FileReader();
                 reader.onload = e => {
                     try {
-                        this.state.data = JSON.parse(e.target.result);
-                        document.getElementById("jsonStatus").innerText = "Records Loaded Successfully (" + this.state.data.schools.length + " Institutions)";
+                        const parsed = JSON.parse(e.target.result);
+                        this.state.data = this.normalizeData(parsed);
+
+                        document.getElementById("jsonStatus").innerText =
+                            "Dynamic JSON Loaded (" + this.state.data.length + " Records)";
                         document.getElementById("jsonStatus").style.color = "var(--success)";
+
                     } catch (err) {
-                        alert("Invalid JSON structure detected.");
-                        console.error(err);
+                        alert("Invalid JSON structure.");
                     }
                 };
                 reader.readAsText(file);
             },
 
+            /* ---------------- SHEET SYNC (FULLY DYNAMIC) ---------------- */
+
             loadFromSheet() {
                 const sheetId = document.getElementById("sheetIdInput").value.trim();
-                if (!sheetId) { alert("Input Required: Sheet ID missing."); return; }
-                const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
-                document.getElementById("sheetStatus").innerText = "Connecting to Satellite... ";
+                if (!sheetId) {
+                    alert("Sheet ID Required");
+                    return;
+                }
+
+                const csvUrl =
+                    `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
+
+                document.getElementById("sheetStatus").innerText = "Connecting...";
 
                 fetch(csvUrl)
-                    .then(res => {
-                        if (!res.ok) throw new Error("Cannot fetch CSV. Ensure synchronization is active.");
-                        return res.text();
-                    })
-                    .then(csvText => {
-                        const lines = csvText.split("\n").filter(l => l.trim() !== "");
-                        const headers = lines[0].split(",");
-                        const jsonData = lines.slice(1).map(line => {
-                            const values = line.split(",");
+                    .then(res => res.text())
+                    .then(csv => {
+
+                        const rows = csv.split("\n").filter(r => r.trim() !== "");
+                        const headers = rows[0].split(",").map(h => h.trim());
+
+                        const json = rows.slice(1).map(row => {
+                            const cols = row.split(",");
                             let obj = {};
-                            headers.forEach((h, i) => obj[h.trim()] = values[i]?.trim());
+                            headers.forEach((h, i) => {
+                                obj[h] = cols[i] ? cols[i].trim() : "";
+                            });
                             return obj;
                         });
-                        this.state.data = jsonData;
-                        document.getElementById("sheetStatus").innerText = `Sync Complete: ${jsonData.length} records retrieved.`;
+
+                        this.state.data = this.normalizeData(json);
+
+                        document.getElementById("sheetStatus").innerText =
+                            "Cloud Sync Success (" + this.state.data.length + " Records)";
                         document.getElementById("sheetStatus").style.color = "var(--success)";
-                        document.getElementById("portalStatus").innerText = "Records Active: Cloud Sync Successful.";
+                        document.getElementById("portalStatus").innerText = "Records Active: Cloud Mode";
                         document.getElementById("portalStatus").style.color = "var(--success)";
-                        alert("Intelligence Data Synced via Cloud.");
+
                     })
-                    .catch(err => {
-                        console.error("Sync Error:", err);
-                        alert("Sync Failure: Ensure sheet is 'Published to Web' and ID is correct.");
-                        document.getElementById("sheetStatus").innerText = "Sync Terminated.";
+                    .catch(() => {
+                        document.getElementById("sheetStatus").innerText = "Sync Failed";
                         document.getElementById("sheetStatus").style.color = "var(--danger)";
                     });
             },
 
+            /* ---------------- NORMALIZER ---------------- */
+
+            normalizeData(data) {
+
+                // Case 1: Flat Array
+                if (Array.isArray(data)) return data;
+
+                // Case 2: schools structure
+                if (data.schools) {
+                    let flat = [];
+                    data.schools.forEach(s =>
+                        s.exams?.forEach(e =>
+                            e.students?.forEach(st => {
+                                flat.push({
+                                    School: s.name,
+                                    Exam: e.name,
+                                    ...st
+                                });
+                            })
+                        )
+                    );
+                    return flat;
+                }
+
+                return [];
+            },
+
+            /* ---------------- PORTABLE LINK GENERATOR ---------------- */
+
             generateLink() {
-                if (!this.state.data) {
-                    alert("Error: No data loaded for deployment.");
+
+                if (!this.state.data || this.state.data.length === 0) {
+                    alert("No data loaded for deployment.");
                     return;
                 }
 
-                const examToken = "mil-exam-" + Date.now();
-                localStorage.setItem(examToken, JSON.stringify(this.state.data));
+                try {
+                    const payload = {
+                        data: this.state.data,
+                        exp: Date.now() + (24 * 60 * 60 * 1000) // 24-hour expiry
+                    };
 
-                const url = window.location.origin + window.location.pathname + "?exam=" + examToken;
-                const linkEl = document.getElementById("generatedLink");
-                linkEl.classList.remove("hidden");
-                linkEl.innerHTML = `<strong>Deployment Success:</strong><br><a href="${url}" target="_blank">${url}</a>`;
+                    // Portable UTF-8 Safe Encoding
+                    let token = btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
+                        .replace(/\+/g, '-')
+                        .replace(/\//g, '_')
+                        .replace(/=+$/, '');
 
-                alert("Secure Deployment Link Generated Successfully");
+                    const url =
+                        window.location.origin +
+                        window.location.pathname +
+                        "?secure=" + token;
+
+                    const box = document.getElementById("generatedLink");
+                    box.classList.remove("hidden");
+                    box.innerHTML = `<input class="input" value="${url}" readonly onclick="this.select()" style="font-size:0.8rem; height:auto; padding:8px;">`;
+
+                    alert("Secure Deployment Link Constructed Successfully");
+                } catch (err) {
+                    console.error(err);
+                    alert("Link Construction Failed.");
+                }
             },
 
-            /* ---------------- DATA LOADING ---------------- */
+            /* ---------------- PORTABLE TOKEN LOAD ---------------- */
 
             loadSecure() {
-                const params = new URLSearchParams(window.location.search);
-                const token = params.get("exam");
+                const params = new URLSearchParams(location.search);
+                let secure = params.get("secure") || params.get("exam");
 
-                if (!token) {
-                    document.getElementById("portalStatus").innerText = "Records Active: Waiting for secure token...";
-                    document.getElementById("resultMsg").innerText = "Please open via secure link.";
-                    return;
-                }
+                if (!secure) return;
 
-                // Retrieve from persistence
-                const stored = localStorage.getItem(token);
-                if (stored) {
+                // Check if it's the new portable format or legacy localStorage token
+                if (secure.length > 50) {
                     try {
-                        this.state.tokenData = JSON.parse(stored);
-                        document.getElementById("portalStatus").innerText = "Records Active: Secure Connection Established.";
+                        let base64 = secure.replace(/-/g, '+').replace(/_/g, '/');
+                        while (base64.length % 4 !== 0) { base64 += '='; }
+                        const decoded = JSON.parse(decodeURIComponent(escape(atob(base64))));
+
+                        if (decoded.exp && Date.now() > decoded.exp) {
+                            alert("Secure Link Expired.");
+                            document.getElementById("portalStatus").innerText = "Protocol Error: Session Expired.";
+                            return;
+                        }
+
+                        this.state.tokenData = decoded.data;
+                        document.getElementById("portalStatus").innerText = "Secure Satellite Link Established";
                         document.getElementById("portalStatus").style.color = "var(--success)";
-                        document.getElementById("resultMsg").innerText = "Identification scan required.";
-                    } catch (e) {
-                        console.error("Token Error:", e);
-                        document.getElementById("portalStatus").innerText = "Error: Transmission Integrity Failure.";
+                    } catch (err) {
+                        console.error("Decryption Error:", err);
                     }
                 } else {
-                    // Fallback to simulation/testing data as requested
-                    console.warn("Token not found. Engaging simulation mode.");
-                    this.state.tokenData = {
-                        "schools": [
-                            {
-                                "name": "Sunrise Public School",
-                                "exams": [
-                                    {
-                                        "name": "mil-exam-simulated",
-                                        "students": [
-                                            { "roll": "101", "name": "Alice Kumar", "total": 450, "status": "Pass" },
-                                            { "roll": "102", "name": "Bob Joseph", "total": 390, "status": "Pass" }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    };
-                    document.getElementById("portalStatus").innerText = "Records Active: Simulation Data Initialized.";
-                    document.getElementById("portalStatus").style.color = "var(--success)";
+                    // Legacy LocalStorage fallback for internal testing
+                    const stored = localStorage.getItem(secure);
+                    if (stored) {
+                        this.state.tokenData = JSON.parse(stored);
+                        document.getElementById("portalStatus").innerText = "Local Secure Session Active";
+                        document.getElementById("portalStatus").style.color = "var(--success)";
+                    }
                 }
             },
 
-            /* ---------------- SEARCH & RETRIEVAL ---------------- */
+            /* ---------------- SEARCH (AUTO DETECT ROLL) ---------------- */
 
             search() {
-                if (!this.state.tokenData) {
-                    document.getElementById("resultMsg").innerText = "Operation Blocked: No active record session.";
+
+                const dataset = this.state.tokenData || this.state.data;
+                if (!dataset) {
+                    document.getElementById("resultMsg").innerText = "No active data session.";
                     return;
                 }
 
-                const roll = document.getElementById("rollInput").value.trim();
-                if (!roll) {
-                    document.getElementById("resultMsg").innerText = "Input Required: Identification missing.";
+                const rollVal = document.getElementById("rollInput").value.trim();
+                if (!rollVal) {
+                    alert("Enter Roll Number");
                     return;
                 }
 
-                let found = null;
-                // Intelligence Algorithm (Handles Multi-School JSON & Flat Spreadsheet Data)
-                if (Array.isArray(this.state.tokenData)) {
-                    const st = this.state.tokenData.find(s => s.Roll == roll || s.roll == roll);
-                    if (st) found = { school: st.School || st.school || "Field Unit", exam: st.Exam || st.exam || "Active Op", student: st };
-                } else if (this.state.tokenData.schools) {
-                    this.state.tokenData.schools.forEach(school => {
-                        school.exams.forEach(exam => {
-                            exam.students.forEach(student => {
-                                if (student.roll == roll) {
-                                    found = { school: school.name, exam: exam.name, student: student };
-                                }
-                            });
-                        });
-                    });
-                }
+                const rollKeys =
+                    ["roll", "Roll", "ID", "RegNo", "regno", "Admission", "admission"];
+
+                let found = dataset.find(record =>
+                    Object.keys(record).some(k =>
+                        rollKeys.includes(k) &&
+                        record[k] == rollVal
+                    )
+                );
 
                 if (!found) {
-                    document.getElementById("resultMsg").innerText = "Status: Identification Not Found.";
+                    document.getElementById("resultMsg").innerText = "Record Not Found";
                     document.getElementById("resultMsg").style.color = "var(--danger)";
                     return;
                 }
 
-                // Execution
-                this.trackAnalytics(roll);
-
-                // Result Summary
-                document.getElementById("resultMsg").style.color = "var(--primary)";
-                document.getElementById("resultMsg").innerHTML = `
-                    <div style="background: var(--bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px;">
-                        <strong>${found.student.name}</strong><br>
-                        ID: ${found.student.roll} | Evaluation: <span style="color:${found.student.status.toLowerCase() === 'pass' ? 'var(--success)' : 'var(--danger)'}">${found.student.status}</span>
-                    </div>
-                `;
-
-                // Certificate Rendering
-                const lang = document.getElementById("langSelect").value;
-                this.renderCertificate(found, lang);
+                document.getElementById("resultMsg").innerText = "";
+                this.renderCertificate(found);
+                this.trackAnalytics(rollVal);
             },
 
-            renderCertificate(obj, lang = 'en') {
-                const i18n = {
-                    en: { name: "Full Name", roll: "Roll ID", total: "Total Score", status: "Evaluation Status" },
-                    ml: { name: "പേര്", roll: "റോള് നമ്പര്‍", total: "ആകെ മാര്‍ക്ക്", status: "ഫലം" }
-                };
-                const t = i18n[lang] || i18n.en;
+            /* ---------------- FULLY DYNAMIC CERTIFICATE ---------------- */
+
+            renderCertificate(record) {
 
                 document.getElementById("certificateArea").classList.add("active");
-                document.getElementById("certSchool").innerText = obj.school;
-                document.getElementById("certExam").innerText = obj.exam;
 
-                document.getElementById("certContent").innerHTML = `
-                    <p><strong>${t.name}</strong> <span>${obj.student.Name || obj.student.name}</span></p>
-                    <p><strong>${t.roll}</strong> <span>${obj.student.Roll || obj.student.roll}</span></p>
-                    <p><strong>${t.total}</strong> <span>${obj.student.Total || obj.student.total}</span></p>
-                    <p><strong>${t.status}</strong> <span style="font-weight:700; color:${(obj.student.Status || obj.student.status).toLowerCase() === 'pass' ? 'var(--success)' : 'var(--danger)'}">${obj.student.Status || obj.student.status}</span></p>
-                `;
+                document.getElementById("certSchool").innerText =
+                    record.School || record.school || "Institution";
+
+                document.getElementById("certExam").innerText =
+                    record.Exam || record.exam || "Examination";
+
+                let html = "";
+
+                Object.keys(record).forEach(key => {
+                    if (!record[key] || ["school", "exam"].includes(key.toLowerCase())) return;
+
+                    html += `
+                <p>
+                    <strong>${key}</strong>
+                    <span>${record[key]}</span>
+                </p>
+            `;
+                });
+
+                document.getElementById("certContent").innerHTML = html;
 
                 document.getElementById("qrcode").innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), {
-                    text: window.location.href,
+                    text: location.origin + location.pathname + "?secure_ref=" + (record.Roll || record.roll || "GEN"),
                     width: 120,
-                    height: 120,
-                    colorDark: "#0f172a",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
+                    height: 120
                 });
             },
 
@@ -563,41 +603,32 @@
 
             downloadPDF() {
                 const element = document.getElementById("certificate");
-                const opt = {
-                    margin: 0,
-                    filename: 'Secure_Result_Record.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-                };
-                html2pdf().set(opt).from(element).save();
+                html2pdf().from(element).save("Result_Record.pdf");
             },
 
             trackAnalytics(roll) {
                 let logs = JSON.parse(localStorage.getItem("analytics") || "[]");
-                logs.push({
-                    roll: roll,
-                    timestamp: new Date().toISOString(),
-                    user_agent: navigator.userAgent.substring(0, 50)
-                });
+                logs.push({ roll, time: new Date().toISOString() });
                 localStorage.setItem("analytics", JSON.stringify(logs));
             },
 
             showAnalytics() {
-                const logs = JSON.parse(localStorage.getItem("analytics") || "[]");
-                if (logs.length === 0) {
-                    alert("Intelligence Report: No access attempts recorded.");
+                const logs =
+                    JSON.parse(localStorage.getItem("analytics") || "[]");
+
+                if (!logs.length) {
+                    alert("No logs available.");
                     return;
                 }
+
                 console.table(logs);
-                alert("Protocol Check: Activity logs sent to System Console (F12).");
+                alert("Logs displayed in console (F12)");
             }
         };
 
-        window.onload = () => {
-            App.loadSecure();
-        };
+        window.onload = () => App.loadSecure();
     </script>
+
 </body>
 
 </html>
