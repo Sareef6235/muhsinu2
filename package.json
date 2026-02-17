@@ -1,15 +1,31 @@
 {
-  "name": "results-app",
+  "name": "secure-result-system",
   "version": "1.0.0",
-  "description": "Secure Results Deployment System",
+  "description": "Enterprise Secure Result System with MongoDB, Supabase, and Local JSON fallback",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "secure",
+    "results",
+    "mongodb",
+    "supabase",
+    "express"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.3.1",
+    "@supabase/supabase-js": "^2.10.0",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   },
   "engines": {
-    "node": "20.x"
-  },
-  "dependencies": {
-    "express": "^4.18.2"
+    "node": "18.x"
   }
 }

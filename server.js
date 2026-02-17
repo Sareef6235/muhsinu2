@@ -1,80 +1,60 @@
+// server.js
+require('dotenv').config();
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const mongoose = require("mongoose");
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
+app.use(express.json());
+app.use(express.static(".")); // Serve project root for local accessibility
 
-// ==========================
-// MIDDLEWARE
-// ==========================
-app.use(express.json({ limit: "10mb" }));
-app.use(express.static(path.join(__dirname, "public")));
+const filePath = path.join(__dirname, "pages", "results", "published-results.json");
 
-
-// ==========================
-// FILE PATH (Portable)
-// ==========================
-const filePath = path.join(__dirname, "published-results.json");
-
-
-// ==========================
-// ENSURE FILE EXISTS
-// ==========================
-if (!fs.existsSync(filePath)) {
-  fs.writeFileSync(filePath, JSON.stringify({ exams: [] }, null, 2));
-  console.log("New JSON file created");
+// Ensure the directory exists
+const dir = path.dirname(filePath);
+if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
 }
 
+// Unified Deployment Endpoints (Support for both standard and legacy)
+const saveHandler = (req, res) => {
+    const data = req.body;
+    fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
+        if (err) {
+            console.error("Save Error:", err);
+            return res.json({ success: false, message: "Server Error during save" });
+        }
+        console.log("JSON Updated Successfully");
+        res.json({ success: true });
+    });
+};
 
-// ==========================
-// SAVE JSON (Deploy)
-// ==========================
-app.post("/deploy", (req, res) => {
+app.post("/deploy", saveHandler);
+app.post("/save-json", saveHandler);
 
-  if (!req.body || Object.keys(req.body).length === 0) {
-    return res.status(400).json({ success: false, message: "Empty Data" });
-  }
-
-  fs.writeFile(filePath, JSON.stringify(req.body, null, 2), (err) => {
-    if (err) {
-      console.error("Write Error:", err);
-      return res.status(500).json({ success: false });
+// Unified Retrieval Endpoints (Support for both search and sync)
+const getHandler = (req, res) => {
+    if (fs.existsSync(filePath)) {
+        try {
+            const data = fs.readFileSync(filePath, "utf8");
+            res.json(JSON.parse(data));
+        } catch (e) {
+            console.error("Parse Error:", e);
+            res.json({ exams: [] });
+        }
+    } else {
+        res.json({ exams: [] });
     }
+};
 
-    console.log("JSON Saved Successfully");
-    res.json({ success: true });
-  });
-});
+app.get("/results", getHandler);
+app.get("/get-json", getHandler);
 
-
-// ==========================
-// GET JSON (Search Page)
-// ==========================
-app.get("/results", (req, res) => {
-  try {
-    const raw = fs.readFileSync(filePath, "utf8");
-    const data = JSON.parse(raw);
-    res.json(data);
-  } catch (err) {
-    console.error("Read Error:", err);
-    res.status(500).json({ exams: [] });
-  }
-});
-
-
-// ==========================
-// ROOT TEST ROUTE
-// ==========================
-app.get("/health", (req, res) => {
-  res.send("Server Running OK");
-});
-
-
-// ==========================
-// START SERVER (Render Safe)
-// ==========================
-const PORT = process.env.PORT || 3000;
-
+const PORT = 3000;
 app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+    console.log(`\n🛡  Secure Deployment Server Running`);
+    console.log(`→ Local:  http://localhost:${PORT}`);
+    console.log(`→ Target: ${filePath}\n`);
 });
