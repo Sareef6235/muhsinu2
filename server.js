@@ -11,7 +11,7 @@ const app = express();
 // ==========================
 // MIDDLEWARE
 // ==========================
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "15mb" }));
 app.use(express.static(".")); // Serve frontend static files from root
 
 // ==========================
@@ -50,54 +50,78 @@ if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
 // UNIFIED HANDLERS
 // ==========================
 
+// ROBUST DEPLOY HANDLER
 const deployHandler = async (req, res) => {
-    const data = req.body;
-    const results = data.exams?.[0]?.results || data.results || (Array.isArray(data) ? data : null);
-
-    if (!results) return res.json({ success: false, message: "Invalid JSON structure" });
-
     try {
-        const resultsArray = Array.isArray(results) ? results : [results];
+        const data = req.body;
+        if (!data) return res.status(400).json({ success: false, message: "No data received" });
 
-        // MongoDB
-        if (mongoConnected) {
+        // Extract results safely from various possible structures
+        const results = data.exams?.[0]?.results || data.results || (Array.isArray(data) ? data : null);
+
+        if (!results || !Array.isArray(results)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid structure. Expected results array or exams[0].results"
+            });
+        }
+
+        console.log(`🚀 Deploying ${results.length} records...`);
+
+        // 1. MongoDB Sync
+        if (MongoResult && mongoose.connection.readyState === 1) {
             await MongoResult.deleteMany({});
-            await MongoResult.insertMany(resultsArray);
-            console.log(" - MongoDB updated");
+            await MongoResult.insertMany(results);
+            console.log(" - MongoDB Synced");
         }
 
-        // Supabase
+        // 2. Supabase Sync
         if (supabase) {
-            await supabase.from("results").delete().neq("id", "0");
-            await supabase.from("results").insert(resultsArray);
-            console.log(" - Supabase updated");
+            const { error: deleteError } = await supabase.from("results").delete().neq("id", "0");
+            if (deleteError) console.error(" ! Supabase Delete Error:", deleteError.message);
+
+            const { error: insertError } = await supabase.from("results").insert(results);
+            if (insertError) console.error(" ! Supabase Insert Error:", insertError.message);
+            else console.log(" - Supabase Synced");
         }
 
-        // Local JSON
+        // 3. Local JSON Sync
+        // Ensure data is wrapped properly for local storage if it's a flat array
         const finalData = Array.isArray(data) ? {
             meta: { generatedAt: new Date().toISOString(), published: true },
-            exams: [{ results: data }]
+            exams: [{ examId: "deployed_sync", results: data }]
         } : data;
-        fs.writeFileSync(localFilePath, JSON.stringify(finalData, null, 2));
-        console.log(" - Local JSON updated");
 
-        res.json({ success: true, message: "Deployed to all systems" });
-    } catch (err) {
-        console.error("Deploy Error:", err);
-        res.json({ success: false, message: "Deployment failed", error: err.message });
+        fs.writeFileSync(localFilePath, JSON.stringify(finalData, null, 2));
+        console.log(" - Local JSON Saved");
+
+        res.json({
+            success: true,
+            message: "Deployment completed successfully across all nodes",
+            count: results.length
+        });
+
+    } catch (error) {
+        console.error("❌ DEPLOYMENT CRASH:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server internal error during deployment",
+            error: error.message
+        });
     }
 };
 
+// ROBUST RESULTS HANDLER
 const resultsHandler = async (req, res) => {
-    // MongoDB first
-    if (mongoConnected) {
+    // Priority 1: MongoDB
+    if (mongoose.connection.readyState === 1) {
         try {
             const mongoData = await MongoResult.find({});
             if (mongoData.length > 0) return res.json({ exams: [{ results: mongoData }] });
         } catch (err) { console.error("Mongo fetch error:", err); }
     }
 
-    // Supabase fallback
+    // Priority 2: Supabase
     if (supabase) {
         try {
             const { data: supaData, error } = await supabase.from("results").select("*");
@@ -105,7 +129,7 @@ const resultsHandler = async (req, res) => {
         } catch (err) { console.error("Supabase fetch error:", err); }
     }
 
-    // Local JSON fallback
+    // Priority 3: Local JSON fallback
     try {
         if (fs.existsSync(localFilePath)) {
             const raw = fs.readFileSync(localFilePath, "utf8");
@@ -128,7 +152,7 @@ app.get("/get-json", resultsHandler); // Alias for legacy support
 // ==========================
 // HEALTH CHECK
 // ==========================
-app.get("/health", (req, res) => res.send("🛡 Result Cloud Server: Operational"));
+app.get("/health", (req, res) => res.json({ status: "Operational", node: process.version }));
 
 // ==========================
 // START SERVER
@@ -137,5 +161,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`\n🚀 Secure Result System Running`);
     console.log(`→ Local:  http://localhost:${PORT}`);
-    console.log(`→ Mode:   ${mongoConnected || process.env.MONGO_URI ? "Cloud-Synchronized" : "Local-Only"}\n`);
+    console.log(`→ Mode:   ${process.env.MONGO_URI ? "Cloud-Synchronized" : "Local-Only"}\n`);
 });
