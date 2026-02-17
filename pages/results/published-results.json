@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "generatedAt": "2026-02-17T14:53:16.000Z",
+    "published": true
+  },
+  "exams": [
+    {
+      "examId": "ex_1770660897473",
+      "examName": "4 (sdsdg)",
+      "published": true,
+      "results": [
+        {
+          "roll": "4029",
+          "name": "محمد محسن",
+          "subjects": {
+            "QURA'N HIFZ": 3,
+            "THAFHEEMU THILAVAH": 64
+          },
+          "total": 67
+        },
+        {
+          "roll": "4030",
+          "name": "رزل رزاق",
+          "subjects": {
+            "QURA'N HIFZ": 0,
+            "THAFHEEMU THILAVAH": 70
+          },
+          "total": 70
+        },
+        {
+          "roll": "4031",
+          "name": "آبس جليل",
+          "subjects": {
+            "QURA'N HIFZ": 0,
+            "THAFHEEMU THILAVAH": 94
+          },
+          "total": 94
+        }
+      ]
+    }
+  ]
+}

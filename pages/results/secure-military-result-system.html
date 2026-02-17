@@ -283,7 +283,8 @@
             <input type="file" id="jsonInput" accept=".json" class="input" onchange="App.uploadJSON(this)">
 
             <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button class="btn btn-primary" onclick="App.generateLink()">Deploy Secure Link</button>
+                <button class="btn btn-primary" onclick="App.deployToServer()">Deploy to Cloud</button>
+                <button class="btn btn-primary" onclick="App.generateLink()">Secure Link</button>
                 <button class="btn btn-danger" onclick="App.showAnalytics()">Activity Logs</button>
                 <button class="btn btn-danger" onclick="App.logout()">Logout</button>
             </div>
@@ -393,23 +394,10 @@
                         // 2. Render Overview Table
                         this.renderResults(finalData);
 
-                        // 3. Sync to Server (Enterprise Cloud Backup)
-                        await fetch("/api/save-json", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(finalData)
-                        });
-
                         const statusEl = document.getElementById("jsonStatus");
                         if (statusEl) {
-                            statusEl.innerText = `Deployment Success (${finalData.length} Records Synchronized)`;
+                            statusEl.innerText = `Deployment Success (${finalData.length} Records Localized)`;
                             statusEl.style.color = "var(--success)";
-                        }
-
-                        const portalStatus = document.getElementById("portalStatus");
-                        if (portalStatus) {
-                            portalStatus.innerText = "Records Active: Hybrid Secure Mode";
-                            portalStatus.style.color = "var(--success)";
                         }
 
                     } catch (err) {
@@ -418,6 +406,46 @@
                     }
                 };
                 reader.readAsText(file);
+            },
+
+            async deployToServer() {
+                const dataset = this.state.data;
+                if (!dataset) {
+                    alert("Operation Blocked: No active data session for cloud deployment.");
+                    return;
+                }
+
+                try {
+                    const payload = {
+                        meta: { generatedAt: new Date().toISOString(), published: true },
+                        exams: [
+                            {
+                                examId: "ex_1770660897473",
+                                examName: "Active Military Results",
+                                published: true,
+                                results: dataset
+                            }
+                        ]
+                    };
+
+                    const result = await fetch("/save-json", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    const resJson = await result.json();
+
+                    if (resJson.success) {
+                        document.getElementById("jsonStatus").innerText = "Deployment Success: Cloud Mission Active";
+                        document.getElementById("jsonStatus").style.color = "var(--success)";
+                        alert("Secure Record Deployment: SUCCESS.");
+                    } else {
+                        alert("Deployment Failed: Server Protocol Error.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Deployment Error: Satellite uplink interrupted.");
+                }
             },
 
             /* ---------------- TABLE VIEW DASHBOARD ---------------- */
@@ -448,7 +476,7 @@
 
                 // Create Body
                 const tbody = document.createElement("tbody");
-                data.slice(0, 100).forEach(row => { // Limit to first 100 for performance
+                data.slice(0, 100).forEach(row => {
                     const tr = document.createElement("tr");
                     headers.forEach(h => {
                         const td = document.createElement("td");
@@ -497,11 +525,6 @@
                             statusEl.innerText = `Sync Complete: ${finalData.length} records retrieved.`;
                             statusEl.style.color = "var(--success)";
                         }
-                        const ps = document.getElementById("portalStatus");
-                        if (ps) {
-                            ps.innerText = "Records Active: Cloud Sync Successful.";
-                            ps.style.color = "var(--success)";
-                        }
                     })
                     .catch(err => {
                         console.error("Sync Error:", err);
@@ -524,6 +547,9 @@
                     );
                     return flat;
                 }
+                if (data.exams && data.exams[0]?.results) {
+                    return data.exams[0].results;
+                }
                 return [];
             },
 
@@ -541,7 +567,6 @@
                         exp: Date.now() + (24 * 60 * 60 * 1000) // 24-hour mission session
                     };
 
-                    // UTF-8 Safe Base64 Encoding
                     let token = btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
                         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
@@ -551,7 +576,6 @@
                         box.classList.remove("hidden");
                         box.innerHTML = `<input class="input" value="${url}" readonly onclick="this.select()" style="font-size:0.8rem; height:auto; padding:8px; margin-bottom:0;">`;
 
-                        // Copy to clipboard pro-actively
                         navigator.clipboard.writeText(url).then(() => {
                             alert("Secure Deployment Link copied to clipboard!");
                         });
@@ -566,27 +590,23 @@
 
             loadSecure() {
                 const params = new URLSearchParams(window.location.search);
-                // Support both 'secure' and 'data' (user manual edit) parameters
                 let secure = params.get("secure") || params.get("data") || params.get("exam");
 
                 if (!secure) return false;
 
                 try {
-                    // Normalize Base64 URL for standard atob
                     let base64 = secure.replace(/-/g, '+').replace(/_/g, '/');
                     while (base64.length % 4 !== 0) { base64 += '='; }
 
-                    // UTF-8 Safe Decoding
                     const decoded = JSON.parse(decodeURIComponent(escape(atob(base64))));
 
-                    // Check Expiration
                     if (decoded.exp && Date.now() > decoded.exp) {
                         alert("Protocol Warning: Secure Link has Expired.");
                         document.getElementById("portalStatus").innerText = "Protocol Error: Session Expired.";
                         return true;
                     }
 
-                    this.state.tokenData = decoded.data || decoded.exams || decoded; // Flexible schema support
+                    this.state.tokenData = decoded.data || decoded.exams || decoded;
                     const ps = document.getElementById("portalStatus");
                     if (ps) {
                         ps.innerText = "Secure Satellite Link Established";
@@ -608,7 +628,6 @@
                     return;
                 }
 
-                // Handle both flat array and student results format
                 let records = dataset;
                 if (dataset.exams && dataset.exams[0]?.results) records = dataset.exams[0].results;
 
@@ -649,7 +668,6 @@
                     if (!record[key] || ["school", "exam"].includes(key.toLowerCase())) return;
 
                     if (typeof record[key] === 'object') {
-                        // Nested subjects support
                         html += `<div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;"><strong style="color:var(--accent)">${key}:</strong></div>`;
                         Object.entries(record[key]).forEach(([sub, val]) => {
                             html += `<p><strong>${sub}:</strong> <span>${val}</span></p>`;
@@ -699,38 +717,29 @@
             },
 
             init() {
-                // Triple-Check Data Loading Priority:
-
-                // 1. Sharing Link (Highest Priority)
                 if (this.loadSecure()) return;
 
-                // 2. Local Cache (Persistence)
                 const stored = localStorage.getItem("persistentData") || localStorage.getItem("examData");
                 if (stored) {
                     try {
                         const data = JSON.parse(stored);
                         this.state.data = this.normalizeData(data);
                         this.renderResults(this.state.data);
-
-                        const statusEl = document.getElementById("jsonStatus");
-                        if (statusEl) {
-                            statusEl.innerText = `Records Restored From Local Cache (${this.state.data.length})`;
-                            statusEl.style.color = "var(--success)";
-                        }
                     } catch (e) { console.error("Local Cache Corrupt"); }
                 }
 
-                // 3. Remote Server (Global Backup)
-                fetch("/api/get-json")
+                fetch("/get-json")
                     .then(res => res.json())
                     .then(data => {
-                        if (data && !this.state.tokenData && !this.state.data) {
-                            this.state.data = this.normalizeData(data);
-                            this.renderResults(this.state.data);
-                            const ps = document.getElementById("portalStatus");
-                            if (ps) {
-                                ps.innerText = "Records Synchronized from Cloud Backbone";
-                                ps.style.color = "var(--accent)";
+                        if (data && (Array.isArray(data) || (data.exams && data.exams.length > 0))) {
+                            if (!this.state.tokenData) {
+                                this.state.data = this.normalizeData(data);
+                                this.renderResults(this.state.data);
+                                const ps = document.getElementById("portalStatus");
+                                if (ps) {
+                                    ps.innerText = "Records Synchronized from Cloud Backbone";
+                                    ps.style.color = "var(--accent)";
+                                }
                             }
                         }
                     })
