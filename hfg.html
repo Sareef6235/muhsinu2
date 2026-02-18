@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Madrasa Management Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/hfg/css/styles.css">
+</head>
+<body>
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading Madrasa Management Portal...</p>
+  </div>
+
+  <header class="app-header glass">
+    <div>
+      <h1>Madrasa Management Portal</h1>
+      <p>Unified administration for 13 madrasas</p>
+    </div>
+    <div class="header-controls">
+      <button id="themeToggle" class="btn btn-outline" type="button">🌙 Dark Mode</button>
+      <button id="adminToggle" class="btn btn-primary" type="button">Admin Login</button>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    <section class="top-controls glass">
+      <label for="madrasaSelect">Select Madrasa</label>
+      <select id="madrasaSelect" aria-label="Madrasa selector"></select>
+      <div id="profileInfo" class="profile-info"></div>
+    </section>
+
+    <section class="tab-nav glass">
+      <button class="tab-btn active" data-tab="overview">Overview</button>
+      <button class="tab-btn" data-tab="students">Students</button>
+      <button class="tab-btn" data-tab="results">Results</button>
+      <button class="tab-btn" data-tab="markbook">Mark Book</button>
+      <button class="tab-btn" data-tab="announcements">Announcements</button>
+    </section>
+
+    <section id="overview" class="tab-panel active">
+      <div id="dashboardCards" class="card-grid"></div>
+    </section>
+
+    <section id="students" class="tab-panel">
+      <div class="section-card glass">
+        <div class="section-title-row">
+          <h2>Student Directory</h2>
+          <button id="addStudentBtn" class="btn btn-primary admin-only" type="button">Add Student</button>
+        </div>
+        <div class="toolbar">
+          <input id="studentSearch" type="search" placeholder="Search by student name">
+          <select id="classFilter"></select>
+          <select id="genderFilter">
+            <option value="All">All Genders</option>
+            <option value="Boy">Boys</option>
+            <option value="Girl">Girls</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Gender</th>
+                <th class="admin-only">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="studentsPagination"></div>
+      </div>
+    </section>
+
+    <section id="results" class="tab-panel">
+      <div class="section-card glass">
+        <div class="section-title-row">
+          <h2>Exam Results</h2>
+          <button id="addResultBtn" class="btn btn-primary admin-only" type="button">Add Result</button>
+        </div>
+        <div id="resultsSummary" class="result-summary"></div>
+      </div>
+    </section>
+
+    <section id="markbook" class="tab-panel">
+      <div class="section-card glass">
+        <h2>Mark Book</h2>
+        <div id="markbookArea"></div>
+        <div class="toolbar">
+          <button id="printMarkbook" class="btn btn-outline" type="button">Print Mark Book</button>
+          <button id="downloadPdf" class="btn btn-primary" type="button">Download as PDF</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="announcements" class="tab-panel">
+      <div class="section-card glass">
+        <div class="section-title-row">
+          <h2>Announcements</h2>
+          <button id="addAnnouncementBtn" class="btn btn-primary admin-only" type="button">Add Announcement</button>
+        </div>
+        <div id="announcementList" class="announcement-list"></div>
+      </div>
+    </section>
+
+    <section id="adminPanel" class="admin-panel glass hidden">
+      <h2>Admin Panel</h2>
+      <form id="adminLoginForm" class="admin-login-form">
+        <input type="text" id="adminUser" placeholder="Username" required>
+        <input type="password" id="adminPass" placeholder="Password" required>
+        <button class="btn btn-primary" type="submit">Login</button>
+      </form>
+      <div id="adminState" class="admin-state">Use <strong>admin / madrasa123</strong> to unlock management controls.</div>
+      <div class="toolbar">
+        <label for="jsonUpload" class="btn btn-outline">Upload Data via JSON</label>
+        <input id="jsonUpload" type="file" accept="application/json">
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer glass">
+    <p>© 2026 Madrasa Management System • API-ready architecture • Local JSON storage enabled</p>
+  </footer>
+
+  <script type="module" src="assets/hfg/js/app.js"></script>
+</body>
+</html>
