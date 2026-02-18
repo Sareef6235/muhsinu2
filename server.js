@@ -1,6 +1,7 @@
 // server.js
 require('dotenv').config();
 const express = require("express");
+const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
@@ -11,7 +12,9 @@ const app = express();
 // ==========================
 // MIDDLEWARE
 // ==========================
-app.use(express.json({ limit: "15mb" }));
+app.use(cors()); // Allow cross-origin requests for cloud deployment
+app.use(express.json({ limit: "50mb" })); // Support large datasets
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.static(".")); // Serve frontend static files from root
 
 // ==========================

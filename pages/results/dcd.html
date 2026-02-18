@@ -323,8 +323,8 @@
     <script>
         const App = {
             config: {
-                // FALLBACK SYSTEM: Use Render API if exists, otherwise local
-                API_BASE: "https://api-result.onrender.com"
+                // ABSOLUTE URL FACTORY: Works local or cloud
+                API_BASE: window.location.origin
             },
 
             state: { data: [] },
@@ -343,11 +343,11 @@
                 const stored = localStorage.getItem("examData");
                 if (stored) this.state.data = JSON.parse(stored);
 
-                // Health Check Diagnostic
+                // Health Check
                 fetch(`${this.config.API_BASE}/health`)
                     .then(r => r.json())
                     .then(s => console.log("System Health:", s))
-                    .catch(() => console.warn("Primary API unavailable, system may use local fallback or be restricted."));
+                    .catch(e => console.error("API Linkage Failed:", e));
             },
 
             adminLogin() {
@@ -382,7 +382,7 @@
             },
 
             async deploy() {
-                if (!this.state.data.length) return alert("No payload found");
+                if (!this.state.data || !this.state.data.length) return alert("No payload found");
                 const payload = { exams: [{ examId: "dcd_sync", results: this.state.data }] };
 
                 try {
@@ -391,12 +391,18 @@
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload)
                     });
+
+                    if (!res.ok) {
+                        const errText = await res.text();
+                        console.error("Deploy Error:", errText);
+                        return alert("Deployment Failed ❌ Check Server logs.");
+                    }
+
                     const results = await res.json();
-                    if (results.success) alert("Cloud Sync Complete ✅");
-                    else alert("Sync Failed ❌: " + (results.message || "Unknown error"));
+                    alert(`Deployment Success ✅ Records: ${results.count}`);
                 } catch (err) {
-                    console.error("Deploy Error:", err);
-                    alert("Server Unavailable");
+                    console.error("Network Violation:", err);
+                    alert("Server Unavailable ❌ Check Connection");
                 }
             },
 
@@ -439,7 +445,6 @@
                 let html = "<table><thead><tr><th>SUBJECT</th><th>MARKS</th></tr></thead><tbody>";
                 let total = 0;
 
-                // Handle both Object and Array subject formats
                 if (record.subjects && typeof record.subjects === "object" && !Array.isArray(record.subjects)) {
                     Object.entries(record.subjects).forEach(([sub, mark]) => {
                         total += Number(mark) || 0;
@@ -448,7 +453,7 @@
                 } else if (record.Subjects && Array.isArray(record.Subjects)) {
                     record.Subjects.forEach(s => {
                         total += Number(s.Marks) || 0;
-                        html += `<tr><td>${s.Subject.toUpperCase()}</td><td>${s.Marks}</td></tr>`;
+                        html += `<tr><td>${s.Subject ? s.Subject.toUpperCase() : "N/A"}</td><td>${s.Marks}</td></tr>`;
                     });
                 }
 
@@ -456,7 +461,6 @@
                 document.getElementById("certTableArea").innerHTML = html;
                 document.getElementById("certTotal").innerText = record.total || total;
 
-                // QR Code
                 document.getElementById("qrcode").innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), { text: location.href, width: 100, height: 100 });
             },
