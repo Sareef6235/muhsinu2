@@ -1,131 +1,204 @@
-// server.js (Root Backend)
-require('dotenv').config();
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
-const mongoose = require("mongoose");
-const { createClient } = require("@supabase/supabase-js");
+const { exec } = require("child_process");
 
 const app = express();
 
-/* =========================
-   MIDDLEWARE (PRODUCTION)
-========================= */
-app.use(cors()); // Allow cross-origin requests
-app.use(express.json({ limit: "50mb" })); // Support large payloads
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
-app.use(express.static(".")); // Serve all static files from root
+/* ===================================================
+   GLOBAL SAFETY (PREVENT SERVER CRASH)
+=================================================== */
 
-/* =========================
-   DATA NODE: LOCAL
-========================= */
-const localFilePath = path.join(__dirname, "pages", "results", "published-results.json");
-const localDir = path.dirname(localFilePath);
-if (!fs.existsSync(localDir)) fs.mkdirSync(localDir, { recursive: true });
-if (!fs.existsSync(localFilePath)) fs.writeFileSync(localFilePath, JSON.stringify({ exams: [] }, null, 2));
+// Catch unexpected errors
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION:", err);
+});
 
-/* =========================
-   DATA NODE: MONGODB
-========================= */
-if (process.env.MONGO_URI) {
-    mongoose.connect(process.env.MONGO_URI)
-        .then(() => console.log("✅ Database: MongoDB Connected"))
-        .catch(err => console.error("❌ Database: MongoDB Connection Error:", err));
+process.on("unhandledRejection", (reason) => {
+  console.error("UNHANDLED PROMISE REJECTION:", reason);
+});
+
+/* ===================================================
+   MIDDLEWARE
+=================================================== */
+
+app.use(cors());
+
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+/* ===================================================
+   STORAGE SETUP
+=================================================== */
+
+const DATA_PATH = path.join(__dirname, "results.json");
+
+try {
+  if (!fs.existsSync(DATA_PATH)) {
+    fs.writeFileSync(DATA_PATH, JSON.stringify({ exams: [] }, null, 2));
+    console.log("Local results.json created");
+  }
+} catch (err) {
+  console.error("File Init Error:", err);
 }
-const MongoResult = mongoose.model("MongoResult", new mongoose.Schema({}, { strict: false }));
 
-/* =========================
-   DATA NODE: SUPABASE
-========================= */
-let supabase = null;
-if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
-    supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-    console.log("✅ Database: Supabase Connected");
-}
+/* ===================================================
+   HEALTH CHECK
+=================================================== */
 
-/* =========================
-   API ROUTES
-========================= */
-
-// Health Check
-app.get("/health", (req, res) => res.json({
+app.get("/health", (req, res) => {
+  res.status(200).json({
     status: "Operational",
     node: process.version,
     uptime: process.uptime()
-}));
-
-// Unified Deployment Route
-app.post("/deploy", async (req, res) => {
-    try {
-        const data = req.body;
-        if (!data) return res.status(400).json({ success: false, message: "No payload received" });
-
-        const results = data.exams?.[0]?.results || data.results || (Array.isArray(data) ? data : null);
-        if (!results || !Array.isArray(results)) {
-            return res.status(400).json({ success: false, message: "Invalid payload: Expected results array" });
-        }
-
-        console.log(`🚀 Syncing ${results.length} records...`);
-
-        // 1. MongoDB Sync
-        if (mongoose.connection.readyState === 1) {
-            await MongoResult.deleteMany({});
-            await MongoResult.insertMany(results);
-        }
-
-        // 2. Supabase Sync (Chunked)
-        if (supabase) {
-            await supabase.from("results").delete().neq("id", 0);
-            const CHUNK = 500;
-            for (let i = 0; i < results.length; i += CHUNK) {
-                await supabase.from("results").insert(results.slice(i, i + CHUNK));
-            }
-        }
-
-        // 3. Local JSON Sync (Persistence)
-        const finalData = data.exams ? data : { exams: [{ results }] };
-        fs.writeFileSync(localFilePath, JSON.stringify(finalData, null, 2));
-
-        res.status(200).json({
-            success: true,
-            message: "Cloud and Local nodes synchronized successfully",
-            count: results.length
-        });
-
-    } catch (error) {
-        console.error("❌ Deployment Crash:", error);
-        res.status(500).json({ success: false, message: "Internal server error during sync", error: error.message });
-    }
+  });
 });
 
-// Unified Results Retrieval
-app.get("/results", async (req, res) => {
-    try {
-        // Priority: Mongo > Supabase > Local
-        if (mongoose.connection.readyState === 1) {
-            const mData = await MongoResult.find({});
-            if (mData.length > 0) return res.json({ exams: [{ results: mData }] });
-        }
-        if (supabase) {
-            const { data: sData } = await supabase.from("results").select("*");
-            if (sData?.length > 0) return res.json({ exams: [{ results: sData }] });
-        }
-        if (fs.existsSync(localFilePath)) {
-            return res.json(JSON.parse(fs.readFileSync(localFilePath, "utf8")));
-        }
-        res.json({ exams: [] });
-    } catch (err) {
-        res.status(500).json({ success: false, message: "Data retrieval failure" });
+/* ===================================================
+   DEPLOY ROUTE (CRASH SAFE)
+=================================================== */
+
+app.post("/deploy", (req, res) => {
+  try {
+
+    if (!req.body) {
+      return res.status(400).json({
+        success: false,
+        message: "Request body missing"
+      });
     }
+
+    // Extract results safely from multiple formats
+    const results =
+      req.body.exams?.[0]?.results ||
+      req.body.results ||
+      (Array.isArray(req.body) ? req.body : null);
+
+    if (!results || !Array.isArray(results)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid results format. Expected array."
+      });
+    }
+
+    console.log(`Received ${results.length} records`);
+
+    // Save safely to file
+    fs.writeFileSync(DATA_PATH, JSON.stringify(req.body, null, 2));
+
+    return res.status(200).json({
+      success: true,
+      message: "Deployment successful",
+      count: results.length
+    });
+
+  } catch (error) {
+    console.error("DEPLOY ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error during sync"
+    });
+  }
 });
 
-/* =========================
-   STARTUP
-========================= */
+/* ===================================================
+   GIT SYNC ROUTE (NEW)
+=================================================== */
+
+app.post("/git-sync", (req, res) => {
+  const { message, branch } = req.body;
+  const commitMsg = message || "Auto-sync from Dashboard";
+  const targetBranch = branch || "main";
+
+  console.log(`[GIT] Starting sync: ${commitMsg} on ${targetBranch}`);
+
+  // Chained Git Commands
+  const cmd = `git add . && git commit -m "${commitMsg}" && git push origin ${targetBranch}`;
+
+  exec(cmd, { cwd: __dirname }, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`[GIT ERROR] ${error.message}`);
+      return res.status(500).json({
+        success: false,
+        message: "Git sync failed",
+        details: stderr || error.message
+      });
+    }
+
+    console.log(`[GIT SUCCESS] ${stdout}`);
+
+    return res.status(200).json({
+      success: true,
+      message: "Git sync completed successfully",
+      output: stdout
+    });
+  });
+});
+
+/* ===================================================
+   RESULTS ROUTE (SAFE)
+=================================================== */
+
+app.get("/results", (req, res) => {
+  try {
+
+    if (!fs.existsSync(DATA_PATH)) {
+      return res.json({ exams: [] });
+    }
+
+    const raw = fs.readFileSync(DATA_PATH, "utf8");
+
+    if (!raw) {
+      return res.json({ exams: [] });
+    }
+
+    const parsed = JSON.parse(raw);
+
+    return res.status(200).json(parsed);
+
+  } catch (error) {
+    console.error("RESULT FETCH ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to read results"
+    });
+  }
+});
+
+/* ===================================================
+   STATIC FRONTEND
+=================================================== */
+
+app.use(express.static(path.join(__dirname, "public")));
+app.use('/pages', express.static(path.join(__dirname, 'pages')));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
+/* ===================================================
+   GLOBAL 404 HANDLER
+=================================================== */
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found"
+  });
+});
+
+/* ===================================================
+   START SERVER
+=================================================== */
+
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
-    console.log(`\n🚀 Secure Result Engine Online`);
-    console.log(`🌍 Endpoint: http://localhost:${PORT}`);
-    console.log(`📦 Payload Limit: 50MB | Sync Nodes: Mongo, Supabase, Local\n`);
+  console.log("=================================");
+  console.log(" Secure Result System Running");
+  console.log(" Port:", PORT);
+  console.log(" Mode:", process.env.NODE_ENV || "development");
+  console.log("=================================");
 });

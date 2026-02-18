@@ -50,43 +50,40 @@ const App = {
   },
 
   async deploy() {
-
-  if (!this.state.data?.length) {
-    alert("No data to sync");
-    return;
-  }
-
-  const payload = {
-    exams: [{
-      examId: "sync",
-      results: this.state.data
-    }]
-  };
-
-  try {
-
-    const res = await fetch(window.location.origin + "/deploy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const responseText = await res.text();
-
-    if (!res.ok) {
-      console.error("SERVER RESPONSE:", responseText);
-      alert("Sync Failed ❌\n\n" + responseText);
+    if (!this.state.data.length) {
+      alert("No data to deploy");
       return;
     }
 
-    alert("Sync Success ✅");
+    const payload = {
+      exams: [{
+        examId: "sync",
+        results: this.state.data
+      }]
+    };
 
-  } catch (err) {
-    console.error("Cloud Error:", err);
-    alert("Network Error ❌");
-  }
-}
+    try {
+      const res = await fetch(window.location.origin + "/deploy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
+      const text = await res.text();
+
+      if (!res.ok) {
+        console.error(text);
+        alert("Deployment Failed ❌");
+        return;
+      }
+
+      alert("Deployment Success ✅");
+
+    } catch (err) {
+      console.error(err);
+      alert("Server Unavailable ❌");
+    }
+  },
 
   async search() {
     const roll = document.getElementById("rollInput").value;

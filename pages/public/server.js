@@ -26,7 +26,6 @@ if (!fs.existsSync(dataPath)) {
    ROUTES
 ========================= */
 
-
 // Health Check
 app.get("/health", (req, res) => {
   res.status(200).json({
