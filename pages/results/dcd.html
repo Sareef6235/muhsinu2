@@ -323,8 +323,8 @@
     <script>
         const App = {
             config: {
-                // ABSOLUTE URL FACTORY: Works local or cloud
-                API_BASE: window.location.origin
+                // ABSOLUTE URL FACTORY: Works local or cloud natively
+                API: window.location.origin
             },
 
             state: { data: [] },
@@ -341,13 +341,15 @@
 
                 // Session Restore
                 const stored = localStorage.getItem("examData");
-                if (stored) this.state.data = JSON.parse(stored);
+                if (stored) {
+                    try { this.state.data = JSON.parse(stored); } catch (e) { localStorage.removeItem("examData"); }
+                }
 
-                // Health Check
-                fetch(`${this.config.API_BASE}/health`)
+                // Node Health Diagnostic
+                fetch(`${this.config.API}/health`)
                     .then(r => r.json())
                     .then(s => console.log("System Status:", s))
-                    .catch(() => console.warn("API Node is currently offline or unreachable. Local search enabled."));
+                    .catch(() => console.warn("Primary API node is restricted or offline."));
             },
 
             adminLogin() {
@@ -356,7 +358,7 @@
                     document.getElementById("loginSection").classList.add("hidden");
                     document.getElementById("adminPanel").classList.remove("hidden");
                 } else {
-                    alert("Administrative Access Denied");
+                    alert("Administrative Authorization Refused");
                 }
             },
 
@@ -374,42 +376,42 @@
                         const raw = JSON.parse(event.target.result);
                         this.state.data = Array.isArray(raw) ? raw : (raw.exams?.[0]?.results || []);
                         localStorage.setItem("examData", JSON.stringify(this.state.data));
-                        document.getElementById("uploadStatus").innerText = `Loaded ${this.state.data.length} records. Cloud synchronization ready.`;
+                        document.getElementById("uploadStatus").innerText = `Loaded ${this.state.data.length} records into local buffer.`;
                         document.getElementById("uploadStatus").style.color = "var(--success)";
-                    } catch (err) { alert("Invalid Registry Structure"); }
+                    } catch (err) { alert("Registry Parse Error"); }
                 };
                 reader.readAsText(file);
             },
 
             async deploy() {
-                if (!this.state.data || !this.state.data.length) return alert("System state is empty: Upload JSON first.");
+                if (!this.state.data || !this.state.data.length) return alert("System state is empty: Capture JSON first.");
 
                 const payload = { exams: [{ examId: "dcd_pro_sync", results: this.state.data }] };
                 const msg = document.getElementById("uploadStatus");
-                msg.innerText = "Synchronizing with Cloud Nodes...";
-                msg.style.color = "var(--text-dim)";
+                msg.innerText = "Transmitting to Cloud Nodes...";
 
                 try {
-                    const res = await fetch(`${this.config.API_BASE}/deploy`, {
+                    const res = await fetch(`${this.config.API}/deploy`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload)
                     });
 
-                    const text = await res.text(); // Safe text read before parsing
-                    let result;
-                    try { result = JSON.parse(text); } catch (e) { throw new Error("Invalid Server Response"); }
+                    // Safe-Fetch Pattern: Read as text first to handle non-JSON errors
+                    const text = await res.text();
+                    let response;
+                    try { response = JSON.parse(text); } catch (e) { throw new Error("Server returned corrupt data stream"); }
 
-                    if (!res.ok) throw new Error(result.message || "Cloud Connection Failure");
+                    if (!res.ok) throw new Error(response.message || "Cloud Handshake Failure");
 
-                    alert(`Deployment Complete ✅\nRecords Synced: ${result.count}`);
-                    msg.innerText = `Last Sync Success at ${new Date().toLocaleTimeString()} ✅`;
+                    alert(`Cloud Sync Optimized ✅\nRecords: ${response.count}`);
+                    msg.innerText = `Last Cloud Sync: ${new Date().toLocaleTimeString()}`;
                     msg.style.color = "var(--success)";
 
                 } catch (err) {
-                    console.error("Deploy Crash:", err);
-                    alert(`Sync Violation: ${err.message}`);
-                    msg.innerText = "Sync Interrupted ❌ Try Again.";
+                    console.error("Cloud Error:", err);
+                    alert(`Sync Interrupted: ${err.message}`);
+                    msg.innerText = "Sync Failed ❌ Check Backend Logs";
                     msg.style.color = "var(--danger)";
                 }
             },
@@ -419,29 +421,29 @@
                 const msg = document.getElementById("searchMsg");
                 if (!roll) return;
 
-                msg.innerText = "Scanning Secure Records...";
+                msg.innerText = "Deciphering Cloud Records...";
                 msg.style.color = "var(--text-dim)";
 
                 try {
-                    const res = await fetch(`${this.config.API_BASE}/results`);
+                    const res = await fetch(`${this.config.API}/results`);
                     const text = await res.text();
                     let data;
-                    try { data = JSON.parse(text); } catch (e) { throw new Error("Unreadable Data Stream"); }
+                    try { data = JSON.parse(text); } catch (e) { throw new Error("Data stream unreadable"); }
 
                     const records = data.exams?.[0]?.results || [];
                     const found = records.find(r => r.roll == roll || r["Roll Number"] == roll || r.Roll == roll);
 
                     if (found) {
-                        msg.innerText = "Data Integrity Verified ✅";
+                        msg.innerText = "Access Granted ✅";
                         msg.style.color = "var(--success)";
                         this.renderCertificate(found);
                     } else {
-                        msg.innerText = "Record ID Not Found ❌";
+                        msg.innerText = "Access Denied ❌ Identity Unknown";
                         msg.style.color = "var(--danger)";
                     }
                 } catch (err) {
-                    console.error("Search Error:", err);
-                    msg.innerText = "Neural Link Error: Using Local Latency ⏳";
+                    console.error("Fetch Error:", err);
+                    msg.innerText = "Node Offline ⏳ Connection Restricted";
                     msg.style.color = "var(--danger)";
                 }
             },
@@ -477,7 +479,7 @@
             },
 
             closeCert() { document.getElementById("certificateArea").classList.remove("active"); },
-            downloadPDF() { html2pdf().from(document.getElementById("certificate")).save("Result_DCD_Enterprise.pdf"); }
+            downloadPDF() { html2pdf().from(document.getElementById("certificate")).save(`Result_${Date.now()}.pdf`); }
         };
 
         window.onload = () => App.init();
