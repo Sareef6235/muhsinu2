@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Playable 3D Letter Rain Madrasa game with English, Arabic, and Malayalam support." />
+  <title>HTGD 3D Letter Rain</title>
+  <style>
+    :root {
+      --bg: #060814;
+      --bg2: #0a1028;
+      --neon: #5ecbff;
+      --neon2: #b86bff;
+      --danger: #ff5a7a;
+      --ok: #6affc3;
+      --glass: rgba(9, 14, 34, 0.55);
+      --border: rgba(153, 197, 255, 0.34);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: radial-gradient(circle at 15% 15%, #172851 0%, transparent 42%),
+                  radial-gradient(circle at 85% 15%, #30135f 0%, transparent 40%),
+                  linear-gradient(140deg, var(--bg), var(--bg2));
+      color: #e9f4ff;
+    }
+    #game {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .hud {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+      user-select: none;
+    }
+    .panel {
+      pointer-events: auto;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 8px 12px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+    }
+    .stats {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(94, 203, 255, 0.4);
+    }
+    .stat b { color: var(--neon); }
+    .langs {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      border: 1px solid var(--border);
+      color: #e9f4ff;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 6px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform .15s ease, background .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); background: rgba(94, 203, 255, 0.18); }
+    .btn.active { background: linear-gradient(120deg, rgba(94, 203, 255, 0.22), rgba(184, 107, 255, 0.2)); }
+    .tiny {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .admin {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      z-index: 12;
+      width: 250px;
+      max-width: calc(100vw - 24px);
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 28px rgba(0,0,0,.45);
+      transform: translateY(calc(100% + 20px));
+      opacity: 0;
+      transition: .2s ease;
+      pointer-events: none;
+    }
+    .admin.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .admin h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: var(--neon);
+    }
+    .admin label { display: block; font-size: 12px; margin-bottom: 6px; }
+    .admin input[type="range"] { width: 100%; }
+    .admin .row { display: flex; gap: 8px; margin-top: 8px; }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 8, 22, 0.65);
+      backdrop-filter: blur(5px);
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+    }
+    .overlay.show { display: flex; }
+    .gameover-card {
+      max-width: 420px;
+      width: 100%;
+      background: linear-gradient(160deg, rgba(15, 22, 48, 0.95), rgba(11, 17, 39, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 12px 38px rgba(0,0,0,.5);
+    }
+    .gameover-card h1 {
+      margin: 0 0 10px;
+      color: var(--danger);
+      text-shadow: 0 0 18px rgba(255, 90, 122, 0.45);
+    }
+    .shake {
+      animation: shake .16s linear;
+    }
+    @keyframes shake {
+      0%{ transform: translate(0,0);} 25%{ transform: translate(-6px, 2px);} 50%{ transform: translate(6px, -2px);} 75%{ transform: translate(-4px, 2px);} 100%{ transform: translate(0,0);} 
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div class="hud" id="hud">
+    <div class="panel stats">
+      <span>Score: <b id="score">0</b></span>
+      <span>Lives: <b id="lives">5</b></span>
+      <span>Combo: <b id="combo">0</b></span>
+      <span>Best: <b id="best">0</b></span>
+    </div>
+    <div class="panel langs" id="langButtons">
+      <button class="btn active" data-lang="english">English</button>
+      <button class="btn" data-lang="arabic">العربية</button>
+      <button class="btn" data-lang="malayalam">മലയാളം</button>
+      <button class="btn tiny" id="adminToggle" title="Admin">⚙</button>
+    </div>
+  </div>
+
+  <div class="admin" id="adminPanel">
+    <h3>Admin Panel</h3>
+    <label>Letter Speed Multiplier: <span id="speedValue">1.00x</span></label>
+    <input id="speedRange" type="range" min="0.5" max="2.4" step="0.05" value="1" />
+    <div class="row">
+      <button class="btn" id="resetScore">Reset Score</button>
+      <button class="btn" id="resetLeader">Reset Leaderboard</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="gameOver">
+    <div class="gameover-card">
+      <h1>Game Over</h1>
+      <p>Final Score: <strong id="finalScore">0</strong></p>
+      <p>Highest Score: <strong id="finalBest">0</strong></p>
+      <button class="btn" id="restart">Restart</button>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById('game');
+      const ctx = canvas.getContext('2d');
+
+      const ui = {
+        score: document.getElementById('score'),
+        lives: document.getElementById('lives'),
+        combo: document.getElementById('combo'),
+        best: document.getElementById('best'),
+        finalScore: document.getElementById('finalScore'),
+        finalBest: document.getElementById('finalBest'),
+        gameOver: document.getElementById('gameOver'),
+        restart: document.getElementById('restart'),
+        hud: document.getElementById('hud'),
+        langButtons: document.getElementById('langButtons'),
+        adminToggle: document.getElementById('adminToggle'),
+        adminPanel: document.getElementById('adminPanel'),
+        speedRange: document.getElementById('speedRange'),
+        speedValue: document.getElementById('speedValue'),
+        resetScore: document.getElementById('resetScore'),
+        resetLeader: document.getElementById('resetLeader')
+      };
+
+      const LANGS = {
+        english: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+        arabic: 'ابتثجحخدذرزسشصضطظعغفقكلمنهوي'.split(''),
+        malayalam: 'അആഇഈഉഊഋഎഏഐഒഓകഖഗഘങചജടഡണതദനപബമയരലവശഷസഹ'.split('')
+      };
+
+      const STORAGE_KEY = 'htgd-letter-rain-best-v2';
+
+      const state = {
+        w: innerWidth,
+        h: innerHeight,
+        running: true,
+        language: 'english',
+        letters: [],
+        particles: [],
+        score: 0,
+        lives: 5,
+        combo: 0,
+        best: Number(localStorage.getItem(STORAGE_KEY) || 0),
+        speedMultiplier: 1,
+        spawnTimer: 0,
+        spawnGap: 0.33,
+        shakeTime: 0,
+        lastTime: 0
+      };
+
+      function resize() {
+        state.w = innerWidth;
+        state.h = innerHeight;
+        canvas.width = Math.floor(state.w * devicePixelRatio);
+        canvas.height = Math.floor(state.h * devicePixelRatio);
+        canvas.style.width = state.w + 'px';
+        canvas.style.height = state.h + 'px';
+        ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      }
+
+      function rand(min, max) {
+        return min + Math.random() * (max - min);
+      }
+
+      function pick(arr) {
+        return arr[(Math.random() * arr.length) | 0];
+      }
+
+      function spawnLetter() {
+        const chars = LANGS[state.language];
+        const size = rand(28, 52);
+        const x = rand(size, state.w - size);
+        const speed = rand(65, 170) * state.speedMultiplier;
+        const rot = rand(-0.5, 0.5);
+        const glow = state.language === 'arabic' ? '#ff86df' : state.language === 'malayalam' ? '#7cfbff' : '#7aa7ff';
+        state.letters.push({
+          char: pick(chars),
+          x,
+          y: -size,
+          size,
+          speed,
+          rot,
+          angle: rand(0, Math.PI * 2),
+          glow
+        });
+      }
+
+      function burst(x, y, color) {
+        for (let i = 0; i < 18; i++) {
+          const a = rand(0, Math.PI * 2);
+          const sp = rand(60, 240);
+          state.particles.push({
+            x,
+            y,
+            vx: Math.cos(a) * sp,
+            vy: Math.sin(a) * sp,
+            life: rand(0.35, 0.7),
+            maxLife: 1,
+            size: rand(1.5, 3.5),
+            color
+          });
+        }
+      }
+
+      function update(dt) {
+        if (!state.running) return;
+
+        state.spawnTimer += dt;
+        const gap = Math.max(0.11, state.spawnGap / Math.max(0.8, state.speedMultiplier));
+        while (state.spawnTimer >= gap) {
+          state.spawnTimer -= gap;
+          spawnLetter();
+        }
+
+        for (let i = state.letters.length - 1; i >= 0; i--) {
+          const L = state.letters[i];
+          L.y += L.speed * dt;
+          L.angle += L.rot * dt;
+          if (L.y - L.size > state.h) {
+            state.letters.splice(i, 1);
+            state.lives -= 1;
+            state.combo = 0;
+            triggerShake();
+            if (state.lives <= 0) {
+              endGame();
+              return;
+            }
+          }
+        }
+
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+          const p = state.particles[i];
+          p.life -= dt;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vx *= 0.96;
+          p.vy *= 0.96;
+          p.vy += 30 * dt;
+          if (p.life <= 0) state.particles.splice(i, 1);
+        }
+
+        if (state.shakeTime > 0) {
+          state.shakeTime -= dt;
+          if (state.shakeTime <= 0) ui.hud.classList.remove('shake');
+        }
+      }
+
+      function renderBackground(t) {
+        const g = ctx.createLinearGradient(0, 0, 0, state.h);
+        g.addColorStop(0, '#060814');
+        g.addColorStop(1, '#0b1230');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, state.w, state.h);
+
+        const pulse = 0.6 + Math.sin(t * 0.0018) * 0.18;
+        ctx.globalAlpha = pulse;
+        ctx.fillStyle = 'rgba(94,203,255,0.07)';
+        for (let i = 0; i < 8; i++) {
+          ctx.beginPath();
+          ctx.arc((i + 1) * state.w / 9, 60 + Math.sin(t * 0.001 + i) * 10, 20 + i * 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function renderLetters() {
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        for (const L of state.letters) {
+          ctx.save();
+          ctx.translate(L.x, L.y);
+          ctx.rotate(L.angle);
+          ctx.font = `700 ${L.size}px "Segoe UI", Arial, sans-serif`;
+          ctx.shadowColor = L.glow;
+          ctx.shadowBlur = 18;
+          ctx.fillStyle = '#eff6ff';
+          if (state.language === 'arabic') {
+            ctx.direction = 'rtl';
+          } else {
+            ctx.direction = 'ltr';
+          }
+          ctx.fillText(L.char, 0, 0);
+          ctx.restore();
+        }
+      }
+
+      function renderParticles() {
+        for (const p of state.particles) {
+          const a = Math.max(0, p.life / p.maxLife);
+          ctx.globalAlpha = a;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function render(time) {
+        renderBackground(time);
+        renderLetters();
+        renderParticles();
+      }
+
+      function updateHud() {
+        ui.score.textContent = String(state.score);
+        ui.lives.textContent = String(state.lives);
+        ui.combo.textContent = String(state.combo);
+        ui.best.textContent = String(state.best);
+      }
+
+      function endGame() {
+        state.running = false;
+        if (state.score > state.best) {
+          state.best = state.score;
+          localStorage.setItem(STORAGE_KEY, String(state.best));
+        }
+        updateHud();
+        ui.finalScore.textContent = String(state.score);
+        ui.finalBest.textContent = String(state.best);
+        ui.gameOver.classList.add('show');
+      }
+
+      function resetGame(full = true) {
+        state.running = true;
+        state.letters.length = 0;
+        state.particles.length = 0;
+        state.lives = 5;
+        state.combo = 0;
+        state.spawnTimer = 0;
+        if (full) state.score = 0;
+        ui.gameOver.classList.remove('show');
+        updateHud();
+      }
+
+      function triggerShake() {
+        state.shakeTime = 0.16;
+        ui.hud.classList.remove('shake');
+        void ui.hud.offsetWidth;
+        ui.hud.classList.add('shake');
+      }
+
+      function normalizeInput(key) {
+        return key.length === 1 ? key.toUpperCase() : key;
+      }
+
+      function hitLetter(key) {
+        if (!state.running) return;
+
+        const normalized = normalizeInput(key);
+        let hitIndex = -1;
+
+        for (let i = 0; i < state.letters.length; i++) {
+          const lChar = normalizeInput(state.letters[i].char);
+          if (lChar === normalized) {
+            if (hitIndex === -1 || state.letters[i].y > state.letters[hitIndex].y) hitIndex = i;
+          }
+        }
+
+        if (hitIndex !== -1) {
+          const L = state.letters[hitIndex];
+          state.letters.splice(hitIndex, 1);
+          state.combo += 1;
+          const add = 10 + Math.min(40, state.combo * 2);
+          state.score += add;
+          burst(L.x, L.y, L.glow);
+          if (state.score > state.best) {
+            state.best = state.score;
+            localStorage.setItem(STORAGE_KEY, String(state.best));
+          }
+        } else {
+          state.lives -= 1;
+          state.combo = 0;
+          triggerShake();
+          if (state.lives <= 0) {
+            endGame();
+          }
+        }
+
+        updateHud();
+      }
+
+      function setLanguage(lang) {
+        if (!LANGS[lang]) return;
+        state.language = lang;
+        document.documentElement.lang = lang === 'arabic' ? 'ar' : 'en';
+        document.documentElement.dir = lang === 'arabic' ? 'rtl' : 'ltr';
+        const buttons = ui.langButtons.querySelectorAll('[data-lang]');
+        buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+      }
+
+      function loop(ts) {
+        const dt = Math.min(0.032, (ts - state.lastTime) / 1000 || 0.016);
+        state.lastTime = ts;
+        update(dt);
+        render(ts);
+        requestAnimationFrame(loop);
+      }
+
+      function bindEvents() {
+        addEventListener('resize', resize);
+
+        addEventListener('keydown', (e) => {
+          if (e.repeat) return;
+          if (e.key === 'Escape') {
+            ui.adminPanel.classList.toggle('open');
+            return;
+          }
+          hitLetter(e.key);
+        });
+
+        ui.langButtons.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-lang]');
+          if (!btn) return;
+          setLanguage(btn.dataset.lang);
+        });
+
+        ui.restart.addEventListener('click', () => resetGame(true));
+
+        ui.adminToggle.addEventListener('click', () => {
+          ui.adminPanel.classList.toggle('open');
+        });
+
+        ui.speedRange.addEventListener('input', () => {
+          state.speedMultiplier = Number(ui.speedRange.value);
+          ui.speedValue.textContent = `${state.speedMultiplier.toFixed(2)}x`;
+          for (const L of state.letters) L.speed = L.speed * 0.9 + L.speed * 0.1;
+        });
+
+        ui.resetScore.addEventListener('click', () => {
+          state.score = 0;
+          state.combo = 0;
+          updateHud();
+        });
+
+        ui.resetLeader.addEventListener('click', () => {
+          state.best = 0;
+          localStorage.removeItem(STORAGE_KEY);
+          updateHud();
+        });
+      }
+
+      resize();
+      bindEvents();
+      setLanguage('english');
+      updateHud();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>

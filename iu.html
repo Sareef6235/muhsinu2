@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIFTHAHUL HUDA MADRASA</title>
+    <meta name="description" content="Portfolio of MIFTHAHUL HUDA MADRASA. Exploring technology and sharing knowledge.">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/modern-nav.css">
+    <link rel="stylesheet" href="assets/css/site-footer.css">
+    <link rel="stylesheet" href="assets/css/site-languages.css">
+
+    <!-- Global Navigation & Footer -->
+    <link rel="stylesheet" href="assets/css/global-navigation.css">
+    <link rel="stylesheet" href="assets/css/global-footer.css">
+
+    <!-- Critical Scripts (Optimized) -->
+    <script src="assets/js/utils/performance.js" defer></script>
+    <script src="assets/js/site-languages.js" defer></script>
+    <script src="assets/js/subject-storage.js" defer></script>
+    <script type="module">
+        import StorageManager from './assets/js/storage-manager.js';
+        import ServicesEngine from './assets/js/services-engine.js';
+        import ResultManager from './assets/js/result-system.js';
+        import NewsService from './assets/js/news-service.js';
+
+        // Auto-Init Global Access
+        window.StorageManager = StorageManager;
+        window.ServicesEngine = ServicesEngine;
+        window.ResultManager = ResultManager;
+        window.NewsService = NewsService;
+
+        ServicesEngine.init();
+        ResultManager.init();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to My Portal - Neon Arcade</title>
+  <style>
+    :root {
+      --cyan: #1de9ff;
+      --purple: #c84cff;
+      --bg1: #050509;
+      --bg2: #0b1022;
+      --text: #eaf6ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at 20% 20%, #111734 0%, var(--bg1) 40%, #020205 100%);
+      color: var(--text);
+    }
+
+    #gameCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .hud {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .title {
+      position: absolute;
+      top: clamp(10px, 3vh, 28px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      font-size: clamp(1.1rem, 3vw, 2rem);
+      color: #d9f8ff;
+      text-shadow:
+        0 0 8px rgba(29, 233, 255, 0.9),
+        0 0 16px rgba(29, 233, 255, 0.75),
+        0 0 28px rgba(200, 76, 255, 0.55);
+      animation: glowTitle 2.6s ease-in-out infinite;
+    }
+
+    .scoreboard {
+      position: absolute;
+      top: clamp(10px, 2vh, 22px);
+      right: clamp(10px, 2vw, 24px);
+      text-align: right;
+      font-size: clamp(0.9rem, 2vw, 1.15rem);
+      line-height: 1.5;
+      color: #ecf9ff;
+      text-shadow: 0 0 8px rgba(29, 233, 255, 0.75);
+      font-weight: 600;
+      min-width: 120px;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      border-radius: 16px;
+      background: rgba(10, 14, 29, 0.56);
+      border: 1px solid rgba(29, 233, 255, 0.35);
+      box-shadow:
+        0 0 18px rgba(29, 233, 255, 0.18),
+        0 0 32px rgba(200, 76, 255, 0.14),
+        inset 0 0 30px rgba(12, 18, 40, 0.95);
+      backdrop-filter: blur(4px);
+      pointer-events: auto;
+      min-width: min(80vw, 340px);
+      text-align: center;
+    }
+
+    .panel h2 {
+      font-size: clamp(1.2rem, 3vw, 1.9rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #f4f9ff;
+      text-shadow:
+        0 0 10px rgba(200, 76, 255, 0.9),
+        0 0 20px rgba(29, 233, 255, 0.6);
+    }
+
+    .panel p {
+      font-size: clamp(0.9rem, 2.4vw, 1rem);
+      color: #cde8ff;
+    }
+
+    .neon-btn {
+      border: 1px solid rgba(29, 233, 255, 0.8);
+      color: #dffbff;
+      background: linear-gradient(135deg, rgba(29, 233, 255, 0.18), rgba(200, 76, 255, 0.2));
+      padding: 0.72rem 1.6rem;
+      font-size: clamp(0.9rem, 2.2vw, 1rem);
+      letter-spacing: 0.08em;
+      border-radius: 999px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-weight: 600;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      box-shadow:
+        0 0 10px rgba(29, 233, 255, 0.75),
+        0 0 18px rgba(200, 76, 255, 0.45);
+    }
+
+    .neon-btn:hover,
+    .neon-btn:focus-visible {
+      transform: translateY(-1px) scale(1.02);
+      filter: brightness(1.08);
+      box-shadow:
+        0 0 15px rgba(29, 233, 255, 0.95),
+        0 0 26px rgba(200, 76, 255, 0.65);
+      outline: none;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @keyframes glowTitle {
+      0%,
+      100% {
+        filter: brightness(0.96);
+      }
+      50% {
+        filter: brightness(1.24);
+      }
+    }
+  </style>
+</head>
+
+<body data-page-id="home">
+    <!-- Global Navigation -->
+    <div id="global-nav"></div>
+
+    <header id="main-header">
+        <!-- Navigation injected via site-nav.js -->
+    </header>
+
+    <main>
+        <section id="hero"
+            style="position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden;">
+            <!-- Hero Background Circles -->
+            <div class="hero-bg">
+                <div class="circle circle-1"></div>
+                <div class="circle circle-2"></div>
+            </div>
+
+            <!-- Three.js Animated Background -->
+            <canvas id="hero-canvas"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
+
+
+            <!-- Content overlay -->
+            <div class="container hero-content" style="position: relative; z-index: 1;">
+                <h2 class="animate-fade-up" data-t="welcome_to">Welcome to</h2>
+                <h1 class="animate-fade-up delay-1" data-t="mhmv_title">MIFTHAHUL HUDA MADRASA</h1>
+                <h3 class="animate-fade-up delay-2" data-t="address_vengara">Vengara S S Road</h3>
+                <p class="animate-fade-up delay-3" data-t="hero_cta_text">
+                    A simple reminder that consistent effort and dedication in learning today pave the way for
+                    achievement and success in the future.
+                </p>
+                <div class="cta-group animate-fade-up delay-4">
+                    <a href="pages/students/creation_receipt.html" class="btn btn-primary"
+                        data-t="btn_receipt">Receipt</a>
+                    <a href="pages/gallery/index.html?tab=photo" class="btn btn-secondary"
+                        style="border-color: var(--primary-color); color: var(--primary-color);"
+                        data-t="btn_gallery">View Gallery</a>
+                    <a href="#contact" class="btn btn-secondary" data-t="btn_contact">Contact Us</a>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <div class="about-grid overhaul-content">
+                    <div class="about-text">
+                        <h2 class="section-title" data-t="results_title">Student Results</h2>
+                        <p data-t="results_desc">
+                            Verify student performance directly from our official examination database.
+                            Enter your Register Number below to view immediate results and standigs.
+                        </p>
+
+                        <!-- Premium Search Box for Homepage -->
+                        <div class="search-premium" style="margin-top: 30px; margin-bottom: 40px; max-width: 500px;">
+                            <div class="home-search-box"
+                                style="display: flex; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 5px; transition: all 0.3s ease;">
+                                <input type="text" id="home-regno" placeholder="Enter Register No (e.g. 101)"
+                                    style="flex: 1; background: none; border: none; font-family: inherit; padding: 12px 20px; color: #fff; font-size: 1rem; outline: none;">
+                                <button onclick="fetchHomeResult()"
+                                    style="background: var(--primary-color); border: none; padding: 0 25px; border-radius: 8px; color: #000; font-weight: 700; cursor: pointer; transition: 0.3s; height: 45px;">View</button>
+                            </div>
+                            <div id="home-status"
+                                style="margin-top: 10px; font-size: 0.85rem; color: #888; text-align: center; height: 20px;">
+                            </div>
+                        </div>
+
+                        <!-- Result Modal/Overlay (Simple version for homepage) -->
+                        <div id="home-result-container"
+                            style="display: none; background: rgba(0, 243, 255, 0.03); border: 1px solid rgba(0, 243, 255, 0.2); padding: 25px; border-radius: 15px; margin-top: 20px; animation: fadeIn 0.5s ease;">
+                            <div id="home-result-area"></div>
+                            <a href="pages/results/index.html" class="btn-link"
+                                style="display: inline-block; margin-top: 15px; color: var(--primary-color);">View Full
+                                Transcript →</a>
+                        </div>
+                    </div>
+
+                    <div class="about-text">
+                        <h2 class="section-title" data-t="programs_title">Educational Programs</h2>
+                        <p data-t="programs_desc">
+                            Our Madrasa offers a range of structured educational programs designed to develop both
+                            religious and
+                            academic knowledge. These include Qur’an memorization classes, Tajweed and Arabic language
+                            lessons,
+                            Islamic studies, and age‑based learning tracks that are updated regularly. Each program is
+                            tailored
+                            to help students grow in knowledge, character, and spiritual understanding.
+                        </p>
+
+                        <h2 class="section-title" style="margin-top: 30px;">Our Core Skills</h2>
+                        <div class="skills-wrapper">
+                            <div class="skills-grid">
+                                <div class="skill-card">
+                                    <span class="icon">📖</span>
+                                    <h3>Qur'an Recitation</h3>
+                                    <p>Advanced Tajweed and rhythmic recitation techniques.</p>
+                                </div>
+                                <div class="skill-card">
+                                    <span class="icon">✍️</span>
+                                    <h3>Calligraphy</h3>
+                                    <p>Traditional Arabic script and modern artistic styles.</p>
+                                </div>
+                                <div class="skill-card">
+                                    <span class="icon">🤝</span>
+                                    <h3>Ethics & Morality</h3>
+                                    <p>Developing character and social responsibility.</p>
+                                </div>
+                                <div class="skill-card">
+                                    <span class="icon">🎤</span>
+                                    <h3>Public Speaking</h3>
+                                    <p>Confidence building through student presentations.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2 class="section-title" style="margin-top: 30px;">Meetings & Community Engagement</h2>
+                        <p>
+                            Regular meetings are held with students, parents, and faculty to discuss progress reports,
+                            upcoming
+                            events, and educational goals. These gatherings help build strong communication between home
+                            and
+                            school and ensure that everyone works together to support student success. Meetings are
+                            documented
+                            with minutes and action points so key decisions and follow‑ups are clear and actionable.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" style="padding: 0; margin-top: -100px;"></section>
+        <!-- NEWS & UPDATES SECTION -->
+        <section id="news" class="section" style="position: relative; overflow: hidden;">
+            <!-- Cosmic Accents -->
+            <div class="cosmic-accent accent-1"></div>
+            <div class="cosmic-accent accent-2"></div>
+            <div class="cosmic-accent accent-3"></div>
+
+            <div class="container" style="text-align: center; position: relative; z-index: 2;">
+                <div class="section-badge animate-fade-up">Updates</div>
+                <h2 class="section-title animate-fade-up" style="margin-bottom: 25px;">Latest News & Notices</h2>
+
+                <!-- Language Toggle -->
+                <div class="lang-toggle-wrapper animate-fade-up">
+                    <button class="lang-btn active" onclick="setNewsLang('en')">EN</button>
+                    <button class="lang-btn" onclick="setNewsLang('ml')">ML</button>
+                    <button class="lang-btn" onclick="setNewsLang('ar')">AR</button>
+                </div>
+
+                <div id="home-news-grid" class="grid"
+                    style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; text-align: left;">
+                    <!-- Filled dynamically by JS -->
+                    <p style="color: #666; text-align: center; width: 100%;">Loading news...</p>
+                </div>
+
+                <a href="pages/news/index.html" class="btn-primary animate-fade-up"
+                    style="margin-top: 40px; display: none;" id="view-all-news-btn">View All Updates</a>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="section" style="background: rgba(10, 10, 10, 0.5);">
+            <div class="container">
+                <h2 class="section-title">Our Services</h2>
+                <div class="services-grid" id="services-grid-home">
+                    <!-- Cards rendered dynamically via JS -->
+                </div>
+
+                <script type="module">
+                    const grid = document.getElementById('services-grid-home');
+                    if (grid) {
+                        const allServices = window.ServicesEngine.getActive();
+                        grid.innerHTML = allServices.slice(0, 4).map(service => `
+                            <a href="pages/services/index.html#${service.id}" class="service-card animate-fade-up">
+                                <i class="ph-bold ${service.icon} service-icon"></i>
+                                <h3>${service.title}</h3>
+                                <p>${service.desc.substring(0, 100)}...</p>
+                                <ul class="service-list">
+                                    <li>Professional Guidance</li>
+                                    <li>Premium Material</li>
+                                </ul>
+                            </a>
+                        `).join('');
+                    }
+                </script>
+            </div>
+        </section>
+
+
+        <!-- News & Notice Section -->
+        <section id="news-notice">
+            <div class="container">
+                <h2 class="section-title">News & Notice</h2>
+                <div class="news-container">
+                    <p>Stay updated with our latest announcements, schedule changes, and achievements.</p>
+                    <div id="notice-content" class="animate-fade-up">
+                        <div
+                            style="background: rgba(0,243,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid var(--primary-color);">
+                            <h4 style="color: var(--primary-color);">Admission Open 2026</h4>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">We are now accepting registrations for the
+                                new academic session. Book your seat today!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Latest Sessions Section -->
+        <section id="latest-sessions">
+            <div class="container">
+                <h2 class="section-title">Latest Sessions</h2>
+                <div id="pdf-list" class="sessions-list">
+                    <!-- Dynamic PDFs will load here -->
+                    <div class="no-sessions">Loading official documents...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upcoming Events Section -->
+        <section id="events">
+            <div class="container">
+                <h2 class="section-title">Upcoming Events</h2>
+                <div class="events-grid">
+                    <div class="event-card">
+                        <div class="event-date">MAR 15, 2026</div>
+                        <h3>Annual Day 2026</h3>
+                        <p>Join us for our grand annual celebration featuring student performances and awards.</p>
+                        <span class="event-tag">Institutional</span>
+                    </div>
+                    <div class="event-card">
+                        <div class="event-date">APR 02, 2026</div>
+                        <h3>Islamic Quiz Competition</h3>
+                        <p>Testing the knowledge of our students in a healthy and engaging environment.</p>
+                        <span class="event-tag">Academic</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects & Achievements Section -->
+        <section id="projects">
+            <div class="container">
+                <h2 class="section-title">Major Projects</h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div class="project-image">
+                            <div class="img-placeholder"
+                                style="background: linear-gradient(45deg, var(--bg-color), var(--primary-color)); opacity: 0.3;">
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Smart Classroom Initiative</h3>
+                            <p>Integrating digital tools into Islamic education for interactive learning.</p>
+                            <div class="tech-stack">
+                                <span>Digital</span>
+                                <span>EdTech</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-image">
+                            <div class="img-placeholder"
+                                style="background: linear-gradient(45deg, var(--bg-color), var(--secondary-color)); opacity: 0.3;">
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Community Outreach</h3>
+                            <p>Students participating in local social welfare and environmental programs.</p>
+                            <div class="tech-stack">
+                                <span>Social</span>
+                                <span>Service</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Gallery Section -->
+        <section id="video-gallery">
+            <div class="container">
+                <h2 class="section-title">Video Gallery</h2>
+                <div id="video-list" class="video-grid">
+                    <!-- Dynamic Videos will load here -->
+                    <div class="video-item">
+                        <video controls poster="assets/refont_calligraphic (4).png"
+                            style="width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <source src="assets/gallery/videos/WhatsApp Video 2025-11-20 at 11.51.28 AM.mp4"
+                                type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Creations Section -->
+        <section id="creations">
+            <div class="container">
+                <h2 class="section-title">Student Creations</h2>
+                <div id="creations-grid" class="creations-grid">
+                    <div class="creation-card drawing">
+                        <div class="drawing-frame" style="height: 250px; overflow: hidden; border-radius: 12px;">
+                            <img src="assets/refont_calligraphic (4).png" alt="Student Drawing"
+                                style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="creation-info" style="padding: 20px;">
+                            <h3>Islamic Calligraphy</h3>
+                            <p>By Muhsin U2 - Class 10</p>
+                        </div>
+                    </div>
+                    <div class="creation-card story"
+                        style="padding: 30px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border);">
+                        <div class="story-content">
+                            <h3>The Path of Knowledge</h3>
+                            <p style="font-style: italic; color: #888; margin-top: 10px;">"A short story about the
+                                journey of a young student seeking wisdom..."</p>
+                            <a href="pages/students/creations.html" class="btn-link"
+                                style="color: var(--secondary-color); font-weight: 600; display: inline-block; margin-top: 15px;">Read
+                                Full Story →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="dialog-message dialog-lightbox-message" style="display: none;">
+            <div data-elementor-type="popup" data-elementor-id="748"
+                class="elementor elementor-748 elementor-location-popup"
+                data-elementor-settings="{&quot;prevent_scroll&quot;:&quot;yes&quot;,&quot;a11y_navigation&quot;:&quot;yes&quot;,&quot;triggers&quot;:{&quot;inactivity_time&quot;:5,&quot;inactivity&quot;:&quot;yes&quot;},&quot;timing&quot;:[]}"
+                data-elementor-post-type="elementor_library" style="display: block;">
+                <div class="elementor-element elementor-element-32902fd e-flex e-con-boxed e-con e-parent"
+                    data-id="32902fd" data-element_type="container">
+                    <div class="e-con-inner">
+                        <div class="elementor-element elementor-element-4379674 elementor-widget elementor-widget-heading"
+                            data-id="4379674" data-element_type="widget" data-widget_type="heading.default">
+                            <form class="booking-form" id="tuition-form"
+                                action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfzhjNS8F_8_BvbwYFFZMxqfmdJqMTJx2rik6C29szqPPc9EA/formResponse"
+                                method="POST" target="hidden_iframe">
+                                <!-- Google Form Internal Hidden Fields -->
+                                <input type="hidden" name="fvv" value="1">
+                                <input type="hidden" name="fbzx" value="-5401259598252436307">
+                                <input type="hidden" name="pageHistory" value="0">
+                                <input type="hidden" name="entry.202934602" value="Option 1">
+                                <input type="hidden" name="entry.202934602_sentinel" value="">
+                                <input type="hidden" name="entry.63709490_sentinel" value="">
+                                <input type="hidden" name="entry.9885691_sentinel" value="">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="fname">First Name</label>
+                                        <input type="text" name="entry.819151435" id="fname" placeholder="First Name"
+                                            required="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lname">Last Name</label>
+                                        <input type="text" name="entry.1242527177" id="lname" placeholder="Last Name"
+                                            required="">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" name="entry.1739343054" id="email" placeholder="Your Email"
+                                        required="">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Subject (Max 8)</label>
+                                    <!-- Hidden inputs for granular Google Form mapping -->
+                                    <input type="hidden" name="entry.63709490" id="booking-subjects-hidden" value="">
+                                    <input type="hidden" name="entry.9885691" id="booking-class-hidden" value="">
+                                    <input type="hidden" name="entry.116107118" id="booking-price-hidden" value="">
+
+                                    <div class="checkbox-grid" id="subject-checkboxes">
+                                        Loading subjects...
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Class</label>
+                                    <div class="radio-group classes-grid" id="class-radios">
+                                        <label class="radio-label"><input type="radio" name="class" value="1"
+                                                required="" data-multiplier="1"> 1</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="2"
+                                                data-multiplier="1">
+                                            2</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="3"
+                                                data-multiplier="1">
+                                            3</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="4"
+                                                data-multiplier="1">
+                                            4</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="5"
+                                                data-multiplier="1">
+                                            5</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="6"
+                                                data-multiplier="1">
+                                            6</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="7"
+                                                data-multiplier="1">
+                                            7</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="8"
+                                                data-multiplier="1">
+                                            8</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="9"
+                                                data-multiplier="1">
+                                            9</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="10"
+                                                data-multiplier="1">
+                                            10</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="11"
+                                                data-multiplier="1">
+                                            +1</label>
+                                        <label class="radio-label"><input type="radio" name="class" value="12"
+                                                data-multiplier="1">
+                                            +2</label>
+                                    </div>
+                                </div>
+
+                                <div class="price-box">
+                                    <h3>Total Price: <span id="total-price">₹0</span></h3>
+                                </div>
+
+                                <div class="form-group"
+                                    style="margin-top: 25px; display: flex; flex-direction: column; gap: 10px;">
+                                    <button type="submit" class="btn btn-primary" style="width: 100%;">Book Now</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                </section>
+
+                <section id="contact">
+                    <div class="container">
+                        <div class="contact-content">
+                            <h2 class="section-title">Get In Touch</h2>
+                            <p>Interested in collaborating or having me speak at your event? Let's connect.</p>
+
+                            <!-- Form Submission Feedback -->
+                            <script type="text/javascript">var submitted = false;</script>
+                            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"
+                                onload="if(submitted) {document.getElementById('contact-status').innerHTML = 'Message Sent Successfully!'; document.getElementById('contact-form-el').reset(); submitted=false;}"></iframe>
+
+                            <form class="contact-form" id="contact-form-el"
+                                action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfq5PjEIs83m4gq7_-ihVbqAWJa_KNKgtQ2huzvKCQSfesDYQ/formResponse"
+                                method="POST" target="hidden_iframe" onsubmit="submitted=true;">
+                                <div class="form-group">
+                                    <input type="text" name="entry.456300294" placeholder="Your Name" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" name="entry.1582502936" placeholder="Your Email" required>
+                                </div>
+                                <div class="form-group">
+                                    <textarea name="entry.1231984071" placeholder="Your Message" rows="5"
+                                        required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Send Message</button>
+                                <div id="contact-status"
+                                    style="margin-top: 15px; color: var(--primary-color); font-weight: 600; min-height: 24px;">
+                                </div>
+                            </form>
+
+                            <div class="contact-info">
+                                <p>WhatsApp: <a href="https://wa.me/916235989198">+91 6235989198</a></p>
+                                <div class="social-links-large">
+                                    <a href="https://github.com/sareef6235" class="social-icon">GitHub</a>
+                                    <a href="https://wa.me/916235989198" class="social-icon">WhatsApp</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+    </main>
+
+    <script src="assets/js/site-nav.js"></script>
+    <script src="assets/js/script.js"></script>
+
+
+    <!-- Three.js Background Animation -->
+    <!-- Three.js Background Animation -->
+    <script>
+        // Defer 3D animation until browser is idle
+        const initThreeJS = () => {
+            const canvas = document.getElementById('hero-canvas');
+            if (!canvas) return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            camera.position.z = 5;
+
+            // Create particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            // Create material with cyan color
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.015,
+                color: 0x00f3ff,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            // Animation
+            let mouseX = 0;
+            let mouseY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Rotate particles
+                particlesMesh.rotation.y += 0.0005;
+                particlesMesh.rotation.x += 0.0003;
+
+                // Mouse interaction
+                particlesMesh.rotation.y += mouseX * 0.0002;
+                particlesMesh.rotation.x += mouseY * 0.0002;
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            // Handle resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        if (window.Perf) {
+            window.Perf.runIdle(initThreeJS, 1000);
+        } else {
+            // Fallback if Perf is not loaded (shouldn't happen if head script works)
+            setTimeout(initThreeJS, 1000);
+        }
+    </script>
+
+    </nav>
+
+    <!-- Booking Confirmation Modal -->
+    <div id="booking-modal" class="modal-overlay">
+        <div class="modal-content animate-fade-up">
+            <div class="modal-icon">
+                <i class="ph ph-check-circle"></i>
+            </div>
+            <h2>Booking Summary</h2>
+            <div class="modal-body">
+                <p>Hello <span id="modal-name"></span>,</p>
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin: 15px 0;">
+                    <p style="margin: 0; color: #888; font-size: 0.85rem;">Subjects:</p>
+                    <p id="modal-subjects" style="color: #fff; font-weight: 600;"></p>
+                    <div style="height: 1px; background: var(--glass-border); margin: 10px 0;"></div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #888;">Class: <strong id="modal-class" style="color: #fff;"></strong></span>
+                        <span style="color: #888;">Total: <strong id="modal-price"
+                                style="color: var(--primary-color);"></strong></span>
+                    </div>
+                </div>
+
+                <!-- UPI QR Code Section -->
+                <div class="modal-qr-section"
+                    style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--glass-border);">
+                    <p style="margin-bottom: 15px; color: #bbb; font-size: 0.9rem;">Scan to Pay via UPI</p>
+                    <div class="modal-qr-container"
+                        style="background: white; padding: 15px; border-radius: 15px; display: inline-block;">
+                        <img src="assets/upi-qr.jpeg" alt="UPI QR Code" class="modal-qr-img"
+                            style="max-width: 180px; width: 100%; display: block; height: auto; border-radius: 8px;">
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <p style="font-size: 0.9rem; color: #fff; margin-bottom: 5px;">UPI ID: <b>mmuhsinu2-1@okaxis</b>
+                        </p>
+                        <p style="font-size: 0.8rem; color: #888;">Name: Mo Mhn</p>
+                    </div>
+                </div>
+
+                <p class="modal-note">Click "Proceed to Pay" to visit your UPI app and confirm the booking.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="modal-pay-btn" style="width: 100; padding: 15px;">Proceed to
+                    Pay</button>
+                <button onclick="closeBookingModal()"
+                    style="margin-top: 15px; background: none; border: none; color: #666; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+            </div>
+        </div>
+<body>
+  <canvas id="gameCanvas" aria-label="Neon arcade game"></canvas>
+
+  <div class="hud" aria-hidden="true">
+    <h1 class="title">Welcome to My Portal</h1>
+    <div class="scoreboard">
+      <div id="scoreText">Score: 000</div>
+      <div id="livesText">Lives: 3</div>
+    </div>
+  </div>
+
+    <script type="module">
+        import { NewsService } from './assets/js/news-service.js';
+
+        // 0. Initialize Systems
+        window.NewsService = NewsService;
+
+        const subjectContainer = document.getElementById('subject-checkboxes');
+        const totalPriceEl = document.getElementById('total-price');
+  <div class="overlay" id="startOverlay">
+    <div class="panel">
+      <h2>Neon Arcade</h2>
+      <p>Move the paddle, keep all balls in play.</p>
+      <button class="neon-btn" id="startBtn">Start Game</button>
+    </div>
+  </div>
+
+        // 1. Local Subject Loader (Replacing Firebase)
+        function updateTotalPrice() {
+            let total = 0;
+            document.querySelectorAll('#subject-checkboxes input:checked').forEach(cb => {
+                total += Number(cb.dataset.price);
+            });
+            if (totalPriceEl) totalPriceEl.textContent = `₹${total}`;
+            const hiddenPrice = document.getElementById('booking-price-hidden');
+            if (hiddenPrice) hiddenPrice.value = total;
+  <div class="overlay hidden" id="gameOverOverlay">
+    <div class="panel">
+      <h2>Game Over</h2>
+      <p id="finalScore">Final Score: 000</p>
+      <button class="neon-btn" id="restartBtn">Restart</button>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const scoreText = document.getElementById('scoreText');
+      const livesText = document.getElementById('livesText');
+      const startOverlay = document.getElementById('startOverlay');
+      const gameOverOverlay = document.getElementById('gameOverOverlay');
+      const finalScore = document.getElementById('finalScore');
+      const startBtn = document.getElementById('startBtn');
+      const restartBtn = document.getElementById('restartBtn');
+
+      let w = 0;
+      let h = 0;
+      let running = false;
+      let score = 0;
+      let lives = 3;
+      let gameSpeedFactor = 1;
+      let lastTime = 0;
+      let audioCtx;
+
+      const paddle = {
+        x: 0,
+        y: 0,
+        width: 130,
+        height: 14,
+        targetX: 0,
+        glow: 0
+      };
+
+      const balls = [];
+      const sparks = [];
+      const bgParticles = [];
+      const BALL_COUNT = 3;
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+
+        paddle.width = Math.max(90, Math.min(170, w * 0.18));
+        paddle.height = Math.max(12, Math.min(18, h * 0.02));
+        paddle.y = h - Math.max(32, h * 0.08);
+        paddle.x = (w - paddle.width) * 0.5;
+        paddle.targetX = paddle.x;
+
+        if (!bgParticles.length) {
+          createBackgroundParticles();
+        }
+
+        async function initSubjects() {
+            if (!subjectContainer) return;
+
+            // Check if SubjectStorage is available
+            if (typeof SubjectStorage === 'undefined') {
+                console.error("SubjectStorage not found");
+                return;
+            }
+
+            const activeSubjects = SubjectStorage.getActive();
+            subjectContainer.innerHTML = "";
+
+            if (activeSubjects.length === 0) {
+                subjectContainer.innerHTML = "<p style='color: #666; font-size: 0.9rem;'>No subjects available.</p>";
+                return;
+            }
+
+            activeSubjects.forEach(s => {
+                const label = document.createElement('label');
+                if (s.rtl) label.dir = 'rtl';
+                label.innerHTML = `
+                    <input type="checkbox" name="subject[]" value="${s.name} (₹${s.price})" data-price="${s.price}">
+                    ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
+                `;
+                const input = label.querySelector('input');
+                input.addEventListener('change', () => {
+                    updateTotalPrice();
+                    const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
+                        .map(c => c.value).join(', ');
+                    const hiddenSub = document.getElementById('booking-subjects-hidden');
+                    if (hiddenSub) hiddenSub.value = selected;
+                });
+                subjectContainer.appendChild(label);
+            });
+      }
+
+      function createBackgroundParticles() {
+        bgParticles.length = 0;
+        const amount = Math.min(110, Math.floor((w * h) / 20000));
+        for (let i = 0; i < amount; i++) {
+          bgParticles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.8 + 0.4,
+            vy: -(Math.random() * 0.15 + 0.05),
+            alpha: Math.random() * 0.5 + 0.15,
+            hue: Math.random() > 0.5 ? 190 : 285
+          });
+        }
+
+        // Run on load
+        initSubjects();
+
+        // 2. Local Notice System (Listen for storage events if needed, or static for now)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'mhm_site_notice') {
+                const notice = JSON.parse(e.newValue);
+                if (notice && notice.active) {
+                    // Handle local notice
+                }
+            }
+        });
+
+        // 3. GitHub Media Sync
+        const galleryList = document.getElementById('gallery-list');
+        const videoList = document.getElementById('video-list');
+        const downloadIcon = `<svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+
+        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallery")
+            .then(res => res.json())
+            .then(files => {
+                if (Array.isArray(files) && galleryList) {
+                    // Dynamic loading logic if needed
+                }
+            }).catch(err => console.error("Image sync failed:", err));
+
+        // 4. PDF Sync
+        const pdfList = document.getElementById('pdf-list');
+        function addPdfToSessions(name, url) {
+            const item = document.createElement("div");
+            item.className = "session-card pdf-card animate-fade-up";
+            item.innerHTML = `
+                <div class="pdf-info">
+                    <i class="ph ph-file-pdf" style="font-size: 2rem; color: #ff4d4d;"></i>
+                    <div>
+                        <h4>${name.replace(/\.pdf$/i, '')}</h4>
+                        <p>Official Document / Certificate</p>
+                    </div>
+                </div>
+                <a href="${url}" target="_blank" class="btn-pdf">View Document</a>
+            `;
+            if (pdfList) pdfList.appendChild(item);
+      }
+
+      function padScore(value) {
+        return String(value).padStart(3, '0');
+      }
+
+      function randomBallColor() {
+        const hue = Math.floor(Math.random() * 360);
+        return `hsl(${hue}, 95%, 65%)`;
+      }
+
+      function resetBalls() {
+        balls.length = 0;
+        for (let i = 0; i < BALL_COUNT; i++) {
+          const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.9;
+          const speed = 230 + Math.random() * 70;
+          balls.push({
+            x: w * 0.35 + i * (w * 0.12),
+            y: h * 0.35,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            r: Math.max(7, Math.min(11, w * 0.012)),
+            color: randomBallColor()
+          });
+        }
+
+        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/pdfs")
+            .then(res => res.json())
+            .then(files => {
+                if (Array.isArray(files)) {
+                    const hasPdfs = files.some(f => f.name.match(/\.(pdf)$/i));
+                    if (hasPdfs && pdfList) pdfList.innerHTML = '';
+                    files.forEach(file => {
+                        if (file.type === "file" && file.name.match(/\.(pdf)$/i)) {
+                            addPdfToSessions(file.name, file.download_url);
+                        }
+                    });
+                }
+            }).catch(err => console.error("PDF sync failed:", err));
+
+        // 5. Exam Result Logic
+        const RESULT_SHEET_ID = "1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU";
+        const RESULT_TAB_NAME = "class1";
+
+        window.fetchHomeResult = async function () {
+            const regnoInput = document.getElementById('home-regno');
+            const regno = regnoInput.value.trim();
+            const status = document.getElementById('home-status');
+            const container = document.getElementById('home-result-container');
+            const area = document.getElementById('home-result-area');
+
+            if (!regno) return;
+            status.innerHTML = "🔍 Fetching from local vault...";
+            container.style.display = "none";
+
+            setTimeout(() => {
+                const result = window.ResultManager.lookup(regno, '2010-01-01', '1'); // Default Public Category
+                if (result) {
+                    status.innerHTML = "✅ Record Found";
+                    area.innerHTML = `
+                        <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">${result.name}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px;">
+                            <span style="color: #888; font-size: 0.9rem;">Status: <b style="color:#00ff88">PASS</b></span>
+                            <span style="color: #fff; font-weight: 700;">Score: ${result.score}</span>
+                        </div>
+                    `;
+                    container.style.display = "block";
+                } else {
+                    status.innerHTML = "❌ ID not found in local records.";
+                }
+            }, 500);
+        };
+
+        document.getElementById('home-regno')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') window.fetchHomeResult();
+        });
+
+        // --- ADVANCED NEWS SYSTEM ---
+        let currentNewsLang = 'en';
+
+        window.setNewsLang = (lang) => {
+            currentNewsLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.toggle('active', b.innerText.toLowerCase() === lang);
+            });
+            window.loadNews();
+        };
+
+        window.loadNews = async () => {
+            try {
+                const newsGrid = document.getElementById('home-news-grid');
+                if (!newsGrid || !window.NewsService) return;
+
+                const latestNews = window.NewsService.getPublishedNews().slice(0, 3);
+                const currentLang = document.documentElement.lang || 'en';
+                const t = (window.LanguageSystem && window.LanguageSystem.dictionary[currentLang]) || { news_no_updates: "No updates at the moment.", read_more: "Read More" };
+
+                if (latestNews.length === 0) {
+                    newsGrid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                            <p style="color: #666;">${t.news_no_updates}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                newsGrid.innerHTML = latestNews.map((item, index) => `
+                    <article class="news-card-premium animate-fade-up" style="animation-delay: ${index * 0.1}s;">
+                        <div class="img-wrapper" style="height:200px; background:rgba(255,255,255,0.02); display:flex; align-items:center; justify-content:center">
+                            ${item.image ? `<img src="${item.image}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover">` : `<i class="ph ph-newspaper" style="font-size:3rem; color:#222"></i>`}
+                        </div>
+                        <div style="padding: 25px;">
+                            <span class="badge" style="background:var(--primary-color); color:#000; font-size:0.75rem">${item.category}</span>
+                            <h3 style="margin: 15px 0; color:#fff">${item.title}</h3>
+                            <p style="color:#888; font-size:0.9rem; margin-bottom:20px">${item.desc.substring(0, 120)}...</p>
+                            <a href="pages/news/index.html?id=${item.id}" style="color:var(--primary-color); text-decoration:none; font-weight:700">${t.read_more} →</a>
+                        </div>
+                    </article>
+                `).join('');
+            } catch (e) { console.error("News load error", e); }
+        };
+
+        // Badge & Sync Logic
+        window.updateBadges = () => {
+            const count = parseInt(localStorage.getItem('mhm_unread_news') || '0');
+            const badges = [document.getElementById('news-badge-nav'), document.getElementById('news-badge-mobile')];
+            badges.forEach(b => {
+                if (b) {
+                    b.innerText = count > 9 ? '9+' : count;
+                    b.style.display = count > 0 ? 'flex' : 'none';
+                }
+            });
+        };
+
+        window.addEventListener('news-updated', window.updateBadges);
+        window.addEventListener('DOMContentLoaded', () => {
+            window.loadNews();
+            window.updateBadges();
+        });
+
+        // Clear badge when visiting news section
+        const newsSection = document.getElementById('news');
+        if (newsSection) {
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    localStorage.setItem('mhm_unread_news', '0');
+                    window.updateBadges();
+                }
+            }, { threshold: 0.5 });
+            observer.observe(newsSection);
+      }
+
+      function resetGame() {
+        score = 0;
+        lives = 3;
+        gameSpeedFactor = 1;
+        sparks.length = 0;
+        updateHUD();
+        resetBalls();
+      }
+
+      function updateHUD() {
+        scoreText.textContent = `Score: ${padScore(score)}`;
+        livesText.textContent = `Lives: ${lives}`;
+      }
+
+      function ensureAudioContext() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      function playTone(type, frequency, duration, volume) {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(frequency, now);
+        gain.gain.setValueAtTime(volume, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+      }
+
+      function playPaddleHit() {
+        playTone('triangle', 480, 0.08, 0.045);
+      }
+
+      function playWallBounce() {
+        playTone('sine', 280, 0.055, 0.03);
+      }
+
+      function playGameOverSound() {
+        playTone('square', 180, 0.16, 0.05);
+        setTimeout(() => playTone('square', 120, 0.24, 0.05), 120);
+      }
+
+      function createSparkBurst(x, y, color) {
+        for (let i = 0; i < 14; i++) {
+          const angle = (Math.PI * 2 * i) / 14 + Math.random() * 0.3;
+          const speed = Math.random() * 120 + 70;
+          sparks.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 0.45 + Math.random() * 0.25,
+            maxLife: 0.45 + Math.random() * 0.25,
+            color
+          });
+        }
+      }
+
+      function loseLife(ball) {
+        lives -= 1;
+        updateHUD();
+
+        if (lives <= 0) {
+          running = false;
+          finalScore.textContent = `Final Score: ${padScore(score)}`;
+          gameOverOverlay.classList.remove('hidden');
+          playGameOverSound();
+          return;
+        }
+    </script>
+
+
+    <!-- Global Footer -->
+    <div id="global-footer"></div>
+
+    <footer id="main-footer"></footer>
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.8;
+        const speed = 250;
+        ball.x = w * (0.2 + Math.random() * 0.6);
+        ball.y = h * 0.34;
+        ball.vx = Math.cos(angle) * speed;
+        ball.vy = Math.sin(angle) * speed;
+      }
+
+      function update(dt) {
+        gameSpeedFactor = Math.min(2.2, gameSpeedFactor + dt * 0.018);
+
+        paddle.x += (paddle.targetX - paddle.x) * Math.min(1, 14 * dt);
+        paddle.x = Math.max(0, Math.min(w - paddle.width, paddle.x));
+        paddle.glow = Math.max(0, paddle.glow - dt * 2.8);
+
+        for (const particle of bgParticles) {
+          particle.y += particle.vy * 60 * dt;
+          if (particle.y < -3) {
+            particle.y = h + 3;
+            particle.x = Math.random() * w;
+          }
+        }
+
+    <!-- WhatsApp Floating Button -->
+    <div class="whatsapp-float-wrapper">
+        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp"
+            data-t="whatsapp_aria">
+            <i class="ph-fill ph-whatsapp-logo"></i>
+        </a>
+    </div>
+        for (const ball of balls) {
+          const speedMultiplier = gameSpeedFactor;
+          ball.x += ball.vx * dt * speedMultiplier;
+          ball.y += ball.vy * dt * speedMultiplier;
+
+          if (ball.x - ball.r <= 0) {
+            ball.x = ball.r;
+            ball.vx *= -1;
+            playWallBounce();
+          } else if (ball.x + ball.r >= w) {
+            ball.x = w - ball.r;
+            ball.vx *= -1;
+            playWallBounce();
+          }
+
+          if (ball.y - ball.r <= 0) {
+            ball.y = ball.r;
+            ball.vy *= -1;
+            playWallBounce();
+          }
+
+          const paddleTop = paddle.y;
+          const paddleBottom = paddle.y + paddle.height;
+          const paddleRight = paddle.x + paddle.width;
+
+          if (
+            ball.y + ball.r >= paddleTop &&
+            ball.y - ball.r <= paddleBottom &&
+            ball.x >= paddle.x &&
+            ball.x <= paddleRight &&
+            ball.vy > 0
+          ) {
+            ball.y = paddleTop - ball.r;
+            const hitPos = (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
+            ball.vy = -Math.abs(ball.vy) * 1.02;
+            ball.vx += hitPos * 80;
+
+            const maxHorizontal = 520;
+            ball.vx = Math.max(-maxHorizontal, Math.min(maxHorizontal, ball.vx));
+
+            score += 1;
+            paddle.glow = 1;
+            updateHUD();
+            createSparkBurst(ball.x, paddle.y, ball.color);
+            playPaddleHit();
+          }
+
+          if (ball.y - ball.r > h) {
+            loseLife(ball);
+          }
+        }
+
+    <!-- Global Navigation & Footer Scripts -->
+    <script src="assets/js/global-navigation.js"></script>
+    <script src="assets/js/navigation-config.js"></script>
+    <script src="assets/js/global-footer.js"></script>
+    <script src="assets/js/footer-config.js"></script>
+
+    <!-- Existing Scripts -->
+    <script src="assets/js/site-nav.js" defer></script>
+    <script src="assets/js/site-footer.js" defer></script>
+    <script src="assets/js/script.js" defer></script>
+    <script type="module" src="assets/js/auth-nav-guard.js" defer></script>
+        for (let i = sparks.length - 1; i >= 0; i--) {
+          const s = sparks[i];
+          s.life -= dt;
+          s.x += s.vx * dt;
+          s.y += s.vy * dt;
+          s.vx *= 0.98;
+          s.vy *= 0.98;
+          if (s.life <= 0) sparks.splice(i, 1);
+        }
+      }
+
+      function drawBackground() {
+        const gradient = ctx.createLinearGradient(0, 0, w, h);
+        gradient.addColorStop(0, '#05060d');
+        gradient.addColorStop(0.5, '#080d1d');
+        gradient.addColorStop(1, '#030307');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, w, h);
+
+        for (const particle of bgParticles) {
+          ctx.beginPath();
+          ctx.fillStyle = `hsla(${particle.hue}, 100%, 70%, ${particle.alpha})`;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = `hsla(${particle.hue}, 100%, 70%, 0.8)`;
+          ctx.arc(particle.x, particle.y, particle.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.shadowBlur = 0;
+      }
+
+      function drawPaddle() {
+        const pulse = 0.45 + paddle.glow * 0.9;
+        const grad = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x + paddle.width, paddle.y + paddle.height);
+        grad.addColorStop(0, 'rgba(29, 233, 255, 0.95)');
+        grad.addColorStop(1, 'rgba(200, 76, 255, 0.95)');
+
+        ctx.save();
+        ctx.fillStyle = grad;
+        ctx.shadowBlur = 16 + paddle.glow * 26;
+        ctx.shadowColor = `rgba(29, 233, 255, ${pulse})`;
+        ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        ctx.restore();
+      }
+
+      function drawBalls() {
+        for (const ball of balls) {
+          ctx.save();
+          ctx.fillStyle = ball.color;
+          ctx.shadowBlur = 20;
+          ctx.shadowColor = ball.color;
+          ctx.beginPath();
+          ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      function drawSparks() {
+        for (const s of sparks) {
+          const alpha = Math.max(0, s.life / s.maxLife);
+          ctx.save();
+          ctx.fillStyle = s.color.replace('hsl', 'hsla').replace(')', `, ${alpha})`);
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = s.color;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      function render() {
+        drawBackground();
+        drawPaddle();
+        drawBalls();
+        drawSparks();
+      }
+
+      function gameLoop(time) {
+        const now = time * 0.001;
+        const dt = Math.min(0.033, now - lastTime || 0.016);
+        lastTime = now;
+
+        if (running) {
+          update(dt);
+        }
+        render();
+        requestAnimationFrame(gameLoop);
+      }
+
+      function setPaddleByClientX(clientX) {
+        const rect = canvas.getBoundingClientRect();
+        const x = clientX - rect.left;
+        paddle.targetX = x - paddle.width / 2;
+      }
+
+      canvas.addEventListener('mousemove', (event) => {
+        setPaddleByClientX(event.clientX);
+      });
+
+      canvas.addEventListener('touchmove', (event) => {
+        if (event.touches.length > 0) {
+          setPaddleByClientX(event.touches[0].clientX);
+        }
+      }, { passive: true });
+
+      startBtn.addEventListener('click', () => {
+        ensureAudioContext();
+        resetGame();
+        running = true;
+        startOverlay.classList.add('hidden');
+        gameOverOverlay.classList.add('hidden');
+      });
+
+      restartBtn.addEventListener('click', () => {
+        ensureAudioContext();
+        resetGame();
+        running = true;
+        gameOverOverlay.classList.add('hidden');
+      });
+
+      window.addEventListener('resize', () => {
+        resize();
+        createBackgroundParticles();
+      });
+
+      resize();
+      resetGame();
+      render();
+      requestAnimationFrame(gameLoop);
+    })();
+  </script>
+</body>
+
+</html>
+</html>

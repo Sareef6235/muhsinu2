@@ -1,125 +1,128 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Secure Result System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
+
 <body>
 
-<h2>Admin Panel</h2>
-<input type="file" id="jsonInput">
-<button id="deployBtn">Deploy Cloud</button>
+  <h2>Admin Panel</h2>
+  <input type="file" id="jsonInput">
+  <button id="deployBtn">Deploy Cloud</button>
 
-<hr>
+  <hr>
 
-<h2>Search Result</h2>
-<input type="text" id="rollInput" placeholder="Enter Roll">
-<button id="searchBtn">Search</button>
+  <h2>Search Result</h2>
+  <input type="text" id="rollInput" placeholder="Enter Roll">
+  <button id="searchBtn">Search</button>
 
-<div id="resultArea"></div>
+  <div id="resultArea"></div>
 
-<script>
-const App = {
-  state: { data: [] },
+  <script>
+    const App = {
+      state: { data: [] },
 
-  init() {
-    document.getElementById("deployBtn")
-      .addEventListener("click", () => this.deploy());
+      init() {
+        document.getElementById("deployBtn")
+          .addEventListener("click", () => this.deploy());
 
-    document.getElementById("searchBtn")
-      .addEventListener("click", () => this.search());
+        document.getElementById("searchBtn")
+          .addEventListener("click", () => this.search());
 
-    document.getElementById("jsonInput")
-      .addEventListener("change", e => this.loadJSON(e));
-  },
+        document.getElementById("jsonInput")
+          .addEventListener("change", e => this.loadJSON(e));
+      },
 
-  loadJSON(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+      loadJSON(e) {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = event => {
-      const parsed = JSON.parse(event.target.result);
-      this.state.data = Array.isArray(parsed)
-        ? parsed
-        : parsed.exams?.[0]?.results || [];
+        const reader = new FileReader();
+        reader.onload = event => {
+          const parsed = JSON.parse(event.target.result);
+          this.state.data = Array.isArray(parsed)
+            ? parsed
+            : parsed.exams?.[0]?.results || [];
 
-      alert("JSON Loaded ✅");
-    };
-    reader.readAsText(file);
-  },
+          alert("JSON Loaded ✅");
+        };
+        reader.readAsText(file);
+      },
 
-  async deploy() {
+      async deploy() {
 
-  if (!this.state.data?.length) {
-    alert("No data to sync");
-    return;
-  }
+        if (!this.state.data?.length) {
+          alert("No data to sync");
+          return;
+        }
 
-  const payload = {
-    exams: [{
-      examId: "sync",
-      results: this.state.data
-    }]
-  };
+        const payload = {
+          exams: [{
+            examId: "sync",
+            results: this.state.data
+          }]
+        };
 
-  try {
+        try {
 
-    const res = await fetch(window.location.origin + "/deploy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+          const res = await fetch(window.location.origin + "/api/deploy", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
 
-    const responseText = await res.text();
+          const responseText = await res.text();
 
-    if (!res.ok) {
-      console.error("SERVER RESPONSE:", responseText);
-      alert("Sync Failed ❌\n\n" + responseText);
-      return;
-    }
+          if (!res.ok) {
+            console.error("SERVER RESPONSE:", responseText);
+            alert("Sync Failed ❌\n\n" + responseText);
+            return;
+          }
 
-    alert("Sync Success ✅");
+          alert("Sync Success ✅");
 
-  } catch (err) {
-    console.error("Cloud Error:", err);
-    alert("Network Error ❌");
-  }
-}
+        } catch (err) {
+          console.error("Cloud Error:", err);
+          alert("Network Error ❌");
+        }
+      }
 
 
   async search() {
-    const roll = document.getElementById("rollInput").value;
-    if (!roll) return;
+        const roll = document.getElementById("rollInput").value;
+        if (!roll) return;
 
-    const res = await fetch(window.location.origin + "/results");
-    const data = await res.json();
-    const results = data.exams?.[0]?.results || [];
+        const res = await fetch(window.location.origin + "/api/results");
+        const data = await res.json();
+        const results = data.exams?.[0]?.results || [];
 
-    const student = results.find(r => r.roll == roll);
+        const student = results.find(r => r.roll == roll);
 
-    if (!student) {
-      document.getElementById("resultArea").innerHTML = "No Result ❌";
-      return;
-    }
+        if (!student) {
+          document.getElementById("resultArea").innerHTML = "No Result ❌";
+          return;
+        }
 
-    let html = `<h3>${student.name}</h3>`;
-    html += `<p>Total: ${student.total}</p>`;
+        let html = `<h3>${student.name}</h3>`;
+        html += `<p>Total: ${student.total}</p>`;
 
-    if (student.subjects) {
-      html += "<ul>";
-      for (let s in student.subjects) {
-        html += `<li>${s}: ${student.subjects[s]}</li>`;
+        if (student.subjects) {
+          html += "<ul>";
+          for (let s in student.subjects) {
+            html += `<li>${s}: ${student.subjects[s]}</li>`;
+          }
+          html += "</ul>";
+        }
+
+        document.getElementById("resultArea").innerHTML = html;
       }
-      html += "</ul>";
-    }
+    };
 
-    document.getElementById("resultArea").innerHTML = html;
-  }
-};
-
-window.onload = () => App.init();
-</script>
+    window.onload = () => App.init();
+  </script>
 
 </body>
+
 </html>

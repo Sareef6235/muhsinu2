@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HTGD Madrasa Education Arcade Platform - SaaS style language learning arcade with curriculum, multiplayer simulation, admin panel, branding, achievements, and leaderboard." />
+  <meta name="keywords" content="Madrasa, education arcade, Arabic learning, Malayalam learning, curriculum game, leaderboard" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>HTGD | Madrasa Education Arcade Platform</title>
+  <style>
+    :root {
+      --bg: #070a16;
+      --bg-soft: #111a33;
+      --text: #eaf1ff;
+      --muted: #a6b4d9;
+      --glass: rgba(17, 25, 45, 0.58);
+      --border: rgba(180, 210, 255, 0.2);
+      --accent: #4f8cff;
+      --accent-2: #8e61ff;
+      --success: #2ed9a6;
+      --warning: #ffb857;
+      --danger: #ff5f7a;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      --radius: 18px;
+      --school-theme: #4f8cff;
+    }
+    html[data-theme="light"] {
+      --bg: #f4f8ff;
+      --bg-soft: #ffffff;
+      --text: #102040;
+      --muted: #4a5d82;
+      --glass: rgba(255, 255, 255, 0.72);
+      --border: rgba(49, 86, 150, 0.16);
+      --accent: #2d62f0;
+      --accent-2: #7b3ff0;
+      --shadow: 0 10px 24px rgba(25, 52, 115, 0.16);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at 18% 18%, #233668 0%, transparent 38%),
+                  radial-gradient(circle at 86% 12%, #3d1d78 0%, transparent 34%),
+                  linear-gradient(130deg, var(--bg) 0%, #090f24 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .particle-field { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; position: relative; z-index: 1; }
+    .sidebar {
+      position: sticky; top: 0; height: 100vh; padding: 1rem; backdrop-filter: blur(16px);
+      background: linear-gradient(160deg, rgba(9, 14, 31, 0.95), rgba(10, 18, 42, 0.75));
+      border-right: 1px solid var(--border); box-shadow: var(--shadow);
+      transform-style: preserve-3d;
+    }
+    .brand { display: flex; gap: .75rem; align-items: center; padding: .75rem; background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; }
+    .brand img { width: 42px; height: 42px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }
+    .brand h1 { margin: 0; font-size: 1rem; }
+    .brand p { margin: .15rem 0 0; color: var(--muted); font-size: .75rem; }
+    .nav { display: grid; gap: .45rem; }
+    .nav button {
+      all: unset; cursor: pointer; padding: .72rem .86rem; border-radius: 12px; border: 1px solid transparent;
+      color: var(--text); background: rgba(255,255,255,.02); transition: .25s ease; font-size: .86rem;
+    }
+    .nav button:hover, .nav button.active { transform: translateX(3px); border-color: var(--border); background: linear-gradient(120deg, rgba(79,140,255,.22), rgba(142,97,255,.12)); box-shadow: 0 0 16px rgba(79,140,255,.24); }
+    .main { padding: 1.2rem; }
+    .topbar {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem; margin-bottom: 1rem;
+      background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius); padding: .9rem;
+      backdrop-filter: blur(12px);
+    }
+    .pill { padding: .4rem .68rem; border-radius: 99px; background: rgba(79,140,255,.14); border: 1px solid var(--border); font-size: .76rem; }
+    .grid { display: grid; gap: 1rem; }
+    .cards-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .panel {
+      background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem;
+      box-shadow: var(--shadow); backdrop-filter: blur(13px); transform-style: preserve-3d;
+    }
+    .panel h2, .panel h3 { margin: 0 0 .8rem; }
+    .muted { color: var(--muted); font-size: .9rem; }
+    .hidden { display: none !important; }
+    .section { display: none; animation: fade .4s ease; }
+    .section.active { display: block; }
+    @keyframes fade { from {opacity: 0; transform: translateY(8px);} to {opacity: 1; transform: translateY(0);} }
+    .btn {
+      border: 1px solid var(--border); color: var(--text); background: linear-gradient(120deg, rgba(79,140,255,.2), rgba(142,97,255,.18));
+      padding: .6rem .86rem; border-radius: 12px; cursor: pointer; font-weight: 600; transition: .2s;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(79,140,255,.22); }
+    .btn.alt { background: rgba(255,255,255,.04); }
+    .btn.danger { background: rgba(255,95,122,.15); }
+    .btn.success { background: rgba(46,217,166,.15); }
+    input, select, textarea {
+      width: 100%; background: rgba(0,0,0,.18); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: .6rem; margin-top: .3rem;
+    }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: .8rem; }
+    .stat { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 12px; padding: .7rem; }
+    .stat b { display: block; font-size: 1.2rem; margin-top: .3rem; }
+    .letter-rain {
+      position: relative; height: 250px; overflow: hidden; border-radius: 14px; border: 1px solid var(--border);
+      background: linear-gradient(160deg, rgba(5,11,22,.85), rgba(14,22,49,.6));
+    }
+    .letter { position: absolute; font-weight: 800; opacity: .9; text-shadow: 0 0 8px rgba(79,140,255,.6); animation: drop linear forwards; }
+    @keyframes drop { from { transform: translateY(-24px) rotateX(0deg);} to { transform: translateY(280px) rotateX(360deg); opacity: .35;} }
+    .mode-grid, .badge-grid, .leader-grid { display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); }
+    .tile { border: 1px solid var(--border); background: rgba(255,255,255,.03); border-radius: 14px; padding: .7rem; position: relative; }
+    .lock::after { content: "🔒 Pro"; position: absolute; top: .45rem; right: .45rem; font-size: .7rem; background: rgba(255,95,122,.2); padding: .2rem .4rem; border-radius: 99px; }
+    .progress-wrap { display: grid; gap: .55rem; }
+    .progress {
+      height: 8px; background: rgba(255,255,255,.08); border-radius: 99px; overflow: hidden;
+    }
+    .progress > span { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    .stars { color: #ffd66a; letter-spacing: 1px; }
+    .badge {
+      perspective: 900px; min-height: 120px;
+    }
+    .badge > div {
+      border: 1px solid var(--border); border-radius: 14px; padding: .8rem; background: rgba(255,255,255,.04);
+      transform-style: preserve-3d; animation: spin 8s linear infinite;
+    }
+    @keyframes spin { from { transform: rotateY(0deg);} to { transform: rotateY(360deg);} }
+    .rarity-epic { box-shadow: 0 0 20px rgba(142,97,255,.4); }
+    .rarity-rare { box-shadow: 0 0 20px rgba(79,140,255,.4); }
+    .rarity-legend { box-shadow: 0 0 20px rgba(255,184,87,.45); }
+    .multi-col { display: grid; gap: .8rem; grid-template-columns: 2fr 1fr; }
+    .chat { height: 190px; overflow: auto; border: 1px solid var(--border); border-radius: 10px; padding: .6rem; background: rgba(0,0,0,.2); }
+    .kbd { display: grid; grid-template-columns: repeat(10, 1fr); gap: .35rem; }
+    .kbd button { padding: .45rem; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,.05); color: var(--text); }
+    .certificate { text-align: center; border: 1px dashed var(--warning); border-radius: 14px; padding: 1rem; background: rgba(255,184,87,.08); }
+    .price { border: 1px solid var(--border); border-radius: 14px; padding: .9rem; background: rgba(255,255,255,.04); }
+    .mobile-toggle { display:none; }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; z-index: 20; left: -100%; width: 80vw; max-width: 300px; transition: .25s; }
+      .sidebar.open { left: 0; }
+      .mobile-toggle { display: inline-flex; }
+      .multi-col { grid-template-columns: 1fr; }
+      .kbd { grid-template-columns: repeat(5,1fr); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles" class="particle-field"></canvas>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img id="schoolLogo" alt="School Logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%234f8cff'/%3E%3Cstop offset='1' stop-color='%238e61ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='120' height='120' rx='24' fill='url(%23g)'/%3E%3Ctext x='60' y='73' fill='white' text-anchor='middle' font-family='Arial' font-size='48'%3EH%3C/text%3E%3C/svg%3E" />
+        <div>
+          <h1 id="schoolName">HTGD Madrasa Arcade</h1>
+          <p id="welcomeMsg">Empowering Class 1–10 Through Play</p>
+        </div>
+      </div>
+      <nav class="nav" id="nav"></nav>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <button class="btn alt mobile-toggle" id="mobileToggle">☰ Menu</button>
+          <span class="pill" id="planPill">Plan: Free</span>
+          <span class="pill" id="langPill">Language: English</span>
+          <span class="pill">Offline Safe • Client-only</span>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center;">
+          <button class="btn alt" id="themeBtn">Toggle Theme</button>
+          <button class="btn" id="upgradeTopBtn">Upgrade Pro</button>
+        </div>
+      </div>
+
+      <section id="home" class="section active">
+        <div class="grid cards-3">
+          <article class="panel"><h2>Complete Madrasa Education Arcade</h2><p class="muted">SaaS-style platform with curriculum progression, multiplayer simulation, branding, and admin controls.</p></article>
+          <article class="panel"><h3>Curriculum Range</h3><p class="muted">Structured classes from 1 to 10 with star ratings and unlock logic.</p></article>
+          <article class="panel"><h3>Deployment Ready</h3><p class="muted">Single-file, SEO friendly, static-host compatible for GitHub Pages/Netlify/Vercel.</p></article>
+        </div>
+      </section>
+
+      <section id="arcade" class="section">
+        <div class="panel">
+          <h2>3D Language Arcade Engine</h2>
+          <div class="stats">
+            <div class="stat">Game Mode<b id="modeCount">5 / 10</b></div>
+            <div class="stat">Power-ups<b>Shield • Freeze • Double XP</b></div>
+            <div class="stat">Combo<b id="comboValue">x0</b></div>
+            <div class="stat">Letters Caught<b id="lettersCaught">0</b></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.7rem;margin:.8rem 0;">
+            <label>Language
+              <select id="languageSelect">
+                <option value="english">English</option>
+                <option value="arabic">العربية</option>
+                <option value="malayalam">മലയാളം</option>
+              </select>
+            </label>
+            <label>Game Mode<select id="modeSelect"></select></label>
+            <label>Difficulty<select id="difficulty"><option>Easy</option><option>Normal</option><option>Hard</option></select></label>
+          </div>
+          <div class="letter-rain" id="letterRain" aria-label="3D Letter Rain"></div>
+          <div style="display:flex;gap:.6rem;margin-top:.8rem;flex-wrap:wrap;">
+            <button class="btn success" id="startArcade">Start Session</button>
+            <button class="btn alt" id="powerBtn">Activate Power-up</button>
+            <button class="btn alt" id="soundBtn">Sound: On</button>
+          </div>
+          <p class="muted" id="rtlHint">Arabic mode automatically switches to RTL-friendly letter set.</p>
+          <div class="mode-grid" id="modeGrid" style="margin-top:.8rem;"></div>
+          <div class="panel" style="margin-top:.8rem;">
+            <h3>Touch Keyboard</h3>
+            <div class="kbd" id="touchKeyboard"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="curriculum" class="section"><div class="panel"><h2>Curriculum Progression (Class 1–10)</h2><div class="progress-wrap" id="curriculumList"></div><div class="certificate hidden" id="certificateBox"><h3>🎓 Certificate Unlocked</h3><p>Congratulations! Full Survival Mastery (Class 10) completed.</p><button class="btn" id="exportCertificate">Export Certificate (Simulated)</button></div></div></section>
+
+      <section id="multiplayer" class="section"><div class="panel"><h2>WebSocket Multiplayer Architecture (Simulation)</h2><div class="multi-col"><div class="panel"><label>Player Name<input id="playerName" value="Student-01" /></label><div style="display:flex;gap:.5rem;margin-top:.6rem;"><button class="btn" id="createRoom">Create Room</button><button class="btn alt" id="joinRoom">Join Room</button></div><div class="stats" style="margin-top:.7rem;"><div class="stat">Room<b id="roomCode">-</b></div><div class="stat">Server<b>ws://localhost:8080 (placeholder)</b></div><div class="stat">Fallback<b id="aiFallback">AI Opponent Ready</b></div></div><h3 style="margin-top:.8rem;">Players</h3><ul id="playerList"></ul><h3>Live Scores</h3><ul id="liveScores"></ul></div><div class="panel"><h3>Lobby Chat</h3><div class="chat" id="chatBox"></div><div style="display:flex;gap:.5rem;margin-top:.5rem;"><input id="chatInput" placeholder="Type message" /><button class="btn" id="sendChat">Send</button></div></div></div></div></section>
+
+      <section id="achievements" class="section"><div class="panel"><h2>Achievement & Badge Gallery</h2><div class="badge-grid" id="badgeGrid"></div></div></section>
+
+      <section id="leaderboard" class="section"><div class="panel"><h2>Leaderboard</h2><div class="leader-grid" id="leaderGrid"></div></div></section>
+
+      <section id="admin" class="section"><div class="panel"><h2>Admin Dashboard (Simulated)</h2><div id="adminAuth"><label>Admin Passcode<input id="adminPass" type="password" placeholder="Enter passcode" /></label><button class="btn" id="adminLogin">Access Dashboard</button></div><div id="adminPanel" class="hidden"><div class="stats"><div class="stat">Total Plays<b id="totalPlays">0</b></div><div class="stat">Unlocked Badges<b id="unlockedCount">0</b></div><div class="stat">Pro Users<b id="proCount">1 (Local)</b></div></div><div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;"><button class="btn danger" id="resetLeaderboard">Reset Leaderboard</button><button class="btn danger" id="resetAchievements">Reset Achievements</button><button class="btn danger" id="resetCurriculum">Reset Curriculum</button><button class="btn alt" id="toggleMultiplayer">Toggle Multiplayer</button></div><h3 style="margin-top:.8rem;">Mode Access Controls</h3><div id="adminModes" class="mode-grid"></div><h3 style="margin-top:.8rem;">Theme Customization</h3><label>Accent Color<input type="color" id="adminColor" value="#4f8cff" /></label></div></div></section>
+
+      <section id="branding" class="section"><div class="panel"><h2>School Branding</h2><div class="grid cards-3"><div><label>School Name<input id="brandName" /></label></div><div><label>Welcome Message<input id="brandWelcome" /></label></div><div><label>Theme Color<input type="color" id="brandColor" /></label></div></div><label style="margin-top:.6rem;display:block;">School Logo<input type="file" id="logoUpload" accept="image/*" /></label><label style="margin-top:.6rem;display:block;">Class-specific Branding Notes<textarea id="classBranding" rows="4"></textarea></label><button class="btn" id="saveBranding" style="margin-top:.6rem;">Save Branding</button></div></section>
+
+      <section id="pricing" class="section"><div class="panel"><h2>Freemium + Pro Model</h2><div class="grid cards-3"><div class="price"><h3>Free</h3><ul><li>5 game modes</li><li>Class 1–3</li><li>Basic leaderboard</li><li>Limited achievements</li></ul></div><div class="price"><h3>Pro</h3><ul><li>All 10 modes</li><li>Class 1–10</li><li>Multiplayer battle</li><li>Advanced achievements</li><li>Custom branding + export certificate</li></ul><button class="btn" id="upgradeBtn">Upgrade to Pro</button></div><div class="price"><h3>Feature Locks</h3><p class="muted">Locked items include clear 🔒 indicators and smooth unlock transitions.</p></div></div></div></section>
+
+      <section id="settings" class="section"><div class="panel"><h2>Settings</h2><div class="grid cards-3"><label>Animation Quality<select id="animationQuality"><option value="auto">Auto</option><option value="low">Low</option><option value="high">High</option></select></label><label>Sound Volume<input id="volume" type="range" min="0" max="100" value="40" /></label><label>Reset Local Platform<button class="btn danger" id="resetAll" style="margin-top:.45rem;">Factory Reset</button></label></div><p class="muted">No external APIs, no personal data storage, fully offline compatible.</p></div></section>
+    </main>
+  </div>
+
+  <script>
+    const state = {
+      storageKey: 'htgd-platform-v1',
+      navItems: [
+        ['home','Home'], ['arcade','Language Arcade'], ['curriculum','Curriculum'], ['multiplayer','Multiplayer'],
+        ['achievements','Achievements'], ['leaderboard','Leaderboard'], ['admin','Admin Dashboard'],
+        ['branding','School Branding'], ['pricing','Pricing'], ['settings','Settings']
+      ],
+      modes: ['Letter Rain','Word Dash','Match Master','Speed Type','Grammar Blitz','Survival 3D','Boss Battle','Memory Tower','Sentence Forge','Multiplayer Arena'],
+      classes: [
+        'Basic letters & simple word recognition','Two-letter words & matching game','Three-letter words & speed typing intro','Vocabulary building','Sentence formation',
+        'Grammar basics','Word memory challenges','Advanced vocabulary','Timed competitive typing','Full survival mastery mode'
+      ],
+      badges: [
+        { id:'firstWin', name:'First Win', rarity:'rare' }, { id:'letters100', name:'100 Letters Master', rarity:'rare' },
+        { id:'class5', name:'Class 5 Completed', rarity:'epic' }, { id:'comboKing', name:'Combo King', rarity:'epic' },
+        { id:'survival', name:'Survival Master', rarity:'legend' }, { id:'champion', name:'Language Champion', rarity:'legend' }
+      ],
+      letters: {
+        english: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+        arabic: 'ابتثجحخدذرزسشصضطظعغفقكلمنهوي'.split(''),
+        malayalam: 'അആഇഈഉഊഋഎഏഐഒഓകഖഗഘങചജടഡണതദനപബമയരലവശഷസഹ'.split('')
+      },
+      data: {
+        pro: false, theme: 'dark', language: 'english', totalPlays: 0, multiplayerEnabled: true,
+        leaderboard: [], liveRoom: null, achievements: [], classProgress: Array.from({length:10},(_,i)=>({classNo:i+1,progress:0,stars:0,unlocked:i===0})),
+        branding: { schoolName:'HTGD Madrasa Arcade', welcomeMsg:'Empowering Class 1–10 Through Play', themeColor:'#4f8cff', classBranding:'', logo:'' },
+        modesEnabled: Array.from({length:10},()=>true)
+      }
+    };
+
+    const $ = (s,p=document) => p.querySelector(s);
+    const $$ = (s,p=document) => [...p.querySelectorAll(s)];
+
+    function load() {
+      const raw = localStorage.getItem(state.storageKey);
+      if (raw) { try { state.data = { ...state.data, ...JSON.parse(raw) }; } catch {} }
+      document.documentElement.dataset.theme = state.data.theme;
+      applyBranding();
+      renderAll();
+    }
+    function save() { localStorage.setItem(state.storageKey, JSON.stringify(state.data)); }
+
+    function renderNav() {
+      const nav = $('#nav');
+      nav.innerHTML = state.navItems.map(([id,label],i)=>`<button class="${i===0?'active':''}" data-target="${id}">${label}</button>`).join('');
+      nav.addEventListener('click', e => {
+        const b = e.target.closest('button[data-target]'); if(!b) return;
+        $$('.nav button').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+        $$('.section').forEach(s=>s.classList.remove('active')); $('#'+b.dataset.target).classList.add('active');
+        $('#sidebar').classList.remove('open');
+      });
+    }
+
+    function renderModes() {
+      const pro = state.data.pro;
+      $('#modeCount').textContent = `${pro?10:5} / 10`;
+      $('#modeSelect').innerHTML = state.modes.map((m,i)=>{
+        const locked = !pro && i>4; return `<option ${locked?'disabled':''}>${locked?'🔒 ':''}${m}</option>`;
+      }).join('');
+      $('#modeGrid').innerHTML = state.modes.map((m,i)=>{
+        const locked = !pro && i>4;
+        return `<article class="tile ${locked?'lock':''}"><b>${m}</b><p class="muted">${locked?'Upgrade to Pro to unlock this mode.':'Enabled arcade mode with combo and power-up support.'}</p></article>`;
+      }).join('');
+      $('#adminModes').innerHTML = state.modes.map((m,i)=>`<label class="tile"><input data-mode-toggle="${i}" type="checkbox" ${state.data.modesEnabled[i]?'checked':''}/> ${m}</label>`).join('');
+    }
+
+    function renderCurriculum() {
+      const lockedAt = state.data.pro ? 10 : 3;
+      $('#curriculumList').innerHTML = state.data.classProgress.map(c=>{
+        const idx = c.classNo - 1;
+        const isLocked = idx >= lockedAt;
+        return `<div class="tile ${isLocked?'lock':''}">
+          <b>Class ${c.classNo}</b>
+          <p class="muted">${state.classes[idx]}</p>
+          <div class="progress"><span style="width:${c.progress}%"></span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.4rem;">
+            <span class="stars">${'★'.repeat(c.stars)}${'☆'.repeat(3-c.stars)}</span>
+            <button class="btn alt" data-play-class="${c.classNo}" ${isLocked?'disabled':''}>Play</button>
+          </div>
+        </div>`;
+      }).join('');
+      const c10 = state.data.classProgress[9];
+      $('#certificateBox').classList.toggle('hidden', !(state.data.pro && c10.progress >= 100));
+    }
+
+    function renderBadges() {
+      const limited = !state.data.pro;
+      $('#badgeGrid').innerHTML = state.badges.map((b,i)=>{
+        const isLockedByPlan = limited && i>2;
+        const unlocked = state.data.achievements.includes(b.id);
+        return `<article class="badge ${isLockedByPlan?'lock':''}">
+          <div class="rarity-${b.rarity} ${unlocked?'':'muted'}">
+            <h3>${unlocked?'🏅':'🔐'} ${b.name}</h3>
+            <p>${b.rarity.toUpperCase()} • ${unlocked?'Unlocked':'Locked'}</p>
+          </div>
+        </article>`;
+      }).join('');
+    }
+
+    function renderLeaderboard() {
+      const data = state.data.leaderboard.length ? state.data.leaderboard : seedLeaderboard();
+      state.data.leaderboard = data;
+      const langs = ['english','arabic','malayalam'];
+      $('#leaderGrid').innerHTML = langs.map(lang=>{
+        const top = data.filter(x=>x.lang===lang).sort((a,b)=>b.score-a.score).slice(0,5);
+        return `<div class="tile"><h3>${lang.toUpperCase()} Top 5</h3><ol>${top.map((x,i)=>`<li>${i===0?'⭐ ':''}${x.name} — ${x.score}</li>`).join('')}</ol></div>`;
+      }).join('') + `<div class="tile"><h3>Top 5 by Class</h3><ol>${state.data.classProgress.map((c)=>({c:c.classNo,s:c.progress*10+c.stars*100})).sort((a,b)=>b.s-a.s).slice(0,5).map(x=>`<li>Class ${x.c} • ${x.s} pts</li>`).join('')}</ol></div>`;
+      save();
+    }
+
+    function seedLeaderboard() {
+      const d = [];
+      ['english','arabic','malayalam'].forEach(lang=>{
+        for (let i=1;i<=7;i++) d.push({name:`Player${i}`,score:Math.floor(Math.random()*2000)+400,lang});
+      });
+      return d;
+    }
+
+    function renderBrandingFields() {
+      $('#brandName').value = state.data.branding.schoolName;
+      $('#brandWelcome').value = state.data.branding.welcomeMsg;
+      $('#brandColor').value = state.data.branding.themeColor;
+      $('#classBranding').value = state.data.branding.classBranding;
+    }
+
+    function applyBranding() {
+      document.documentElement.style.setProperty('--school-theme', state.data.branding.themeColor || '#4f8cff');
+      document.documentElement.style.setProperty('--accent', state.data.branding.themeColor || '#4f8cff');
+      $('#schoolName').textContent = state.data.branding.schoolName;
+      $('#welcomeMsg').textContent = state.data.branding.welcomeMsg;
+      if (state.data.branding.logo) $('#schoolLogo').src = state.data.branding.logo;
+      $('#planPill').textContent = `Plan: ${state.data.pro ? 'Pro' : 'Free'}`;
+      $('#langPill').textContent = `Language: ${state.data.language[0].toUpperCase()+state.data.language.slice(1)}`;
+    }
+
+    function renderTouchKeyboard() {
+      const letters = state.letters[state.data.language].slice(0,20);
+      $('#touchKeyboard').innerHTML = letters.map(l=>`<button>${l}</button>`).join('');
+    }
+
+    function renderAll() {
+      renderModes(); renderCurriculum(); renderBadges(); renderLeaderboard(); renderBrandingFields(); renderTouchKeyboard();
+      $('#totalPlays').textContent = state.data.totalPlays;
+      $('#unlockedCount').textContent = state.data.achievements.length;
+      applyBranding(); save();
+    }
+
+    function unlockBadge(id) {
+      if (!state.data.achievements.includes(id)) {
+        state.data.achievements.push(id);
+        const toast = document.createElement('div');
+        toast.className = 'panel';
+        toast.style.position = 'fixed'; toast.style.right = '1rem'; toast.style.bottom = '1rem'; toast.style.zIndex = '99';
+        toast.innerHTML = `<b>Badge Unlocked!</b><p>${state.badges.find(b=>b.id===id)?.name || id}</p>`;
+        document.body.appendChild(toast);
+        setTimeout(()=>toast.remove(),1600);
+      }
+      renderBadges(); save();
+    }
+
+    function playClass(classNo) {
+      const c = state.data.classProgress[classNo-1];
+      if (!c) return;
+      state.data.totalPlays++;
+      c.progress = Math.min(100, c.progress + Math.floor(Math.random()*30+20));
+      c.stars = Math.min(3, Math.ceil(c.progress/34));
+      if (classNo < 10 && c.progress >= 100) state.data.classProgress[classNo].unlocked = true;
+      if (classNo === 5 && c.progress >= 100) unlockBadge('class5');
+      if (classNo === 10 && c.progress >= 100) unlockBadge('survival');
+      renderAll();
+    }
+
+    let rainInt;
+    function startRain() {
+      const rain = $('#letterRain');
+      const letters = state.letters[state.data.language];
+      clearInterval(rainInt); rain.innerHTML = ''; let caught = 0, combo = 0;
+      rainInt = setInterval(()=>{
+        const span = document.createElement('span');
+        span.className = 'letter';
+        span.textContent = letters[Math.floor(Math.random()*letters.length)];
+        span.style.left = Math.random()*95 + '%';
+        span.style.animationDuration = (1.8+Math.random()*2.2)+'s';
+        span.style.fontSize = (16+Math.random()*22)+'px';
+        span.onclick = () => {
+          caught++; combo++; span.remove();
+          $('#lettersCaught').textContent = caught;
+          $('#comboValue').textContent = 'x'+combo;
+          if (caught===1) unlockBadge('firstWin');
+          if (caught>=100) unlockBadge('letters100');
+          if (combo>=15) unlockBadge('comboKing');
+        };
+        rain.appendChild(span);
+        setTimeout(()=>{ if (span.isConnected) { span.remove(); combo = 0; $('#comboValue').textContent='x0'; } },4200);
+      }, 280);
+    }
+
+    function particleEngine() {
+      const canvas = $('#particles');
+      const ctx = canvas.getContext('2d');
+      const isMobile = innerWidth < 800;
+      const count = isMobile ? 36 : 72;
+      const p = Array.from({length: count},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.6,vy:(Math.random()-.5)*.6,r:Math.random()*2+1}));
+      const resize = ()=>{canvas.width=innerWidth; canvas.height=innerHeight;}; resize(); addEventListener('resize',resize);
+      (function tick(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        p.forEach(a=>{ a.x+=a.vx; a.y+=a.vy; if(a.x<0||a.x>canvas.width) a.vx*=-1; if(a.y<0||a.y>canvas.height) a.vy*=-1;
+          ctx.beginPath(); ctx.arc(a.x,a.y,a.r,0,Math.PI*2); ctx.fillStyle='rgba(120,170,255,.4)'; ctx.fill();
+        });
+        requestAnimationFrame(tick);
+      })();
+    }
+
+    function setupEvents() {
+      $('#mobileToggle').onclick = ()=> $('#sidebar').classList.toggle('open');
+      $('#themeBtn').onclick = ()=> { state.data.theme = state.data.theme==='dark'?'light':'dark'; document.documentElement.dataset.theme = state.data.theme; save(); };
+      $('#upgradeBtn').onclick = $('#upgradeTopBtn').onclick = ()=> {
+        state.data.pro = !state.data.pro;
+        $('#upgradeBtn').textContent = state.data.pro ? 'Pro Active ✓' : 'Upgrade to Pro';
+        unlockBadge('champion');
+        renderAll();
+      };
+      $('#languageSelect').onchange = (e)=> { state.data.language = e.target.value; renderTouchKeyboard(); applyBranding(); startRain(); save(); };
+      $('#startArcade').onclick = startRain;
+      $('#powerBtn').onclick = ()=> { $('#comboValue').textContent = 'x'+(Math.floor(Math.random()*6)+5); };
+      $('#soundBtn').onclick = e => { e.target.textContent = e.target.textContent.includes('On') ? 'Sound: Off' : 'Sound: On'; };
+      $('#curriculumList').onclick = e => { const b=e.target.closest('[data-play-class]'); if(b) playClass(+b.dataset.playClass); };
+      $('#exportCertificate').onclick = ()=> alert('Certificate exported (simulation).');
+
+      $('#createRoom').onclick = ()=> {
+        const code = Math.random().toString(36).slice(2,7).toUpperCase();
+        state.data.liveRoom = code; $('#roomCode').textContent = code;
+        $('#playerList').innerHTML = `<li>${$('#playerName').value} (Host)</li><li>AI-Opponent</li>`;
+        $('#liveScores').innerHTML = '<li>Host: 0</li><li>AI: 0</li>';
+      };
+      $('#joinRoom').onclick = ()=> {
+        const code = prompt('Enter room code') || 'LOCAL'; state.data.liveRoom = code;
+        $('#roomCode').textContent = code; $('#playerList').innerHTML = `<li>${$('#playerName').value}</li><li>Peer-01</li>`;
+      };
+      $('#sendChat').onclick = ()=> {
+        const v = $('#chatInput').value.trim(); if(!v) return;
+        $('#chatBox').innerHTML += `<div><b>${$('#playerName').value}:</b> ${v}</div>`;
+        $('#chatInput').value=''; $('#chatBox').scrollTop = 99999;
+      };
+      setInterval(()=>{
+        if (!state.data.liveRoom) return;
+        const a = Math.floor(Math.random()*200), b = Math.floor(Math.random()*200);
+        $('#liveScores').innerHTML = `<li>${$('#playerName').value}: ${a}</li><li>${state.data.multiplayerEnabled?'Peer':'AI'}: ${b}</li>`;
+      }, 1800);
+
+      $('#adminLogin').onclick = ()=> {
+        if ($('#adminPass').value === '7860') { $('#adminPanel').classList.remove('hidden'); $('#adminAuth').classList.add('hidden'); }
+        else alert('Invalid passcode');
+      };
+      $('#resetLeaderboard').onclick = ()=> { state.data.leaderboard = []; renderLeaderboard(); };
+      $('#resetAchievements').onclick = ()=> { state.data.achievements = []; renderBadges(); save(); };
+      $('#resetCurriculum').onclick = ()=> {
+        state.data.classProgress = Array.from({length:10},(_,i)=>({classNo:i+1,progress:0,stars:0,unlocked:i===0}));
+        renderCurriculum(); save();
+      };
+      $('#toggleMultiplayer').onclick = ()=> { state.data.multiplayerEnabled = !state.data.multiplayerEnabled; $('#aiFallback').textContent = state.data.multiplayerEnabled ? 'AI Opponent Ready' : 'Multiplayer Disabled'; save(); };
+      $('#adminModes').addEventListener('change', (e)=>{
+        const x = e.target.closest('[data-mode-toggle]'); if (!x) return;
+        state.data.modesEnabled[+x.dataset.modeToggle] = x.checked; save();
+      });
+      $('#adminColor').oninput = e=> { state.data.branding.themeColor = e.target.value; applyBranding(); save(); };
+
+      $('#logoUpload').onchange = e => {
+        const f = e.target.files?.[0]; if (!f) return;
+        const rd = new FileReader(); rd.onload = ()=> { state.data.branding.logo = rd.result; applyBranding(); save(); }; rd.readAsDataURL(f);
+      };
+      $('#saveBranding').onclick = ()=> {
+        state.data.branding.schoolName = $('#brandName').value.trim() || state.data.branding.schoolName;
+        state.data.branding.welcomeMsg = $('#brandWelcome').value.trim() || state.data.branding.welcomeMsg;
+        state.data.branding.themeColor = $('#brandColor').value;
+        state.data.branding.classBranding = $('#classBranding').value;
+        applyBranding(); renderAll();
+      };
+
+      $('#resetAll').onclick = ()=> {
+        if (!confirm('Reset all local platform data?')) return;
+        localStorage.removeItem(state.storageKey); location.reload();
+      };
+    }
+
+    renderNav(); load(); setupEvents(); startRain(); particleEngine();
+  </script>
+</body>
+</html>
