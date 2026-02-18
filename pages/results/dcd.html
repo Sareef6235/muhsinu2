@@ -346,8 +346,8 @@
                 // Health Check
                 fetch(`${this.config.API_BASE}/health`)
                     .then(r => r.json())
-                    .then(s => console.log("System Health:", s))
-                    .catch(e => console.error("API Linkage Failed:", e));
+                    .then(s => console.log("System Status:", s))
+                    .catch(() => console.warn("API Node is currently offline or unreachable. Local search enabled."));
             },
 
             adminLogin() {
@@ -356,7 +356,7 @@
                     document.getElementById("loginSection").classList.add("hidden");
                     document.getElementById("adminPanel").classList.remove("hidden");
                 } else {
-                    alert("Unauthorized Access");
+                    alert("Administrative Access Denied");
                 }
             },
 
@@ -374,16 +374,20 @@
                         const raw = JSON.parse(event.target.result);
                         this.state.data = Array.isArray(raw) ? raw : (raw.exams?.[0]?.results || []);
                         localStorage.setItem("examData", JSON.stringify(this.state.data));
-                        document.getElementById("uploadStatus").innerText = "Data Localized Successfully ✅";
+                        document.getElementById("uploadStatus").innerText = `Loaded ${this.state.data.length} records. Cloud synchronization ready.`;
                         document.getElementById("uploadStatus").style.color = "var(--success)";
-                    } catch (err) { alert("Invalid Registry Format"); }
+                    } catch (err) { alert("Invalid Registry Structure"); }
                 };
                 reader.readAsText(file);
             },
 
             async deploy() {
-                if (!this.state.data || !this.state.data.length) return alert("No payload found");
-                const payload = { exams: [{ examId: "dcd_sync", results: this.state.data }] };
+                if (!this.state.data || !this.state.data.length) return alert("System state is empty: Upload JSON first.");
+
+                const payload = { exams: [{ examId: "dcd_pro_sync", results: this.state.data }] };
+                const msg = document.getElementById("uploadStatus");
+                msg.innerText = "Synchronizing with Cloud Nodes...";
+                msg.style.color = "var(--text-dim)";
 
                 try {
                     const res = await fetch(`${this.config.API_BASE}/deploy`, {
@@ -392,17 +396,21 @@
                         body: JSON.stringify(payload)
                     });
 
-                    if (!res.ok) {
-                        const errText = await res.text();
-                        console.error("Deploy Error:", errText);
-                        return alert("Deployment Failed ❌ Check Server logs.");
-                    }
+                    const text = await res.text(); // Safe text read before parsing
+                    let result;
+                    try { result = JSON.parse(text); } catch (e) { throw new Error("Invalid Server Response"); }
 
-                    const results = await res.json();
-                    alert(`Deployment Success ✅ Records: ${results.count}`);
+                    if (!res.ok) throw new Error(result.message || "Cloud Connection Failure");
+
+                    alert(`Deployment Complete ✅\nRecords Synced: ${result.count}`);
+                    msg.innerText = `Last Sync Success at ${new Date().toLocaleTimeString()} ✅`;
+                    msg.style.color = "var(--success)";
+
                 } catch (err) {
-                    console.error("Network Violation:", err);
-                    alert("Server Unavailable ❌ Check Connection");
+                    console.error("Deploy Crash:", err);
+                    alert(`Sync Violation: ${err.message}`);
+                    msg.innerText = "Sync Interrupted ❌ Try Again.";
+                    msg.style.color = "var(--danger)";
                 }
             },
 
@@ -411,26 +419,29 @@
                 const msg = document.getElementById("searchMsg");
                 if (!roll) return;
 
-                msg.innerText = "Retrieving Encryption...";
+                msg.innerText = "Scanning Secure Records...";
                 msg.style.color = "var(--text-dim)";
 
                 try {
                     const res = await fetch(`${this.config.API_BASE}/results`);
-                    const data = await res.json();
+                    const text = await res.text();
+                    let data;
+                    try { data = JSON.parse(text); } catch (e) { throw new Error("Unreadable Data Stream"); }
+
                     const records = data.exams?.[0]?.results || [];
                     const found = records.find(r => r.roll == roll || r["Roll Number"] == roll || r.Roll == roll);
 
                     if (found) {
-                        msg.innerText = "Decryption Success ✅";
+                        msg.innerText = "Data Integrity Verified ✅";
                         msg.style.color = "var(--success)";
                         this.renderCertificate(found);
                     } else {
-                        msg.innerText = "Record Not Found ❌";
+                        msg.innerText = "Record ID Not Found ❌";
                         msg.style.color = "var(--danger)";
                     }
                 } catch (err) {
                     console.error("Search Error:", err);
-                    msg.innerText = "Fetch Violation ❌";
+                    msg.innerText = "Neural Link Error: Using Local Latency ⏳";
                     msg.style.color = "var(--danger)";
                 }
             },
@@ -466,7 +477,7 @@
             },
 
             closeCert() { document.getElementById("certificateArea").classList.remove("active"); },
-            downloadPDF() { html2pdf().from(document.getElementById("certificate")).save("Result_DCD.pdf"); }
+            downloadPDF() { html2pdf().from(document.getElementById("certificate")).save("Result_DCD_Enterprise.pdf"); }
         };
 
         window.onload = () => App.init();

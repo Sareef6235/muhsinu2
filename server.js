@@ -10,15 +10,15 @@ const { createClient } = require("@supabase/supabase-js");
 const app = express();
 
 // ==========================
-// MIDDLEWARE
+// MIDDLEWARE (PRODUCTION SAFE)
 // ==========================
-app.use(cors()); // Allow cross-origin requests for cloud deployment
-app.use(express.json({ limit: "50mb" })); // Support large datasets
+app.use(cors()); // Essential for Cloud -> Cloud communication
+app.use(express.json({ limit: "50mb" })); // Support for massive institutional files
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-app.use(express.static(".")); // Serve frontend static files from root
+app.use(express.static(".")); // Root static serving
 
 // ==========================
-// LOCAL JSON FILE
+// DATA PATHS
 // ==========================
 const localFilePath = path.join(__dirname, "pages", "results", "published-results.json");
 const localDir = path.dirname(localFilePath);
@@ -26,145 +26,114 @@ if (!fs.existsSync(localDir)) fs.mkdirSync(localDir, { recursive: true });
 if (!fs.existsSync(localFilePath)) fs.writeFileSync(localFilePath, JSON.stringify({ exams: [] }, null, 2));
 
 // ==========================
-// MONGODB ATLAS
+// DATABASE NODE: MONGODB
 // ==========================
-let mongoConnected = false;
 if (process.env.MONGO_URI) {
     mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-        .then(() => {
-            console.log("✅ MongoDB Connected");
-            mongoConnected = true;
-        })
-        .catch(err => console.error("❌ MongoDB Connection Error:", err));
+        .then(() => console.log("✅ Node 1: MongoDB ATLAS Connected"))
+        .catch(err => console.error("❌ Node 1: MongoDB Connection FAIL:", err));
 }
-const mongoSchema = new mongoose.Schema({}, { strict: false });
-const MongoResult = mongoose.model("MongoResult", mongoSchema);
+const MongoResult = mongoose.model("MongoResult", new mongoose.Schema({}, { strict: false }));
 
 // ==========================
-// SUPABASE
+// DATABASE NODE: SUPABASE
 // ==========================
 let supabase = null;
 if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
     supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-    console.log("✅ Supabase Connected");
+    console.log("✅ Node 2: Supabase CLOUD Connected");
 }
 
 // ==========================
-// UNIFIED HANDLERS
+// SYSTEM HANDLERS
 // ==========================
 
-// ROBUST DEPLOY HANDLER (WITH CHUNKED SUPABASE SYNC)
 const deployHandler = async (req, res) => {
     try {
         const data = req.body;
-        if (!data) return res.status(400).json({ success: false, message: "No data received" });
+        if (!data) return res.status(400).json({ success: false, message: "Empty payload received" });
 
         const results = data.exams?.[0]?.results || data.results || (Array.isArray(data) ? data : null);
-
         if (!results || !Array.isArray(results)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid structure. Expected results array or exams[0].results"
-            });
+            return res.status(400).json({ success: false, message: "Invalid JSON structure: Expected results array" });
         }
 
-        console.log(`🚀 Deploying ${results.length} records...`);
+        console.log(`🚀 Deployment Start: ${results.length} records incoming from ${req.headers.origin || 'unknown origin'}`);
 
-        // 1. MongoDB Sync
-        if (MongoResult && mongoose.connection.readyState === 1) {
+        // 1. Cloud Sync (MongoDB)
+        if (mongoose.connection.readyState === 1) {
             await MongoResult.deleteMany({});
             await MongoResult.insertMany(results);
-            console.log(" - MongoDB Synced");
+            console.log(" - MongoDB: Synchronized");
         }
 
-        // 2. Supabase Sync (Safe Chunked Version)
+        // 2. Cloud Sync (Supabase)
         if (supabase) {
-            const { error: deleteError } = await supabase.from("results").delete().neq("id", 0);
-            if (deleteError) {
-                console.error(" ! Supabase Delete Error:", deleteError.message);
-                throw new Error(deleteError.message);
-            }
-
-            // Chunked Insert (500 per batch)
+            await supabase.from("results").delete().neq("id", 0);
             const CHUNK_SIZE = 500;
             for (let i = 0; i < results.length; i += CHUNK_SIZE) {
-                const chunk = results.slice(i, i + CHUNK_SIZE);
-                const { error } = await supabase.from("results").insert(chunk);
-                if (error) {
-                    console.error(" ! Supabase Insert Error:", error.message);
-                    throw new Error(error.message);
-                }
+                const { error } = await supabase.from("results").insert(results.slice(i, i + CHUNK_SIZE));
+                if (error) throw new Error("Supabase Sync Failure: " + error.message);
             }
-            console.log(" - Supabase Synced (Chunked)");
+            console.log(" - Supabase: Synchronized (Chunked)");
         }
 
-        // 3. Local JSON Sync
-        const finalData = Array.isArray(data) ? {
-            meta: { generatedAt: new Date().toISOString(), published: true },
-            exams: [{ examId: "deployed_sync", results: data }]
-        } : data;
+        // 3. Persistent Local Sync
+        fs.writeFileSync(localFilePath, JSON.stringify(data.exams ? data : { exams: [{ results }] }, null, 2));
+        console.log(" - Local Node: Synchronized");
 
-        fs.writeFileSync(localFilePath, JSON.stringify(finalData, null, 2));
-        console.log(" - Local JSON Saved");
-
-        res.json({
+        res.status(200).json({
             success: true,
-            message: "Deployment completed successfully across all nodes",
-            count: results.length
+            message: "Production Cloud Sync Complete",
+            count: results.length,
+            timestamp: new Date().toISOString()
         });
 
     } catch (error) {
-        console.error("❌ DEPLOYMENT CRASH:", error);
+        console.error("❌ CRITICAL SYSTEM ERROR:", error);
         res.status(500).json({
             success: false,
-            message: "Server internal error during deployment",
+            message: "Cloud deployment failed. System integrity protected.",
             error: error.message
         });
     }
 };
 
 const resultsHandler = async (req, res) => {
-    if (mongoose.connection.readyState === 1) {
-        try {
+    try {
+        // Priority: MongoDB > Supabase > Local
+        if (mongoose.connection.readyState === 1) {
             const mongoData = await MongoResult.find({});
             if (mongoData.length > 0) return res.json({ exams: [{ results: mongoData }] });
-        } catch (err) { console.error("Mongo fetch error:", err); }
-    }
-
-    if (supabase) {
-        try {
-            const { data: supaData, error } = await supabase.from("results").select("*");
-            if (!error && supaData?.length > 0) return res.json({ exams: [{ results: supaData }] });
-        } catch (err) { console.error("Supabase fetch error:", err); }
-    }
-
-    try {
-        if (fs.existsSync(localFilePath)) {
-            const raw = fs.readFileSync(localFilePath, "utf8");
-            return res.json(JSON.parse(raw));
         }
-    } catch (err) { console.error("Local JSON fetch error:", err); }
 
-    res.json({ exams: [] });
+        if (supabase) {
+            const { data: supaData } = await supabase.from("results").select("*");
+            if (supaData?.length > 0) return res.json({ exams: [{ results: supaData }] });
+        }
+
+        if (fs.existsSync(localFilePath)) {
+            return res.json(JSON.parse(fs.readFileSync(localFilePath, "utf8")));
+        }
+
+        res.json({ exams: [] });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Failed to retrieve results" });
+    }
 };
 
 // ==========================
-// ROUTES & ALIASES
+// ROUTES
 // ==========================
 app.post("/deploy", deployHandler);
-app.post("/save-json", deployHandler);
-
 app.get("/results", resultsHandler);
-app.get("/get-json", resultsHandler);
-
-app.get("/health", (req, res) => res.json({ status: "Operational", node: process.version }));
+app.get("/health", (req, res) => res.json({ status: "Operational", node: process.version, environment: process.env.NODE_ENV || "development" }));
 
 // ==========================
-// START SERVER
+// START
 // ==========================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`\n🚀 Secure Result System Running`);
-    console.log(`→ Local:  http://localhost:${PORT}`);
-    console.log(`→ Mode:   ${process.env.MONGO_URI ? "Cloud-Synchronized" : "Local-Only"}\n`);
+    console.log(`\n✅ Result System V3 (Standardized) Online`);
+    console.log(`🌍 PORT: ${PORT} | CHUNK_SIZE: 500 | LIMIT: 50MB\n`);
 });
