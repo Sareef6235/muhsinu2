@@ -2,907 +2,1370 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIFTHAHUL HUDA MADRASA</title>
-    <meta name="description" content="Portfolio of MIFTHAHUL HUDA MADRASA. Exploring technology and sharing knowledge.">
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/modern-nav.css">
-    <link rel="stylesheet" href="assets/css/site-footer.css">
-    <link rel="stylesheet" href="assets/css/site-languages.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DCD Result Portal | Secure Academic Verification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    <!-- Global Navigation & Footer -->
-    <link rel="stylesheet" href="assets/css/global-navigation.css">
-    <link rel="stylesheet" href="assets/css/global-footer.css">
+    <style>
+        :root {
+            --bg-1: #060816;
+            --bg-2: #101a38;
+            --bg-3: #2b1250;
+            --text: #e8ecff;
+            --text-dim: #b2bbde;
+            --surface: rgba(16, 22, 48, 0.55);
+            --surface-strong: rgba(11, 16, 35, 0.85);
+            --border: rgba(158, 177, 255, 0.24);
+            --glow: rgba(122, 162, 255, 0.35);
+            --primary: #6c8bff;
+            --primary-2: #8f67ff;
+            --success: #2ed49b;
+            --danger: #ff6e8b;
+            --warning: #ffd166;
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+            --radius: 18px;
+            --radius-lg: 24px;
+            --container: 1180px;
+        }
 
-    <!-- Critical Scripts (Optimized) -->
-    <script src="assets/js/utils/performance.js" defer></script>
-    <script src="assets/js/site-languages.js" defer></script>
-    <script src="assets/js/subject-storage.js" defer></script>
-    <script type="module">
-        import StorageManager from './assets/js/storage-manager.js';
-        import ServicesEngine from './assets/js/services-engine.js';
-        import ResultManager from './assets/js/result-system.js';
-        import NewsService from './assets/js/news-service.js';
+        * {
+            box-sizing: border-box;
+        }
 
-        // Auto-Init Global Access
-        window.StorageManager = StorageManager;
-        window.ServicesEngine = ServicesEngine;
-        window.ResultManager = ResultManager;
-        window.NewsService = NewsService;
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            scroll-behavior: smooth;
+        }
 
-        ServicesEngine.init();
-        ResultManager.init();
-    </script>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            color: var(--text);
+            background: linear-gradient(120deg, var(--bg-1), var(--bg-2), var(--bg-3), var(--bg-1));
+            background-size: 220% 220%;
+            animation: bgShift 18s ease infinite;
+            overflow-x: hidden;
+        }
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .bg-particles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(1px);
+            opacity: 0.35;
+            animation: floatUp linear infinite;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.85), rgba(108, 139, 255, 0.06));
+        }
+
+        @keyframes floatUp {
+            from { transform: translateY(115vh) translateX(0); }
+            to { transform: translateY(-15vh) translateX(18px); }
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .wrapper {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 18px;
+        }
+
+        .glass {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(16px);
+            box-shadow: var(--shadow);
+        }
+
+        .navbar {
+            position: sticky;
+            top: 14px;
+            z-index: 50;
+            margin: 16px auto;
+            border-radius: 999px;
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: linear-gradient(140deg, var(--primary), var(--primary-2));
+            box-shadow: 0 0 18px var(--glow);
+            display: grid;
+            place-items: center;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+
+        .nav-links a {
+            padding: 8px 12px;
+            border-radius: 999px;
+            transition: .2s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a:focus-visible {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.08);
+            outline: none;
+        }
+
+        .network-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(11, 16, 35, 0.6);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 12px var(--success);
+        }
+
+        .offline .dot {
+            background: var(--danger);
+            box-shadow: 0 0 12px var(--danger);
+        }
+
+        .hero {
+            margin: 36px auto 26px;
+            padding: 44px 26px;
+            border-radius: var(--radius-lg);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .hero::before,
+        .hero::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            pointer-events: none;
+        }
+
+        .hero::before {
+            width: 320px;
+            height: 320px;
+            background: rgba(108, 139, 255, 0.28);
+            top: -130px;
+            right: -120px;
+        }
+
+        .hero::after {
+            width: 240px;
+            height: 240px;
+            background: rgba(143, 103, 255, 0.25);
+            bottom: -90px;
+            left: -70px;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4.5vw, 3.8rem);
+            line-height: 1.05;
+            letter-spacing: -1.4px;
+            text-wrap: balance;
+        }
+
+        .hero p {
+            max-width: 720px;
+            margin: 16px 0 0;
+            color: var(--text-dim);
+            font-size: clamp(1rem, 2vw, 1.1rem);
+        }
+
+        .hero-actions {
+            margin-top: 26px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s ease;
+            font-size: 14px;
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: .75;
+        }
+
+        .btn-primary {
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            box-shadow: 0 12px 24px rgba(79, 94, 180, 0.45);
+        }
+
+        .btn-primary:hover { transform: translateY(-1px); }
+
+        .btn-ghost {
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.45fr 1fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .panel {
+            border-radius: var(--radius);
+            padding: 22px;
+            margin-bottom: 18px;
+        }
+
+        .panel h2,
+        .panel h3 {
+            margin: 0 0 14px;
+            font-size: 1.16rem;
+            letter-spacing: -0.3px;
+        }
+
+        .panel p {
+            margin: 0;
+            color: var(--text-dim);
+        }
+
+        .field {
+            margin-top: 14px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .field label {
+            font-size: 12px;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+
+        .input {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(8, 11, 24, 0.72);
+            color: var(--text);
+            padding: 12px 13px;
+            font-size: 14px;
+        }
+
+        .input:focus {
+            outline: 2px solid rgba(108, 139, 255, 0.32);
+            border-color: rgba(108, 139, 255, 0.52);
+        }
+
+        .split {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .metric {
+            border-radius: 14px;
+            padding: 14px;
+            background: rgba(7, 10, 22, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.13);
+        }
+
+        .metric small {
+            display: block;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: .3px;
+        }
+
+        .metric strong {
+            font-size: 1.1rem;
+            letter-spacing: -.2px;
+        }
+
+        .status {
+            min-height: 22px;
+            margin-top: 12px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 10px;
+        }
+
+        .list li {
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(8, 11, 24, 0.5);
+        }
+
+        .list strong { display: block; margin-bottom: 6px; }
+
+        .admin-cta {
+            margin-top: 16px;
+            width: 100%;
+        }
+
+        .hidden { display: none !important; }
+
+        .toasts {
+            position: fixed;
+            top: 90px;
+            right: 16px;
+            z-index: 99;
+            display: grid;
+            gap: 10px;
+            max-width: min(90vw, 340px);
+        }
+
+        .toast {
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(10, 14, 30, 0.92);
+            color: var(--text);
+            animation: toastIn .25s ease;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .toast.success { border-color: rgba(46, 212, 155, 0.5); }
+        .toast.error { border-color: rgba(255, 110, 139, 0.6); }
+        .toast.info { border-color: rgba(108, 139, 255, 0.65); }
+
+        .loader-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: 90;
+            display: none;
+            place-items: center;
+            background: rgba(2, 5, 15, 0.55);
+            backdrop-filter: blur(7px);
+        }
+
+        .loader-wrap.active { display: grid; }
+
+        .loader {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.14);
+            border-top-color: #88a4ff;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 70;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(6, 9, 18, 0.72);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-card {
+            width: min(430px, 100%);
+            border-radius: 20px;
+            padding: 22px;
+            position: relative;
+        }
+
+        .close-x {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .admin-shell {
+            border-radius: var(--radius-lg);
+            margin-top: 14px;
+            display: none;
+            overflow: hidden;
+            grid-template-columns: 250px 1fr;
+            min-height: 390px;
+        }
+
+        .admin-shell.active { display: grid; }
+
+        .sidebar {
+            border-right: 1px solid rgba(255, 255, 255, 0.14);
+            padding: 20px 16px;
+            background: rgba(6, 9, 20, 0.78);
+        }
+
+        .side-title {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: .95rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .side-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 8px;
+        }
+
+        .side-list li {
+            padding: 10px 11px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.02);
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+
+        .admin-main {
+            padding: 18px;
+            display: grid;
+            gap: 12px;
+            background: rgba(10, 15, 34, 0.65);
+        }
+
+        .admin-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+
+        .split-top {
+            margin-top: 12px;
+        }
+
+        .upload-panel {
+            margin-bottom: 0;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+
+        .upload-title {
+            margin-bottom: 10px;
+        }
+
+        .qr-caption {
+            display: block;
+            margin-top: 6px;
+            color: #5c6f9f;
+            font-weight: 600;
+        }
+
+        .modal-title {
+            margin-top: 0;
+            margin-bottom: 6px;
+        }
+
+        .modal-subtitle {
+            margin: 0;
+            color: var(--text-dim);
+        }
+
+        .security-note {
+            margin-top: 14px;
+            font-size: 12px;
+            color: #95f8d1;
+        }
+
+        #certificateArea {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            background: rgba(2, 4, 12, 0.78);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+
+        #certificateArea.active { display: flex; }
+
+        #certificate {
+            width: min(100%, 900px);
+            background: #fff;
+            color: #1b2142;
+            border-radius: 8px;
+            border: 16px solid #f8fafc;
+            outline: 2px solid #d0d9f7;
+            box-shadow: 0 30px 85px rgba(0, 0, 0, 0.35);
+            padding: 34px;
+            position: relative;
+        }
+
+        .cert-watermark {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            pointer-events: none;
+            font-size: clamp(58px, 9vw, 110px);
+            font-weight: 800;
+            letter-spacing: 8px;
+            color: rgba(41, 68, 139, 0.07);
+            transform: rotate(-18deg);
+            user-select: none;
+        }
+
+        .cert-header {
+            display: grid;
+            grid-template-columns: 90px 1fr 90px;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e5ebfb;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .logo-placeholder,
+        .stamp-placeholder {
+            width: 84px;
+            height: 84px;
+            border: 2px dashed #c4d0f4;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: #7084bb;
+            font-size: 11px;
+            text-align: center;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        .cert-title {
+            text-align: center;
+        }
+
+        .cert-title h3 {
+            margin: 0;
+            font-size: 30px;
+            color: #1b3268;
+            letter-spacing: .5px;
+        }
+
+        .cert-title p {
+            margin: 6px 0 0;
+            color: #55648d;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .candidate {
+            margin: 14px 0;
+            padding: 14px;
+            background: #f7f9ff;
+            border: 1px solid #dae3ff;
+            border-radius: 10px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .candidate span { font-weight: 700; }
+
+        .cert-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .cert-table th,
+        .cert-table td {
+            border: 1px solid #dce5ff;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .cert-table th {
+            background: #f2f6ff;
+            text-align: left;
+            color: #30457d;
+        }
+
+        .cert-total {
+            margin-top: 14px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #1f3469;
+        }
+
+        .cert-foot {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 10px;
+            border-top: 1px dashed #d2dbf7;
+            padding-top: 12px;
+        }
+
+        .signature {
+            text-align: center;
+            min-width: 160px;
+            font-size: 12px;
+            color: #50618f;
+            font-weight: 700;
+        }
+
+        .signature .line {
+            border-top: 2px solid #c9d5f8;
+            margin-bottom: 6px;
+            height: 30px;
+        }
+
+        #qrcode {
+            width: 90px;
+            height: 90px;
+            display: grid;
+            place-items: center;
+        }
+
+        .cert-actions {
+            margin-top: 14px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        footer {
+            margin: 26px 0 16px;
+            border-radius: var(--radius);
+            padding: 18px;
+            display: grid;
+            gap: 8px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        @media (max-width: 980px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .admin-shell.active { grid-template-columns: 1fr; }
+            .sidebar { border-right: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
+        }
+
+        @media (max-width: 720px) {
+            .navbar { border-radius: 16px; }
+            .nav-links { gap: 8px; font-size: 12px; }
+            .meta-grid,
+            .admin-metrics,
+            .split { grid-template-columns: 1fr; }
+            .hero { padding: 30px 18px; }
+            #certificate { padding: 16px; border-width: 8px; }
+            .cert-header { grid-template-columns: 1fr; }
+            .logo-placeholder,
+            .stamp-placeholder { width: 68px; height: 68px; margin: 0 auto; }
+            .cert-title h3 { font-size: 22px; }
+            .cert-foot { flex-direction: column; align-items: flex-start; }
+            .toasts { top: 76px; right: 10px; }
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #certificate,
+            #certificate * { visibility: visible; }
+            #certificate {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 210mm;
+                min-height: 297mm;
+                margin: 0;
+                box-shadow: none;
+                border: 10px solid #f8fafc;
+                outline: 2px solid #d0d9f7;
+                border-radius: 0;
+            }
+        }
+    </style>
 </head>
 
-<body data-page-id="home">
-    <!-- Global Navigation -->
-    <div id="global-nav"></div>
+<body>
+    <div class="bg-particles" id="particles"></div>
 
-    <header id="main-header">
-        <!-- Navigation injected via site-nav.js -->
-    </header>
-
-    <main>
-        <section id="hero"
-            style="position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden;">
-            <!-- Hero Background Circles -->
-            <div class="hero-bg">
-                <div class="circle circle-1"></div>
-                <div class="circle circle-2"></div>
+    <div class="wrapper">
+        <nav class="navbar glass" aria-label="Main navigation">
+            <a href="#home" class="brand" aria-label="DCD Portal Home">
+                <span class="brand-badge">DCD</span>
+                <span>Result Portal</span>
+            </a>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#verify">Verify Result</a>
+                <a href="#admin">Admin</a>
+                <a href="#about">About</a>
+                <span class="network-chip" id="networkChip"><span class="dot"></span><span id="networkText">Online</span></span>
             </div>
+        </nav>
 
-            <!-- Three.js Animated Background -->
-            <canvas id="hero-canvas"
-                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
-
-
-            <!-- Content overlay -->
-            <div class="container hero-content" style="position: relative; z-index: 1;">
-                <h2 class="animate-fade-up" data-t="welcome_to">Welcome to</h2>
-                <h1 class="animate-fade-up delay-1" data-t="mhmv_title">MIFTHAHUL HUDA MADRASA</h1>
-                <h3 class="animate-fade-up delay-2" data-t="address_vengara">Vengara S S Road</h3>
-                <p class="animate-fade-up delay-3" data-t="hero_cta_text">
-                    A simple reminder that consistent effort and dedication in learning today pave the way for
-                    achievement and success in the future.
-                </p>
-                <div class="cta-group animate-fade-up delay-4">
-                    <a href="pages/students/creation_receipt.html" class="btn btn-primary"
-                        data-t="btn_receipt">Receipt</a>
-                    <a href="pages/gallery/index.html?tab=photo" class="btn btn-secondary"
-                        style="border-color: var(--primary-color); color: var(--primary-color);"
-                        data-t="btn_gallery">View Gallery</a>
-                    <a href="#contact" class="btn btn-secondary" data-t="btn_contact">Contact Us</a>
-                </div>
+        <header id="home" class="hero glass">
+            <h1>Secure Academic Result Verification for Modern Institutions</h1>
+            <p>
+                A professional SaaS-grade education verification experience with tamper-aware records, cloud synchronization,
+                and certificate-grade output optimized for institutions and students.
+            </p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="#verify">Start Verification</a>
+                <a class="btn btn-ghost" href="#about">Learn More</a>
             </div>
+        </header>
 
-        </section>
+        <main class="main-grid">
+            <section>
+                <article id="verify" class="panel glass">
+                    <h2>Result Verification</h2>
+                    <p>Enter the official roll number to validate and view certified result documents.</p>
+                    <div class="field">
+                        <label for="rollInput">Roll Number</label>
+                        <input type="text" id="rollInput" class="input" placeholder="e.g. 000001" inputmode="numeric" maxlength="24" />
+                    </div>
+                    <div class="split split-top">
+                        <button class="btn btn-primary" id="searchBtn">Verify Result</button>
+                        <button class="btn btn-ghost" id="clearBtn" type="button">Clear</button>
+                    </div>
+                    <div id="searchMsg" class="status" aria-live="polite"></div>
+                </article>
 
-        <section id="about">
-            <div class="container">
-                <div class="about-grid overhaul-content">
-                    <div class="about-text">
-                        <h2 class="section-title" data-t="results_title">Student Results</h2>
-                        <p data-t="results_desc">
-                            Verify student performance directly from our official examination database.
-                            Enter your Register Number below to view immediate results and standigs.
-                        </p>
+                <article id="about" class="panel glass">
+                    <h3>About Institution</h3>
+                    <ul class="list">
+                        <li>
+                            <strong>Academic Trust</strong>
+                            We provide authenticated mark records and transparent verification workflows.
+                        </li>
+                        <li>
+                            <strong>Cloud Reliability</strong>
+                            Built for Render deployment, MongoDB compatibility, and Supabase-ready integration paths.
+                        </li>
+                        <li>
+                            <strong>Student-first Access</strong>
+                            Fast certificate generation and mobile-ready view for public and administrative users.
+                        </li>
+                    </ul>
+                </article>
 
-                        <!-- Premium Search Box for Homepage -->
-                        <div class="search-premium" style="margin-top: 30px; margin-bottom: 40px; max-width: 500px;">
-                            <div class="home-search-box"
-                                style="display: flex; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 5px; transition: all 0.3s ease;">
-                                <input type="text" id="home-regno" placeholder="Enter Register No (e.g. 101)"
-                                    style="flex: 1; background: none; border: none; font-family: inherit; padding: 12px 20px; color: #fff; font-size: 1rem; outline: none;">
-                                <button onclick="fetchHomeResult()"
-                                    style="background: var(--primary-color); border: none; padding: 0 25px; border-radius: 8px; color: #000; font-weight: 700; cursor: pointer; transition: 0.3s; height: 45px;">View</button>
+                <article class="panel glass">
+                    <h3>Security & Authenticity</h3>
+                    <ul class="list">
+                        <li><strong>Endpoint Integrity</strong>Securely interacts with institutional APIs for results and deploy checks.</li>
+                        <li><strong>Sanitized Rendering</strong>Escaped dynamic fields to reduce XSS risk in generated tables and certificate areas.</li>
+                        <li><strong>Verification QR</strong>Certificate QR references active portal location for validation lookup workflow.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <aside id="admin" class="panel glass">
+                <h3>Admin Access</h3>
+                <p>Administrative actions are locked behind secure authorization.</p>
+                <button id="openAdminModal" class="btn btn-primary admin-cta" type="button">Open Admin Panel</button>
+
+                <div id="adminShell" class="admin-shell glass" aria-live="polite">
+                    <div class="sidebar">
+                        <h4 class="side-title">Dashboard</h4>
+                        <ul class="side-list">
+                            <li>Data Sync</li>
+                            <li>JSON Upload</li>
+                            <li>Deployment Logs</li>
+                            <li>Session Controls</li>
+                        </ul>
+                        <p class="security-note">Admin visibility restricted until authenticated.</p>
+                    </div>
+
+                    <div class="admin-main">
+                        <div class="admin-metrics">
+                            <div class="metric"><small>Total Records</small><strong id="totalRecords">0</strong></div>
+                            <div class="metric"><small>Last Deploy</small><strong id="lastDeploy">Never</strong></div>
+                            <div class="metric"><small>System Status</small><strong id="systemStatus">Checking...</strong></div>
+                        </div>
+
+                        <div class="panel upload-panel">
+                            <h3 class="upload-title">JSON Upload</h3>
+                            <div class="field">
+                                <label for="jsonInput">Upload Data File (.json)</label>
+                                <input type="file" id="jsonInput" accept="application/json,.json" class="input" />
                             </div>
-                            <div id="home-status"
-                                style="margin-top: 10px; font-size: 0.85rem; color: #888; text-align: center; height: 20px;">
+                            <div class="split split-top">
+                                <button class="btn btn-primary" id="deployBtn" type="button">Deploy to Cloud</button>
+                                <button class="btn btn-ghost" id="logoutBtn" type="button">Logout</button>
                             </div>
+                            <div id="uploadStatus" class="status" aria-live="polite"></div>
                         </div>
-
-                        <!-- Result Modal/Overlay (Simple version for homepage) -->
-                        <div id="home-result-container"
-                            style="display: none; background: rgba(0, 243, 255, 0.03); border: 1px solid rgba(0, 243, 255, 0.2); padding: 25px; border-radius: 15px; margin-top: 20px; animation: fadeIn 0.5s ease;">
-                            <div id="home-result-area"></div>
-                            <a href="pages/results/index.html" class="btn-link"
-                                style="display: inline-block; margin-top: 15px; color: var(--primary-color);">View Full
-                                Transcript →</a>
-                        </div>
-                    </div>
-
-                    <div class="about-text">
-                        <h2 class="section-title" data-t="programs_title">Educational Programs</h2>
-                        <p data-t="programs_desc">
-                            Our Madrasa offers a range of structured educational programs designed to develop both
-                            religious and
-                            academic knowledge. These include Qur’an memorization classes, Tajweed and Arabic language
-                            lessons,
-                            Islamic studies, and age‑based learning tracks that are updated regularly. Each program is
-                            tailored
-                            to help students grow in knowledge, character, and spiritual understanding.
-                        </p>
-
-                        <h2 class="section-title" style="margin-top: 30px;">Our Core Skills</h2>
-                        <div class="skills-wrapper">
-                            <div class="skills-grid">
-                                <div class="skill-card">
-                                    <span class="icon">📖</span>
-                                    <h3>Qur'an Recitation</h3>
-                                    <p>Advanced Tajweed and rhythmic recitation techniques.</p>
-                                </div>
-                                <div class="skill-card">
-                                    <span class="icon">✍️</span>
-                                    <h3>Calligraphy</h3>
-                                    <p>Traditional Arabic script and modern artistic styles.</p>
-                                </div>
-                                <div class="skill-card">
-                                    <span class="icon">🤝</span>
-                                    <h3>Ethics & Morality</h3>
-                                    <p>Developing character and social responsibility.</p>
-                                </div>
-                                <div class="skill-card">
-                                    <span class="icon">🎤</span>
-                                    <h3>Public Speaking</h3>
-                                    <p>Confidence building through student presentations.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <h2 class="section-title" style="margin-top: 30px;">Meetings & Community Engagement</h2>
-                        <p>
-                            Regular meetings are held with students, parents, and faculty to discuss progress reports,
-                            upcoming
-                            events, and educational goals. These gatherings help build strong communication between home
-                            and
-                            school and ensure that everyone works together to support student success. Meetings are
-                            documented
-                            with minutes and action points so key decisions and follow‑ups are clear and actionable.
-                        </p>
                     </div>
                 </div>
+            </aside>
+        </main>
+
+        <footer class="glass">
+            <div>© <span id="year"></span> DCD Education Technology. All rights reserved.</div>
+            <div>Contact: support@dcd-portal.edu · Secure Verification Infrastructure</div>
+        </footer>
+    </div>
+
+    <div id="certificateArea" aria-modal="true" role="dialog" aria-label="Result Certificate">
+        <section id="certificate">
+            <div class="cert-watermark">VERIFIED</div>
+            <div class="cert-header">
+                <div class="logo-placeholder">INSTITUTION<br />LOGO</div>
+                <div class="cert-title">
+                    <h3 id="certSchool">Institution Name</h3>
+                    <p id="certExam">Official Examination Result Certificate</p>
+                </div>
+                <div class="stamp-placeholder">STAMP<br />AREA</div>
+            </div>
+
+            <div class="candidate">
+                <div><strong>Candidate Name:</strong> <span id="certName">-</span></div>
+                <div><strong>Roll Number:</strong> <span id="certRoll">-</span></div>
+            </div>
+
+            <div id="certTableArea"></div>
+            <div class="cert-total"><span>Total:</span><span id="certTotal">0</span></div>
+
+            <div class="cert-foot">
+                <div>
+                    <div id="qrcode"></div>
+                    <small class="qr-caption">Verification QR</small>
+                </div>
+                <div class="signature">
+                    <div class="line"></div>
+                    Authorized Signature
+                </div>
+            </div>
+
+            <div class="cert-actions" id="certActions">
+                <button class="btn btn-primary" id="downloadBtn" type="button">Download PDF</button>
+                <button class="btn btn-ghost" id="closeCertBtn" type="button">Close</button>
             </div>
         </section>
+    </div>
 
-        <section id="dashboard" style="padding: 0; margin-top: -100px;"></section>
-        <!-- NEWS & UPDATES SECTION -->
-        <section id="news" class="section" style="position: relative; overflow: hidden;">
-            <!-- Cosmic Accents -->
-            <div class="cosmic-accent accent-1"></div>
-            <div class="cosmic-accent accent-2"></div>
-            <div class="cosmic-accent accent-3"></div>
-
-            <div class="container" style="text-align: center; position: relative; z-index: 2;">
-                <div class="section-badge animate-fade-up">Updates</div>
-                <h2 class="section-title animate-fade-up" style="margin-bottom: 25px;">Latest News & Notices</h2>
-
-                <!-- Language Toggle -->
-                <div class="lang-toggle-wrapper animate-fade-up">
-                    <button class="lang-btn active" onclick="setNewsLang('en')">EN</button>
-                    <button class="lang-btn" onclick="setNewsLang('ml')">ML</button>
-                    <button class="lang-btn" onclick="setNewsLang('ar')">AR</button>
-                </div>
-
-                <div id="home-news-grid" class="grid"
-                    style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; text-align: left;">
-                    <!-- Filled dynamically by JS -->
-                    <p style="color: #666; text-align: center; width: 100%;">Loading news...</p>
-                </div>
-
-                <a href="pages/news/index.html" class="btn-primary animate-fade-up"
-                    style="margin-top: 40px; display: none;" id="view-all-news-btn">View All Updates</a>
+    <div id="adminModal" class="modal" aria-modal="true" role="dialog" aria-label="Admin Login">
+        <div class="modal-card glass">
+            <button class="close-x" id="closeAdminModal" type="button" aria-label="Close">✕</button>
+            <h3 class="modal-title">Administrator Sign In</h3>
+            <p class="modal-subtitle">Authorized personnel only.</p>
+            <div class="field">
+                <label for="adminPass">Administrative Key</label>
+                <input type="password" id="adminPass" class="input" autocomplete="current-password" placeholder="••••••••" />
             </div>
-        </section>
-
-        <!-- Services Section -->
-        <section id="services" class="section" style="background: rgba(10, 10, 10, 0.5);">
-            <div class="container">
-                <h2 class="section-title">Our Services</h2>
-                <div class="services-grid" id="services-grid-home">
-                    <!-- Cards rendered dynamically via JS -->
-                </div>
-
-                <script type="module">
-                    const grid = document.getElementById('services-grid-home');
-                    if (grid) {
-                        const allServices = window.ServicesEngine.getActive();
-                        grid.innerHTML = allServices.slice(0, 4).map(service => `
-                            <a href="pages/services/index.html#${service.id}" class="service-card animate-fade-up">
-                                <i class="ph-bold ${service.icon} service-icon"></i>
-                                <h3>${service.title}</h3>
-                                <p>${service.desc.substring(0, 100)}...</p>
-                                <ul class="service-list">
-                                    <li>Professional Guidance</li>
-                                    <li>Premium Material</li>
-                                </ul>
-                            </a>
-                        `).join('');
-                    }
-                </script>
+            <div class="split split-top">
+                <button class="btn btn-primary" id="loginBtn" type="button">Authenticate</button>
+                <button class="btn btn-ghost" id="cancelLoginBtn" type="button">Cancel</button>
             </div>
-        </section>
-
-
-        <!-- News & Notice Section -->
-        <section id="news-notice">
-            <div class="container">
-                <h2 class="section-title">News & Notice</h2>
-                <div class="news-container">
-                    <p>Stay updated with our latest announcements, schedule changes, and achievements.</p>
-                    <div id="notice-content" class="animate-fade-up">
-                        <div
-                            style="background: rgba(0,243,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid var(--primary-color);">
-                            <h4 style="color: var(--primary-color);">Admission Open 2026</h4>
-                            <p style="font-size: 0.9rem; margin-top: 10px;">We are now accepting registrations for the
-                                new academic session. Book your seat today!</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Latest Sessions Section -->
-        <section id="latest-sessions">
-            <div class="container">
-                <h2 class="section-title">Latest Sessions</h2>
-                <div id="pdf-list" class="sessions-list">
-                    <!-- Dynamic PDFs will load here -->
-                    <div class="no-sessions">Loading official documents...</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Upcoming Events Section -->
-        <section id="events">
-            <div class="container">
-                <h2 class="section-title">Upcoming Events</h2>
-                <div class="events-grid">
-                    <div class="event-card">
-                        <div class="event-date">MAR 15, 2026</div>
-                        <h3>Annual Day 2026</h3>
-                        <p>Join us for our grand annual celebration featuring student performances and awards.</p>
-                        <span class="event-tag">Institutional</span>
-                    </div>
-                    <div class="event-card">
-                        <div class="event-date">APR 02, 2026</div>
-                        <h3>Islamic Quiz Competition</h3>
-                        <p>Testing the knowledge of our students in a healthy and engaging environment.</p>
-                        <span class="event-tag">Academic</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Projects & Achievements Section -->
-        <section id="projects">
-            <div class="container">
-                <h2 class="section-title">Major Projects</h2>
-                <div class="projects-grid">
-                    <div class="project-card">
-                        <div class="project-image">
-                            <div class="img-placeholder"
-                                style="background: linear-gradient(45deg, var(--bg-color), var(--primary-color)); opacity: 0.3;">
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3>Smart Classroom Initiative</h3>
-                            <p>Integrating digital tools into Islamic education for interactive learning.</p>
-                            <div class="tech-stack">
-                                <span>Digital</span>
-                                <span>EdTech</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-card">
-                        <div class="project-image">
-                            <div class="img-placeholder"
-                                style="background: linear-gradient(45deg, var(--bg-color), var(--secondary-color)); opacity: 0.3;">
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3>Community Outreach</h3>
-                            <p>Students participating in local social welfare and environmental programs.</p>
-                            <div class="tech-stack">
-                                <span>Social</span>
-                                <span>Service</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Video Gallery Section -->
-        <section id="video-gallery">
-            <div class="container">
-                <h2 class="section-title">Video Gallery</h2>
-                <div id="video-list" class="video-grid">
-                    <!-- Dynamic Videos will load here -->
-                    <div class="video-item">
-                        <video controls poster="assets/refont_calligraphic (4).png"
-                            style="width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
-                            <source src="assets/gallery/videos/WhatsApp Video 2025-11-20 at 11.51.28 AM.mp4"
-                                type="video/mp4">
-                        </video>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Creations Section -->
-        <section id="creations">
-            <div class="container">
-                <h2 class="section-title">Student Creations</h2>
-                <div id="creations-grid" class="creations-grid">
-                    <div class="creation-card drawing">
-                        <div class="drawing-frame" style="height: 250px; overflow: hidden; border-radius: 12px;">
-                            <img src="assets/refont_calligraphic (4).png" alt="Student Drawing"
-                                style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div class="creation-info" style="padding: 20px;">
-                            <h3>Islamic Calligraphy</h3>
-                            <p>By Muhsin U2 - Class 10</p>
-                        </div>
-                    </div>
-                    <div class="creation-card story"
-                        style="padding: 30px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border);">
-                        <div class="story-content">
-                            <h3>The Path of Knowledge</h3>
-                            <p style="font-style: italic; color: #888; margin-top: 10px;">"A short story about the
-                                journey of a young student seeking wisdom..."</p>
-                            <a href="pages/students/creations.html" class="btn-link"
-                                style="color: var(--secondary-color); font-weight: 600; display: inline-block; margin-top: 15px;">Read
-                                Full Story →</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <div class="dialog-message dialog-lightbox-message" style="display: none;">
-            <div data-elementor-type="popup" data-elementor-id="748"
-                class="elementor elementor-748 elementor-location-popup"
-                data-elementor-settings="{&quot;prevent_scroll&quot;:&quot;yes&quot;,&quot;a11y_navigation&quot;:&quot;yes&quot;,&quot;triggers&quot;:{&quot;inactivity_time&quot;:5,&quot;inactivity&quot;:&quot;yes&quot;},&quot;timing&quot;:[]}"
-                data-elementor-post-type="elementor_library" style="display: block;">
-                <div class="elementor-element elementor-element-32902fd e-flex e-con-boxed e-con e-parent"
-                    data-id="32902fd" data-element_type="container">
-                    <div class="e-con-inner">
-                        <div class="elementor-element elementor-element-4379674 elementor-widget elementor-widget-heading"
-                            data-id="4379674" data-element_type="widget" data-widget_type="heading.default">
-                            <form class="booking-form" id="tuition-form"
-                                action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfzhjNS8F_8_BvbwYFFZMxqfmdJqMTJx2rik6C29szqPPc9EA/formResponse"
-                                method="POST" target="hidden_iframe">
-                                <!-- Google Form Internal Hidden Fields -->
-                                <input type="hidden" name="fvv" value="1">
-                                <input type="hidden" name="fbzx" value="-5401259598252436307">
-                                <input type="hidden" name="pageHistory" value="0">
-                                <input type="hidden" name="entry.202934602" value="Option 1">
-                                <input type="hidden" name="entry.202934602_sentinel" value="">
-                                <input type="hidden" name="entry.63709490_sentinel" value="">
-                                <input type="hidden" name="entry.9885691_sentinel" value="">
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="fname">First Name</label>
-                                        <input type="text" name="entry.819151435" id="fname" placeholder="First Name"
-                                            required="">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="lname">Last Name</label>
-                                        <input type="text" name="entry.1242527177" id="lname" placeholder="Last Name"
-                                            required="">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="email">Email Address</label>
-                                    <input type="email" name="entry.1739343054" id="email" placeholder="Your Email"
-                                        required="">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Subject (Max 8)</label>
-                                    <!-- Hidden inputs for granular Google Form mapping -->
-                                    <input type="hidden" name="entry.63709490" id="booking-subjects-hidden" value="">
-                                    <input type="hidden" name="entry.9885691" id="booking-class-hidden" value="">
-                                    <input type="hidden" name="entry.116107118" id="booking-price-hidden" value="">
-
-                                    <div class="checkbox-grid" id="subject-checkboxes">
-                                        Loading subjects...
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Class</label>
-                                    <div class="radio-group classes-grid" id="class-radios">
-                                        <label class="radio-label"><input type="radio" name="class" value="1"
-                                                required="" data-multiplier="1"> 1</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="2"
-                                                data-multiplier="1">
-                                            2</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="3"
-                                                data-multiplier="1">
-                                            3</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="4"
-                                                data-multiplier="1">
-                                            4</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="5"
-                                                data-multiplier="1">
-                                            5</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="6"
-                                                data-multiplier="1">
-                                            6</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="7"
-                                                data-multiplier="1">
-                                            7</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="8"
-                                                data-multiplier="1">
-                                            8</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="9"
-                                                data-multiplier="1">
-                                            9</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="10"
-                                                data-multiplier="1">
-                                            10</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="11"
-                                                data-multiplier="1">
-                                            +1</label>
-                                        <label class="radio-label"><input type="radio" name="class" value="12"
-                                                data-multiplier="1">
-                                            +2</label>
-                                    </div>
-                                </div>
-
-                                <div class="price-box">
-                                    <h3>Total Price: <span id="total-price">₹0</span></h3>
-                                </div>
-
-                                <div class="form-group"
-                                    style="margin-top: 25px; display: flex; flex-direction: column; gap: 10px;">
-                                    <button type="submit" class="btn btn-primary" style="width: 100%;">Book Now</button>
-                                </div>
-
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                </section>
-
-                <section id="contact">
-                    <div class="container">
-                        <div class="contact-content">
-                            <h2 class="section-title">Get In Touch</h2>
-                            <p>Interested in collaborating or having me speak at your event? Let's connect.</p>
-
-                            <!-- Form Submission Feedback -->
-                            <script type="text/javascript">var submitted = false;</script>
-                            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"
-                                onload="if(submitted) {document.getElementById('contact-status').innerHTML = 'Message Sent Successfully!'; document.getElementById('contact-form-el').reset(); submitted=false;}"></iframe>
-
-                            <form class="contact-form" id="contact-form-el"
-                                action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfq5PjEIs83m4gq7_-ihVbqAWJa_KNKgtQ2huzvKCQSfesDYQ/formResponse"
-                                method="POST" target="hidden_iframe" onsubmit="submitted=true;">
-                                <div class="form-group">
-                                    <input type="text" name="entry.456300294" placeholder="Your Name" required>
-                                </div>
-                                <div class="form-group">
-                                    <input type="email" name="entry.1582502936" placeholder="Your Email" required>
-                                </div>
-                                <div class="form-group">
-                                    <textarea name="entry.1231984071" placeholder="Your Message" rows="5"
-                                        required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Send Message</button>
-                                <div id="contact-status"
-                                    style="margin-top: 15px; color: var(--primary-color); font-weight: 600; min-height: 24px;">
-                                </div>
-                            </form>
-
-                            <div class="contact-info">
-                                <p>WhatsApp: <a href="https://wa.me/916235989198">+91 6235989198</a></p>
-                                <div class="social-links-large">
-                                    <a href="https://github.com/sareef6235" class="social-icon">GitHub</a>
-                                    <a href="https://wa.me/916235989198" class="social-icon">WhatsApp</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-
-    </main>
-
-    <script src="assets/js/site-nav.js"></script>
-    <script src="assets/js/script.js"></script>
-
-
-    <!-- Three.js Background Animation -->
-    <!-- Three.js Background Animation -->
-    <script>
-        // Defer 3D animation until browser is idle
-        const initThreeJS = () => {
-            const canvas = document.getElementById('hero-canvas');
-            if (!canvas) return;
-
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            camera.position.z = 5;
-
-            // Create particles
-            const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = 1500;
-            const posArray = new Float32Array(particlesCount * 3);
-
-            for (let i = 0; i < particlesCount * 3; i++) {
-                posArray[i] = (Math.random() - 0.5) * 10;
-            }
-
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-
-            // Create material with cyan color
-            const particlesMaterial = new THREE.PointsMaterial({
-                size: 0.015,
-                color: 0x00f3ff,
-                transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending
-            });
-
-            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-            scene.add(particlesMesh);
-
-            // Animation
-            let mouseX = 0;
-            let mouseY = 0;
-
-            document.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-            });
-
-            function animate() {
-                requestAnimationFrame(animate);
-
-                // Rotate particles
-                particlesMesh.rotation.y += 0.0005;
-                particlesMesh.rotation.x += 0.0003;
-
-                // Mouse interaction
-                particlesMesh.rotation.y += mouseX * 0.0002;
-                particlesMesh.rotation.x += mouseY * 0.0002;
-
-                renderer.render(scene, camera);
-            }
-
-            animate();
-
-            // Handle resize
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        };
-
-        if (window.Perf) {
-            window.Perf.runIdle(initThreeJS, 1000);
-        } else {
-            // Fallback if Perf is not loaded (shouldn't happen if head script works)
-            setTimeout(initThreeJS, 1000);
-        }
-    </script>
-
-    </nav>
-
-    <!-- Booking Confirmation Modal -->
-    <div id="booking-modal" class="modal-overlay">
-        <div class="modal-content animate-fade-up">
-            <div class="modal-icon">
-                <i class="ph ph-check-circle"></i>
-            </div>
-            <h2>Booking Summary</h2>
-            <div class="modal-body">
-                <p>Hello <span id="modal-name"></span>,</p>
-                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin: 15px 0;">
-                    <p style="margin: 0; color: #888; font-size: 0.85rem;">Subjects:</p>
-                    <p id="modal-subjects" style="color: #fff; font-weight: 600;"></p>
-                    <div style="height: 1px; background: var(--glass-border); margin: 10px 0;"></div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: #888;">Class: <strong id="modal-class" style="color: #fff;"></strong></span>
-                        <span style="color: #888;">Total: <strong id="modal-price"
-                                style="color: var(--primary-color);"></strong></span>
-                    </div>
-                </div>
-
-                <!-- UPI QR Code Section -->
-                <div class="modal-qr-section"
-                    style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--glass-border);">
-                    <p style="margin-bottom: 15px; color: #bbb; font-size: 0.9rem;">Scan to Pay via UPI</p>
-                    <div class="modal-qr-container"
-                        style="background: white; padding: 15px; border-radius: 15px; display: inline-block;">
-                        <img src="assets/upi-qr.jpeg" alt="UPI QR Code" class="modal-qr-img"
-                            style="max-width: 180px; width: 100%; display: block; height: auto; border-radius: 8px;">
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <p style="font-size: 0.9rem; color: #fff; margin-bottom: 5px;">UPI ID: <b>mmuhsinu2-1@okaxis</b>
-                        </p>
-                        <p style="font-size: 0.8rem; color: #888;">Name: Mo Mhn</p>
-                    </div>
-                </div>
-
-                <p class="modal-note">Click "Proceed to Pay" to visit your UPI app and confirm the booking.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="modal-pay-btn" style="width: 100; padding: 15px;">Proceed to
-                    Pay</button>
-                <button onclick="closeBookingModal()"
-                    style="margin-top: 15px; background: none; border: none; color: #666; cursor: pointer; font-size: 0.9rem;">Cancel</button>
-            </div>
+            <div id="loginStatus" class="status" aria-live="polite"></div>
         </div>
     </div>
 
-    <script type="module">
-        import { NewsService } from './assets/js/news-service.js';
+    <div class="loader-wrap" id="loaderWrap"><div class="loader" aria-label="Loading"></div></div>
+    <div id="toasts" class="toasts" aria-live="polite" aria-atomic="true"></div>
 
-        // 0. Initialize Systems
-        window.NewsService = NewsService;
+    <script>
+        const App = {
+            config: {
+                API: window.location.origin,
+                ADMIN_PASS: "1234"
+            },
+            state: {
+                data: [],
+                authenticated: false,
+                lastDeploy: "Never"
+            },
+            els: {},
 
-        const subjectContainer = document.getElementById('subject-checkboxes');
-        const totalPriceEl = document.getElementById('total-price');
+            init() {
+                this.cacheElements();
+                this.bindEvents();
+                this.renderParticles();
+                this.syncNetworkState();
+                this.restoreData();
+                this.setYear();
+                this.healthCheck();
+                this.updateMetrics();
+            },
 
-        // 1. Local Subject Loader (Replacing Firebase)
-        function updateTotalPrice() {
-            let total = 0;
-            document.querySelectorAll('#subject-checkboxes input:checked').forEach(cb => {
-                total += Number(cb.dataset.price);
-            });
-            if (totalPriceEl) totalPriceEl.textContent = `₹${total}`;
-            const hiddenPrice = document.getElementById('booking-price-hidden');
-            if (hiddenPrice) hiddenPrice.value = total;
-        }
+            cacheElements() {
+                const byId = (id) => document.getElementById(id);
+                this.els = {
+                    openAdminModal: byId("openAdminModal"),
+                    adminModal: byId("adminModal"),
+                    closeAdminModal: byId("closeAdminModal"),
+                    cancelLoginBtn: byId("cancelLoginBtn"),
+                    loginBtn: byId("loginBtn"),
+                    loginStatus: byId("loginStatus"),
+                    adminPass: byId("adminPass"),
+                    adminShell: byId("adminShell"),
+                    deployBtn: byId("deployBtn"),
+                    logoutBtn: byId("logoutBtn"),
+                    jsonInput: byId("jsonInput"),
+                    uploadStatus: byId("uploadStatus"),
+                    searchBtn: byId("searchBtn"),
+                    clearBtn: byId("clearBtn"),
+                    rollInput: byId("rollInput"),
+                    searchMsg: byId("searchMsg"),
+                    certificateArea: byId("certificateArea"),
+                    certSchool: byId("certSchool"),
+                    certExam: byId("certExam"),
+                    certRoll: byId("certRoll"),
+                    certName: byId("certName"),
+                    certTableArea: byId("certTableArea"),
+                    certTotal: byId("certTotal"),
+                    certificate: byId("certificate"),
+                    qrcode: byId("qrcode"),
+                    closeCertBtn: byId("closeCertBtn"),
+                    downloadBtn: byId("downloadBtn"),
+                    loaderWrap: byId("loaderWrap"),
+                    toasts: byId("toasts"),
+                    networkChip: byId("networkChip"),
+                    networkText: byId("networkText"),
+                    totalRecords: byId("totalRecords"),
+                    lastDeploy: byId("lastDeploy"),
+                    systemStatus: byId("systemStatus"),
+                    particles: byId("particles"),
+                    year: byId("year")
+                };
+            },
 
-        async function initSubjects() {
-            if (!subjectContainer) return;
-
-            // Check if SubjectStorage is available
-            if (typeof SubjectStorage === 'undefined') {
-                console.error("SubjectStorage not found");
-                return;
-            }
-
-            const activeSubjects = SubjectStorage.getActive();
-            subjectContainer.innerHTML = "";
-
-            if (activeSubjects.length === 0) {
-                subjectContainer.innerHTML = "<p style='color: #666; font-size: 0.9rem;'>No subjects available.</p>";
-                return;
-            }
-
-            activeSubjects.forEach(s => {
-                const label = document.createElement('label');
-                if (s.rtl) label.dir = 'rtl';
-                label.innerHTML = `
-                    <input type="checkbox" name="subject[]" value="${s.name} (₹${s.price})" data-price="${s.price}">
-                    ${s.name} <span style="font-size: 0.8rem; opacity: 0.6;">(₹${s.price})</span>
-                `;
-                const input = label.querySelector('input');
-                input.addEventListener('change', () => {
-                    updateTotalPrice();
-                    const selected = Array.from(document.querySelectorAll('#subject-checkboxes input:checked'))
-                        .map(c => c.value).join(', ');
-                    const hiddenSub = document.getElementById('booking-subjects-hidden');
-                    if (hiddenSub) hiddenSub.value = selected;
+            bindEvents() {
+                this.els.openAdminModal.addEventListener("click", () => this.openAdminModal());
+                this.els.closeAdminModal.addEventListener("click", () => this.closeAdminModal());
+                this.els.cancelLoginBtn.addEventListener("click", () => this.closeAdminModal());
+                this.els.loginBtn.addEventListener("click", () => this.adminLogin());
+                this.els.deployBtn.addEventListener("click", () => this.deploy());
+                this.els.logoutBtn.addEventListener("click", () => this.logout());
+                this.els.jsonInput.addEventListener("change", (e) => this.uploadJSON(e));
+                this.els.searchBtn.addEventListener("click", () => this.search());
+                this.els.clearBtn.addEventListener("click", () => this.clearSearch());
+                this.els.rollInput.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") this.search();
                 });
-                subjectContainer.appendChild(label);
-            });
-        }
+                this.els.downloadBtn.addEventListener("click", () => this.downloadPDF());
+                this.els.closeCertBtn.addEventListener("click", () => this.closeCert());
 
-        // Run on load
-        initSubjects();
+                window.addEventListener("online", () => this.syncNetworkState());
+                window.addEventListener("offline", () => this.syncNetworkState());
+                window.addEventListener("keydown", (e) => {
+                    if (e.key === "Escape") {
+                        this.closeAdminModal();
+                        this.closeCert();
+                    }
+                });
+            },
 
-        // 2. Local Notice System (Listen for storage events if needed, or static for now)
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'mhm_site_notice') {
-                const notice = JSON.parse(e.newValue);
-                if (notice && notice.active) {
-                    // Handle local notice
+            openAdminModal() {
+                this.els.loginStatus.textContent = "";
+                this.els.adminPass.value = "";
+                this.els.adminModal.classList.add("active");
+                this.els.adminPass.focus();
+            },
+
+            closeAdminModal() {
+                this.els.adminModal.classList.remove("active");
+            },
+
+            setYear() {
+                this.els.year.textContent = String(new Date().getFullYear());
+            },
+
+            renderParticles() {
+                const frag = document.createDocumentFragment();
+                for (let i = 0; i < 28; i += 1) {
+                    const p = document.createElement("span");
+                    p.className = "particle";
+                    const size = Math.floor(Math.random() * 6) + 4;
+                    p.style.width = `${size}px`;
+                    p.style.height = `${size}px`;
+                    p.style.left = `${Math.random() * 100}%`;
+                    p.style.animationDuration = `${Math.random() * 18 + 10}s`;
+                    p.style.animationDelay = `${Math.random() * 10}s`;
+                    frag.appendChild(p);
                 }
-            }
-        });
+                this.els.particles.appendChild(frag);
+            },
 
-        // 3. GitHub Media Sync
-        const galleryList = document.getElementById('gallery-list');
-        const videoList = document.getElementById('video-list');
-        const downloadIcon = `<svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+            showLoader(show = true) {
+                this.els.loaderWrap.classList.toggle("active", show);
+            },
 
-        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/gallery")
-            .then(res => res.json())
-            .then(files => {
-                if (Array.isArray(files) && galleryList) {
-                    // Dynamic loading logic if needed
+            toast(message, type = "info") {
+                const toast = document.createElement("div");
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                this.els.toasts.appendChild(toast);
+                setTimeout(() => {
+                    toast.remove();
+                }, 3500);
+            },
+
+            syncNetworkState() {
+                const isOnline = navigator.onLine;
+                this.els.networkChip.classList.toggle("offline", !isOnline);
+                this.els.networkText.textContent = isOnline ? "Online" : "Offline";
+            },
+
+            restoreData() {
+                const stored = localStorage.getItem("examData");
+                if (!stored) return;
+                try {
+                    const parsed = JSON.parse(stored);
+                    this.state.data = Array.isArray(parsed) ? parsed : [];
+                } catch (e) {
+                    localStorage.removeItem("examData");
                 }
-            }).catch(err => console.error("Image sync failed:", err));
+            },
 
-        // 4. PDF Sync
-        const pdfList = document.getElementById('pdf-list');
-        function addPdfToSessions(name, url) {
-            const item = document.createElement("div");
-            item.className = "session-card pdf-card animate-fade-up";
-            item.innerHTML = `
-                <div class="pdf-info">
-                    <i class="ph ph-file-pdf" style="font-size: 2rem; color: #ff4d4d;"></i>
-                    <div>
-                        <h4>${name.replace(/\.pdf$/i, '')}</h4>
-                        <p>Official Document / Certificate</p>
-                    </div>
-                </div>
-                <a href="${url}" target="_blank" class="btn-pdf">View Document</a>
-            `;
-            if (pdfList) pdfList.appendChild(item);
-        }
+            sanitizeText(value) {
+                return String(value ?? "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+            },
 
-        fetch("https://api.github.com/repos/Sareef6235/muhsinu2/contents/assets/pdfs")
-            .then(res => res.json())
-            .then(files => {
-                if (Array.isArray(files)) {
-                    const hasPdfs = files.some(f => f.name.match(/\.(pdf)$/i));
-                    if (hasPdfs && pdfList) pdfList.innerHTML = '';
-                    files.forEach(file => {
-                        if (file.type === "file" && file.name.match(/\.(pdf)$/i)) {
-                            addPdfToSessions(file.name, file.download_url);
-                        }
-                    });
-                }
-            }).catch(err => console.error("PDF sync failed:", err));
+            setStatus(el, message, tone = "info") {
+                const colorMap = {
+                    info: "var(--text-dim)",
+                    success: "var(--success)",
+                    error: "var(--danger)",
+                    warning: "var(--warning)"
+                };
+                el.textContent = message;
+                el.style.color = colorMap[tone] || colorMap.info;
+            },
 
-        // 5. Exam Result Logic
-        const RESULT_SHEET_ID = "1oG1NRnlekVEj8U6bAm-qNKL2N0LZj3kgNI1UMASvQKU";
-        const RESULT_TAB_NAME = "class1";
+            validateRoll(roll) {
+                return /^[a-zA-Z0-9\-_/]{1,24}$/.test(roll);
+            },
 
-        window.fetchHomeResult = async function () {
-            const regnoInput = document.getElementById('home-regno');
-            const regno = regnoInput.value.trim();
-            const status = document.getElementById('home-status');
-            const container = document.getElementById('home-result-container');
-            const area = document.getElementById('home-result-area');
-
-            if (!regno) return;
-            status.innerHTML = "🔍 Fetching from local vault...";
-            container.style.display = "none";
-
-            setTimeout(() => {
-                const result = window.ResultManager.lookup(regno, '2010-01-01', '1'); // Default Public Category
-                if (result) {
-                    status.innerHTML = "✅ Record Found";
-                    area.innerHTML = `
-                        <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">${result.name}</div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px;">
-                            <span style="color: #888; font-size: 0.9rem;">Status: <b style="color:#00ff88">PASS</b></span>
-                            <span style="color: #fff; font-weight: 700;">Score: ${result.score}</span>
-                        </div>
-                    `;
-                    container.style.display = "block";
+            adminLogin() {
+                const pass = this.els.adminPass.value;
+                if (pass === this.config.ADMIN_PASS) {
+                    this.state.authenticated = true;
+                    this.els.adminShell.classList.add("active");
+                    this.closeAdminModal();
+                    this.toast("Admin authentication successful.", "success");
+                    this.updateMetrics();
                 } else {
-                    status.innerHTML = "❌ ID not found in local records.";
+                    this.setStatus(this.els.loginStatus, "Invalid administrative key.", "error");
+                    this.toast("Authorization failed.", "error");
                 }
-            }, 500);
-        };
+            },
 
-        document.getElementById('home-regno')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') window.fetchHomeResult();
-        });
+            logout() {
+                localStorage.removeItem("examData");
+                this.state.data = [];
+                this.state.authenticated = false;
+                this.state.lastDeploy = "Never";
+                this.els.adminShell.classList.remove("active");
+                this.setStatus(this.els.uploadStatus, "Admin session terminated.", "warning");
+                this.updateMetrics();
+                this.toast("Logged out and local buffer cleared.", "info");
+            },
 
-        // --- ADVANCED NEWS SYSTEM ---
-        let currentNewsLang = 'en';
+            uploadJSON(e) {
+                if (!this.state.authenticated) {
+                    this.toast("Authenticate to upload data.", "error");
+                    return;
+                }
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const raw = JSON.parse(event.target?.result || "[]");
+                        this.state.data = Array.isArray(raw) ? raw : (raw.exams?.[0]?.results || []);
+                        localStorage.setItem("examData", JSON.stringify(this.state.data));
+                        this.setStatus(this.els.uploadStatus, `Loaded ${this.state.data.length} records into local buffer.`, "success");
+                        this.updateMetrics();
+                        this.toast("JSON loaded successfully.", "success");
+                    } catch (err) {
+                        this.setStatus(this.els.uploadStatus, "Registry parse error. Please provide valid JSON.", "error");
+                        this.toast("Invalid JSON file.", "error");
+                    }
+                };
+                reader.readAsText(file);
+            },
 
-        window.setNewsLang = (lang) => {
-            currentNewsLang = lang;
-            document.querySelectorAll('.lang-btn').forEach(b => {
-                b.classList.toggle('active', b.innerText.toLowerCase() === lang);
-            });
-            window.loadNews();
-        };
+            async healthCheck() {
+                try {
+                    const res = await fetch(`${this.config.API}/health`);
+                    const json = await res.json();
+                    const up = !!(json && (json.ok || json.status));
+                    this.els.systemStatus.textContent = up ? "Healthy" : "Degraded";
+                    this.els.systemStatus.style.color = up ? "var(--success)" : "var(--warning)";
+                } catch (e) {
+                    this.els.systemStatus.textContent = "Offline";
+                    this.els.systemStatus.style.color = "var(--danger)";
+                }
+            },
 
-        window.loadNews = async () => {
-            try {
-                const newsGrid = document.getElementById('home-news-grid');
-                if (!newsGrid || !window.NewsService) return;
+            updateMetrics() {
+                this.els.totalRecords.textContent = String(this.state.data?.length || 0);
+                this.els.lastDeploy.textContent = this.state.lastDeploy;
+            },
 
-                const latestNews = window.NewsService.getPublishedNews().slice(0, 3);
-                const currentLang = document.documentElement.lang || 'en';
-                const t = (window.LanguageSystem && window.LanguageSystem.dictionary[currentLang]) || { news_no_updates: "No updates at the moment.", read_more: "Read More" };
-
-                if (latestNews.length === 0) {
-                    newsGrid.innerHTML = `
-                        <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
-                            <p style="color: #666;">${t.news_no_updates}</p>
-                        </div>
-                    `;
+            async deploy() {
+                if (!this.state.authenticated) {
+                    this.toast("Authentication required for deploy.", "error");
+                    return;
+                }
+                if (!this.state.data || !this.state.data.length) {
+                    this.toast("System state is empty: capture JSON first.", "error");
                     return;
                 }
 
-                newsGrid.innerHTML = latestNews.map((item, index) => `
-                    <article class="news-card-premium animate-fade-up" style="animation-delay: ${index * 0.1}s;">
-                        <div class="img-wrapper" style="height:200px; background:rgba(255,255,255,0.02); display:flex; align-items:center; justify-content:center">
-                            ${item.image ? `<img src="${item.image}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover">` : `<i class="ph ph-newspaper" style="font-size:3rem; color:#222"></i>`}
-                        </div>
-                        <div style="padding: 25px;">
-                            <span class="badge" style="background:var(--primary-color); color:#000; font-size:0.75rem">${item.category}</span>
-                            <h3 style="margin: 15px 0; color:#fff">${item.title}</h3>
-                            <p style="color:#888; font-size:0.9rem; margin-bottom:20px">${item.desc.substring(0, 120)}...</p>
-                            <a href="pages/news/index.html?id=${item.id}" style="color:var(--primary-color); text-decoration:none; font-weight:700">${t.read_more} →</a>
-                        </div>
-                    </article>
-                `).join('');
-            } catch (e) { console.error("News load error", e); }
+                const payload = { exams: [{ examId: "dcd_pro_sync", results: this.state.data }] };
+                this.setStatus(this.els.uploadStatus, "Transmitting to cloud nodes...", "info");
+                this.showLoader(true);
+
+                try {
+                    const res = await fetch(`${this.config.API}/deploy`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const text = await res.text();
+                    let response;
+                    try {
+                        response = JSON.parse(text);
+                    } catch {
+                        throw new Error("Server returned corrupt data stream");
+                    }
+                    if (!res.ok) throw new Error(response.message || "Cloud handshake failure");
+
+                    this.state.lastDeploy = new Date().toLocaleString();
+                    this.setStatus(this.els.uploadStatus, `Cloud sync successful. Records: ${response.count ?? 0}`, "success");
+                    this.updateMetrics();
+                    this.toast("Cloud deployment completed.", "success");
+                } catch (err) {
+                    console.error("Cloud Error:", err);
+                    this.setStatus(this.els.uploadStatus, `Sync failed: ${err.message}`, "error");
+                    this.toast("Cloud sync interrupted.", "error");
+                } finally {
+                    this.showLoader(false);
+                }
+            },
+
+            clearSearch() {
+                this.els.rollInput.value = "";
+                this.setStatus(this.els.searchMsg, "", "info");
+            },
+
+            async search() {
+                const roll = this.els.rollInput.value.trim();
+                if (!roll) {
+                    this.setStatus(this.els.searchMsg, "Roll number is required.", "warning");
+                    return;
+                }
+                if (!this.validateRoll(roll)) {
+                    this.setStatus(this.els.searchMsg, "Invalid roll number format.", "error");
+                    return;
+                }
+
+                this.setStatus(this.els.searchMsg, "Deciphering cloud records...", "info");
+                this.showLoader(true);
+
+                try {
+                    const res = await fetch(`${this.config.API}/results`);
+                    const text = await res.text();
+                    let data;
+                    try {
+                        data = JSON.parse(text);
+                    } catch {
+                        throw new Error("Data stream unreadable");
+                    }
+
+                    const records = data.exams?.[0]?.results || [];
+                    const found = records.find((r) => {
+                        const a = String(r.roll ?? "");
+                        const b = String(r["Roll Number"] ?? "");
+                        const c = String(r.Roll ?? "");
+                        return a === roll || b === roll || c === roll;
+                    });
+
+                    if (found) {
+                        this.setStatus(this.els.searchMsg, "Verified. Record found.", "success");
+                        this.toast("Result verified.", "success");
+                        this.renderCertificate(found);
+                    } else {
+                        this.setStatus(this.els.searchMsg, "No matching record found.", "error");
+                        this.toast("Record not found.", "error");
+                    }
+                } catch (err) {
+                    console.error("Fetch Error:", err);
+                    this.setStatus(this.els.searchMsg, "Node offline. Connection restricted.", "error");
+                    this.toast("Unable to fetch records.", "error");
+                } finally {
+                    this.showLoader(false);
+                }
+            },
+
+            renderCertificate(record) {
+                const school = this.sanitizeText(record.School || record.school || "ENTERPRISE INSTITUTION");
+                const exam = this.sanitizeText(record.Exam || record.exam || "OFFICIAL SYSTEM RECORD");
+                const roll = this.sanitizeText(record.roll || record.Roll || record["Roll Number"] || "-");
+                const name = this.sanitizeText(record.name || record.Name || record["Student Name"] || "ANONYMOUS");
+
+                this.els.certSchool.textContent = school;
+                this.els.certExam.textContent = exam;
+                this.els.certRoll.textContent = roll;
+                this.els.certName.textContent = name;
+
+                let rows = "";
+                let total = 0;
+                if (record.subjects && typeof record.subjects === "object" && !Array.isArray(record.subjects)) {
+                    Object.entries(record.subjects).forEach(([sub, mark]) => {
+                        const safeSub = this.sanitizeText(sub).toUpperCase();
+                        const safeMark = this.sanitizeText(mark);
+                        total += Number(mark) || 0;
+                        rows += `<tr><td>${safeSub}</td><td>${safeMark}</td></tr>`;
+                    });
+                } else if (record.Subjects && Array.isArray(record.Subjects)) {
+                    record.Subjects.forEach((s) => {
+                        const subject = this.sanitizeText(s.Subject || "N/A").toUpperCase();
+                        const marks = this.sanitizeText(s.Marks);
+                        total += Number(s.Marks) || 0;
+                        rows += `<tr><td>${subject}</td><td>${marks}</td></tr>`;
+                    });
+                }
+
+                const table = `
+                    <table class="cert-table">
+                        <thead><tr><th>Subject</th><th>Marks</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                `;
+                this.els.certTableArea.innerHTML = table;
+                this.els.certTotal.textContent = this.sanitizeText(record.total || total);
+
+                this.els.qrcode.innerHTML = "";
+                new QRCode(this.els.qrcode, {
+                    text: `${location.origin}/results?roll=${encodeURIComponent(roll)}`,
+                    width: 82,
+                    height: 82
+                });
+
+                this.els.certificateArea.classList.add("active");
+            },
+
+            closeCert() {
+                this.els.certificateArea.classList.remove("active");
+            },
+
+            downloadPDF() {
+                const opt = {
+                    margin: [6, 6, 6, 6],
+                    filename: `Result_${Date.now()}.pdf`,
+                    image: { type: "jpeg", quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+                };
+                html2pdf().set(opt).from(this.els.certificate).save();
+            }
         };
 
-        // Badge & Sync Logic
-        window.updateBadges = () => {
-            const count = parseInt(localStorage.getItem('mhm_unread_news') || '0');
-            const badges = [document.getElementById('news-badge-nav'), document.getElementById('news-badge-mobile')];
-            badges.forEach(b => {
-                if (b) {
-                    b.innerText = count > 9 ? '9+' : count;
-                    b.style.display = count > 0 ? 'flex' : 'none';
-                }
-            });
-        };
-
-        window.addEventListener('news-updated', window.updateBadges);
-        window.addEventListener('DOMContentLoaded', () => {
-            window.loadNews();
-            window.updateBadges();
-        });
-
-        // Clear badge when visiting news section
-        const newsSection = document.getElementById('news');
-        if (newsSection) {
-            const observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    localStorage.setItem('mhm_unread_news', '0');
-                    window.updateBadges();
-                }
-            }, { threshold: 0.5 });
-            observer.observe(newsSection);
-        }
+        window.addEventListener("load", () => App.init());
     </script>
-
-
-    <!-- Global Footer -->
-    <div id="global-footer"></div>
-
-    <footer id="main-footer"></footer>
-
-    <!-- WhatsApp Floating Button -->
-    <div class="whatsapp-float-wrapper">
-        <a href="https://wa.me/916235989198" class="whatsapp-btn" target="_blank" aria-label="Contact us on WhatsApp"
-            data-t="whatsapp_aria">
-            <i class="ph-fill ph-whatsapp-logo"></i>
-        </a>
-    </div>
-
-    <!-- Global Navigation & Footer Scripts -->
-    <script src="assets/js/global-navigation.js"></script>
-    <script src="assets/js/navigation-config.js"></script>
-    <script src="assets/js/global-footer.js"></script>
-    <script src="assets/js/footer-config.js"></script>
-
-    <!-- Existing Scripts -->
-    <script src="assets/js/site-nav.js" defer></script>
-    <script src="assets/js/site-footer.js" defer></script>
-    <script src="assets/js/script.js" defer></script>
-    <script type="module" src="assets/js/auth-nav-guard.js" defer></script>
 </body>
 
 </html>
