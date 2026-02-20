@@ -3,6 +3,7 @@ const ResultsManagement = (() => {
 
     const STORAGE_KEY = 'results'; // New unified key: results[schoolId][examId]
     let syncing = false; // State flag for sync operation
+    const Utils = window.ExamPortalUtils || {};
 
     // UI Elements
     const syncButton = document.getElementById('btn-sync-results');
@@ -310,136 +311,19 @@ const ResultsManagement = (() => {
 
 
     /**
-     * Calculate grade based on percentage (NOT fixed totals)
-     * @param {number} percentage - Percentage score (0-100)
-     * @returns {string} Grade (A+, A, B, C, D, F)
+     * UTILITIES: Using centralized ExamPortalUtils
      */
-    const calculateGrade = (percentage) => {
-        if (percentage >= 90) return 'A+';
-        if (percentage >= 80) return 'A';
-        if (percentage >= 70) return 'B';
-        if (percentage >= 60) return 'C';
-        if (percentage >= 50) return 'D';
-        return 'F';
-    };
-
-    /**
-     * Calculate percentage from marks
-     * @param {number} obtained - Total marks obtained
-     * @param {number} maxMarks - Maximum possible marks
-     * @returns {number} Percentage (0-100)
-     */
-    const calculatePercentage = (obtained, maxMarks) => {
-        if (maxMarks === 0) return 0;
-        return Math.round((obtained / maxMarks) * 100 * 100) / 100; // Round to 2 decimals
-    };
-
-    /**
-     * Determine pass/fail status
-     * @param {object} subjects - Subject marks object {subjectName: marks}
-     * @param {number} passMark - Minimum passing marks per subject (default: 33)
-     * @returns {string} 'Pass' or 'Fail'
-     */
-    const calculateStatus = (subjects, passMark = 33) => {
-        const marks = Object.values(subjects);
-        if (marks.length === 0) return 'Absent';
-
-        // Check if any subject has marks below pass mark
-        const hasFailed = marks.some(mark => mark < passMark && mark > 0);
-
-        // If all marks are 0, mark as Absent
-        const allZero = marks.every(mark => mark === 0);
-        if (allZero) return 'Absent';
-
-        return hasFailed ? 'Fail' : 'Pass';
-    };
-
-
+    const calculateGrade = Utils.calculateGrade;
+    const calculatePercentage = Utils.calculatePercentage;
+    const calculateStatus = Utils.calculateStatus;
+    const normalizeHeader = Utils.normalizeHeader;
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     /**
-     * ========================================
-     * COLUMN CLASSIFICATION ENGINE
-     * ========================================
-     * Implements strict 3-category classification:
-     * 1. IDENTITY: Roll No, Student Name (required)
-     * 2. METADATA: CLASS, SECTION, etc. (ignored)
-     * 3. SUBJECTS: All other columns with marks
-     */
-
-    // Normalize header for comparison (case-insensitive, remove symbols)
-    const normalizeHeader = (h) => {
-        if (!h) return '';
-        return h.toString()
-            .toLowerCase()
-            .replace(/['\s\-_]/g, '') // Remove quotes, spaces, hyphens, underscores
-            .trim();
-    };
-
-    // Identity field patterns (REQUIRED for student identification)
-    const IDENTITY_PATTERNS = {
-        roll: [
-            'rollno', 'roll', 'rollnumber',
-            'regno', 'registerno', 'registernumber',
-            'admissionno', 'admissionnumber',
-            'studentid', 'idno', 'id'
-        ],
-        name: [
-            'studentname', 'name', 'candidatename',
-            'fullname', 'student'
-        ],
-        dob: ['dob', 'dateofbirth', 'birthdate'],
-        status: ['status', 'result', 'passfail', 'resultstatus']
-    };
-
-    // Metadata patterns (MUST BE IGNORED - not subject marks)
-    const METADATA_PATTERNS = [
-        'class', 'section', 'batch', 'group',
-        'division', 'stream', 'year', 'semester',
-        'total', 'grade', 'rank', 'percentage',
-        'remark', 'remarks', 'comment', 'comments',
-        'exam', 'examname', 'examtype'
-    ];
-
-    /**
      * Classify a column header into one of three categories
-     * @param {string} header - Column header from sheet
-     * @param {string} sampleValue - Sample value from first data row
-     * @returns {object} - {type: 'identity'|'metadata'|'subject', field: string|null}
      */
     const classifyColumn = (header, sampleValue = '') => {
-        const normalized = normalizeHeader(header);
-
-        if (!normalized) {
-            return { type: 'unknown', field: null };
-        }
-
-        // 1. Check if it's an IDENTITY field (Roll No, Name, etc.)
-        for (const [field, patterns] of Object.entries(IDENTITY_PATTERNS)) {
-            for (const pattern of patterns) {
-                if (normalized === pattern || normalized.includes(pattern)) {
-                    return { type: 'identity', field: field };
-                }
-            }
-        }
-
-        // 2. Check if it's METADATA (must be excluded from subjects)
-        for (const pattern of METADATA_PATTERNS) {
-            if (normalized === pattern || normalized.includes(pattern)) {
-                return { type: 'metadata', field: pattern };
-            }
-        }
-
-        // 3. Otherwise, it's a SUBJECT column
-        // Additional heuristic: if sample value is numeric or reasonable length
-        const isNumeric = sampleValue && !isNaN(parseFloat(sampleValue.toString().replace('%', '')));
-        const isReasonableLength = header.length > 0 && header.length < 50;
-
-        if (isReasonableLength) {
-            return { type: 'subject', field: header }; // Preserve EXACT original name
-        }
-
-        return { type: 'unknown', field: null };
+        return Utils.classifyColumn(header, sampleValue);
     };
 
     /**
@@ -451,17 +335,8 @@ const ResultsManagement = (() => {
     const findBestMatch = (header, type) => {
         const normalized = normalizeHeader(header);
         if (!normalized) return false;
-
-        const patterns = IDENTITY_PATTERNS[type] || [];
-
-        // Exact match
-        if (patterns.includes(normalized)) return true;
-
-        // Partial match for specific types
-        if (type === 'roll' && (normalized.includes('roll') || normalized.includes('regno'))) return true;
-        if (type === 'name' && normalized.includes('name')) return true;
-
-        return false;
+        const patterns = Utils.PATTERNS.IDENTITY[type] || [];
+        return patterns.some(p => normalized === p || normalized.includes(p));
     };
 
     /**

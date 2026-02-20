@@ -3,12 +3,26 @@ node_modules/
 Thumbs.db
 *.log
 .env
-# dist/
-# build/
 .vscode/
 .idea/
+
+# Environment
+api/db_config.php
+api/env_loader.php
+
+# Build & Dist
+cpanel_dist/
+flattened_v3/
+*.zip
+*.tar.gz
+
+# Agent Data
+.gemini/
+.agent/
+brain/
 
 # Firebase configuration
 # firebase.json (tracked for hosting config)
 hn/*.json
 my-pc-*.json
+

@@ -7,7 +7,6 @@ import StorageManager from './storage-manager.js';
 import LocalAuth from './local-auth.js';
 import UploadUtils from './upload-utils.js';
 import ServicesCMS from './services-cms.js';
-import GoogleSheetsFetcher from './google-sheets-fetcher.js';
 import NavigationCMS from './nav-cms.js';
 
 const AdminLogic = {
@@ -33,9 +32,9 @@ const AdminLogic = {
         this.updateStats();
 
         // Initialize Specialized CMS Engines
-        ServicesCMS.init();
-        ResultsCMS.init();
-        NavigationCMS.init();
+        if (typeof ServicesCMS !== 'undefined') ServicesCMS.init();
+        if (typeof ResultsCMS !== 'undefined') ResultsCMS.init();
+        if (typeof NavigationCMS !== 'undefined') NavigationCMS.init();
     },
 
     // 2. DOM Rendering (Main Layout)
@@ -90,9 +89,9 @@ const AdminLogic = {
                         </div>
                     </header>
 
-                    <content class="admin-content" id="admin-panel-container">
+                    <div class="admin-content" id="admin-panel-container">
                         <!-- Dynamic Panels Injected Here -->
-                    </content>
+                    </div>
                 </main>
             </div>
             
@@ -113,7 +112,10 @@ const AdminLogic = {
             link.classList.toggle('active', link.dataset.panel === panelId);
         });
 
-        document.getElementById('breadcrumb-current').innerText = panelId.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+        const breadcrumbEl = document.getElementById('breadcrumb-current');
+        if (breadcrumbEl) {
+            breadcrumbEl.innerText = panelId.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+        }
 
         // Routing Logic
         switch (panelId) {
@@ -128,14 +130,15 @@ const AdminLogic = {
             default: container.innerHTML = `<div class="admin-card"><h2><i class="ph ph-construction"></i> Panel ${panelId} is under development.</h2></div>`;
         }
 
-        if (window.innerWidth <= 992) document.getElementById('admin-sidebar').classList.remove('visible');
-        history.pushState(null, null, \`#\${panelId}\`);
+        const sidebar = document.getElementById('admin-sidebar');
+        if (sidebar && window.innerWidth <= 992) sidebar.classList.remove('visible');
+        history.pushState(null, null, `#${panelId}`);
     },
 
     // 4. Panel Renderers
     renderDashboard(container) {
         container.innerHTML = `
-            < div class= "dashboard-stats-grid animate-fade-in" >
+            <div class="dashboard-stats-grid animate-fade-in">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="ph ph-briefcase"></i></div>
                     <div class="stat-info">
@@ -164,34 +167,34 @@ const AdminLogic = {
                         <div class="stat-label">Storage Usage</div>
                     </div>
                 </div>
-            </div >
-
-    <div class="dashboard-recent-grid">
-        <div class="admin-card">
-            <h3>Quick Launch</h3>
-            <div class="action-buttons">
-                <button onclick="AdminLogic.switchPanel('services-cms')"><i class="ph ph-plus"></i> New Service</button>
-                <button onclick="AdminLogic.switchPanel('result-manager')"><i class="ph ph-upload"></i> Upload Results</button>
-                <button onclick="AdminLogic.switchPanel('menu-manager')"><i class="ph ph-list-numbers"></i> Edit Navigation</button>
             </div>
-        </div>
-        <div class="admin-card">
-            <h3>System Health</h3>
-            <ul class="status-list">
-                <li><span>CMS Engines:</span> <span class="badge success">Active</span></li>
-                <li><span>Local Auth:</span> <span class="badge success">Secure</span></li>
-                <li><span>Media Optimizer:</span> <span class="badge success">Ready</span></li>
-            </ul>
-        </div>
-    </div>
-`;
+
+            <div class="dashboard-recent-grid">
+                <div class="admin-card">
+                    <h3>Quick Launch</h3>
+                    <div class="action-buttons">
+                        <button onclick="AdminLogic.switchPanel('services-cms')"><i class="ph ph-plus"></i> New Service</button>
+                        <button onclick="AdminLogic.switchPanel('result-manager')"><i class="ph ph-upload"></i> Upload Results</button>
+                        <button onclick="AdminLogic.switchPanel('menu-manager')"><i class="ph ph-list-numbers"></i> Edit Navigation</button>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <h3>System Health</h3>
+                    <ul class="status-list">
+                        <li><span>CMS Engines:</span> <span class="badge success">Active</span></li>
+                        <li><span>Local Auth:</span> <span class="badge success">Secure</span></li>
+                        <li><span>Media Optimizer:</span> <span class="badge success">Ready</span></li>
+                    </ul>
+                </div>
+            </div>
+        `;
         this.updateStats();
     },
 
     renderServicesCMS(container) {
         const services = ServicesCMS.getAll();
         container.innerHTML = `
-    < div class="admin-card animate-fade-in" >
+            <div class="admin-card animate-fade-in">
                 <div class="card-header-flex">
                     <div>
                         <h2><i class="ph ph-briefcase"></i> Services CMS</h2>
@@ -223,8 +226,8 @@ const AdminLogic = {
                         </div>
                     `).join('')}
                 </div>
-            </div >
-    `;
+            </div>
+        `;
     },
 
     showServiceModal(id = null) {
@@ -239,7 +242,7 @@ const AdminLogic = {
         const modal = document.createElement('div');
         modal.className = 'admin-modal active';
         modal.innerHTML = `
-    < div class="modal-content glass-mhm animate-pop-in" >
+            <div class="modal-content glass-mhm animate-pop-in">
                 <div class="modal-header">
                     <h3>${id ? 'Edit' : 'Create'} Service</h3>
                     <button class="modal-close"><i class="ph ph-x"></i></button>
@@ -310,8 +313,8 @@ const AdminLogic = {
 
                     <button type="submit" class="btn btn-primary w-100">Save Service</button>
                 </form>
-            </div >
-    `;
+            </div>
+        `;
 
         document.body.appendChild(modal);
 
@@ -321,7 +324,7 @@ const AdminLogic = {
                 modal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 modal.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
                 btn.classList.add('active');
-                modal.querySelector(`#tab - ${ btn.dataset.tab } `).classList.remove('hidden');
+                modal.querySelector(`#tab-${btn.dataset.tab}`).classList.remove('hidden');
             };
         });
 
@@ -333,8 +336,8 @@ const AdminLogic = {
             try {
                 const res = await UploadUtils.processImage(file);
                 imageData = res.data;
-                modal.querySelector('.upload-area').innerHTML = `< img src = "${res.data}" class="preview-img" > `;
-                this.showToast(`✨ compressed to ${ UploadUtils.formatBytes(res.size) } `);
+                modal.querySelector('.upload-area').innerHTML = `<img src="${res.data}" class="preview-img">`;
+                this.showToast(`✨ compressed to ${UploadUtils.formatBytes(res.size)}`);
             } catch (err) {
                 this.showToast(err.message, 'error');
             }
@@ -381,11 +384,11 @@ const AdminLogic = {
 
     async renderResultManager(container) {
         container.innerHTML = `
-    < div class="admin-card animate-fade-in" >
+            <div class="admin-card animate-fade-in">
                 <div class="card-header-flex">
                     <div>
-                        <h2><i class="ph ph-exam"></i> Exam Result System (Google Sheets)</h2>
-                        <p>Results are managed externally via Google Sheets. This view is read-only.</p>
+                        <h2><i class="ph ph-exam"></i> Exam Result System (Shared)</h2>
+                        <p>Results are managed via the Results Portal Sync module.</p>
                     </div>
                     <div class="action-group">
                         <button class="btn btn-primary" onclick="AdminLogic.refreshResultsWithoutReload()"><i class="ph ph-arrows-clockwise"></i> Sync Now</button>
@@ -420,30 +423,32 @@ const AdminLogic = {
                         </div>
                     </div>
                 </div>
-            </div >
-    `;
+            </div>
+        `;
 
-        // Load data properly
         try {
-            const results = await GoogleSheetsFetcher.fetchResults(); // Fetch or get cached
-            const exams = GoogleSheetsFetcher.getExamNames(results);
-            
-            // Populate Filter
+            const cms = window.ResultsCMS;
+            if (!cms) throw new Error('ResultsCMS not initialized');
+
+            const results = cms.getAllResults();
+            const exams = cms.getVisibleExamList();
+
             const filterDropdown = document.getElementById('admin-exam-filter');
-            if(filterDropdown) {
-                 exams.forEach(ex => {
+            if (filterDropdown) {
+                exams.forEach(ex => {
                     const opt = document.createElement('option');
-                    opt.value = ex;
-                    opt.innerText = ex;
-                    if(this.state.selectedExamFilter === ex) opt.selected = true;
+                    opt.value = ex.id;
+                    opt.innerText = ex.displayName || ex.id;
+                    if (this.state.selectedExamFilter === ex.id) opt.selected = true;
                     filterDropdown.appendChild(opt);
-                 });
+                });
             }
 
             this.renderAdminResultsTable(results);
 
         } catch (e) {
-            document.getElementById('admin-results-body').innerHTML = `< tr > <td colspan="6" style="text-align:center; color:red;">Error loading results: ${e.message}</td></tr > `;
+            const tbody = document.getElementById('admin-results-body');
+            if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Error loading results: ${e.message}</td></tr>`;
         }
     },
 
@@ -451,9 +456,9 @@ const AdminLogic = {
         const tbody = document.getElementById('admin-results-body');
         if (!tbody) return;
 
-        const filtered = this.state.selectedExamFilter === 'all' 
-            ? results 
-            : results.filter(r => (r['Exam Name'] || r['ExamName'] || r['exam']) === this.state.selectedExamFilter);
+        const filtered = this.state.selectedExamFilter === 'all'
+            ? results
+            : results.filter(r => (r.examId === this.state.selectedExamFilter));
 
         if (filtered.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#666;">No records found.</td></tr>';
@@ -461,183 +466,179 @@ const AdminLogic = {
         }
 
         tbody.innerHTML = filtered.slice(0, 100).map(r => `
-    < tr >
-                <td><b>${r['Roll Number'] || r['RollNumber'] || r['rollNo']}</b></td>
-                <td>${r['Student Name'] || r['Name'] || r['name']}</td>
-                <td>${r['Exam Name'] || r['ExamName'] || r['exam']}</td>
-                <td>${r['Class'] || r['class']}</td>
-                <td><span class="status-badge ${(r['Status'] || r['status'] || 'pass').toLowerCase() === 'pass' ? 'approved' : 'pending'}">${r['Status'] || r['status']}</span></td>
-                <td>${r['Total'] || r['total']}</td>
-            </tr >
-    `).join('') + (filtered.length > 100 ? ` < tr > <td colspan="6" style="text-align:center; padding:10px; color:#888;">...and ${filtered.length - 100} more records</td></tr > ` : '');
+            <tr>
+                <td><b>${r.rollNo}</b></td>
+                <td>${r.name}</td>
+                <td>${r.exam || 'N/A'}</td>
+                <td>${r.class || 'N/A'}</td>
+                <td><span class="status-badge ${(r.status || 'Pass').toLowerCase() === 'pass' ? 'approved' : 'pending'}">${r.status || 'Unknown'}</span></td>
+                <td>${r.totalMarks || 0}</td>
+            </tr>
+        `).join('') + (filtered.length > 100 ? `<tr><td colspan="6" style="text-align:center; padding:10px; color:#888;">...and ${filtered.length - 100} more records</td></tr>` : '');
     },
 
-    filterAdminResults(examName) {
-        this.state.selectedExamFilter = examName;
-        // Re-fetch from cache is fast
-        const results = GoogleSheetsFetcher.getCachedResults();
-        this.renderAdminResultsTable(results);
+    filterAdminResults(examId) {
+        this.state.selectedExamFilter = examId;
+        if (window.ResultsCMS) {
+            this.renderAdminResultsTable(window.ResultsCMS.getAllResults());
+        }
     },
 
     async refreshResultsWithoutReload() {
-        if(!confirm('This will clear the local cache and fetch fresh data from Google Sheets. Continue?')) return;
-        
-        GoogleSheetsFetcher.clearCache();
-        this.showToast('🔄 Syncing with Google Sheets...');
+        this.showToast('🔄 Refreshing result cache...');
         try {
-            await GoogleSheetsFetcher.fetchResults(true);
-            this.showToast('✅ Data Synced Successfully!');
-            this.renderResultManager(document.getElementById('admin-panel-container'));
+            const container = document.getElementById('admin-panel-container');
+            if (container) this.renderResultManager(container);
             this.updateStats();
-        } catch(e) {
-            this.showToast('❌ Sync Failed: ' + e.message, 'danger');
+            this.showToast('✅ Results refreshed!');
+        } catch (e) {
+            this.showToast('❌ Refresh Failed: ' + e.message, 'danger');
         }
     },
 
-
     renderMenuManager(container) {
-    const config = NavigationCMS.getMenu();
-    container.innerHTML = `
-        < div class="admin-card animate-fade-in" >
-            <div class="card-header-flex">
-                <div>
-                    <h2><i class="ph ph-list-numbers"></i> Menu Management</h2>
-                    <p>Control site navigation links, dropdowns, and order.</p>
+        const config = NavigationCMS.getMenu();
+        container.innerHTML = `
+            <div class="admin-card animate-fade-in">
+                <div class="card-header-flex">
+                    <div>
+                        <h2><i class="ph ph-list-numbers"></i> Menu Management</h2>
+                        <p>Control site navigation links, dropdowns, and order.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="AdminLogic.showMenuItemModal()">
+                        <i class="ph ph-plus"></i> Add Menu Item
+                    </button>
                 </div>
-                <button class="btn btn-primary" onclick="AdminLogic.showMenuItemModal()">
-                    <i class="ph ph-plus"></i> Add Menu Item
-                </button>
-            </div>
-            <div class="menu-list-container">
-                ${config.map(item => `
-                    <div class="menu-item-row glass-mhm">
-                        <div class="item-info">
-                            <i class="ph ph-dots-six-vertical"></i>
-                            <div class="item-details">
-                                <span class="label">${item.label}</span>
-                                <small class="path">${item.href}</small>
-                                ${item.type === 'dropdown' ? '<span class="badge info">Dropdown</span>' : ''}
-                                ${item.adminOnly ? '<span class="badge danger">Admin Only</span>' : ''}
+                <div class="menu-list-container">
+                    ${config.map(item => `
+                        <div class="menu-item-row glass-mhm">
+                            <div class="item-info">
+                                <i class="ph ph-dots-six-vertical"></i>
+                                <div class="item-details">
+                                    <span class="label">${item.label}</span>
+                                    <small class="path">${item.href}</small>
+                                    ${item.type === 'dropdown' ? '<span class="badge info">Dropdown</span>' : ''}
+                                    ${item.adminOnly ? '<span class="badge danger">Admin Only</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn-icon" onclick="AdminLogic.showMenuItemModal('${item.id}')" title="Edit"><i class="ph ph-pencil"></i></button>
+                                <button class="btn-icon danger" onclick="AdminLogic.deleteMenuItem('${item.id}')" title="Delete"><i class="ph ph-trash"></i></button>
+                                <label class="switch">
+                                    <input type="checkbox" ${item.visible ? 'checked' : ''} onchange="AdminLogic.toggleMenu('${item.id}')">
+                                    <span class="slider"></span>
+                                </label>
                             </div>
                         </div>
-                        <div class="item-actions">
-                            <button class="btn-icon" onclick="AdminLogic.showMenuItemModal('${item.id}')" title="Edit"><i class="ph ph-pencil"></i></button>
-                            <button class="btn-icon danger" onclick="AdminLogic.deleteMenuItem('${item.id}')" title="Delete"><i class="ph ph-trash"></i></button>
-                            <label class="switch">
-                                <input type="checkbox" ${item.visible ? 'checked' : ''} onchange="AdminLogic.toggleMenu('${item.id}')">
-                                <span class="slider"></span>
-                            </label>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    },
+
+    showMenuItemModal(id = null) {
+        const item = id ? NavigationCMS.getMenu().find(m => m.id === id) : { label: '', href: '', type: 'link', visible: true, adminOnly: false };
+        const modal = document.createElement('div');
+        modal.className = 'admin-modal active';
+        modal.innerHTML = `
+            <div class="modal-content glass-mhm animate-slide-up">
+                <h3>${id ? 'Edit' : 'Add'} Menu Item</h3>
+                <form id="menu-item-form">
+                    <input type="hidden" name="id" value="${id || ''}">
+                    <div class="form-group">
+                        <label>Label</label>
+                        <input type="text" name="label" value="${item.label}" placeholder="Link Text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>URL / Path</label>
+                        <input type="text" name="href" value="${item.href}" placeholder="/pages/..." required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select name="type">
+                                <option value="link" ${item.type === 'link' ? 'selected' : ''}>Standard Link</option>
+                                <option value="dropdown" ${item.type === 'dropdown' ? 'selected' : ''}>Dropdown Menu</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Order</label>
+                            <input type="number" name="order" value="${item.order || 0}">
                         </div>
                     </div>
-                `).join('')}
+                    <div class="form-check-group">
+                        <label class="check-container">
+                            Visible to all
+                            <input type="checkbox" name="visible" ${item.visible ? 'checked' : ''}>
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="check-container">
+                            Admin Only
+                            <input type="checkbox" name="adminOnly" ${item.adminOnly ? 'checked' : ''}>
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="this.closest('.admin-modal').remove()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Item</button>
+                    </div>
+                </form>
             </div>
-        </div >
-    `;
-},
+        `;
+        document.body.appendChild(modal);
 
-showMenuItemModal(id = null) {
-    const item = id ? NavigationCMS.getMenu().find(m => m.id === id) : { label: '', href: '', type: 'link', visible: true, adminOnly: false };
-    const modal = document.createElement('div');
-    modal.className = 'admin-modal active';
-    modal.innerHTML = `
-    < div class="modal-content glass-mhm animate-slide-up" >
-            <h3>${id ? 'Edit' : 'Add'} Menu Item</h3>
-            <form id="menu-item-form">
-                <input type="hidden" name="id" value="${id || ''}">
-                <div class="form-group">
-                    <label>Label</label>
-                    <input type="text" name="label" value="${item.label}" placeholder="Link Text" required>
-                </div>
-                <div class="form-group">
-                    <label>URL / Path</label>
-                    <input type="text" name="href" value="${item.href}" placeholder="/pages/..." required>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Type</label>
-                        <select name="type">
-                            <option value="link" ${item.type === 'link' ? 'selected' : ''}>Standard Link</option>
-                            <option value="dropdown" ${item.type === 'dropdown' ? 'selected' : ''}>Dropdown Menu</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Order</label>
-                        <input type="number" name="order" value="${item.order || 0}">
-                    </div>
-                </div>
-                <div class="form-check-group">
-                    <label class="check-container">
-                        Visible to all
-                        <input type="checkbox" name="visible" ${item.visible ? 'checked' : ''}>
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="check-container">
-                        Admin Only
-                        <input type="checkbox" name="adminOnly" ${item.adminOnly ? 'checked' : ''}>
-                        <span class="checkmark"></span>
-                    </label>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="this.closest('.admin-modal').remove()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Item</button>
-                </div>
-            </form>
-        </div >
-    `;
-    document.body.appendChild(modal);
+        modal.querySelector('form').onsubmit = (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalHtml = btn.innerHTML;
 
-    modal.querySelector('form').onsubmit = (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalHtml = btn.innerHTML;
+            const data = Object.fromEntries(new FormData(e.target).entries());
+            data.visible = !!data.visible;
+            data.adminOnly = !!data.adminOnly;
+            data.order = parseInt(data.order) || 0;
 
-        const data = Object.fromEntries(new FormData(e.target).entries());
-        data.visible = !!data.visible;
-        data.adminOnly = !!data.adminOnly;
-        data.order = parseInt(data.order) || 0;
+            if (window.uiLock) window.uiLock(btn, true, originalHtml);
 
-        if (window.uiLock) window.uiLock(btn, true, originalHtml);
-
-        try {
-            if (data.id) {
-                NavigationCMS.updateItem(data.id, data);
-            } else {
-                NavigationCMS.addItem(data);
+            try {
+                if (data.id) {
+                    NavigationCMS.updateItem(data.id, data);
+                } else {
+                    NavigationCMS.addItem(data);
+                }
+                modal.remove();
+                this.switchPanel('menu-manager');
+                this.showToast('Navigation updated! 🚀');
+            } catch (err) {
+                this.showToast('❌ Error saving menu: ' + err.message, 'danger');
+                if (window.uiLock) window.uiLock(btn, false, originalHtml);
             }
-            modal.remove();
+        };
+    },
+
+    deleteMenuItem(id) {
+        if (confirm('Delete this menu item?')) {
+            NavigationCMS.deleteItem(id);
             this.switchPanel('menu-manager');
-            this.showToast('Navigation updated! 🚀');
-        } catch (err) {
-            this.showToast('❌ Error saving menu: ' + err.message, 'danger');
-            if (window.uiLock) window.uiLock(btn, false, originalHtml);
+            this.showToast('Item removed 🗑️');
         }
-    };
-},
+    },
 
-deleteMenuItem(id) {
-    if (confirm('Delete this menu item?')) {
-        NavigationCMS.deleteItem(id);
-        this.switchPanel('menu-manager');
-        this.showToast('Item removed 🗑️');
-    }
-},
-
-toggleMenu(id) {
-    NavigationCMS.toggleVisibility(id);
-    this.showToast('Visibility toggled 👁️');
-},
+    toggleMenu(id) {
+        NavigationCMS.toggleVisibility(id);
+        this.showToast('Visibility toggled 👁️');
+    },
 
     renderFeeSubmissions(container) {
         const fees = StorageManager.get('fee_submissions', []);
         container.innerHTML = `
-    < div class="admin-card" >
+            <div class="admin-card">
                 <div class="card-header-flex">
                     <h2><i class="ph ph-receipt"></i> Fee Submissions</h2>
                     <p>Total: ${fees.length} student records found.</p>
                 </div>
                 <div class="fees-list-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-top:25px;">
                     ${fees.length === 0 ? '<p style="color:#666; grid-column:1/-1; text-align:center;">No submissions yet.</p>' : ''}
-                    ${fees.reverse().map(f => `
+                    ${[...fees].reverse().map(f => `
                         <div class="fee-item-card glass-mhm" style="padding:20px; border-radius:15px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.02)">
                             <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
                                 <span class="badge ${f.status === 'pending' ? 'warning' : 'success'}">${f.status.toUpperCase()}</span>
@@ -656,13 +657,15 @@ toggleMenu(id) {
                         </div>
                     `).join('')}
                 </div>
-            </div >
-    `;
+            </div>
+        `;
     },
 
     viewReceipt(dataUrl) {
         const win = window.open();
-        win.document.write(`< img src = "${dataUrl}" style = "max-width:100%" > `);
+        if (win) {
+            win.document.write(`<img src="${dataUrl}" style="max-width:100%">`);
+        }
     },
 
     updateFeeStatus(id, status) {
@@ -686,7 +689,7 @@ toggleMenu(id) {
     renderThemeSettings(container) {
         const theme = StorageManager.get('theme_config', { primary: '#00f3ff', secondary: '#bc13fe' });
         container.innerHTML = `
-    < div class="admin-card" >
+            <div class="admin-card">
                 <h2><i class="ph ph-palette"></i> Theme Customization</h2>
                 <form id="theme-form" class="admin-form">
                     <div class="form-row">
@@ -701,17 +704,20 @@ toggleMenu(id) {
                     </div>
                     <button type="submit" class="btn btn-primary">Apply Theme</button>
                 </form>
-            </div >
-    `;
+            </div>
+        `;
 
-        document.getElementById('theme-form').onsubmit = (e) => {
-            e.preventDefault();
-            const config = Object.fromEntries(new FormData(e.target).entries());
-            StorageManager.set('theme_config', config);
-            document.documentElement.style.setProperty('--primary-color', config.primary);
-            document.documentElement.style.setProperty('--secondary-color', config.secondary);
-            this.showToast('✨ Theme updated instantly!');
-        };
+        const form = document.getElementById('theme-form');
+        if (form) {
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                const config = Object.fromEntries(new FormData(e.target).entries());
+                StorageManager.set('theme_config', config);
+                document.documentElement.style.setProperty('--primary-color', config.primary);
+                document.documentElement.style.setProperty('--secondary-color', config.secondary);
+                this.showToast('✨ Theme updated instantly!');
+            };
+        }
     },
 
     renderSiteSettings(container) {
@@ -720,7 +726,7 @@ toggleMenu(id) {
             description: 'Educational Excellence'
         });
         container.innerHTML = `
-    < div class="admin-card" >
+            <div class="admin-card">
                 <h2><i class="ph ph-gear"></i> Page Settings</h2>
                 <form id="settings-form" class="admin-form">
                     <div class="form-group">
@@ -733,22 +739,25 @@ toggleMenu(id) {
                     </div>
                     <button type="submit" class="btn btn-primary">Save Config</button>
                 </form>
-            </div >
-    `;
-        document.getElementById('settings-form').onsubmit = (e) => {
-            e.preventDefault();
-            const data = Object.fromEntries(new FormData(e.target).entries());
-            StorageManager.set('site_settings', data);
-            this.showToast('✅ Configuration saved!');
-        };
+            </div>
+        `;
+        const form = document.getElementById('settings-form');
+        if (form) {
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                const data = Object.fromEntries(new FormData(e.target).entries());
+                StorageManager.set('site_settings', data);
+                this.showToast('✅ Configuration saved!');
+            };
+        }
     },
-
 
     // 5. Utility Functions
     updateStats() {
+        const resultCount = window.ResultsCMS ? window.ResultsCMS.getAllResults().length : 0;
         const stats = {
-            services: ServicesCMS.getAll().length,
-            results: GoogleSheetsFetcher.getCachedResults().length,
+            services: (typeof ServicesCMS !== 'undefined' && ServicesCMS.getAll) ? ServicesCMS.getAll().length : 0,
+            results: resultCount,
             fees: StorageManager.get('fee_submissions', []).length,
             storage: (JSON.stringify(localStorage).length / 1024).toFixed(1) + ' KB'
         };
@@ -779,7 +788,8 @@ toggleMenu(id) {
         if (toggle && sidebar) toggle.onclick = () => sidebar.classList.toggle('visible');
 
         // Logout
-        document.getElementById('admin-logout').onclick = () => LocalAuth.logout();
+        const logoutBtn = document.getElementById('admin-logout');
+        if (logoutBtn) logoutBtn.onclick = () => LocalAuth.logout();
     },
 
     loadPanelFromUrl() {
@@ -788,9 +798,15 @@ toggleMenu(id) {
     },
 
     showToast(message, type = 'success') {
+        if (typeof Toast !== 'undefined' && Toast.show) {
+            const toastType = type === 'danger' ? 'error' : type;
+            Toast.show(message, toastType);
+            return;
+        }
         const container = document.getElementById('admin-toast-container');
+        if (!container) return;
         const toast = document.createElement('div');
-        toast.className = \`admin-toast \${type}\`;
+        toast.className = `admin-toast ${type}`;
         toast.innerText = message;
         container.appendChild(toast);
         setTimeout(() => toast.classList.add('visible'), 10);
@@ -800,17 +816,15 @@ toggleMenu(id) {
         }, 3000);
     },
 
-    // 10. Security & PIN Management
     renderSecuritySettings(container) {
         container.innerHTML = `
-    < div class="admin-card animate-fade-in" style = "max-width: 600px; margin: 0 auto;" >
+            <div class="admin-card animate-fade-in" style="max-width: 600px; margin: 0 auto;">
                 <div class="card-header-flex">
                     <div>
                         <h2><i class="ph ph-shield-check"></i> Security Settings</h2>
                         <p>Protect your dashboard by managing your access PIN.</p>
                     </div>
                 </div>
-
                 <div class="security-form-container glass-mhm" style="padding: 30px; border-radius: 20px;">
                     <form id="change-pin-form">
                         <div class="form-group">
@@ -827,7 +841,6 @@ toggleMenu(id) {
                             <label>Confirm New PIN</label>
                             <input type="password" name="confirmPin" maxlength="4" placeholder="••••" required>
                         </div>
-                        
                         <div class="form-actions" style="margin-top: 30px;">
                             <button type="submit" class="btn btn-primary" style="width: 100%;">
                                 <i class="ph ph-check"></i> Update Access PIN
@@ -835,95 +848,81 @@ toggleMenu(id) {
                         </div>
                     </form>
                 </div>
-
-                <div class="security-info" style="margin-top: 30px; padding: 20px; background: rgba(0,243,255,0.05); border-radius: 12px; border: 1px dashed rgba(0,243,255,0.2);">
-                    <p style="font-size: 0.85rem; color: #888; margin: 0;">
-                        <i class="ph ph-info" style="color: var(--primary-color);"></i>
-                        <b>Security Tip:</b> Avoid using simple patterns like "1234" or "0000". Your PIN is stored as a secure SHA-256 hash locally.
-                    </p>
-                </div>
-            </div >
-    `;
-
+            </div>
+        `;
         const form = document.getElementById('change-pin-form');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const data = Object.fromEntries(new FormData(e.target).entries());
-
-            if (data.newPin.length !== 4) {
-                this.showToast('❌ PIN must be exactly 4 digits.', 'danger');
-                return;
-            }
-
-            if (data.newPin !== data.confirmPin) {
-                this.showToast('❌ New PINs do not match.', 'danger');
-                return;
-            }
-
-            const btn = e.target.querySelector('button[type="submit"]');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Updating...';
-            btn.disabled = true;
-
-            try {
-                await LocalAuth.changePin(data.currentPin, data.newPin);
-                this.showToast('✅ Security PIN updated successfully! 🚀');
-                e.target.reset();
-            } catch (err) {
-                this.showToast(`❌ ${ err.message } `, 'danger');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        };
+        if (form) {
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const data = Object.fromEntries(new FormData(e.target).entries());
+                if (data.newPin.length !== 4) {
+                    this.showToast('❌ PIN must be exactly 4 digits.', 'danger');
+                    return;
+                }
+                if (data.newPin !== data.confirmPin) {
+                    this.showToast('❌ New PINs do not match.', 'danger');
+                    return;
+                }
+                const btn = e.target.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Updating...';
+                btn.disabled = true;
+                try {
+                    await LocalAuth.changePin(data.currentPin, data.newPin);
+                    this.showToast('✅ Security PIN updated successfully!');
+                    e.target.reset();
+                } catch (err) {
+                    this.showToast(`❌ ${err.message}`, 'danger');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            };
+        }
     },
 
     applyStyles() {
+        if (document.getElementById('admin-logic-styles')) return;
         const style = document.createElement('style');
+        style.id = 'admin-logic-styles';
         style.innerHTML = `
             :root {
-    --sidebar - width: 280px;
-    --sidebar - bg: #0a0a0a;
-    --main - bg: #050505;
-    --card - bg: rgba(255, 255, 255, 0.03);
-    --glass - border: rgba(255, 255, 255, 0.1);
-}
-
-            .admin - wrapper { display: flex; min - height: 100vh; background: var(--main - bg); color: #fff; font - family: 'Outfit', sans - serif; }
-            .admin - sidebar { width: var(--sidebar - width); background: var(--sidebar - bg); border - right: 1px solid var(--glass - border); display: flex; flex - direction: column; transition: 0.3s; z - index: 100; }
-            .sidebar - header { padding: 40px; text - align: center; font - size: 1.5rem; font - weight: 800; }
-            .sidebar - nav { flex: 1; padding: 0 20px; }
-            .sidebar - nav ul { list - style: none; padding: 0; }
-            .nav - link { display: flex; align - items: center; gap: 12px; padding: 12px 20px; color: #888; text - decoration: none; border - radius: 12px; margin - bottom: 5px; cursor: pointer; transition: 0.3s; }
-            .nav - link: hover, .nav - link.active { background: rgba(var(--primary - color), 0.1); color: var(--primary - color); }
-            .nav - divider { padding: 25px 20px 10px; font - size: 0.7rem; color: #444; letter - spacing: 1px; font - weight: 800; }
-            
-            .admin - main { flex: 1; display: flex; flex - direction: column; }
-            .admin - header { height: 80px; border - bottom: 1px solid var(--glass - border); display: flex; align - items: center; justify - content: space - between; padding: 0 40px; }
-            .admin - content { padding: 40px; flex: 1; overflow - y: auto; }
-
-            .dashboard - stats - grid { display: grid; grid - template - columns: repeat(auto - fit, minmax(260px, 1fr)); gap: 30px; margin - bottom: 40px; }
-            .stat - card { background: var(--card - bg); border: 1px solid var(--glass - border); padding: 30px; border - radius: 25px; display: flex; align - items: center; gap: 20px; }
-            .stat - icon { font - size: 2rem; color: var(--primary - color); }
-            .stat - value { font - size: 2.2rem; font - weight: 700; }
-            
-            .admin - card { background: var(--card - bg); border: 1px solid var(--glass - border); padding: 35px; border - radius: 30px; margin - bottom: 30px; }
-            .services - admin - grid { display: grid; grid - template - columns: repeat(auto - fill, minmax(280px, 1fr)); gap: 25px; margin - top: 30px; }
-            .service - admin - card { padding: 25px; border - radius: 20px; text - align: center; border: 1px solid var(--glass - border); background: rgba(255, 255, 255, 0.02); }
-            .card - icon { font - size: 2.5rem; color: var(--primary - color); margin - bottom: 20px; display: block; }
-            
-            .btn { padding: 12px 25px; border - radius: 12px; cursor: pointer; font - weight: 600; border: none; transition: 0.3s; }
-            .btn - primary { background: var(--primary - color); color: #000; }
-            .btn - primary:hover { transform: translateY(-2px); box - shadow: 0 5px 15px rgba(0, 243, 255, 0.4); }
-
-#admin - toast - container { position: fixed; bottom: 30px; right: 30px; }
-            .admin - toast { background: #2ed573; padding: 15px 30px; border - radius: 15px; transform: translateX(120 %); transition: 0.4s; font - weight: 700; color: #000; }
-            .admin - toast.visible { transform: translateX(0); }
-            
-            .form - group { margin - bottom: 20px; }
-            .form - group label { display: block; margin - bottom: 10px; color: #888; }
-            .form - group input, .form - group textarea { width: 100 %; padding: 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass - border); border - radius: 12px; color: #fff; }
-`;
+                --sidebar-width: 280px;
+                --sidebar-bg: #0a0a0a;
+                --main-bg: #050505;
+                --card-bg: rgba(255, 255, 255, 0.03);
+                --glass-border: rgba(255, 255, 255, 0.1);
+            }
+            .admin-wrapper { display: flex; min-height: 100vh; background: var(--main-bg); color: #fff; font-family: 'Outfit', sans-serif; }
+            .admin-sidebar { width: var(--sidebar-width); background: var(--sidebar-bg); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; transition: 0.3s; z-index: 100; }
+            .sidebar-header { padding: 40px; text-align: center; font-size: 1.5rem; font-weight: 800; }
+            .sidebar-nav { flex: 1; padding: 0 20px; }
+            .sidebar-nav ul { list-style: none; padding: 0; }
+            .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #888; text-decoration: none; border-radius: 12px; margin-bottom: 5px; cursor: pointer; transition: 0.3s; }
+            .nav-link:hover, .nav-link.active { background: rgba(var(--primary-color), 0.1); color: var(--primary-color); }
+            .nav-divider { padding: 25px 20px 10px; font-size: 0.7rem; color: #444; letter-spacing: 1px; font-weight: 800; }
+            .admin-main { flex: 1; display: flex; flex-direction: column; }
+            .admin-header { height: 80px; border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
+            .admin-content { padding: 40px; flex: 1; overflow-y: auto; }
+            .dashboard-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; margin-bottom: 40px; }
+            .stat-card { background: var(--card-bg); border: 1px solid var(--glass-border); padding: 30px; border-radius: 25px; display: flex; align-items: center; gap: 20px; }
+            .stat-icon { font-size: 2rem; color: var(--primary-color); }
+            .stat-value { font-size: 2.2rem; font-weight: 700; }
+            .admin-card { background: var(--card-bg); border: 1px solid var(--glass-border); padding: 35px; border-radius: 30px; margin-bottom: 30px; }
+            .services-admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
+            .service-admin-card { padding: 25px; border-radius: 20px; text-align: center; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.02); }
+            .card-icon { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 20px; display: block; }
+            .btn { padding: 12px 25px; border-radius: 12px; cursor: pointer; font-weight: 600; border: none; transition: 0.3s; }
+            .btn-primary { background: var(--primary-color); color: #000; }
+            .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4); }
+            #admin-toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 1000; }
+            .admin-toast { background: #2ed573; padding: 15px 30px; border-radius: 15px; transform: translateX(120%); transition: 0.4s; font-weight: 700; color: #000; margin-top: 10px; }
+            .admin-toast.visible { transform: translateX(0); }
+            .form-group { margin-bottom: 20px; }
+            .form-group label { display: block; margin-bottom: 10px; color: #888; }
+            .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; }
+            .hidden { display: none; }
+        `;
         document.head.appendChild(style);
     }
 };

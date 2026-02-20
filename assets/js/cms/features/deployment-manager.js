@@ -155,7 +155,7 @@ window.DeploymentManager = (function () {
         try {
             if (window.Toast) Toast.info(`Starting sync for ${repo.name}...`);
 
-            const response = await fetch('/git-sync', {
+            const response = await fetch('/api/git_sync.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -253,7 +253,7 @@ window.DeploymentManager = (function () {
      */
     async function checkConnectionStatus() {
         try {
-            const res = await fetch('/health');
+            const res = await fetch('/api/health.php');
             if (res.ok) {
                 const statusBadge = document.getElementById('git-status-badge');
                 if (statusBadge) {

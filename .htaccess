@@ -1,0 +1,25 @@
+# cPanel / Apache Configuration
+RewriteEngine On
+
+# Allow clean URLs for API if desired (e.g. /api/results -> api/results.php)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^api/([^/.]+)/?$ api/$1.php [L]
+
+# Prevent directory listing
+Options -Indexes
+
+# Security: Deny access to .env and db_config directly
+<Files .env>
+    Order allow,deny
+    Deny from all
+</Files>
+<Files api/db_config.php>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# CORS (if needed)
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+</IfModule>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ==========================================
  * PRO EXAM APP - SECURE PORTAL CONTROLLER
  * ==========================================
@@ -6,16 +6,8 @@
  * and Security Logic.
  */
 
-const I18N = {
-    en: { name: "Name", roll: "Register No", sub: "Subject", max: "Max", obt: "Obtained", stat: "Status", tot: "Total", perc: "Percentage", grd: "Grade", res: "Result", sign: "Principal Signature" },
-    mal: { name: "പേര്", roll: "രജിസ്റ്റർ നമ്പർ", sub: "വിഷയം", max: "പരമാവധി", obt: "ലഭിച്ചത്", stat: "നില", tot: "ആകെ", perc: "ശതമാനം", grd: "ഗ്രേഡ്", res: "ഫലം", sign: "പ്രിൻസിപ്പൽ" },
-    ar: { name: "الاسم", roll: "رقم التسجيل", sub: "المادة", max: "الحد الأقصى", obt: "المحصلة", stat: "الحالة", tot: "المجموع", perc: "النسبة", grd: "الدرجة", res: "النتيجة", sign: "توقيع المدير" },
-    ta: { name: "பெயர்", roll: "பதிவு எண்", sub: "பாடம்", max: "அதிகபட்சம்", obt: "பெற்றது", stat: "நிலை", tot: "மொத்தம்", perc: "சதவீதம்", grd: "தரம்", res: "முடிவு", sign: "முதல்வர் கையொப்பம்" },
-    kn: { name: "ಹೆಸರು", roll: "ನೋಂದಣಿ ಸಂಖ್ಯೆ", sub: "ವಿಷಯ", max: "ಗರಿಷ್ಠ", obt: "ಗಳಿಸಿದ", stat: "ಸ್ಥಿತಿ", tot: "ಒಟ್ಟು", perc: "ಶೇಕಡಾವಾರು", grd: "ಶ್ರೇಣಿ", res: "ಫಲಿತಾಂಶ", sign: "ಪ್ರಾಂಶುಪಾಲರ ಸಹಿ" },
-    te: { name: "పేరు", roll: "రిజిస్టర్ నంబర్", sub: "విషయం", max: "గరిష్ట", obt: "పొందిన", stat: "స్థితి", tot: "మొత్తం", perc: "శాతం", grd: "గ్రేడ్", res: "ఫలితం", sign: "ప్రిన్సిపాల్ సంతకం" },
-    ur: { name: "نام", roll: "رجسٹریشن نمبر", sub: "مضمون", max: "زیادہ سے زیادہ", obt: "حاصل کردہ", stat: "حیثیت", tot: "کل", perc: "فیصد", grd: "گریڈ", res: "نتیجہ", sign: "پرنسپل کے دستخط" },
-    hi: { name: "नाम", roll: "पंजीकरण संख्या", sub: "विषय", max: "अधिकतम", obt: "प्राप्त", stat: "स्थिति", tot: "कुल", perc: "प्रतिशत", grd: "श्रेणी", res: "परिणाम", sign: "प्रधानाचार्य" }
-};
+const I18N = window.ExamPortalDict || {};
+const Utils = window.ExamPortalUtils || {};
 
 const proExamApp = {
     state: {
@@ -108,7 +100,7 @@ const proExamApp = {
 
     async fetchPublishedData() {
         try {
-            const response = await fetch('../../data/published-results.json');
+            const response = await fetch('/api/results.php');
             if (!response.ok) throw new Error("No data found");
             const json = await response.json();
 
@@ -142,14 +134,11 @@ const proExamApp = {
             if (score > maxScore) maxScore = score;
             totalScoreSum += score;
 
-            let isPass = true;
-            Object.values(s.subjects || {}).forEach(v => {
-                if (Number(v) < pVal) isPass = false;
-            });
-            if (isPass) passed++;
+            const status = Utils.calculateStatus(s.subjects || {}, pVal);
+            if (status === 'Pass') passed++;
         });
 
-        const passPerc = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
+        const passPerc = Utils.calculatePercentage(passed, total);
         document.getElementById('d-pass').textContent = passPerc + "%";
         document.getElementById('a-topt').textContent = maxScore;
         document.getElementById('a-avg').textContent = total > 0 ? (totalScoreSum / total).toFixed(0) : 0;
@@ -292,19 +281,10 @@ const proExamApp = {
 
         // 4. Summary
         document.getElementById('c-total').textContent = `${totObt} / ${totMax}`;
-        const perc = totMax > 0 ? (totObt / totMax * 100).toFixed(2) : 0;
+        const perc = Utils.calculatePercentage(totObt, totMax);
         document.getElementById('c-perc').textContent = perc + "%";
 
-        let grade = "F";
-        if (allPass) {
-            if (perc >= 90) grade = "A+";
-            else if (perc >= 80) grade = "A";
-            else if (perc >= 70) grade = "B+";
-            else if (perc >= 60) grade = "B";
-            else if (perc >= 50) grade = "C+";
-            else if (perc >= 40) grade = "C";
-            else grade = "D";
-        }
+        const grade = Utils.calculateGrade(perc, allPass);
         document.getElementById('c-grade').textContent = allPass ? grade : "N/A";
 
         const resEl = document.getElementById('c-result');
@@ -312,11 +292,7 @@ const proExamApp = {
         resEl.style.color = allPass ? "var(--success)" : "var(--danger)";
 
         // 5. Generate QR
-        document.getElementById('qrcode').innerHTML = "";
-        new QRCode(document.getElementById('qrcode'), {
-            text: `${s.name}|${s.roll}|${allPass ? 'PASS' : 'FAIL'}|${perc}%`,
-            width: 80, height: 80
-        });
+        Utils.generateQR('qrcode', `${s.name}|${s.roll || s.registerNumber}|${allPass ? 'PASS' : 'FAIL'}|${perc}%`);
 
         // 6. Show Overlay
         document.getElementById('certificate-area').classList.add('visible');
@@ -327,14 +303,7 @@ const proExamApp = {
     },
 
     downloadPDF() {
-        const element = document.getElementById('printable-cert');
-        html2pdf().set({
-            margin: 0,
-            filename: `Result_${new Date().getTime()}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).from(element).save();
+        Utils.downloadPDF('printable-cert', `Result_${new Date().getTime()}.pdf`);
     },
 
     async init() {
