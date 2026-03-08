@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "dbAdapter": "local-json",
+    "apiReady": true,
+    "futureDatabase": "mongodb"
+  },
+  "madrasas": [
+    {
+      "id": "MDR-01",
+      "name": "Darul Huda Central Madrasa",
+      "location": "Kozhikode",
+      "principal": "Usthad Niyas Rahmani",
+      "founded": 1998,
+      "latestExam": "Mid-Term 2026",
+      "passPercentage": 94,
+      "students": [
+        {"id":"S001","name":"Amina Rashid","class":"Class 5","gender":"Girl","marks":{"Quran":89,"Arabic":92,"Fiqh":85,"English":88}},
+        {"id":"S002","name":"Muhammad Shaheer","class":"Class 6","gender":"Boy","marks":{"Quran":76,"Arabic":80,"Fiqh":74,"English":82}},
+        {"id":"S003","name":"Safwan Ali","class":"Class 5","gender":"Boy","marks":{"Quran":68,"Arabic":72,"Fiqh":70,"English":66}},
+        {"id":"S004","name":"Fathima Zahra","class":"Class 7","gender":"Girl","marks":{"Quran":93,"Arabic":90,"Fiqh":92,"English":91}},
+        {"id":"S005","name":"Maryam Habeeb","class":"Class 8","gender":"Girl","marks":{"Quran":84,"Arabic":86,"Fiqh":88,"English":82}},
+        {"id":"S006","name":"Irfan Nizar","class":"Class 7","gender":"Boy","marks":{"Quran":79,"Arabic":75,"Fiqh":73,"English":78}}
+      ],
+      "announcements": [
+        {"id":"A01","title":"Parent Meeting","message":"Monthly parent-teacher meeting on Friday at 4 PM.","date":"2026-02-10","urgent":false},
+        {"id":"A02","title":"Exam Circular","message":"Mid-term exams start from 25 Feb.","date":"2026-02-14","urgent":true}
+      ]
+    },
+    {
+      "id": "MDR-02",
+      "name": "Noorul Islam Madrasa",
+      "location": "Malappuram",
+      "principal": "Usthad Junaid Basri",
+      "founded": 2002,
+      "latestExam": "Quarterly Assessment",
+      "passPercentage": 89,
+      "students": [
+        {"id":"S101","name":"Ridwaan K","class":"Class 4","gender":"Boy","marks":{"Quran":82,"Arabic":79,"Fiqh":77,"English":75}},
+        {"id":"S102","name":"Ayesha N M","class":"Class 4","gender":"Girl","marks":{"Quran":91,"Arabic":89,"Fiqh":90,"English":88}},
+        {"id":"S103","name":"Hiba Ashraf","class":"Class 5","gender":"Girl","marks":{"Quran":86,"Arabic":88,"Fiqh":84,"English":87}}
+      ],
+      "announcements": [
+        {"id":"A11","title":"Library Week","message":"Islamic library exhibition starts Monday.","date":"2026-02-13","urgent":false}
+      ]
+    },
+    {
+      "id": "MDR-03",
+      "name": "Al Falah Girls Madrasa",
+      "location": "Kannur",
+      "principal": "Usthada Sameera Jalal",
+      "founded": 2010,
+      "latestExam": "Final Mock Test",
+      "passPercentage": 97,
+      "students": [
+        {"id":"S201","name":"Nadiya P","class":"Class 8","gender":"Girl","marks":{"Quran":95,"Arabic":93,"Fiqh":94,"English":90}},
+        {"id":"S202","name":"Shahana V","class":"Class 7","gender":"Girl","marks":{"Quran":88,"Arabic":84,"Fiqh":86,"English":85}}
+      ],
+      "announcements": [
+        {"id":"A21","title":"Hifz Camp","message":"Weekend hifz intensive camp registration open.","date":"2026-02-12","urgent":true}
+      ]
+    },
+    {
+      "id": "MDR-04",
+      "name": "Badrul Uloom Madrasa",
+      "location": "Thrissur",
+      "principal": "Usthad Haris K",
+      "founded": 1995,
+      "latestExam": "Semester 1 Exam",
+      "passPercentage": 84,
+      "students": [],
+      "announcements": []
+    },
+    {
+      "id": "MDR-05",
+      "name": "Hidayathul Islam Madrasa",
+      "location": "Palakkad",
+      "principal": "Usthad Thaha M",
+      "founded": 2001,
+      "latestExam": "Bridge Evaluation",
+      "passPercentage": 91,
+      "students": [],
+      "announcements": []
+    },
+    {
+      "id": "MDR-06",
+      "name": "Sirajul Huda Madrasa",
+      "location": "Wayanad",
+      "principal": "Usthad Raheem P",
+      "founded": 2007,
+      "latestExam": "Unit Test - 2",
+      "passPercentage": 88,
+      "students": [],
+      "announcements": []
+    },
+    {
+      "id": "MDR-07",
+      "name": "Rahmaniya Madrasa",
+      "location": "Kasaragod",
+      "principal": "Usthad Aslam N",
+      "founded": 2005,
+      "latestExam": "Mid-Year Review",
+      "passPercentage": 86,
+      "students": [],
+      "announcements": []
+    },
+    {
+      "id": "MDR-08",
+      "name": "Furqan Academy Madrasa",
+      "location": "Alappuzha",
+      "principal": "Usthad Muneer T",
+      "founded": 2012,
+      "latestExam": "Annual Assessment",
+      "passPercentage": 92,
+      "students": [],
+      "announcements": []
+    },
+    {
+      "id": "MDR-09",
+      "name": "Mifthahul Uloom Madrasa",
+      "location": "Pathanamthitta",
+      "principal": "Usthad Naufal I",
+      "founded": 1999,
+      "latestExam": "Practice Exam",
+      "passPercentage": 90,
+      "students": [],
+      "announcements": []
+    },
+    {
+      "id": "MDR-10",
+      "name": "Darussalam Madrasa",
+      "location": "Ernakulam",
+      "principal": "Usthad Favas K",
+      "founded": 2008,
+      "latestExam": "Internal Oral Test",
+      "passPercentage": 87,
+      "students": [],
+      "announcements": []
+    },
+    {
+      "id": "MDR-11",
+      "name": "Thajul Ulama Madrasa",
+      "location": "Idukki",
+      "principal": "Usthad Riyas M",
+      "founded": 1997,
+      "latestExam": "Monthly Review",
+      "passPercentage": 83,
+      "students": [],
+      "announcements": []
+    },
+    {
+      "id": "MDR-12",
+      "name": "Nibrasul Huda Madrasa",
+      "location": "Kollam",
+      "principal": "Usthad Habeeb R",
+      "founded": 2014,
+      "latestExam": "Half-Yearly Exam",
+      "passPercentage": 95,
+      "students": [],
+      "announcements": []
+    },
+    {
+      "id": "MDR-13",
+      "name": "Riyadus Salihin Madrasa",
+      "location": "Thiruvananthapuram",
+      "principal": "Usthad Shabeer A",
+      "founded": 2016,
+      "latestExam": "Talent Evaluation",
+      "passPercentage": 93,
+      "students": [],
+      "announcements": []
+    }
+  ]
+}
