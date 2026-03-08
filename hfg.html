@@ -43,6 +43,16 @@
 
     <section id="overview" class="tab-panel active">
       <div id="dashboardCards" class="card-grid"></div>
+      <div class="chart-grid">
+        <article class="section-card glass">
+          <h3>Student Distribution</h3>
+          <canvas id="distributionChart" aria-label="Student distribution chart"></canvas>
+        </article>
+        <article class="section-card glass">
+          <h3>Pass Percentage Trend</h3>
+          <canvas id="passChart" aria-label="Pass percentage chart"></canvas>
+        </article>
+      </div>
     </section>
 
     <section id="students" class="tab-panel">
@@ -112,11 +122,15 @@
     <section id="adminPanel" class="admin-panel glass hidden">
       <h2>Admin Panel</h2>
       <form id="adminLoginForm" class="admin-login-form">
+        <select id="roleSelect" required>
+          <option value="Admin">Admin</option>
+          <option value="Viewer">Viewer</option>
+        </select>
         <input type="text" id="adminUser" placeholder="Username" required>
         <input type="password" id="adminPass" placeholder="Password" required>
         <button class="btn btn-primary" type="submit">Login</button>
       </form>
-      <div id="adminState" class="admin-state">Use <strong>admin / madrasa123</strong> to unlock management controls.</div>
+      <div id="adminState" class="admin-state">Use <strong>admin / madrasa123</strong> for Admin or <strong>viewer / viewer123</strong> for Viewer mode.</div>
       <div class="toolbar">
         <label for="jsonUpload" class="btn btn-outline">Upload Data via JSON</label>
         <input id="jsonUpload" type="file" accept="application/json">
@@ -128,6 +142,7 @@
     <p>© 2026 Madrasa Management System • API-ready architecture • Local JSON storage enabled</p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="assets/hfg/js/app.js"></script>
 </body>
 </html>

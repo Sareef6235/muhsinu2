@@ -13,12 +13,13 @@ import { uid } from "./modules/utils.js";
 const state = {
   data: null,
   madrasaIndex: 0,
-  isAdmin: false,
+  role: "Guest",
   page: 1,
   pageSize: 5,
   query: "",
   class: "All Classes",
-  gender: "All"
+  gender: "All",
+  charts: { distribution: null, pass: null }
 };
 
 const $ = (id) => document.getElementById(id);
@@ -39,8 +40,11 @@ const elements = {
   adminToggle: $("adminToggle"),
   adminLoginForm: $("adminLoginForm"),
   adminState: $("adminState"),
-  themeToggle: $("themeToggle")
+  themeToggle: $("themeToggle"),
+  roleSelect: $("roleSelect")
 };
+
+const canManage = () => state.role === "Admin";
 
 function currentMadrasa() {
   return state.data.madrasas[state.madrasaIndex];
@@ -65,20 +69,86 @@ function renderStudents() {
   const all = filteredStudents();
   const start = (state.page - 1) * state.pageSize;
   const paged = all.slice(start, start + state.pageSize);
-  renderStudentsTable(elements.studentsTableBody, paged, state.isAdmin);
+  renderStudentsTable(elements.studentsTableBody, paged, canManage());
   renderPagination(elements.studentsPagination, state.page, Math.ceil(all.length / state.pageSize));
+}
+
+function animateCounters() {
+  const map = {
+    students: currentMadrasa().students.length,
+    boys: currentMadrasa().students.filter((s) => s.gender === "Boy").length,
+    girls: currentMadrasa().students.filter((s) => s.gender === "Girl").length,
+    pass: currentMadrasa().passPercentage
+  };
+  document.querySelectorAll("[data-counter]").forEach((node) => {
+    const key = node.dataset.counter;
+    const target = map[key] ?? 0;
+    const suffix = key === "pass" ? "%" : "";
+    let value = 0;
+    const step = Math.max(1, Math.ceil(target / 24));
+    const tick = () => {
+      value = Math.min(target, value + step);
+      node.textContent = `${value}${suffix}`;
+      if (value < target) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+function renderCharts() {
+  const madrasa = currentMadrasa();
+  const boys = madrasa.students.filter((s) => s.gender === "Boy").length;
+  const girls = madrasa.students.filter((s) => s.gender === "Girl").length;
+  const canvasA = $("distributionChart");
+  const canvasB = $("passChart");
+
+  if (state.charts.distribution) state.charts.distribution.destroy();
+  if (state.charts.pass) state.charts.pass.destroy();
+
+  state.charts.distribution = new Chart(canvasA, {
+    type: "doughnut",
+    data: {
+      labels: ["Boys", "Girls"],
+      datasets: [{ data: [boys, girls], backgroundColor: ["#5f7cff", "#ff7ab6"] }]
+    },
+    options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+  });
+
+  const passSeries = state.data.madrasas.map((m) => m.passPercentage);
+  const labels = state.data.madrasas.map((m) => m.id);
+  state.charts.pass = new Chart(canvasB, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        label: "Pass %",
+        data: passSeries,
+        borderColor: "#4f6dff",
+        backgroundColor: "rgba(79,109,255,0.2)",
+        tension: 0.35,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { min: 0, max: 100 } },
+      plugins: { legend: { display: false } }
+    }
+  });
 }
 
 function renderEverything() {
   const madrasa = currentMadrasa();
-  renderProfile(elements.profileInfo, madrasa);
+  renderProfile(elements.profileInfo, madrasa, state.role);
   renderOverview(elements.dashboardCards, madrasa);
   renderResults(elements.resultsSummary, madrasa);
   renderMarkbook(elements.markbookArea, madrasa);
   renderAnnouncements(elements.announcementList, madrasa);
   refreshClassFilter();
   renderStudents();
-  document.querySelectorAll(".admin-only").forEach((el) => el.classList.toggle("hidden", !state.isAdmin));
+  animateCounters();
+  renderCharts();
+  document.querySelectorAll(".admin-only").forEach((el) => el.classList.toggle("hidden", !canManage()));
 }
 
 function populateDropdown() {
@@ -120,7 +190,7 @@ function bindEvents() {
   });
 
   elements.studentsTableBody.addEventListener("click", (e) => {
-    if (!state.isAdmin) return;
+    if (!canManage()) return;
     const { action, id } = e.target.dataset;
     if (!action || !id) return;
     if (action === "delete") {
@@ -136,7 +206,7 @@ function bindEvents() {
   });
 
   $("addStudentBtn").addEventListener("click", () => {
-    if (!state.isAdmin) return;
+    if (!canManage()) return;
     const name = prompt("Student name");
     const cls = prompt("Class (e.g., Class 6)");
     const gender = prompt("Gender (Boy/Girl)", "Boy");
@@ -150,7 +220,7 @@ function bindEvents() {
   });
 
   $("addResultBtn").addEventListener("click", () => {
-    if (!state.isAdmin) return;
+    if (!canManage()) return;
     const studentId = prompt("Student ID to add/update marks");
     const student = currentMadrasa().students.find((s) => s.id === studentId);
     if (!student) return alert("Student not found");
@@ -163,7 +233,7 @@ function bindEvents() {
   });
 
   $("addAnnouncementBtn").addEventListener("click", () => {
-    if (!state.isAdmin) return;
+    if (!canManage()) return;
     const title = prompt("Announcement title");
     const message = prompt("Announcement message");
     const urgent = confirm("Mark as urgent?");
@@ -181,15 +251,25 @@ function bindEvents() {
 
   elements.adminLoginForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    const valid = $("adminUser").value === "admin" && $("adminPass").value === "madrasa123";
-    state.isAdmin = valid;
-    elements.adminState.textContent = valid ? "Admin access granted. CRUD controls unlocked." : "Invalid credentials.";
+    const role = elements.roleSelect.value;
+    const user = $("adminUser").value.trim();
+    const pass = $("adminPass").value;
+    const validAdmin = role === "Admin" && user === "admin" && pass === "madrasa123";
+    const validViewer = role === "Viewer" && user === "viewer" && pass === "viewer123";
+
+    if (validAdmin || validViewer) {
+      state.role = role;
+      elements.adminState.textContent = `${role} access granted.`;
+    } else {
+      state.role = "Guest";
+      elements.adminState.textContent = "Invalid credentials.";
+    }
     renderEverything();
   });
 
   $("jsonUpload").addEventListener("change", async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file || !canManage()) return;
     try {
       const data = await importFromJSON(file);
       if (!data.madrasas || data.madrasas.length !== 13) throw new Error("Upload must contain exactly 13 madrasas.");
@@ -216,6 +296,7 @@ function bindEvents() {
   elements.themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
     elements.themeToggle.textContent = document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+    renderCharts();
   });
 }
 

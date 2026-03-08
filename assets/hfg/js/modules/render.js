@@ -1,23 +1,23 @@
 import { formatDate, gradeFromAverage } from "./utils.js";
 
-export function renderProfile(el, madrasa) {
-  el.innerHTML = `${madrasa.id} • ${madrasa.location} • Principal: ${madrasa.principal} • Founded: ${madrasa.founded}`;
+export function renderProfile(el, madrasa, role = "Guest") {
+  el.innerHTML = `${madrasa.id} • ${madrasa.location} • Principal: ${madrasa.principal} • Founded: ${madrasa.founded} • Role: ${role}`;
 }
 
 export function renderOverview(el, madrasa) {
   const boys = madrasa.students.filter((s) => s.gender === "Boy").length;
   const girls = madrasa.students.filter((s) => s.gender === "Girl").length;
   const cards = [
-    ["Total Students", madrasa.students.length],
-    ["Total Boys", boys],
-    ["Total Girls", girls],
-    ["Latest Exam Conducted", madrasa.latestExam],
-    ["Pass Percentage", `${madrasa.passPercentage}%`]
+    ["Total Students", madrasa.students.length, "students"],
+    ["Total Boys", boys, "boys"],
+    ["Total Girls", girls, "girls"],
+    ["Latest Exam Conducted", madrasa.latestExam, null],
+    ["Pass Percentage", `${madrasa.passPercentage}%`, "pass"]
   ];
-  el.innerHTML = cards.map(([label, value]) => `
+  el.innerHTML = cards.map(([label, value, counter]) => `
     <article class="dashboard-card">
       <h3>${label}</h3>
-      <strong>${value}</strong>
+      <strong ${counter ? `data-counter="${counter}"` : ""}>${value}</strong>
     </article>
   `).join("");
 }
@@ -56,14 +56,14 @@ export function renderAnnouncements(el, madrasa) {
   `).join("") || "<p>No announcements yet.</p>";
 }
 
-export function renderStudentsTable(el, students, isAdmin) {
+export function renderStudentsTable(el, students, canManage) {
   el.innerHTML = students.map((s) => `
     <tr>
       <td>${s.id}</td>
       <td>${s.name}</td>
       <td>${s.class}</td>
       <td>${s.gender}</td>
-      <td class="admin-only ${isAdmin ? "" : "hidden"}">
+      <td class="admin-only ${canManage ? "" : "hidden"}">
         <button data-action="edit" data-id="${s.id}" class="btn small btn-outline">Edit</button>
         <button data-action="delete" data-id="${s.id}" class="btn small btn-outline">Delete</button>
       </td>
